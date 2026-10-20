@@ -9,6 +9,17 @@ test('all 33 stations and 15 controlled stations have source assets',()=>{
  assert.equal(N.stations.filter(s=>s.controlled).length,15);
  for(const station of N.stations)assert(fs.existsSync(path.join(__dirname,station.image)),station.name);
 });
+test('new PDF coordinate maps cover every station signal within its focus region',()=>{
+ for(const station of N.stations.filter(s=>s.controlled)){
+  assert(station.image.startsWith('assets/line-map/'));assert([2,3,4].includes(station.map.page));
+  const [x,y,w,h]=station.map.focus;
+  for(const id of Object.keys(C.forStation(station.id).signals)){
+   const point=station.map.signals[id];assert(point,station.name+' '+id);
+   assert(point.x>=x&&point.x<=x+w&&point.y>=y&&point.y<=y+h,station.name+' '+id);
+  }
+  assert.equal(station.map.modes.length,3);
+ }
+});
 test('every catalogued route sets, blocks point movement, cancels and releases',()=>{
  for(const station of N.stations.filter(s=>s.controlled)){
   const core=C.forStation(station.id);

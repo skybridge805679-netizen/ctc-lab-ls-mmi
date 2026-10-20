@@ -1,0 +1,43 @@
+{
+  "source": "references/diagrams/1.전체노선.pdf",
+  "source_sha256": "9a8636fa396b7362e0c01a7b76c192eaf6d2226471a425d7367e3579ec5c079e",
+  "extraction": "pdfimages -j; embedded JPEG streams preserved without image recompression",
+  "coordinate_space": {
+    "width": 2048,
+    "height": 768
+  },
+  "images": [
+    {
+      "page": 1,
+      "path": "page-1.jpg",
+      "native_width": 5760,
+      "native_height": 2160,
+      "bytes": 1819091,
+      "sha256": "f6667766359453ae788476c4246697534f76022d92d157755dd43e8778be9375"
+    },
+    {
+      "page": 2,
+      "path": "page-2.jpg",
+      "native_width": 5760,
+      "native_height": 2160,
+      "bytes": 1220401,
+      "sha256": "ba9b267b6cbd399f148419a6d4042f69c98838c26f688b0c91d260616e4a5524"
+    },
+    {
+      "page": 3,
+      "path": "page-3.jpg",
+      "native_width": 5760,
+      "native_height": 2160,
+      "bytes": 1344618,
+      "sha256": "323779b8ec021386632b5d0c07d81ed416a6365b26498cb642c4c04c91e9b09a"
+    },
+    {
+      "page": 4,
+      "path": "page-4.jpg",
+      "native_width": 5760,
+      "native_height": 2160,
+      "bytes": 865686,
+      "sha256": "88a369eeb44ec5bbd8414e2a57d836328512e01b9667dc4fce361cc2c63e973b"
+    }
+  ]
+}

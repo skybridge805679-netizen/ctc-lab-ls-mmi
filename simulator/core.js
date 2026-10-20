@@ -2,7 +2,7 @@
  'use strict';
  function create(config=null){
  // A visible route path is evidence about geometry, not an interlocking table.
- const sources=config?.sources||{wiring:'배선도(관제교육장).pptx · 슬라이드 5',mmi:'CTC 운영 매뉴얼 · 인쇄 p.6 · PDF 6쪽',down:'실무5 · 본문 p.362 · PDF 370쪽',up:'실무5 · 본문 p.374 · PDF 382쪽'};
+ const sources=config?.sources||{wiring:'1.전체노선.pdf · PDF 2쪽',mmi:'CTC 운영 매뉴얼 · 인쇄 p.6 · PDF 6쪽',down:'실무5 · 본문 p.362 · PDF 370쪽',up:'실무5 · 본문 p.374 · PDF 382쪽'};
  const routes=config?.routes||{
   '1A-1T':{signal:'1A',pathTracks:['XT','21AT','1T'],path:'M575 512H1233',source:[sources.wiring,sources.down],evidence:'배선도·교재 경로 대조',switchConditions:null,releaseSeconds:null},
   '2A-2T':{signal:'2A',pathTracks:['YT','52T','2T'],path:'M1744 619H936',source:[sources.wiring,sources.up],evidence:'배선도·교재 경로 대조',switchConditions:null,releaseSeconds:null},

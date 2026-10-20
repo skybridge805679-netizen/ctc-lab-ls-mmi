@@ -158,12 +158,35 @@
       "original_name": "비상시조치(상황변경시대응).hwp",
       "bytes": 102912,
       "sha256": "8087894dc9ad8c0fca5409f9c3d164002d4c2915163b07049aa77d410a778928"
+    },
+    {
+      "path": "references/diagrams/1.전체노선.pdf",
+      "original_name": "1.전체노선.pdf",
+      "bytes": 5255784,
+      "sha256": "9a8636fa396b7362e0c01a7b76c192eaf6d2226471a425d7367e3579ec5c079e"
     }
   ],
-  "pending_attachments": [
-    "1.전체노선.png",
-    "2.청량리-영등포.png",
-    "3.구로-수원.png",
-    "4.노량진-금천구청.png"
+  "pending_attachments": [],
+  "superseded_attachments": [
+    {
+      "name": "1.전체노선.png",
+      "replacement": "references/diagrams/1.전체노선.pdf",
+      "page": 1
+    },
+    {
+      "name": "2.청량리-영등포.png",
+      "replacement": "references/diagrams/1.전체노선.pdf",
+      "page": 2
+    },
+    {
+      "name": "3.구로-수원.png",
+      "replacement": "references/diagrams/1.전체노선.pdf",
+      "page": 3
+    },
+    {
+      "name": "4.노량진-금천구청.png",
+      "replacement": "references/diagrams/1.전체노선.pdf",
+      "page": 4
+    }
   ]
 }
