@@ -1,0 +1,14 @@
+{
+  "version": "0.3",
+  "geometry": "배선도 슬라이드 5",
+  "routeMenu": "CTC 매뉴얼 인쇄 p.5–7",
+  "routeStopRelease": "CTC 매뉴얼 인쇄 p.5,7–8",
+  "photoVerifiedRoute": "3A-B065T: B065T–X1T–21BT 녹색, 3A 진행 표시",
+  "limits": [
+    "접근 열차 없는 기본 연습",
+    "상세 연동표 미재현",
+    "정·반위 선형 변화 미재현",
+    "열차 이동과 점유 미구현",
+    "다른 역 미구현"
+  ]
+}

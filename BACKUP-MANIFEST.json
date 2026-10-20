@@ -1,0 +1,111 @@
+{
+  "version": "0.3",
+  "backupDate": "2026-10-20",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 55,
+      "sha256": "3db7588d9185b521064b2d1b529e350b03077933c46f439c24a3482dc7a299af"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 771,
+      "sha256": "66a1155f812506582410048ccc279110f9edc2a2f37c0e2df29e532923e477e6"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2013,
+      "sha256": "f0ae49ec88f2e26712eb1f8eb98c6fa7c9533c82517406d1e4feefd6668573f3"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.1.zip",
+      "bytes": 19786,
+      "sha256": "f231e9321c61f7346b1e0091e92a826419bef2ad635719f3842eb87651a04a86"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.2.zip",
+      "bytes": 60467,
+      "sha256": "d41dafefd86e624f3250fd5f954ee51750401e4e6de603e1c1798b0e7c08a198"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.3.zip",
+      "bytes": 59222,
+      "sha256": "53201b52f258f30aa3c335ab67e230ac1afe6b2a0379fa5fca70e9e9388dd55a"
+    },
+    {
+      "path": "docs/preview-v0.3.png",
+      "bytes": 82098,
+      "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
+    },
+    {
+      "path": "docs/개발로드맵.md",
+      "bytes": 2873,
+      "sha256": "afea157431c50a7409746d78a3df6ef5505b96447e7f267af9a44ff2bc76cb5d"
+    },
+    {
+      "path": "docs/개발인수인계.md",
+      "bytes": 1988,
+      "sha256": "39ef8187765259fb9e85099bf95055381b7849d20319b532c2ce62968e32e891"
+    },
+    {
+      "path": "docs/구현현황.md",
+      "bytes": 2085,
+      "sha256": "cebe4affd50565280d84fa75629f2e33cd99c0b29ea1cb450185e870764553e7"
+    },
+    {
+      "path": "docs/자료근거.md",
+      "bytes": 2181,
+      "sha256": "531b775dff19799e38fa3d2d98401d7d51ae57aa33d1006652b7c5f5a9a483e3"
+    },
+    {
+      "path": "docs/제작지침.md",
+      "bytes": 2436,
+      "sha256": "0a54228eaf7fd1f53887411b3a25d45e11786acbc5bfb4e9076d6116135d95ed"
+    },
+    {
+      "path": "simulator/README.md",
+      "bytes": 1638,
+      "sha256": "e900a4d1992ee98f654e9a0e359d9cab0c6c231108b3eb4b9db65c7d1c62823c"
+    },
+    {
+      "path": "simulator/app.js",
+      "bytes": 18671,
+      "sha256": "182e458ef01fd337eac5cbc56663f77ae330d3424a9a6f6780cf8fa67afdc690"
+    },
+    {
+      "path": "simulator/assets/underground-seoul-original.png",
+      "bytes": 46063,
+      "sha256": "b63695c5b854321a135d974a3fc2a27893add2d7ada5f0d5b976707bc16dbe47"
+    },
+    {
+      "path": "simulator/core.js",
+      "bytes": 6206,
+      "sha256": "93cdfb77128cbefb376b707ed6e0414dd39244dfe7bfe639ded6166e2c197ebd"
+    },
+    {
+      "path": "simulator/core.test.cjs",
+      "bytes": 2563,
+      "sha256": "d0770ea510b3af2f30acb6a916b95dfb5c4b01e8404892f7b2cd4c76d9f264fe"
+    },
+    {
+      "path": "simulator/index.html",
+      "bytes": 8691,
+      "sha256": "cfba5256581f70e3ea537d55d62f3afc75e7eb1b3835831a061dc3dafb195829"
+    },
+    {
+      "path": "simulator/style.css",
+      "bytes": 15094,
+      "sha256": "32653d9e41aa84d7bebfea452fe840ba8b45f7ecca025f082b9c53c83e4115cb"
+    },
+    {
+      "path": "simulator/검증결과.md",
+      "bytes": 905,
+      "sha256": "f5f02e29248dd88f76668f52ce420c18883ad8c27a961752b06933b2d9c6e9aa"
+    },
+    {
+      "path": "simulator/고증대조표.json",
+      "bytes": 454,
+      "sha256": "0fadb50525e6c6fceb673e39e2d38ebd851052b6a8f4f2642e53444900ffa500"
+    }
+  ]
+}
