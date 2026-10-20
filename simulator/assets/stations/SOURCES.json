@@ -1,0 +1,114 @@
+{
+  "source": "references/diagrams/배선도(관제교육장).pptx",
+  "extraction": "Unmodified media bytes from source slides 2–19",
+  "images": [
+    {
+      "slide": 2,
+      "path": "slide2.png",
+      "bytes": 43746,
+      "sha256": "f90318a0ab75ac8c9ca9ddc09a7ff6419d7f5d73bb048f61316c38344f122c73"
+    },
+    {
+      "slide": 3,
+      "path": "slide3.png",
+      "bytes": 58093,
+      "sha256": "e773e5c1d2a12579988104b5976f5298500878e47efb05c88c9ef55f6d3acec4"
+    },
+    {
+      "slide": 4,
+      "path": "slide4.png",
+      "bytes": 48211,
+      "sha256": "cf1255889803ed6e81a1b7913e6646013b2c1de9ab7eae98b89705bbe95ccbcf"
+    },
+    {
+      "slide": 5,
+      "path": "slide5.png",
+      "bytes": 46063,
+      "sha256": "b63695c5b854321a135d974a3fc2a27893add2d7ada5f0d5b976707bc16dbe47"
+    },
+    {
+      "slide": 6,
+      "path": "slide6.png",
+      "bytes": 68506,
+      "sha256": "56c8a0ee899745b634f53a4732c4ef1185ce85437cff0b98736bdf3282f7e758"
+    },
+    {
+      "slide": 7,
+      "path": "slide7.png",
+      "bytes": 76591,
+      "sha256": "2c7d794fcd8d22fbb65d185c63dcdc55a00222bc0dd4f480125b6a70535dd47c"
+    },
+    {
+      "slide": 8,
+      "path": "slide8.png",
+      "bytes": 64142,
+      "sha256": "42a143ab6e36044710db1db524978b0e7adda2c28ab447313c8173a67fc4aaab"
+    },
+    {
+      "slide": 9,
+      "path": "slide9.png",
+      "bytes": 84541,
+      "sha256": "0806869db44a0454ba463423933acce169f243e86f2f0847b6ae605cfa695541"
+    },
+    {
+      "slide": 10,
+      "path": "slide10.png",
+      "bytes": 88423,
+      "sha256": "f748a6219d354f277c61bbae8c854fbf071ffe13a89bbff01b85c1a87aede8a0"
+    },
+    {
+      "slide": 11,
+      "path": "slide11.png",
+      "bytes": 84743,
+      "sha256": "80639ab5cb3b7f107a7746aa079bcdd01b082f5891375f1c5dec3d716453bc89"
+    },
+    {
+      "slide": 12,
+      "path": "slide12.png",
+      "bytes": 79205,
+      "sha256": "338ca9faef16ad3b32dca1b78fbdb3375bf299793b725bf3dbd8a83c9d442411"
+    },
+    {
+      "slide": 13,
+      "path": "slide13.png",
+      "bytes": 43158,
+      "sha256": "72e3dc1ca78c8915bae58346d1881c1bd7adbff3609c5fa28345aa91e65e60d0"
+    },
+    {
+      "slide": 14,
+      "path": "slide14.png",
+      "bytes": 60704,
+      "sha256": "a348a5f6d756174475631d707c3fdf38f281246aa2aeeeeece842cff681485fa"
+    },
+    {
+      "slide": 15,
+      "path": "slide15.png",
+      "bytes": 62239,
+      "sha256": "7e725fc2f895a5f460b891d596b67e0c4156dd708696f608068f537ca633c404"
+    },
+    {
+      "slide": 16,
+      "path": "slide16.png",
+      "bytes": 41535,
+      "sha256": "d18b72a7928cee3d930f2319961dcb42f20a0a23e9eb466b58fe9eff7896ad90"
+    },
+    {
+      "slide": 17,
+      "path": "slide17.png",
+      "bytes": 84510,
+      "sha256": "9b965b38f0590d1831c1fd4b030f3738a3121f936644608799c8837c36f14e0a"
+    },
+    {
+      "slide": 18,
+      "path": "slide18.png",
+      "bytes": 52500,
+      "sha256": "cf95aa85da6fb02026b4702478d2789cb2a59e0d11b8b0e0db87c1ddb97e0b02"
+    },
+    {
+      "slide": 19,
+      "path": "slide19.png",
+      "bytes": 79959,
+      "sha256": "aa0032c00a70f8adcb8676c99addeda992107023bde3865df75a2052cd22ae64"
+    }
+  ]
+}

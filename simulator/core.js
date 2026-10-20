@@ -1,19 +1,21 @@
 (function(root){
  'use strict';
+ function create(config=null){
  // A visible route path is evidence about geometry, not an interlocking table.
- const sources={wiring:'배선도(관제교육장).pptx · 슬라이드 5',mmi:'CTC 운영 매뉴얼 · 인쇄 p.6 · PDF 6쪽',down:'실무5 · 본문 p.362 · PDF 370쪽',up:'실무5 · 본문 p.374 · PDF 382쪽'};
- const routes={
+ const sources=config?.sources||{wiring:'배선도(관제교육장).pptx · 슬라이드 5',mmi:'CTC 운영 매뉴얼 · 인쇄 p.6 · PDF 6쪽',down:'실무5 · 본문 p.362 · PDF 370쪽',up:'실무5 · 본문 p.374 · PDF 382쪽'};
+ const routes=config?.routes||{
   '1A-1T':{signal:'1A',pathTracks:['XT','21AT','1T'],path:'M575 512H1233',source:[sources.wiring,sources.down],evidence:'배선도·교재 경로 대조',switchConditions:null,releaseSeconds:null},
   '2A-2T':{signal:'2A',pathTracks:['YT','52T','2T'],path:'M1744 619H936',source:[sources.wiring,sources.up],evidence:'배선도·교재 경로 대조',switchConditions:null,releaseSeconds:null},
   '3A-B070T':{signal:'3A',pathTracks:['21BT','21AT','XT','B070T'],path:'M936 619H868L804 512H435',source:[sources.wiring,sources.mmi],evidence:'매뉴얼 MMI 진로목록 확인',switchConditions:null,releaseSeconds:null},
   '3A-B065T':{signal:'3A',pathTracks:['21BT','X1T','B065T'],path:'M936 619H435',source:[sources.wiring,sources.mmi,sources.up],evidence:'매뉴얼 MMI 진로목록 확인',switchConditions:null,releaseSeconds:null},
   '4A-B072T':{signal:'4A',pathTracks:['51BT','Y1T','B072T'],path:'M1233 512H1902',source:[sources.wiring,sources.down],evidence:'배선도·교재 경로 대조',switchConditions:null,releaseSeconds:null}
  };
- const points={'21':{parts:['21A','21B'],x:827,y:568},'22':{parts:['22A','22B'],x:878,y:568},'51':{parts:['51A','51B'],x:1452,y:551},'52':{parts:['52'],x:1357,y:606}};
- const signals={'1A':{x:575,y:494,kind:'장내',direction:'하행'},'2A':{x:1744,y:638,kind:'장내',direction:'상행'},'3A':{x:936,y:638,kind:'출발',direction:'상행'},'4A':{x:1233,y:494,kind:'출발',direction:'하행'},'21':{x:575,y:602,kind:'입환'},'22':{x:936,y:654,kind:'입환'},'23':{x:936,y:530,kind:'입환'},'51':{x:1610,y:583,kind:'입환'},'52':{x:1233,y:479,kind:'입환'},'53':{x:1233,y:602,kind:'입환'}};
+ const points=config?.points||{'21':{parts:['21A','21B'],x:827,y:568},'22':{parts:['22A','22B'],x:878,y:568},'51':{parts:['51A','51B'],x:1452,y:551},'52':{parts:['52'],x:1357,y:606}};
+ const signals=config?.signals||{'1A':{x:575,y:494,kind:'장내',direction:'하행'},'2A':{x:1744,y:638,kind:'장내',direction:'상행'},'3A':{x:936,y:638,kind:'출발',direction:'상행'},'4A':{x:1233,y:494,kind:'출발',direction:'하행'},'21':{x:575,y:602,kind:'입환'},'22':{x:936,y:654,kind:'입환'},'23':{x:936,y:530,kind:'입환'},'51':{x:1610,y:583,kind:'입환'},'52':{x:1233,y:479,kind:'입환'},'53':{x:1233,y:602,kind:'입환'}};
  function initial(){return {mode:'AUTO',pending:null,clock:0,points:Object.fromEntries(Object.keys(points).map(id=>[id,'N'])),signals:Object.fromEntries(Object.keys(signals).map(id=>[id,'STOP'])),routes:{},logs:[],events:[],scans:{current:0,all:0},scanUntil:0,inspected:[]};}
  function dispatch(s,a){
   const log=(ok,message)=>{s.logs.unshift({time:s.clock,source:a.source||'안내',action:a.type,result:ok?'완료':'보류',message});if(ok)s.events.push({...a,time:s.clock});return{ok,message};};
+  if(config?.controlled===false&&['mode','route','withdraw','stop','point'].includes(a.type))return log(false,'비연동역입니다. 연결 연동역에서 진로를 제어하세요.');
   if(a.type==='tick'){s.clock+=a.seconds||1;return{ok:true};}
   if(a.type==='cancel'){a={...a,activeRoutes:Object.keys(s.routes)};return log(true,'확인 취소 · 제어명령 전송 없음');}
   if(a.type==='mode'){
@@ -37,7 +39,7 @@
   if(a.type==='route'){
    const r=routes[a.id];if(!r)return log(false,'등록되지 않은 진로입니다.');
    if(s.routes[a.id])return log(false,'이미 설정된 진로입니다.');
-   const conflict=Object.keys(s.routes).find(id=>routes[id].signal===r.signal||routes[id].pathTracks.some(t=>r.pathTracks.includes(t))||(['1A','3A'].includes(r.signal)&&['1A','3A'].includes(routes[id].signal)));
+   const conflict=Object.keys(s.routes).find(id=>config||routes[id].signal===r.signal||routes[id].pathTracks.some(t=>r.pathTracks.includes(t))||(['1A','3A'].includes(r.signal)&&['1A','3A'].includes(routes[id].signal)));
    if(conflict)return log(false,conflict+' 진로를 먼저 정지·해정하세요.');
    s.routes[a.id]={status:'SET',control:a.control||'single'};s.signals[r.signal]='GO';
    return log(true,a.id+' 진로 설정 · '+r.signal+' 진행');
@@ -51,7 +53,7 @@
   if(a.type==='point'){
    if(!points[a.id]||!['N','R'].includes(a.value))return log(false,'전환기와 정·반위를 선택하세요.');
    const side=['21','22'].includes(a.id)?['1A','3A']:['2A','4A'];
-   if(Object.keys(s.routes).some(id=>side.includes(routes[id].signal)))return log(false,'같은 쪽에 설정된 진로를 먼저 해정하세요.');
+   if(Object.keys(s.routes).some(id=>config?true:side.includes(routes[id].signal)))return log(false,'같은 쪽에 설정된 진로를 먼저 해정하세요.');
    s.points[a.id]=a.value;return log(true,a.id+' 전환기 '+(a.value==='N'?'정위':'반위')+' 조작 연습 완료');
   }
   if(a.type==='inspectPoint'){
@@ -62,5 +64,10 @@
   if(a.type==='inspectSignal'&&signals[a.id])return log(true,a.id+' '+signals[a.id].kind+' 위치 확인 · 진로목록 검증 보류');
   return log(false,'근거가 확인되지 않은 조작입니다.');
  }
- const api={initial,dispatch,routes,points,signals,sources};if(typeof module!=='undefined')module.exports=api;else root.SimCore=api;
+ return {initial,dispatch,routes,points,signals,sources};
+ }
+ const network=typeof module!=='undefined'?require('./network.js'):root.SimNetwork;
+ const api=create();
+ api.forStation=id=>{if(!network.catalog[id])throw new RangeError('Unknown station');return id==='underground-seoul'?create():create(network.catalog[id]);};
+ if(typeof module!=='undefined')module.exports=api;else root.SimCore=api;
 })(typeof window!=='undefined'?window:globalThis);
