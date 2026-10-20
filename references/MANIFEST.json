@@ -1,0 +1,103 @@
+{
+  "added_date": "2026-10-20",
+  "source": "User-provided reference attachments",
+  "filename_normalization": "NFC; file contents preserved byte-for-byte",
+  "files": [
+    {
+      "path": "references/manuals/실무5_최종판_실전대본중심.pdf",
+      "original_name": "실무5_최종판_실전대본중심.pdf",
+      "bytes": 18095097,
+      "sha256": "0c4a543e2dabc5b263a71c6b32be349ec642b3cec32dab1924b454ff106a4558"
+    },
+    {
+      "path": "references/scenarios/금천구청역 부본(1번)대피.hwp",
+      "original_name": "금천구청역 부본(1번)대피.hwp",
+      "bytes": 94720,
+      "sha256": "81097c76d39b23b3eb7a5a5e9602034114cf67c38b91aab6bb2ba82ea5b300bc"
+    },
+    {
+      "path": "references/scenarios/구술(관제)_열차운행계획,운용및 실무.hwp",
+      "original_name": "구술(관제)_열차운행계획,운용및 실무.hwp",
+      "bytes": 71168,
+      "sha256": "49e78052f3947e2dc2eb7e783a7fbdc471c98251da755f5da31a813807247eb8"
+    },
+    {
+      "path": "references/scenarios/금천구청역 부본선(6번)대피.hwp",
+      "original_name": "금천구청역 부본선(6번)대피.hwp",
+      "bytes": 92160,
+      "sha256": "7f66a670a153e5b8686d90ed10638d39e086907c8ed7c7bd4d2e4035e3318405"
+    },
+    {
+      "path": "references/scenarios/스케줄생성 시나리오.hwpx",
+      "original_name": "스케줄생성 시나리오.hwpx",
+      "bytes": 38283,
+      "sha256": "a323fab2b67e5f7cf6e1a253612b24b41417bb01027f06dcfa3557fedd7c33be"
+    },
+    {
+      "path": "references/scenarios/경합 시나리오.hwpx",
+      "original_name": "경합 시나리오.hwpx",
+      "bytes": 71456,
+      "sha256": "d6a5f809dab2e16ff5c00685ee5fc9198d2e460dd5d17408df518a9ca0d0ee0b"
+    },
+    {
+      "path": "references/scenarios/영등포역 부본선(1번)대피.hwp",
+      "original_name": "영등포역 부본선(1번)대피.hwp",
+      "bytes": 163328,
+      "sha256": "ec5bdf2b719654f8b53e1aace67b3a656c5a0c09f10974f85a87be44c8674c45"
+    },
+    {
+      "path": "references/scenarios/용산역 부본선(5,6번)대피.hwp",
+      "original_name": "용산역 부본선(5,6번)대피.hwp",
+      "bytes": 184832,
+      "sha256": "a8e382e796dc1bcf2c66e84241b2ba57f0681d702aa41d53bacd7791ace93df2"
+    },
+    {
+      "path": "references/scenarios/용산역 부본선(하,4번선)대피.hwp",
+      "original_name": "용산역 부본선(하,4번선)대피.hwp",
+      "bytes": 87552,
+      "sha256": "9844cab540a447e563f9ca7a1b874d64f0964da671afd2929f2b86977f418c9c"
+    },
+    {
+      "path": "references/diagrams/배선도(관제교육장).pptx",
+      "original_name": "배선도(관제교육장).pptx",
+      "bytes": 1236323,
+      "sha256": "7d1760358158bd4103bac9388635ff6bec49e93a6eb6c3f2a2f3207d4ff66cc0"
+    },
+    {
+      "path": "references/manuals/(실기3)열차운행계획및실습.pdf",
+      "original_name": "(실기3)열차운행계획및실습.pdf",
+      "bytes": 9716171,
+      "sha256": "62ff4d1062a097439a573f0fc008b2e19308df2d978c9baf0c237c4bb56e165b"
+    },
+    {
+      "path": "references/manuals/(실기2)운행선관리및실습.pdf",
+      "original_name": "(실기2)운행선관리및실습.pdf",
+      "bytes": 5996162,
+      "sha256": "c17af6b48bd07ea948a5a2181619bda761f446b7c2e65f5cef38a449380302c3"
+    },
+    {
+      "path": "references/manuals/(실기4)비상시조치.pdf",
+      "original_name": "(실기4)비상시조치.pdf",
+      "bytes": 5076714,
+      "sha256": "0ff59747405aeabb57161acf93b2700fd9f7bd914a1b7ec733b92b1b389d52d2"
+    },
+    {
+      "path": "references/manuals/(실기1)관제시스템운용및실습.pdf",
+      "original_name": "(실기1)관제시스템운용및실습.pdf",
+      "bytes": 22524204,
+      "sha256": "16eaf6e55cbd8afca3518991a90eb71c323c88c7925e8b7853322aac4c656b87"
+    },
+    {
+      "path": "references/manuals/small철도교통관제자격증명 시험설비 운영 매뉴얼.pdf",
+      "original_name": "small철도교통관제자격증명 시험설비 운영 매뉴얼.pdf",
+      "bytes": 4226467,
+      "sha256": "4a4d41638fe08963ced0136a0801d1372c62b9198f861a0230b9603f2457465f"
+    }
+  ],
+  "pending_attachments": [
+    "1.전체노선.png",
+    "2.청량리-영등포.png",
+    "3.구로-수원.png",
+    "4.노량진-금천구청.png"
+  ]
+}
