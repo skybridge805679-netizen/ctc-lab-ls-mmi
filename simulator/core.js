@@ -15,7 +15,7 @@
  function dispatch(s,a){
   const log=(ok,message)=>{s.logs.unshift({time:s.clock,source:a.source||'안내',action:a.type,result:ok?'완료':'보류',message});if(ok)s.events.push({...a,time:s.clock});return{ok,message};};
   if(a.type==='tick'){s.clock+=a.seconds||1;return{ok:true};}
-  if(a.type==='cancel')return log(true,'확인 취소 · 제어명령 전송 없음');
+  if(a.type==='cancel'){a={...a,activeRoutes:Object.keys(s.routes)};return log(true,'확인 취소 · 제어명령 전송 없음');}
   if(a.type==='mode'){
    if(!['AUTO','CCM','LOCAL'].includes(a.value))return log(false,'제어모드를 확인하세요.');
    if(s.pending)return log(false,'현장 인계 응답을 먼저 처리하세요.');

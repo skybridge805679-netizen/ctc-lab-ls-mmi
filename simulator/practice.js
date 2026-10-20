@@ -1,0 +1,17 @@
+(function(root){
+'use strict';
+// Only successful dispatch events are supplied to task checks.
+function inOrder(events,steps){let next=0;for(const event of events){if(steps[next](event)&&++next===steps.length)return true;}return false;}
+const tasks=[
+ {title:'LS에서 CCM 전환',desc:'원본 LS의 모드 버튼을 이용해 CCM으로 바꾸세요.',hint:'원본 화면 상단 CCM 버튼 → 예. MMI에도 현재 CCM이 표시됩니다.',source:'CTC 매뉴얼 p.14–15',check:(e,state)=>e.some(x=>x.type==='mode'&&x.source==='LS'&&x.value==='CCM')&&state.mode==='CCM'},
+ {title:'MMI에서 모드 전환',desc:'MMI 현장설비제어를 이용해 CCM으로 전환하세요.',hint:'역제어모드 설정 → CCM → 확인.',source:'CTC 매뉴얼 인쇄 p.16 / PDF 11쪽',check:(e,state)=>e.some(x=>x.type==='mode'&&x.source==='MMI'&&x.value==='CCM')&&state.mode==='CCM'},
+ {title:'하행 장내 경로 확인',desc:'CCM 전환 후 LS의 1A에서 1A-1T 경로를 확인하세요. 녹색 진로와 진행 표시를 확인하세요.',hint:'1A는 상단 선로의 왼쪽 장내신호기입니다. XT → 21AT → 1T를 대조하세요.',source:'배선도 슬라이드 5 / 실무5 본문 p.362',check:(e,state)=>e.some(x=>x.type==='route'&&x.source==='LS'&&x.id==='1A-1T')&&!!state.routes['1A-1T']},
+ {title:'상행 출발 경로 확인',desc:'MMI에서 3A-B065T를 선택하고, 하단 선로의 상행 출발 경로를 확인하세요.',hint:'CCM → 진로제어 → 3A → 3A-B065T → 설정 → 확인. 21BT → X1T → B065T입니다.',source:'CTC 매뉴얼 p.6 / 배선도 슬라이드 5',check:(e,state)=>e.some(x=>x.type==='route'&&x.source==='MMI'&&x.id==='3A-B065T')&&!!state.routes['3A-B065T']},
+ {title:'3A의 두 출발 경로 비교',desc:'3A-B070T를 설정한 뒤 해정하고 3A-B065T를 설정하여 건넘선 경유 경로와 직진 경로를 비교하세요.',hint:'3A-B070T는 21B에서 21A 쪽으로 건너 상단 B070T로 향합니다. 3A-B065T는 하단 B065T로 향합니다.',source:'CTC 매뉴얼 p.6의 실제 진로목록',check:(e,state)=>inOrder(e,[x=>x.type==='route'&&x.id==='3A-B070T',x=>(x.type==='stop'&&x.id==='3A')||(x.type==='withdraw'&&x.id==='3A-B070T'),x=>x.type==='route'&&x.id==='3A-B065T'])&&!!state.routes['3A-B065T']},
+ {title:'건넘선 전환기 조작',desc:'CCM에서 21번과 22번 전환기를 각각 조작하세요.',hint:'LS의 전환기 영역 → 예, 또는 MMI 선로전환기제어 → 정·반위 → 확인. 진로가 없는 상태에서 정위·반위 조작을 연습하세요.',source:'배선도 슬라이드 5 · 21A/B와 22A/B',check:(e,state)=>['21','22'].every(id=>e.some(x=>x.type==='point'&&x.id===id))},
+ {title:'LOCAL 현장 인계',desc:'LOCAL 요청을 현장에서 거절한 뒤, 다시 요청하여 수락하세요.',hint:'LOCAL → 예 → 현장 거절. 다시 LOCAL → 예 → 현장 수락.',source:'CTC 매뉴얼 p.15',check:(e,state)=>{const i=e.findIndex(x=>x.type==='handover'&&!x.accept);return i>=0&&e.slice(i+1).some(x=>x.type==='handover'&&x.accept)&&state.mode==='LOCAL';}},
+ {title:'베이스스캔 범위 비교',desc:'LS에서 현재역 스캔, MMI에서 전체 제어역 스캔을 실행하세요.',hint:'LS 우클릭 → 현재역 스캔. MMI 베이스스캔 → 전체 제어역 → 확인.',source:'CTC 매뉴얼 p.8–10',check:(e,state)=>e.some(x=>x.type==='scan'&&x.source==='LS'&&x.scope==='current')&&e.some(x=>x.type==='scan'&&x.source==='MMI'&&x.scope==='all')},
+ {title:'3A 설정·취소 유지·정지·해정',desc:'LS에서 3A-B065T를 설정하고, 정지 확인창에서 아니오를 눌러 진로를 유지한 뒤 다시 예를 눌러 해정하세요.',hint:'CCM → 3A → RT_3A_B065T → 3A → 아니오 · 취소 → 1개 설정 유지 확인 → 3A → 예 · 실행 → 0개 설정 확인.',source:'CTC 매뉴얼 인쇄 p.4–8 / PDF 5–7쪽',check:(e,state)=>inOrder(e,[x=>x.type==='route'&&x.id==='3A-B065T'&&x.source==='LS',x=>x.type==='cancel'&&x.target==='stop'&&x.id==='3A'&&x.source==='LS'&&x.activeRoutes?.includes('3A-B065T'),x=>x.type==='stop'&&x.id==='3A'&&x.source==='LS'])&&!state.routes['3A-B065T']&&state.signals['3A']==='STOP'}
+];
+const api={tasks};if(typeof module!=='undefined')module.exports=api;else root.SimPractice=api;
+})(typeof window!=='undefined'?window:globalThis);

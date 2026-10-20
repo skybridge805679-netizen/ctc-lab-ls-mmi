@@ -4,16 +4,8 @@ let state=C.initial(),paused=false,practice='guided',activeTask=null,taskIndex=0
 try{completed=JSON.parse(localStorage.getItem('ctclab-v03-completed')||'[]');if(!Array.isArray(completed))completed=[];}catch{}
 const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const time=t=>`${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString().padStart(2,'0')}`;
-const tasks=[
- {title:'LS에서 CCM 전환',desc:'원본 LS의 모드 버튼을 이용해 CCM으로 바꾸세요.',hint:'원본 화면 상단 CCM 버튼 → 예. MMI에도 현재 CCM이 표시됩니다.',source:'CTC 매뉴얼 p.14–15',check:e=>e.some(x=>x.type==='mode'&&x.source==='LS'&&x.value==='CCM')&&state.mode==='CCM'},
- {title:'MMI에서 모드 전환',desc:'MMI 현장설비제어를 이용해 CCM으로 전환하세요.',hint:'역제어모드 설정 → CCM → 확인.',source:'CTC 매뉴얼 p.16–17',check:e=>e.some(x=>x.type==='mode'&&x.source==='MMI'&&x.value==='CCM')&&state.mode==='CCM'},
- {title:'하행 장내 경로 확인',desc:'CCM 전환 후 LS의 1A에서 1A-1T 경로를 확인하세요. 녹색 진로와 진행 표시를 확인하세요.',hint:'1A는 상단 선로의 왼쪽 장내신호기입니다. XT → 21AT → 1T를 대조하세요.',source:'배선도 슬라이드 5 / 실무5 본문 p.362',check:e=>e.some(x=>x.type==='route'&&x.source==='LS'&&x.id==='1A-1T')&&!!state.routes['1A-1T']},
- {title:'상행 출발 경로 확인',desc:'MMI에서 3A-B065T를 선택하고, 하단 선로의 상행 출발 경로를 확인하세요.',hint:'CCM → 진로제어 → 3A → 3A-B065T → 설정 → 확인. 21BT → X1T → B065T입니다.',source:'CTC 매뉴얼 p.6 / 배선도 슬라이드 5',check:e=>e.some(x=>x.type==='route'&&x.source==='MMI'&&x.id==='3A-B065T')&&!!state.routes['3A-B065T']},
- {title:'3A의 두 출발 경로 비교',desc:'3A-B070T를 설정한 뒤 해정하고 3A-B065T를 설정하여 건넘선 경유 경로와 직진 경로를 비교하세요.',hint:'3A-B070T는 21B에서 21A 쪽으로 건너 상단 B070T로 향합니다. 3A-B065T는 하단 B065T로 향합니다.',source:'CTC 매뉴얼 p.6의 실제 진로목록',check:e=>['3A-B070T','3A-B065T'].every(id=>e.some(x=>x.type==='route'&&x.id===id))},
- {title:'건넘선 전환기 조작',desc:'CCM에서 21번과 22번 전환기를 각각 조작하세요.',hint:'LS의 전환기 영역 → 예, 또는 MMI 선로전환기제어 → 정·반위 → 확인. 진로가 없는 상태에서 정위·반위 조작을 연습하세요.',source:'배선도 슬라이드 5 · 21A/B와 22A/B',check:e=>['21','22'].every(id=>e.some(x=>x.type==='point'&&x.id===id))},
- {title:'LOCAL 현장 인계',desc:'LOCAL 요청을 현장에서 거절한 뒤, 다시 요청하여 수락하세요.',hint:'LOCAL → 예 → 현장 거절. 다시 LOCAL → 예 → 현장 수락.',source:'CTC 매뉴얼 p.15',check:e=>{const i=e.findIndex(x=>x.type==='handover'&&!x.accept);return i>=0&&e.slice(i+1).some(x=>x.type==='handover'&&x.accept)&&state.mode==='LOCAL';}},
- {title:'베이스스캔 범위 비교',desc:'LS에서 현재역 스캔, MMI에서 전체 제어역 스캔을 실행하세요.',hint:'LS 우클릭 → 현재역 스캔. MMI 베이스스캔 → 전체 제어역 → 확인.',source:'CTC 매뉴얼 p.8–10',check:e=>e.some(x=>x.type==='scan'&&x.source==='LS'&&x.scope==='current')&&e.some(x=>x.type==='scan'&&x.source==='MMI'&&x.scope==='all')}
-];
+const tasks=window.SimPractice.tasks;
+completed=[...new Set(completed.filter(i=>Number.isInteger(i)&&i>=0&&i<tasks.length))];
 function toast(msg,error=false){$('toast').textContent=msg;$('toast').className='show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').className='',5000);}
 function run(a){const r=C.dispatch(state,a);render();if(a.type!=='tick')toast(r.message,!r.ok);return r;}
 function openAction(title,body,action,label='예 · 실행'){$('dialogConfirm').hidden=false;$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;dialogAction=action;$('actionDialog').returnValue='';$('dialogConfirm').textContent=label;$('actionDialog').showModal();}
@@ -38,7 +30,7 @@ function render(){
  $('lsStatus').textContent='CCM → 신호기 클릭 → 진로 선택 · 설정된 신호기 클릭 → 정지·해정';
  $('mmiState').textContent=`현재 ${state.mode} · LS와 같은 상태 · ${Object.keys(state.routes).length}개 진로 설정`;
  $('handoverBar').hidden=!state.pending;if(state.pending)$('handoverBar').innerHTML=`<span>${state.pending} 요청 · 가상 현장 응답 대기</span><button data-handover="yes">현장 수락</button><button data-handover="no">현장 거절</button>`;
- $('completedCount').textContent=`${completed.length} / 8 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();
+ $('completedCount').textContent=`${completed.length} / ${tasks.length} 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();
 }
 function routeOptions(){$('mmiRoute').innerHTML=Object.keys(C.routes).filter(id=>C.routes[id].signal===$('mmiSignal').value).map(id=>`<option>${id}</option>`).join('');$('mmiRoute').onchange=()=>{$('mmiRouteEvidence').innerHTML=routeDetails($('mmiRoute').value);};$('mmiRouteEvidence').innerHTML=routeDetails($('mmiRoute').value);}
 function fields(){const type=$('controlSelect').value;let html='';$('mmiApply').textContent='확인 · 명령 실행';
@@ -65,7 +57,7 @@ document.querySelectorAll('[data-practice]').forEach(b=>b.onclick=()=>{practice=
 $('lsDisplay').onclick=e=>{const mode=e.target.closest('[data-mode]'),signal=e.target.closest('[data-signal]'),point=e.target.closest('[data-point]');if(mode)openAction(mode.dataset.mode+' 모드 전환',`제어모드를 ${mode.dataset.mode}로 전환하시겠습니까?`,{type:'mode',value:mode.dataset.mode,source:'LS'});else if(signal)signalAction(signal.dataset.signal);else if(point)pointAction(point.dataset.point);};
 $('trackSvg').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
 $('lsDisplay').oncontextmenu=e=>{e.preventDefault();openAction('베이스스캔','가상 상태정보를 재수신합니다.<select id="lsScope" aria-label="베이스스캔 범위"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>',()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));};
-$('actionDialog').addEventListener('close',()=>{if(!dialogAction)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,source:'LS'});});
+$('actionDialog').addEventListener('close',()=>{if(!dialogAction)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
 $('handoverBar').onclick=e=>{const b=e.target.closest('[data-handover]');if(b)run({type:'handover',accept:b.dataset.handover==='yes',source:'현장'});};
 $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>document.querySelector(`input[name="${n}"]:checked`).value;
  if(type==='mode')run({type,value:checked('mmiMode'),source:'MMI'});
@@ -76,10 +68,10 @@ $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('cont
 $('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
 $('resetBtn').onclick=()=>{if(!confirm('현재 상태와 조작 기록을 초기화할까요?'))return;state=C.initial();activeTask=null;paused=false;$('pauseBtn').textContent='Ⅱ 일시정지';fields();render();taskView();};
 $('startTask').onclick=startTask;$('nextTask').onclick=()=>{taskIndex=(taskIndex+1)%tasks.length;taskView();};
-$('checkTask').onclick=()=>{if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart));if(ok){if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
+$('checkTask').onclick=()=>{if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart),state);if(ok){if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
 for(const id of ['guideBtn','footerGuide'])$(id).onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
 $('overviewBtn').textContent='배선 확대 ↗';$('overviewBtn').onclick=()=>{const panel=document.querySelector('.ls-panel');panel.classList.toggle('expanded');$('overviewBtn').textContent=panel.classList.contains('expanded')?'확대 닫기 ↙':'배선 확대 ↗';};
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.3',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.4',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 setInterval(()=>{if(!paused&&!$('actionDialog').open&&!$('guideDialog').open){C.dispatch(state,{type:'tick',seconds:1});$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
 fields();render();taskView();
