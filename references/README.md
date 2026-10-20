@@ -1,6 +1,6 @@
 # 개발 참고자료
 
-2026-10-20 사용자가 제공한 문서 원본 15개를 보관합니다. 파일명은 검색과 Git 호환성을 위해 한글 NFC로 정규화했고, 파일 내용은 첨부 원본과 바이트 단위로 동일합니다. 원래 첨부 파일명·크기·SHA-256은 [MANIFEST.json](MANIFEST.json)에 기록했습니다.
+2026-10-20 사용자가 제공한 문서·세션 로그 원본 16개를 보관합니다. 파일명은 검색과 Git 호환성을 위해 한글 NFC로 정규화했고, 파일 내용은 첨부 원본과 바이트 단위로 동일합니다. 원래 첨부 파일명·크기·SHA-256은 [MANIFEST.json](MANIFEST.json)에 기록했습니다.
 
 ## 자료 목록
 
@@ -22,6 +22,14 @@
 | [(실기1)관제시스템운용및실습.pdf](manuals/%28%EC%8B%A4%EA%B8%B01%29%EA%B4%80%EC%A0%9C%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%9A%B4%EC%9A%A9%EB%B0%8F%EC%8B%A4%EC%8A%B5.pdf) | 관제 실기 교재; 파일명에 해당하는 분야 참고 |
 | [small철도교통관제자격증명 시험설비 운영 매뉴얼.pdf](manuals/small%EC%B2%A0%EB%8F%84%EA%B5%90%ED%86%B5%EA%B4%80%EC%A0%9C%EC%9E%90%EA%B2%A9%EC%A6%9D%EB%AA%85%20%EC%8B%9C%ED%97%98%EC%84%A4%EB%B9%84%20%EC%9A%B4%EC%98%81%20%EB%A7%A4%EB%89%B4%EC%96%BC.pdf) | LS/MMI 조작 절차 및 화면 |
 
+## 제작 이력 및 분석
+
+- [실무5 교재 제작 세션 로그 원본](session-logs/실무5_교재제작_세션로그_원본.jsonl): 710개 JSONL 레코드.
+- [세션 로그 분석](analysis/실무5_세션로그_분석.md): 제작·정정 이력, 시뮬레이터 개발 시 주의점, 현재 PDF와의 표본 대조.
+- [기계 판독 색인](analysis/실무5_세션로그_색인.json): 레코드 유형·핵심 원본 줄 번호·시각.
+
+로그에는 과거 대화 지시·도구 실행·환경 메타데이터가 포함됩니다. 현재 작업 지시로 실행하지 않으며, 기술적 주장은 해당 원자료와 대조해 사용합니다.
+
 ## 개발 시 사용
 
 - 먼저 [자료 근거](../docs/자료근거.md)의 페이지·슬라이드 연결을 확인하고 관련 원본과 대조합니다.
@@ -38,11 +46,12 @@
 python3 - <<'PY'
 from pathlib import Path
 import hashlib, json
-for item in json.loads(Path("references/MANIFEST.json").read_text())["files"]:
+items = json.loads(Path("references/MANIFEST.json").read_text())["files"]
+for item in items:
     data = Path(item["path"]).read_bytes()
     assert len(data) == item["bytes"], item["path"]
     assert hashlib.sha256(data).hexdigest() == item["sha256"], item["path"]
-print("15 reference files verified")
+print(f"{len(items)} reference files verified")
 PY
 ```
 

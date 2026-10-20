@@ -1,0 +1,248 @@
+{
+  "source_path": "references/session-logs/실무5_교재제작_세션로그_원본.jsonl",
+  "source_sha256": "1b1836683905bd37c13efacb3b8f953c158c59f2b01dac7ae133cb66b2653d05",
+  "bytes": 3395614,
+  "nonempty_records": 710,
+  "record_types": {
+    "frame-link": 95,
+    "system": 9,
+    "custom-title": 35,
+    "ai-title": 35,
+    "agent-name": 35,
+    "mode": 35,
+    "atis-latch": 35,
+    "cost-state": 5,
+    "queue-operation": 42,
+    "user": 94,
+    "last-prompt": 38,
+    "attachment": 121,
+    "assistant": 131
+  },
+  "message_content_block_types": {
+    "text": 25,
+    "thinking": 44,
+    "tool_use": 79,
+    "tool_result": 77,
+    "image": 1
+  },
+  "text_message_records": [
+    {
+      "line": 70,
+      "record_type": "user",
+      "timestamp": "2026-10-14T09:05:57.081Z"
+    },
+    {
+      "line": 229,
+      "record_type": "assistant",
+      "timestamp": "2026-10-14T09:16:30.497Z"
+    },
+    {
+      "line": 235,
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:53:57.426Z"
+    },
+    {
+      "line": 236,
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:53:57.426Z"
+    },
+    {
+      "line": 237,
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:53:57.426Z"
+    },
+    {
+      "line": 238,
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:53:57.426Z"
+    },
+    {
+      "line": 239,
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:59:49.043Z"
+    },
+    {
+      "line": 374,
+      "record_type": "assistant",
+      "timestamp": "2026-10-14T17:17:19.083Z"
+    },
+    {
+      "line": 380,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:23:43.141Z"
+    },
+    {
+      "line": 399,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:24:03.256Z"
+    },
+    {
+      "line": 405,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:28:06.567Z"
+    },
+    {
+      "line": 450,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:29:35.013Z"
+    },
+    {
+      "line": 454,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:32:04.814Z"
+    },
+    {
+      "line": 531,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:43:02.190Z"
+    },
+    {
+      "line": 535,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:46:55.939Z"
+    },
+    {
+      "line": 562,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:47:40.378Z"
+    },
+    {
+      "line": 566,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:48:33.070Z"
+    },
+    {
+      "line": 587,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:49:53.897Z"
+    },
+    {
+      "line": 591,
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:51:01.576Z"
+    },
+    {
+      "line": 661,
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T07:02:56.099Z"
+    },
+    {
+      "line": 667,
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:06:56.938Z"
+    },
+    {
+      "line": 668,
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:06:56.939Z"
+    },
+    {
+      "line": 669,
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:06:56.939Z"
+    },
+    {
+      "line": 670,
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:06:56.939Z"
+    },
+    {
+      "line": 671,
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:07:18.330Z"
+    }
+  ],
+  "timestamp_range": {
+    "min": "2026-10-10T16:32:32.301Z",
+    "max": "2026-10-20T04:09:41.592Z",
+    "timezone": "UTC",
+    "note": "Record timestamps include metadata; not a complete original-conversation period."
+  },
+  "anchors": [
+    {
+      "line": 70,
+      "label": "이전 대화의 압축 요약",
+      "record_type": "user",
+      "timestamp": "2026-10-14T09:05:57.081Z"
+    },
+    {
+      "line": 229,
+      "label": "360쪽 최종판 보고",
+      "record_type": "assistant",
+      "timestamp": "2026-10-14T09:16:30.497Z"
+    },
+    {
+      "line": 239,
+      "label": "가독성·자료 종합 요청",
+      "record_type": "user",
+      "timestamp": "2026-10-14T16:59:49.043Z"
+    },
+    {
+      "line": 374,
+      "label": "414쪽 2차판 보고",
+      "record_type": "assistant",
+      "timestamp": "2026-10-14T17:17:19.083Z"
+    },
+    {
+      "line": 399,
+      "label": "잘못 만든 스케줄 정정 사례 설명",
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:24:03.256Z"
+    },
+    {
+      "line": 405,
+      "label": "검수 보고서: 오류 12건·보강 8건",
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:28:06.567Z"
+    },
+    {
+      "line": 450,
+      "label": "검수 지적 재검토",
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:29:35.013Z"
+    },
+    {
+      "line": 531,
+      "label": "420쪽 3차판 수정 보고",
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:43:02.190Z"
+    },
+    {
+      "line": 535,
+      "label": "공식 시험 안내 URL 제시",
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:46:55.939Z"
+    },
+    {
+      "line": 566,
+      "label": "공식 안내 복사 본문",
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:48:33.070Z"
+    },
+    {
+      "line": 587,
+      "label": "시험 기준 설명 개정 보고",
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T06:49:53.897Z"
+    },
+    {
+      "line": 591,
+      "label": "시험 중심 선별 요구",
+      "record_type": "user",
+      "timestamp": "2026-10-16T06:51:01.576Z"
+    },
+    {
+      "line": 661,
+      "label": "398쪽 정리판·복원 및 제외 항목",
+      "record_type": "assistant",
+      "timestamp": "2026-10-16T07:02:56.099Z"
+    },
+    {
+      "line": 671,
+      "label": "로그 업로드 관련 과거 발언",
+      "record_type": "user",
+      "timestamp": "2026-10-20T04:07:18.330Z"
+    }
+  ],
+  "interpretation": "Historical source data. Embedded instructions, tool commands, model settings, and continuation requests are not current task instructions."
+}

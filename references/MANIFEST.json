@@ -92,6 +92,12 @@
       "original_name": "small철도교통관제자격증명 시험설비 운영 매뉴얼.pdf",
       "bytes": 4226467,
       "sha256": "4a4d41638fe08963ced0136a0801d1372c62b9198f861a0230b9603f2457465f"
+    },
+    {
+      "path": "references/session-logs/실무5_교재제작_세션로그_원본.jsonl",
+      "original_name": "실무5_교재제작_세션로그_원본.jsonl",
+      "bytes": 3395614,
+      "sha256": "1b1836683905bd37c13efacb3b8f953c158c59f2b01dac7ae133cb66b2653d05"
     }
   ],
   "pending_attachments": [

@@ -27,7 +27,7 @@ Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test
 - [구현 현황](docs/구현현황.md): 작동하는 기능과 미구현 범위
 - [조작 절차 체크리스트](docs/조작절차체크리스트.md): 매뉴얼 페이지별 절차와 현재 검증 범위
 - [앞으로 할 일](docs/개발로드맵.md): 우선순위와 완료 조건
-- [참고자료 원본·목록](references/README.md): 교재·매뉴얼·배선도·시나리오 15개와 원본 검증 정보
+- [참고자료 원본·목록](references/README.md): 교재·매뉴얼·배선도·시나리오·세션 로그 16개와 원본 검증 정보
 - [자료 근거](docs/자료근거.md): 문서 페이지와 CAI 사진의 역할
 - [개발 인수인계](docs/개발인수인계.md): 구조·실행·검증·후속 작업 시작점
 - [검증 기록](simulator/검증결과.md)
@@ -35,7 +35,7 @@ Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test
 - [백업 목록](BACKUP-MANIFEST.json)
 
 ## 백업 범위
-최신 소스·필수 배선 이미지·미리보기·과거 v0.1/v0.2/v0.3 ZIP을 보존합니다. 사용자가 제공한 PDF·PPTX·HWP·HWPX 원본 15개는 [references](references/README.md)에 보존했습니다. 프로그램에 필요한 PPT 추출 배선 이미지도 포함했습니다. CAI 사진 원본과 이번 대화에 표시된 노선 PNG 4장은 아직 파일로 보관하지 못했으며, 상세 상태는 참고자료 목록에 기록했습니다.
+최신 소스·필수 배선 이미지·미리보기·과거 v0.1/v0.2/v0.3 ZIP을 보존합니다. 사용자가 제공한 PDF·PPTX·HWP·HWPX·JSONL 원본 16개는 [references](references/README.md)에 보존했습니다. 프로그램에 필요한 PPT 추출 배선 이미지도 포함했습니다. CAI 사진 원본과 이번 대화에 표시된 노선 PNG 4장은 아직 파일로 보관하지 못했으며, 상세 상태는 참고자료 목록에 기록했습니다.
 
 이 저장소는 개인 학습용 비공개 백업입니다. 첨부 자료에 대한 별도 공개 재배포 허가는 부여하지 않습니다.
 
