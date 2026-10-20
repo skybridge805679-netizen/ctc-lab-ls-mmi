@@ -26,17 +26,17 @@ def exercise(page, url):
         expect(page.locator('#actionDialog')).not_to_be_visible()
 
     def ccm():
-        page.locator('[data-mode="CCM"]').click()
+        page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-mode="CCM"]').click()
         confirm()
         expect(page.locator('#stateMode')).to_have_text('CCM')
 
     def route(signal, route_id):
-        page.locator(f'[data-signal="{signal}"]').click()
+        page.locator(f'[data-control-station="underground-seoul"][data-primary="true"] [data-signal="{signal}"]').click()
         page.locator(f'[data-route-choice="{route_id}"]').click()
         expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
 
     def release():
-        page.locator('[data-signal="3A"]').click()
+        page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-signal="3A"]').click()
         confirm()
         expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
 
@@ -64,12 +64,12 @@ def exercise(page, url):
             route('3A', '3A-B065T')
         elif index == 5:
             for point in ['21', '22']:
-                page.locator(f'[data-point="{point}"]').click()
+                page.locator(f'[data-control-station="underground-seoul"][data-primary="true"] [data-point="{point}"]').click()
                 confirm()
                 expect(page.locator('.point-states')).to_contain_text(point+' 반위')
         elif index == 6:
             for response in ['no', 'yes']:
-                page.locator('[data-mode="LOCAL"]').click()
+                page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-mode="LOCAL"]').click()
                 confirm()
                 page.locator(f'[data-handover="{response}"]').click()
             expect(page.locator('#stateMode')).to_have_text('LOCAL')
@@ -81,7 +81,7 @@ def exercise(page, url):
             page.locator('#mmiApply').click()
         elif index == 8:
             route('3A', '3A-B065T')
-            page.locator('[data-signal="3A"]').click()
+            page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-signal="3A"]').click()
             page.locator('#actionDialog button[value="cancel"]').click()
             expect(page.locator('#actionDialog')).not_to_be_visible()
             expect(page.locator('#stateRoutes')).to_have_text('1개 설정')

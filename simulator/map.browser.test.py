@@ -1,4 +1,4 @@
-"""Verify replacement PDF backgrounds, sheet switching and station hit regions."""
+"""Full sheets, all traced LS signals and station-independent controls (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -6,12 +6,8 @@ from threading import Thread
 from playwright.sync_api import sync_playwright, expect
 
 ROOT = Path(__file__).resolve().parent
-
-
 class QuietHandler(SimpleHTTPRequestHandler):
-    def log_message(self, *_args):
-        pass
-
+    def log_message(self, *_args): pass
 
 server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(ROOT)))
 Thread(target=server.serve_forever, daemon=True).start()
@@ -20,44 +16,83 @@ try:
         browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
         for width in [1440, 390]:
             context = browser.new_context(viewport={'width': width, 'height': 1000})
-            page = context.new_page()
-            errors = []
+            page = context.new_page(); errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='networkidle')
-            expect(page.locator('#trackSvg image')).to_have_attribute('href', 'assets/line-map/page-2.jpg')
-            expect(page.locator('#mapSheet')).to_be_disabled()
-            # Exercise each source-aligned mode control and station overview link.
-            stations = page.locator('#stationSelect option').evaluate_all('(options)=>options.map(o=>o.value)')
+            expect(page.locator('#mapSheet')).to_have_value('all')
+            expect(page.locator('#trackSvg image')).to_have_count(3)
+            expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 2368')
+            expect(page.locator('[data-primary="true"]')).to_have_count(15)
+            # Full canvas remains mounted when selecting ANY station or zooming.
+            stations = page.locator('#stationSelect option').evaluate_all('(os)=>os.map(o=>o.value)')
+            for _ in range(4 if width == 1440 else 10): page.locator('#mapZoomIn').click()
+            tested = 0
             for station in stations:
-                page.locator('#mapOverview').click()
-                expect(page.locator('[data-map-station]')).to_have_count(15)
-                page.locator(f'[data-map-station="{station}"]').click()
-                expect(page.locator('#stationSelect')).to_have_value(station)
-                page.locator('[data-mode="CCM"]').click()
-                page.locator('#dialogConfirm').click()
+                page.locator('#stationSelect').select_option(station)
+                expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 2368')
+                expect(page.locator('#trackSvg image')).to_have_count(3)
+                if station=='anyang': assert page.locator('.track-frame').evaluate('(e)=>e.scrollTop')>0
+                layer = page.locator(f'[data-control-station="{station}"][data-primary="true"]')
+                layer.locator('[data-mode="CCM"]').click(); page.locator('#dialogConfirm').click()
                 expect(page.locator('#stateMode')).to_have_text('CCM')
-                expect(page.locator('#trackSvg image')).to_have_attribute('href', 'assets/line-map/page-'+('2' if station in ['cheongnyangni','dongmyo','jonggak','underground-seoul','seoul','yongsan'] else '4' if station in ['noryangjin','yeongdeungpo','guro','geumcheon'] else '3')+'.jpg')
-            page.locator('#mapOverview').click()
+                signals = layer.locator('[data-signal]').evaluate_all('(els)=>els.map(e=>e.dataset.signal)')
+                for signal in signals:
+                    layer.locator(f'[data-signal="{signal}"]').click()
+                    choice = page.locator('[data-route-choice]').first
+                    route = choice.get_attribute('data-route-choice'); choice.click()
+                    expect(layer.locator(f'[data-active-route="{route}"]')).to_have_count(1)
+                    expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
+                    layer.locator(f'[data-signal="{signal}"]').click(); page.locator('#dialogConfirm').click()
+                    expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
+                    tested += 1
+                print(f'PASS {width}px {station}: {len(signals)} LS signal menus / set / visible path / release', flush=True)
+            assert tested == 246
+            # Documented Yongsan 7T path must be available beyond a generic first-route check.
+            page.locator('#stationSelect').select_option('yongsan')
+            layer = page.locator('[data-control-station="yongsan"][data-primary="true"]')
+            layer.locator('[data-signal="2A"]').click();page.locator('[data-route-choice="2A-7T"]').click()
+            expect(layer.locator('[data-active-route="2A-7T"]')).to_have_count(1)
+            layer.locator('[data-signal="2A"]').click();page.locator('#dialogConfirm').click()
+            # The prior broken example: Anyang refuge route and all neighbouring stations remain available.
+            page.locator('#stationSelect').select_option('anyang')
+            page.locator('#controlSelect').select_option('route')
+            page.locator('#mmiSignal').select_option('2A')
+            page.locator('#mmiRoute').select_option('2A-6T')
+            page.locator('#routeControl').select_option('continuous')
+            page.locator('#mmiApply').click()
+            page.locator('[data-sim-enter="2A-6T"]').click()
+            expect(page.locator('[data-control-station="anyang"] [data-active-route="2A-6T"]')).to_have_attribute('stroke', '#ff453b')
+            page.locator('[data-sim-clear="2A-6T"]').click()
+            expect(page.locator('[data-control-station="anyang"] [data-active-route="2A-6T"]')).to_have_attribute('stroke', '#36ed06')
+            page.locator('#controlSelect').select_option('stopAll');page.locator('#mmiApply').click();page.locator('#dialogConfirm').click()
+            expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
+            # Duplicate PDF depictions share the same model, including their actual click regions.
+            page.locator('#stationSelect').select_option('geumcheon')
+            copy = page.locator('[data-control-station="geumcheon"][data-primary="false"]')
+            copy.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()
+            expect(page.locator('[data-control-station="geumcheon"] [data-active-route="1A-1T"]')).to_have_count(2)
+            # All four original sheets can be selected without removing any pixels of the sheet.
             for number in [1, 2, 3, 4]:
                 page.locator('#mapSheet').select_option(str(number))
                 expect(page.locator('#trackSvg image')).to_have_attribute('href', f'assets/line-map/page-{number}.jpg')
-                expect(page.locator('[data-mode]')).to_have_count(0)
-                expect(page.locator('.fidelity-note')).to_contain_text(f'PDF {number}쪽')
+                expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 768')
             page.locator('#mapSheet').select_option('1')
+            page.locator('[data-map-station="anyang"]').press('Enter')
+            expect(page.locator('#mapSheet')).to_have_value('all')
+            expect(page.locator('#stationSelect')).to_have_value('anyang')
+            page.locator('#controlSelect').select_option('route');page.locator('#mmiSignal').select_option('1A');page.locator('#mmiRoute').select_option('1A-1T');page.locator('#mmiApply').click()
             if width == 1440:
-                page.locator('.ls-panel').screenshot(path=str(ROOT.parent/'docs/preview-v0.5.1-overview.png'), style='#toast {visibility:hidden}')
-            page.locator('[data-map-station="underground-seoul"]').press('Enter')
-            page.locator('[data-signal="3A"]').click()
-            page.locator('[data-route-choice="3A-B065T"]').click()
-            expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
-            expect(page.locator('[data-active-route="3A-B065T"]')).to_have_count(1)
-            expect(page.locator('[data-track-label="B065T"]')).to_have_text('B065T')
-            if width == 1440:
-                page.locator('.ls-panel').screenshot(path=str(ROOT.parent/'docs/preview-v0.5.1-station.png'), style='#toast {visibility:hidden}')
+                page.locator('#mapFit').click()
+                page.locator('#stationSelect').select_option('anyang')
+                page.evaluate("window.scrollTo(0,document.querySelector('.ls-panel').getBoundingClientRect().top+window.scrollY-60);scrollToStation()")
+                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6-full-line.png'))
+                for _ in range(3): page.locator('#mapZoomIn').click()
+                page.locator('#stationSelect').select_option('anyang')
+                page.evaluate("window.scrollTo(0,document.querySelector('.ls-panel').getBoundingClientRect().top+window.scrollY-60);scrollToStation()")
+                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6-anyang.png'))
             assert not errors, errors
             context.close()
-            print(f'PASS PDF sheets 1–4, 15 overview links/mode controls, Seoul route at width {width}')
+            print(f'PASS full sheets, {tested} LS signals, refuge/continuous/occupancy/all-stop, duplicate sheets, overview keyboard: {width}px', flush=True)
         browser.close()
 finally:
-    server.shutdown()
-    server.server_close()
+    server.shutdown(); server.server_close()

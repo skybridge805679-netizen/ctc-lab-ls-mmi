@@ -9,10 +9,10 @@ test('all 33 stations and 15 controlled stations have source assets',()=>{
  assert.equal(N.stations.filter(s=>s.controlled).length,15);
  for(const station of N.stations)assert(fs.existsSync(path.join(__dirname,station.image)),station.name);
 });
-test('new PDF coordinate maps cover every station signal within its focus region',()=>{
+test('new PDF coordinate maps cover every station signal within its source registration window',()=>{
  for(const station of N.stations.filter(s=>s.controlled)){
   assert(station.image.startsWith('assets/line-map/'));assert([2,3,4].includes(station.map.page));
-  const [x,y,w,h]=station.map.focus;
+  const [x,y,w,h]=station.map.referenceWindow;
   for(const id of Object.keys(C.forStation(station.id).signals)){
    const point=station.map.signals[id];assert(point,station.name+' '+id);
    assert(point.x>=x&&point.x<=x+w&&point.y>=y&&point.y<=y+h,station.name+' '+id);
@@ -29,7 +29,7 @@ test('every catalogued route sets, blocks point movement, cancels and releases',
    core.dispatch(state,{type:'mode',value:'CCM'});
    assert(core.dispatch(state,{type:'route',id}).ok,station.name+' '+id);
    assert.equal(state.signals[core.routes[id].signal],'GO');
-   const point=station.id==='underground-seoul'?(['2A','4A'].includes(core.routes[id].signal)?'51':'21'):Object.keys(core.points)[0];
+   const point=core.routes[id].pointLocks[0];
    if(point)assert.equal(core.dispatch(state,{type:'point',id:point,value:'R'}).ok,false);
    core.dispatch(state,{type:'cancel',target:'stop'});assert(state.routes[id]);
    assert(core.dispatch(state,{type:'stop',id:core.routes[id].signal}).ok);

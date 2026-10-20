@@ -24,8 +24,8 @@ def check(page, url, screenshot=False):
         page.locator('#lsStationSelect').select_option(station['id'])
         expect(page.locator('#stationSelect')).to_have_value(station['id'])
         expect(page.locator('#stationScope')).to_contain_text(station['label'].split(' [')[0].split(' ·')[0])
-        assert page.locator('#trackSvg image').evaluate('(e)=>{const i=new Image();i.src=e.getAttribute("href");return i.src.length>0}')
-        image_path = page.locator('#trackSvg image').get_attribute('href')
+        assert page.locator('#trackSvg image').first.evaluate('(e)=>{const i=new Image();i.src=e.getAttribute("href");return i.src.length>0}')
+        image_path = page.locator('#trackSvg image').first.get_attribute('href')
         response = page.request.get(url+image_path)
         assert response.ok and len(response.body()) > 1000, image_path
         if '비연동' in station['label']:
@@ -38,7 +38,7 @@ def check(page, url, screenshot=False):
         signal = page.locator('#mmiSignal').input_value()
         page.locator('#mmiApply').click()
         expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
-        page.locator(f'[data-signal="{signal}"]').click()
+        page.locator(f'[data-control-station="{station["id"]}"][data-primary="true"] [data-signal="{signal}"]').click()
         page.locator('#actionDialog button[value="cancel"]').click()
         expect(page.locator('#actionDialog')).not_to_be_visible()
         expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
@@ -51,7 +51,7 @@ def check(page, url, screenshot=False):
     page.locator('#taskSelect').select_option('2')
     page.locator('#startTask').click()
     page.locator('#stationSelect').select_option('cheongnyangni')
-    page.locator('[data-signal="1A"]').click()
+    page.locator('[data-control-station="cheongnyangni"][data-primary="true"] [data-signal="1A"]').click()
     page.locator('[data-route-choice="1A-1T"]').click()
     page.locator('#checkTask').click()
     expect(page.locator('#completedCount')).to_have_text('0 / 9 완료')
@@ -184,8 +184,8 @@ def check(page, url, screenshot=False):
     page.locator('#graphSearch').fill('K1131')
     page.locator('#graphSpan').select_option('120')
     if screenshot:
-        page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.5-diagram.png'), style='#toast {visibility:hidden}')
-        page.locator('#schedulePanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.5-schedule.png'), style='#toast {visibility:hidden}')
+        page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.6-diagram.png'), style='#toast {visibility:hidden}')
+        page.locator('#schedulePanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.6-schedule.png'), style='#toast {visibility:hidden}')
     assert not errors, errors
 
 

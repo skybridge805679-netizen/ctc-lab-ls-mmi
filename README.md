@@ -1,24 +1,26 @@
 # CTC LAB — LS·MMI 관제 조작 연습
 
-매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.5.1: 관제 대상 15개 역 전환·기본 제어, 온라인 열차 다이아, 전체 33개 역 온라인 스케줄 관리.**
+매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.6.0: 중간역을 포함한 전체 배선 표시, 15개 취급역의 진로·입환·전환기 제어, 온라인 다이아·33개 역 스케줄 관리.**
 
-[v0.5.1 실행본 ZIP](archive/CTC-LAB-v0.5.1.zip)을 내려받아 압축을 풀어도 됩니다.
+[v0.6.0 실행본 ZIP](archive/CTC-LAB-v0.6.0.zip)을 내려받아 압축을 풀어도 됩니다.
 
 ## 바로 실행
 저장소를 내려받고 `simulator/index.html`을 브라우저로 여세요. 빌드나 외부 라이브러리가 필요 없습니다.
 로컬 서버를 쓰려면 `python3 -m http.server 8765 --directory simulator` 실행 후 http://localhost:8765/ 에 접속합니다. localhost는 실행 중인 본인 컴퓨터에서만 열립니다.
 
-1. LS 상단 CCM → 예.
+1. 취급역에서 지하서울 선택 → 해당 역 CCM → 예.
 2. 3A 신호기 → RT_3A_B065T.
 3. B065T–X1T–21BT 녹색 경로와 3A 진행 표시 확인.
 4. 3A 재클릭 → 예: 정지·해정. 취소하면 유지.
 5. MMI 진로제어에서 같은 설정·해정 연습 가능.
 
-## 새 배선도
+## 전체 배선과 취급역
 
-[1.전체노선.pdf](references/diagrams/1.전체노선.pdf)로 배선 배경을 교체했습니다. 선택역 화면은 해당 구간을 확대하고, **전체노선 보기**에서 PDF 4쪽을 전환할 수 있습니다. 전체노선 1쪽의 역 이름을 누르면 제어 화면으로 돌아옵니다.
+[1.전체노선.pdf](references/diagrams/1.전체노선.pdf)의 각 쪽 전체를 이어 표시합니다. 취급역을 선택해도 비취급역과 역간 배선을 잘라내지 않습니다. 확대·축소·스크롤로 이동하고, **전체 폭 맞춤**으로 구간 전체를 확인하세요.
 
-![교체된 지하서울 배선](docs/preview-v0.5.1-station.png)
+15개 취급역의 신호기 246개에서 진로 설정·해정과 선 표시를 조작할 수 있습니다. 대피선·입환, 전환기 쇄정, 일괄정지, 모의 점유와 연속진로제어를 포함합니다. 전체 진로표·세부 연동조건까지 완전 재현한 버전은 아닙니다. [수정 내용·근거·현재 범위](docs/전체배선과역별제어.md)를 확인하세요.
+
+![중간역을 포함한 전체 배선](docs/preview-v0.6-full-line.png)
 
 ## 전체 역·다이아·스케줄
 
@@ -29,8 +31,8 @@
 
 [사용법·근거·구현 범위](docs/전체역과열차다이아.md)
 
-![열차 다이아](docs/preview-v0.5-diagram.png)
-![온라인 열차스케줄 관리](docs/preview-v0.5-schedule.png)
+![열차 다이아](docs/preview-v0.6-diagram.png)
+![온라인 열차스케줄 관리](docs/preview-v0.6-schedule.png)
 
 ## 개발 검증
 ```sh
@@ -38,9 +40,10 @@ node simulator/core.test.cjs
 node simulator/practice.test.cjs
 node simulator/network.test.cjs
 node simulator/schedule.test.cjs
+node simulator/wiring.test.cjs
 node --check simulator/app.js
 ```
-Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test.py`로 데스크톱·모바일에서 9개 과제 전체를 검증합니다. `python3 simulator/map.browser.test.py`는 PDF 4쪽과 15개 역의 새 조작 영역을 검증합니다. 추가로 `python3 simulator/network.browser.test.py`는 15개 역과 다이아·온라인 스케줄 관리 전체 흐름을 검증합니다. 파일 직접 실행 검증은 브라우저 정책이 허용하는 환경에서 `--include-file`을 추가합니다.
+Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test.py`로 데스크톱·모바일에서 9개 과제 전체를 검증합니다. `python3 simulator/map.browser.test.py`는 전체 시트 유지와 15개 역의 246개 신호기 조작, 대피선·점유·연속제어를 검증합니다. `python3 simulator/wiring.alignment.test.py`는 Pillow로 원본 선로 픽셀과 경로 위치를 대조합니다. 추가로 `python3 simulator/network.browser.test.py`는 15개 역과 다이아·온라인 스케줄 관리 전체 흐름을 검증합니다. 파일 직접 실행 검증은 브라우저 정책이 허용하는 환경에서 `--include-file`을 추가합니다.
 
 ## 문서 안내
 - [제작 지침](docs/제작지침.md): 목표, 고증 원칙, 구현 판단 기준
