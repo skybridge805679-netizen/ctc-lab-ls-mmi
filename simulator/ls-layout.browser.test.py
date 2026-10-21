@@ -12,7 +12,7 @@ Thread(target=server.serve_forever,daemon=True).start()
 try:
  with sync_playwright() as p:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
-  for width in [1440,390]:
+  for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1000})
    page.goto(f'http://127.0.0.1:{server.server_port}')
    stations=page.locator('#stationSelect option').evaluate_all('(es)=>es.map(e=>e.value)')

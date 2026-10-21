@@ -4,6 +4,11 @@
  // A visible route path is evidence about geometry, not an interlocking table.
  const {sources,routes,points,signals}=config;
  const IL=typeof module!=='undefined'?require('./interlocking.js'):root.SimInterlocking;
+ const MENUS=typeof module!=='undefined'?require('./route-menus.js'):root.SimRouteMenus;
+ // Routes the real LS popup offers for a signal. Verified stations use the transcribed list; others fall back to every derived route.
+ const lsMenu=sig=>{const list=MENUS?.[config.id]?.[sig];return list?list.map(d=>sig+'-'+d).filter(id=>routes[id]):Object.keys(routes).filter(id=>routes[id].signal===sig);};
+ const menuVerified=!!MENUS?.[config.id]&&Object.keys(signals).every(sig=>MENUS[config.id][sig]);
+ const menuVerifiedFor=sig=>!!MENUS?.[config.id]?.[sig];
  const overlapOf=id=>IL.rulesFor(config.id,id);
  const lockSeconds=signal=>IL.approach.seconds[signals[signal]?.kind]||0;
  const remaining=(s,r)=>Math.max(0,Math.ceil(r.lock.until-s.clock));
@@ -123,7 +128,7 @@
   return log(false,'근거가 확인되지 않은 조작입니다.');
  }
  function lockTable(s){return Object.entries(s.routes).map(([id,r])=>{const ov=overlapOf(id);return {id,signal:routes[id].signal,status:r.status,remaining:r.lock?remaining(s,r):0,total:r.lock?.seconds||0,overlap:ov?{points:ov.points,note:ov.note,clearSignals:ov.clearSignals||[]}:null};});}
- return {initial,dispatch,routes,points,signals,sources,lockTable,lockSeconds,overlapOf};
+ return {initial,dispatch,routes,points,signals,sources,lockTable,lockSeconds,overlapOf,lsMenu,menuVerified,menuVerifiedFor};
  }
  const network=typeof module!=='undefined'?require('./network.js'):root.SimNetwork;
  const api=create(network.catalog['underground-seoul']);

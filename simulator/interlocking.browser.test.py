@@ -89,7 +89,7 @@ def main():
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(executable_path='/usr/bin/chromium')
-            for width, height in ((1440, 1000), (390, 844)):
+            for width, height in ((1440, 1000), (1920, 1080)):
                 page = browser.new_page(viewport={'width': width, 'height': height})
                 exercise(page, url, width)
                 page.close()

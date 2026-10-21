@@ -164,6 +164,34 @@
       "original_name": "1.전체노선.pdf",
       "bytes": 5255784,
       "sha256": "9a8636fa396b7362e0c01a7b76c192eaf6d2226471a425d7367e3579ec5c079e"
+    },
+    {
+      "path": "references/route-menus/README.md",
+      "original_name": "README.md",
+      "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
+      "bytes": 1678,
+      "sha256": "0a6910c1e50e64a2a31c05ac928ed1a6cbfb57ca302156470606bd82f56438fe"
+    },
+    {
+      "path": "references/route-menus/answers/yongsan-2026-10-21.txt",
+      "original_name": "yongsan-2026-10-21.txt",
+      "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
+      "bytes": 314,
+      "sha256": "32854924f1d36ab1c220f46c512aa24b76819161d0db20a72ee7eb5889267711"
+    },
+    {
+      "path": "references/route-menus/ls-route-menus-draft.txt",
+      "original_name": "ls-route-menus-draft.txt",
+      "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
+      "bytes": 5985,
+      "sha256": "f907f6c9c216bc181e4905596745a940c1b868c8de067f90082ab3d932892cd2"
+    },
+    {
+      "path": "references/route-menus/ls-route-menus-transcribed.txt",
+      "original_name": "ls-route-menus-transcribed.txt",
+      "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
+      "bytes": 1341,
+      "sha256": "55b5d7bde48f3f2b2c950216b430aa7edcbab869cb3cdc279bf655b074e4b3ee"
     }
   ],
   "pending_attachments": [],

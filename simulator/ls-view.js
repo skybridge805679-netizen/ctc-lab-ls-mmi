@@ -3,7 +3,7 @@
 const details=typeof module!=='undefined'?require('./schematic-details.js'):root.SimSchematicDetails;
 const switchView=typeof module!=='undefined'?require('./ls-switches.js'):root.SimLSSwitches;
 const inventory=typeof module!=='undefined'?require('./wings.js'):root.SimWings;
-const WIDTH=1280,BAR=20,PADDING=30;
+const WIDTH=1600,BAR=14,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dpath=points=>'M'+points.map(p=>p.join(' ')).join('L');
@@ -16,8 +16,18 @@ function railY(def,id,x){
  }
  return poly[0][1];
 }
+// 관악 belongs to the Anyang screen. Move its complete source strip, retaining the source registration.
+const GWANAK={cut:1496,dx:-1607.4,dy:108.8};
+function sceneOf(st){
+ const data=details[st.id];if(!['geumcheon','anyang'].includes(st.id))return data;
+ const g=details.geumcheon,{cut,dx,dy}=GWANAK;
+ if(st.id==='geumcheon')return {...data,cells:data.cells.filter(c=>c[0]<cut).map(([x,y,w,label])=>[x,y,Math.min(w,cut-x),label]),capsules:data.capsules.filter(c=>c[0]<cut)};
+ return {...data,cells:[...data.cells.filter(c=>c[0]>=109),...g.cells.filter(c=>c[0]+c[2]>cut).map(([x,y,w,label])=>[Math.max(x,cut)+dx,y+dy,x+w-Math.max(x,cut),label])],capsules:[...data.capsules,...g.capsules.filter(c=>c[0]>=cut).map(([x,y,...rest])=>[x+dx,y+dy,...rest])]};
+}
 function wingOf(st,def){
- const source=inventory[st.id],data=details[st.id];
+ const original=inventory[st.id],data=sceneOf(st),{cut,dx,dy}=GWANAK;
+ const move=([a,b,c,d,...rest])=>[a+dx,b+dy,c+dx,d+dy,...rest];
+ const source=st.id==='geumcheon'?{...original,plates:original.plates.filter(p=>p[0]<cut),platforms:original.platforms.filter(p=>p[0]<cut)}:st.id==='anyang'?{...original,plates:[inventory.geumcheon.plates.find(p=>p[0]>=cut)].map(move).concat(original.plates),platforms:inventory.geumcheon.platforms.filter(p=>p[0]>=cut).map(move).concat(original.platforms.filter(p=>p[0]>=0))}:original;
  const xs=def.rails.flatMap(r=>r[1].map(p=>p[0]));
  const lo=Math.min(...xs),hi=Math.max(...xs),outside=x=>x<lo-1||x>hi+1;
  const minY=Math.min(...def.rails.flatMap(r=>r[1].map(p=>p[1]))),band=y=>y>=minY-60;
@@ -28,15 +38,15 @@ function wingOf(st,def){
   markers:data.markers,
   cells:data.cells.filter(c=>outside(c[0]+c[2]/2)),
   diags:source.diags.filter(p=>inside(mean(p,0),mean(p,1))&&band(mean(p,1))&&(Math.max(...p.map(q=>q[0]))>hi+1||Math.min(...p.map(q=>q[0]))<lo-1)),
-  platforms:source.platforms.filter(p=>inside((p[0]+p[2])/2,(p[1]+p[3])/2)&&band((p[1]+p[3])/2)),
+  platforms:source.platforms.filter(p=>(inside((p[0]+p[2])/2,(p[1]+p[3])/2)||(st.id==='anyang'&&p[0]<0))&&band((p[1]+p[3])/2)),
   plates:plates.map((box,i)=>({box,name:st.map.view.intermediate[i]||''})),
   labels:source.labels.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1])),
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
 function layout(def,wing){
- const xs=[],ys=[],rows=new Set();
- for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);rows.add(Math.round(y));}
+ const xs=[],ys=[];
+ for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);}
  for(const signal of def.signals)ys.push(signal[3]);
  for(const [x,y,w]of wing.cells){xs.push(x,x+w);ys.push(y);}
  for(const poly of wing.diags)for(const [x,y]of poly){xs.push(x);ys.push(y);}
@@ -44,20 +54,16 @@ function layout(def,wing){
  for(const p of wing.plates)xs.push(p.box[0],p.box[2]);
  for(const s of wing.signals){xs.push(s[0]);ys.push(s[1]);}
  for(const [x,y]of wing.markers||[]){xs.push(x-14,x+14);}
- const ordered=[...rows].sort((a,b)=>a-b);let pitch=Infinity;
- for(let i=1;i<ordered.length;i++)if(ordered[i]-ordered[i-1]>=20)pitch=Math.min(pitch,ordered[i]-ordered[i-1]);
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
- const sx=(WIDTH-2*PADDING)/(maxX-minX),sy=Math.min(1.65,Math.max(.7,78/(Number.isFinite(pitch)?pitch:51)));
- const top=64+(wing.plates.length?64:0);
- const knots=[minY,...[...rows].filter(y=>y>minY&&y<maxY).sort((a,b)=>a-b),maxY];
- const heights=[top];
- for(let i=1;i<knots.length;i++){const gap=knots[i]-knots[i-1];heights.push(heights.at(-1)+(gap>100?Math.min(gap*sy,118):gap*sy));}
- const yAt=y=>{let i=1;while(i<knots.length-1&&knots[i]<y)i++;const a=knots[i-1],b=knots[i];return heights[i-1]+(y-a)*(heights[i]-heights[i-1])/(b-a||1);};
- return {sx,sy,H:Math.ceil(yAt(maxY)+76),pt:([x,y])=>[+(PADDING+(x-minX)*sx).toFixed(2),+yAt(y).toFixed(2)]};
+ // Preserve the source aspect ratio: independent Y expansion turns crossovers into floating steep bars.
+ const sx=(WIDTH-2*PADDING)/(maxX-minX),sy=sx;
+ const top=110;
+ const yAt=y=>top+(y-minY)*sy;
+ return {sx,sy,H:Math.max(420,Math.ceil(yAt(maxY)+110)),pt:([x,y])=>[+(PADDING+(x-minX)*sx).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
 function render(st,def,core,model,neighbours={}){
- const data=details[st.id],wing=wingOf(st,def),L=layout(def,wing),T=L.pt;
+ const data=sceneOf(st),wing=wingOf(st,def),L=layout(def,wing),T=L.pt;
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -129,10 +135,10 @@ function render(st,def,core,model,neighbours={}){
  for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
-  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),x=(left+right)/2,width=Math.max(right-left,plate.name.length*23+24);
+  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),x=(left+right)/2,width=Math.max(right-left,plate.name.length*16+18);
   const near=wing.platforms.filter(p=>Math.abs(T([(p[0]+p[2])/2,0])[0]-x)<150).map(p=>T([p[0],p[1]])[1]);
-  const y=(near.length?Math.min(...near):topRow)-72;
-  plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><path class="stn-line" d="M${x} ${y+30}V${(near.length?Math.min(...near):topRow)-9}"/><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="32" rx="3"/><text class="plate-name" x="${x}" y="${y+22}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
+  const y=(near.length?Math.min(...near):topRow)-48;
+  plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><path class="stn-line" d="M${x} ${y+24}V${(near.length?Math.min(...near):topRow)-9}"/><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
   occupiedBoxes.push([x-width/2-3,y-4,x+width/2+3,y+36]);
  }
  for(const [x,y,label]of data.markers){
@@ -157,62 +163,41 @@ function render(st,def,core,model,neighbours={}){
   }
   return true;
  });
- // Signals reserve their label areas first. Leader stems retain their actual rail anchor after spacing adjustments.
+ // Each signal stays at its surveyed mast and lamp coordinates. Paired signals retain their source stack.
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
  for(const s of placed){
-  const {id,dir,Y,anchorX}=s;let X=anchorX,LY;const kind=core.signals[id].kind;
-  const desiredY=Y+s.side*Math.max(31,Math.min(36,Math.abs(s.lampY-s.railLocal)*L.sy));
-  LY=desiredY;let signalPlaced=false;
-  const candidates=[[0,0],[0,24],[0,8],[0,-8],[0,-16],[64,0],[-64,0],[64,24],[-64,24],[64,8],[-64,8],[128,0],[-128,0]];
-  for(const [dx,dy]of candidates){const xx=anchorX+dx,yy=desiredY+dy*s.side,box=dir===1?[xx-37,yy-10,xx+25,yy+10]:[xx-25,yy-10,xx+37,yy+10];if(box[0]<8||box[2]>WIDTH-8||box[1]<12||box[3]>L.H-12)continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))&&!touchesRail(box)){X=xx;LY=yy;signalPlaced=true;break;}}
-  if(!signalPlaced){
-   const options=[];
-   for(let dy=-192;dy<=192;dy+=12)for(let dx=-192;dx<=192;dx+=12)options.push([dx,dy]);
-   options.sort((a,b)=>(a[0]*a[0]+a[1]*a[1]*1.2)-(b[0]*b[0]+b[1]*b[1]*1.2));
-   for(const [dx,dy]of options){
-    const xx=anchorX+dx,yy=desiredY+dy,box=dir===1?[xx-37,yy-10,xx+25,yy+10]:[xx-25,yy-10,xx+37,yy+10];
-    if(box[0]<8||box[2]>WIDTH-8||box[1]<12||box[3]>L.H-12)continue;
-    if(!occupiedBoxes.some(o=>intersects(box,o,3))&&!touchesRail(box)){X=xx;LY=yy;break;}
-   }
-  }
-  const lampX=X+dir*13,go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
-  const shape=kind==='입환'?`<rect class="lamp ${go?'go shunt':'stop'}" x="${lampX-5.5}" y="${LY-5.5}" width="11" height="11" rx="1"/>`:`<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="8"/>`;
-  const box=dir===1?[X-37,LY-10,X+25,LY+10]:[X-25,LY-10,X+37,LY+10];
-  occupiedBoxes.push(box);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}"><path class="mast" d="M${anchorX} ${Y+s.side*11}L${X} ${LY}H${lampX-dir*(kind==='입환'?5.5:8)}"/>${shape}<text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-11}" width="${box[2]-box[0]}" height="22" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
+  const LY=T([0,s.lampY])[1],lampX=X+dir*18;
+  const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
+  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-5}" width="24" height="10" rx="5"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="4.5"/>`;
+  const box=dir===1?[X-30,LY-6,X+25,LY+6]:[X-25,LY-6,X+30,LY+6];
+  occupiedBoxes.push(dir===1?[X-8-id.length*6,LY-6,X+23,LY+6]:[X-23,LY-6,X+8+id.length*6,LY+6]);
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-6}" width="${box[2]-box[0]}" height="12" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
   if(model.approach?.[id]){
    const x=anchorX-dir*46;trains+=`<g class="approach-train" data-approach-train="${id}"><rect x="${x-24}" y="${Y-10}" width="48" height="20" rx="3"/><text x="${x}" y="${Y+5}" text-anchor="middle">열차</text></g>`;
   }
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
-  const width=text.length*7.2+6,height=16;
-  const offsets=[[0,0],[0,-24],[0,24],[28,-22],[-28,-22],[28,22],[-28,22],[52,0],[-52,0],[0,-48],[0,48],[68,-24],[-68,-24],[68,24],[-68,24]];
-  let chosen=null;
-  for(let ring=0;ring<4&&!chosen;ring++)for(const [dx,dy]of offsets){
-   const x=preferred[0]+dx*(ring+1),y=preferred[1]+dy*(ring+1),box=[x-width/2,y-height/2,x+width/2,y+height/2];
-   if(box[0]<8||box[2]>WIDTH-8||box[1]<14||box[3]>L.H-12)continue;
-   if(!occupiedBoxes.some(o=>intersects(box,o,4))&&!touchesRail(box)){chosen={x,y,box};break;}
+  // Resolve dense labels locally only. Never detach an annotation from its turnout.
+  const width=text.length*5.8+2;
+  preferred=[Math.max(20,Math.min(WIDTH-20,preferred[0])),Math.max(20,Math.min(L.H-20,preferred[1]))];
+  let [x,y]=preferred;
+  const offsets=[[0,0]];
+  for(let d=12;d<=36;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
+  for(const [dx,dy]of offsets){
+   const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-6,xx+width/2,yy+6];
+   if(xx<width/2+8||xx>WIDTH-width/2-8)continue;
+   if(!occupiedBoxes.some(o=>intersects(box,o,1))&&!touchesRail(box)){x=xx;y=yy;break;}
   }
-  if(!chosen){
-   const options=[];
-   for(let dy=-192;dy<=192;dy+=12)for(let dx=-192;dx<=192;dx+=12)options.push([dx,dy]);
-   options.sort((a,b)=>Math.hypot(a[0],a[1])-Math.hypot(b[0],b[1]));
-   for(const [dx,dy]of options){
-    const x=preferred[0]+dx,y=preferred[1]+dy,box=[x-width/2,y-height/2,x+width/2,y+height/2];
-    if(box[0]<8||box[2]>WIDTH-8||box[1]<14||box[3]>L.H-12)continue;
-    if(!occupiedBoxes.some(o=>intersects(box,o,4))&&!touchesRail(box)){chosen={x,y,box};break;}
-   }
-  }
-  if(!chosen){const x=Math.max(width/2+8,Math.min(WIDTH-width/2-8,preferred[0])),y=L.H-24;chosen={x,y,box:[x-width/2,y-8,x+width/2,y+8]};}
-  occupiedBoxes.push(chosen.box);
-  if(Math.hypot(chosen.x-anchor[0],chosen.y-anchor[1])>12)leaders+=`<path class="annotation-leader" d="M${anchor.join(' ')}L${chosen.x} ${chosen.y}"/>`;
-  return {x:chosen.x,y:chosen.y,svg:`<text class="annotation ${kind}" data-label-kind="${kind}" data-label-id="${esc(id)}" x="${chosen.x}" y="${chosen.y+4.5}" text-anchor="middle">${esc(text)}</text>`};
+  occupiedBoxes.push([x-width/2,y-6,x+width/2,y+6]);
+  return {x,y,svg:`<text class="annotation ${kind}" data-label-kind="${kind}" data-label-id="${esc(id)}" x="${x}" y="${y+3.5}" text-anchor="middle">${esc(text)}</text>`};
  };
  const overlapPoints=new Set(Object.keys(model.routes).flatMap(id=>Object.keys(core.overlapOf(id)?.points||{})));
  // Switch identifiers and source A/B part identifiers use the same placement solver.
  for(const [id,pos]of Object.entries(core.points)){
   const anchor=pointAnchors[id]||T(toLocal(pos.x,pos.y)),R=model.points[id]==='R',locked=model.blockedPoints.includes(id);
-  const label=takeLabel(id+(R?' R':''),anchor,'point',id,[anchor[0],anchor[1]-23]);
+  const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>T(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
+  const label=takeLabel(id,anchor,'point',id,surveyed||[anchor[0],anchor[1]-13]);
   pointSymbols+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-label="${id}">${label.svg}<title>${id} · ${R?'반위':'정위'}${locked?' · 수동 쇄정':''}</title></g>`;
   if(overlapPoints.has(id))pointSymbols+=`<circle class="overlap-ring" data-overlap-point="${id}" cx="${label.x}" cy="${label.y}" r="18"/>`;
  }
@@ -223,13 +208,13 @@ function render(st,def,core,model,neighbours={}){
   const key=item.join('|');if(seen.has(key))continue;seen.add(key);
   const anchor=T(item);annotations+=takeLabel(item[2],anchor,'part',key).svg;
  }
- for(const [x,y,id,dir]of wing.signals){const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
+ for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
  const edgeY=topRow-28;
  if(neighbours.left)plates+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(neighbours.left)}</text>`;
  if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
  const switches=switchView.build(st,def,core,model,T);
  return {width:WIDTH,height:L.H,svg:`${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}`};
 }
-const api={render,layout,wingOf};
+const api={render,layout,wingOf,sceneOf};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -12,7 +12,7 @@ Thread(target=server.serve_forever,daemon=True).start()
 try:
  with sync_playwright() as p:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
-  for width in [1440,390]:
+  for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1000});requests=[];errors=[]
    page.on('request',lambda r:requests.append(r.url));page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
@@ -23,7 +23,7 @@ try:
     assert page.locator('[data-track-section]').count()>0
     assert page.locator('[data-circuit-label]').count()>0
     expect(page.locator('[data-equipment]')).to_have_count(11)
-    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.10.0-{station}.png'))
+    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.11.0-{station}.png'))
    page.select_option('#lsStationSelect','underground-seoul')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()

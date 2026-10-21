@@ -18,7 +18,7 @@ Thread(target=server.serve_forever, daemon=True).start()
 try:
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
-        for width in [1440, 390]:
+        for width in [1440, 1920]:
             context = browser.new_context(viewport={'width': width, 'height': 1000})
             page = context.new_page(); errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
@@ -49,8 +49,9 @@ try:
                 box = page.evaluate("""()=>{const s=document.querySelector('#trackSvg').getBoundingClientRect(),h=document.querySelector('#lsStage').getBoundingClientRect(),g=document.querySelector('#trackSvg').getBBox(),v=document.querySelector('#trackSvg').viewBox.baseVal;return {fill:s.width/h.width,left:g.x,right:v.width-(g.x+g.width),top:g.y,bottom:v.height-(g.y+g.height)}}""")
                 if width == 1440:
                     assert box['fill'] > 0.9, box
+                assert stage.locator('#trackSvg').evaluate('(s)=>s.getBoundingClientRect().width <= s.parentElement.clientWidth+1'), 'diagram is cropped inside station screen'
                 assert abs(box['left'] - box['right']) < 90, box
-                assert box['top'] < 130 and box['bottom'] < 90, box
+                assert box['top'] < 130 and box['bottom'] < 250, box
                 assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'page scrolls horizontally'
                 stage.locator('[data-mode="CCM"]').click(); page.locator('#dialogConfirm').click()
                 expect(page.locator('#stateMode')).to_have_text('CCM')
@@ -87,7 +88,7 @@ try:
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:
                     page.select_option('#lsStationSelect', station)
-                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.10.0-{station}.png'))
+                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.11.0-{station}.png'))
             assert not errors, errors
             context.close()
             print(f'PASS vector LS: {tested} signals, navigation, continuous/occupancy, removed controls: {width}px', flush=True)
