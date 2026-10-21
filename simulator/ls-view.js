@@ -3,7 +3,7 @@
 const details=typeof module!=='undefined'?require('./schematic-details.js'):root.SimSchematicDetails;
 const switchView=typeof module!=='undefined'?require('./ls-switches.js'):root.SimLSSwitches;
 const inventory=typeof module!=='undefined'?require('./wings.js'):root.SimWings;
-const WIDTH=1600,BAR=14,PADDING=30;
+const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dpath=points=>'M'+points.map(p=>p.join(' ')).join('L');
@@ -55,11 +55,14 @@ function layout(def,wing){
  for(const s of wing.signals){xs.push(s[0]);ys.push(s[1]);}
  for(const [x,y]of wing.markers||[]){xs.push(x-14,x+14);}
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
- // Preserve the source aspect ratio: independent Y expansion turns crossovers into floating steep bars.
- const sx=(WIDTH-2*PADDING)/(maxX-minX),sy=sx;
- const top=110;
+ // Use vertical desktop space for readable rail and signal lanes; preserve every connection.
+ const railRows=[...new Set(def.rails.flatMap(r=>r[1].slice(1).filter((p,i)=>Math.abs(p[1]-r[1][i][1])<2).map(p=>p[1])))].sort((a,b)=>a-b);
+ const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
+ const pitch=Math.min(...pitches,80);
+ const sx=(WIDTH-2*PADDING)/(maxX-minX),sy=Math.max(sx,80/pitch);
+ const top=72;
  const yAt=y=>top+(y-minY)*sy;
- return {sx,sy,H:Math.max(420,Math.ceil(yAt(maxY)+110)),pt:([x,y])=>[+(PADDING+(x-minX)*sx).toFixed(2),+yAt(y).toFixed(2)]};
+ return {sx,sy,H:Math.max(460,Math.ceil(yAt(maxY)+72)),pt:([x,y])=>[+(PADDING+(x-minX)*sx).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
 function render(st,def,core,model,neighbours={}){
@@ -169,27 +172,27 @@ function render(st,def,core,model,neighbours={}){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
   const LY=T([0,s.lampY])[1],lampX=X+dir*18;
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
-  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-5}" width="24" height="10" rx="5"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="4.5"/>`;
-  const box=dir===1?[X-30,LY-6,X+25,LY+6]:[X-25,LY-6,X+30,LY+6];
-  occupiedBoxes.push(dir===1?[X-8-id.length*6,LY-6,X+23,LY+6]:[X-23,LY-6,X+8+id.length*6,LY+6]);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-6}" width="${box[2]-box[0]}" height="12" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
+  const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
+  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
   if(model.approach?.[id]){
    const x=anchorX-dir*46;trains+=`<g class="approach-train" data-approach-train="${id}"><rect x="${x-24}" y="${Y-10}" width="48" height="20" rx="3"/><text x="${x}" y="${Y+5}" text-anchor="middle">열차</text></g>`;
   }
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
   // Resolve dense labels locally only. Never detach an annotation from its turnout.
-  const width=text.length*5.8+2;
+  const width=text.length*7+2;
   preferred=[Math.max(20,Math.min(WIDTH-20,preferred[0])),Math.max(20,Math.min(L.H-20,preferred[1]))];
   let [x,y]=preferred;
   const offsets=[[0,0]];
   for(let d=12;d<=36;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
   for(const [dx,dy]of offsets){
-   const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-6,xx+width/2,yy+6];
+   const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-7,xx+width/2,yy+7];
    if(xx<width/2+8||xx>WIDTH-width/2-8)continue;
    if(!occupiedBoxes.some(o=>intersects(box,o,1))&&!touchesRail(box)){x=xx;y=yy;break;}
   }
-  occupiedBoxes.push([x-width/2,y-6,x+width/2,y+6]);
+  occupiedBoxes.push([x-width/2,y-7,x+width/2,y+7]);
   return {x,y,svg:`<text class="annotation ${kind}" data-label-kind="${kind}" data-label-id="${esc(id)}" x="${x}" y="${y+3.5}" text-anchor="middle">${esc(text)}</text>`};
  };
  const overlapPoints=new Set(Object.keys(model.routes).flatMap(id=>Object.keys(core.overlapOf(id)?.points||{})));

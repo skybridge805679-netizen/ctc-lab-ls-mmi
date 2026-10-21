@@ -1,7 +1,7 @@
 /* Physical switch display derived from the same N/R positions and locks as the control core. */
 (function(root){
 'use strict';
-const BAR=14,GAP=4,OFFSET=BAR/2+3;
+const BAR=18,GAP=4,OFFSET=BAR/2+3;
 const dpath=points=>'M'+points.map(p=>p.join(' ')).join('L');
 function onSegment(p,a,b){return Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]))<.01&&p[0]>=Math.min(a[0],b[0])-.01&&p[0]<=Math.max(a[0],b[0])+.01&&p[1]>=Math.min(a[1],b[1])-.01&&p[1]<=Math.max(a[1],b[1])+.01;}
 function at(rail,x){const poly=rail[1];for(let i=1;i<poly.length;i++){const a=poly[i-1],b=poly[i];if(x>=Math.min(a[0],b[0])&&x<=Math.max(a[0],b[0])&&b[0]!==a[0])return [x,a[1]+(x-a[0])*(b[1]-a[1])/(b[0]-a[0])];}throw Error('Switch anchor is off rail '+rail[0]);}

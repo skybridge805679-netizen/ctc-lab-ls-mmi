@@ -23,7 +23,7 @@ try:
     assert page.locator('[data-track-section]').count()>0
     assert page.locator('[data-circuit-label]').count()>0
     expect(page.locator('[data-equipment]')).to_have_count(11)
-    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.11.0-{station}.png'))
+    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.11.1-{station}.png'))
    page.select_option('#lsStationSelect','underground-seoul')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()

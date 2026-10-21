@@ -22,13 +22,18 @@ test('jurisdiction stations are drawn with their plates from the original strips
   if(names.length){assert(wing.cells.length>=3,st.id+' cells');assert(wing.platforms.length>=1,st.id+' platforms');}
  }
 });
-test('source proportions and the Gwanak handover retain a complete desktop diagram',()=>{
- for(const st of controlled){const d=W.data[st.id],wing=LS.wingOf(st,d),L=LS.layout(d,wing);assert.equal(L.sx,L.sy,st.id+' distorted source aspect');}
+test('readable vertical lanes and the Gwanak handover retain a complete desktop diagram',()=>{
+ for(const st of controlled){const d=W.data[st.id],wing=LS.wingOf(st,d),L=LS.layout(d,wing);assert(L.sy>=L.sx,st.id+' compressed vertical lanes');}
  const g=LS.wingOf(N.catalog.geumcheon,W.data.geumcheon),a=LS.wingOf(N.catalog.anyang,W.data.anyang);
  assert.deepEqual(g.plates.map(p=>p.name),['석수']);assert.deepEqual(a.plates.map(p=>p.name),['관악','명학']);
  assert(a.platforms.some(p=>p[0]<0),'Gwanak platforms must move with its plate');
  const before=LS.sceneOf(N.catalog.anyang).cells.filter(c=>c[0]<0);
  assert.equal(new Set(before.map(c=>Math.round(c[1]))).size,4,'all four Gwanak tracks are retained');
+});
+test('Geumcheon 4T/5T crossover has no OCR glyphs rendered as horizontal track beds',()=>{
+ const cells=LS.sceneOf(N.catalog.geumcheon).cells;
+ assert(!cells.some(([x,y,w,label])=>x>160&&x<220&&y>440&&y<460),'false horizontal bars inside 21/22 crossing');
+ assert(cells.some(c=>c[3]==='21AT'));assert(cells.some(c=>c[3]==='21BT'));
 });
 test('route lines, approach trains and overlap rings are drawn from the same state',()=>{
  const st=N.catalog.geumcheon,C=Core.forStation('geumcheon'),s=C.initial();
