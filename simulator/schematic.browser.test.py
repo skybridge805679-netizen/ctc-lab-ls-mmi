@@ -23,7 +23,7 @@ try:
     assert page.locator('[data-track-section]').count()>0
     assert page.locator('[data-circuit-label]').count()>0
     expect(page.locator('[data-equipment]')).to_have_count(11)
-    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.13.0-{station}.png'))
+    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.14.0-{station}.png'))
    page.select_option('#lsStationSelect','underground-seoul')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()
@@ -32,7 +32,7 @@ try:
    assert page.locator('[data-track-state="occupied"]').count()>0
    page.locator('[data-sim-clear="1A-1T"]').click()
    expect(page.locator('[data-track-state="occupied"]')).to_have_count(0)
-   assert not [u for u in requests if any(ext in u.lower() for ext in ['.jpg','.jpeg','.png','.webp'])],requests
+   assert not [u for u in requests if any(ext in u.lower() for ext in ['.jpg','.jpeg','.png','.webp']) and 'orpheia-mascot' not in u],requests  # the optional MMI mascot is decoration, not part of the LS
    assert not errors,errors
    page.close();print(f'PASS {width}px: 15 native scenes, no raster requests, equipment identifiers and track-state linkage')
   browser.close()

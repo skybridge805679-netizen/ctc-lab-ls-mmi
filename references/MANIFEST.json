@@ -220,6 +220,13 @@
       "source": "Derived placement inventory reviewed against user-provided 배선도(관제교육장).pptx; original assets preserved",
       "bytes": 101568,
       "sha256": "2e4ee57a4e3ce3e9694b0935a68d7eadbed266b0bce4943a1f1ce5e8ecd1b044"
+    },
+    {
+      "path": "references/route-menus/evidence/mmi-photos-2026-10-21.txt",
+      "original_name": "mmi-photos-2026-10-21.txt",
+      "source": "Derived transcription of user-provided MMI photos; Claude branch ed81a24",
+      "bytes": 950,
+      "sha256": "0bda0bc244600f548039c6fdd48ddef06ee20a093d9bb8cde8706482e8f35403"
     }
   ],
   "pending_attachments": [],
