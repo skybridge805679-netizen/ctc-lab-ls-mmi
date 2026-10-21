@@ -59,3 +59,39 @@
 .tg-menu{padding:3px 10px;border:1px solid transparent;background:transparent;font-size:12px;color:#111;cursor:default}
 .tg-menu:hover{background:#316ac5;color:#fff}
 .mmi-win .graph-scroll{max-height:none;overflow-y:visible}
+
+.mmi-shield{position:absolute;inset:0;z-index:5000;background:rgba(40,50,80,.18);display:flex;align-items:center;justify-content:center}
+.mmi-alert{min-width:280px;max-width:420px;background:#ecebe6;border:1px solid #5d6c97;box-shadow:4px 4px 10px rgba(30,40,70,.45)}
+.mmi-alert .mmi-title{cursor:default;background:linear-gradient(#8ea2d8,#5f78bf);color:#fff}
+.mmi-alert p{margin:0;padding:18px 20px;font-size:13px;line-height:1.5;color:#111}
+.mmi-alert button{display:block;margin:0 auto 12px;min-width:76px;padding:4px 14px}
+/* [CA028_02] schedule window */
+.sched-win{font-size:12px;color:#111}
+.sched-win fieldset{margin:0 0 6px;padding:4px 8px 6px;border:1px solid #9a9a96}
+.sched-win legend{padding:0 4px;font-size:12px}
+.sched-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:8px;padding:8px}
+.sched-info{display:flex;flex-direction:column;min-width:0}
+.sched-cap{background:#8d94b9;color:#fff;padding:2px 8px;font-weight:700}
+.sched-calls{height:300px;overflow:auto;background:#fff;border:1px solid #9a9a96}
+.sched-calls table{width:100%;border-collapse:collapse}
+.sched-calls th{position:sticky;top:0;background:#e6e6e2;border:1px solid #b9b9b4;padding:2px 4px;white-space:nowrap}
+.sched-calls td{border:1px solid #d6d6d2;padding:1px 3px;white-space:nowrap}
+.sched-calls tr.cx td{color:#a33;background:#fbeeee}
+.sched-calls input{width:78px;font-size:12px;padding:0 2px;border:1px solid #aaa}
+.sched-calls input[data-field$="Route"]{width:84px}
+.sched-row{display:flex;align-items:center;gap:8px;margin:2px 0}
+.sched-row input[type=text],.sched-row input:not([type]),.sched-row select{flex:1;min-width:0}
+.sched-side select[size]{width:100%}
+.sched-count{margin:2px 0;color:#555}
+.sched-btn{padding:3px 10px;border:1px solid #6d6d6a;background:#e8e8e4;font-size:12px;cursor:default}
+.sched-btn:hover:not(:disabled){background:#d9e2f6}.sched-btn:disabled{color:#888}.sched-btn.alert{background:#f6d4d0}
+.sched-btn.primary{font-weight:700}
+.sched-lower{display:grid;grid-template-columns:minmax(0,1.6fr) 1fr 1fr;gap:8px;padding:0 8px}
+.sched-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:3px 8px}
+.sched-fields label{display:flex;flex-direction:column;gap:1px}
+.sched-flags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sched-buttons{display:flex;justify-content:space-between;padding:6px 8px}
+.sched-buttons span{display:flex;gap:6px}
+#scheduleMessage{margin:0;padding:3px 8px;min-height:18px;border-top:1px solid #b9b9b4;background:#f6f6f4}
+.pat-dlg{padding:10px 14px;font-size:12px;display:grid;gap:6px}
+.pat-dlg label{display:flex;gap:8px;align-items:center}.pat-dlg label>span{min-width:70px}

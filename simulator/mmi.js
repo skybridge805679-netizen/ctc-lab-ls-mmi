@@ -72,6 +72,14 @@ function createWindow(id,{title,x=24,y=24,width,body,host=null,onClose=null}){
  if(host)new MutationObserver(()=>{el.hidden=host.hidden;}).observe(host,{attributes:true,attributeFilter:['hidden']});
  return w;
 }
+// modal message box (원본의 "확인" 대화상자): a shield blocks the desktop until it is acknowledged
+function alertBox(text,done){
+ const shield=doc.createElement('div');shield.className='mmi-shield';
+ const box=doc.createElement('div');box.className='mmi-alert';box.setAttribute('role','alertdialog');
+ box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">확인</span></div><p>${esc(text)}</p><button type="button" id="mmiAlertOk">확인</button>`;
+ shield.appendChild(box);(desktop||doc.body).appendChild(shield);
+ const ok=box.querySelector('button');ok.focus();ok.onclick=()=>{shield.remove();done?.();};
+}
 function fitDesktop(){
  if(!desktop)return;let bottom=0;for(const w of Object.values(windows))if(!w.el.hidden)bottom=Math.max(bottom,w.el.offsetTop+w.el.offsetHeight);
  desktop.style.minHeight=Math.max(760,bottom+16)+'px';
@@ -150,5 +158,5 @@ function init(){
  renderLogs();
 }
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
-root.SimMMI={open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

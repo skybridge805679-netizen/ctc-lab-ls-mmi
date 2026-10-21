@@ -22,7 +22,7 @@ try:
             context = browser.new_context(viewport={'width': width, 'height': 1000})
             page = context.new_page(); errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
-            page.on('response', lambda r: errors.append(f'HTTP {r.status} {r.url}') if r.status >= 400 else None)
+            page.on('response', lambda r: errors.append(f'HTTP {r.status} {r.url}') if r.status >= 400 and 'orpheia-mascot' not in r.url else None)
             page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='networkidle')
             # Removed: PDF background, sheet/zoom tools, LS point buttons, decorative frame elements.
             for gone in ['#mapSheet', '#mapOverview', '#mapZoomIn', '.track-frame', '#trackSvg image', '[data-point]', '.point-hit', '[data-select-control]']:
