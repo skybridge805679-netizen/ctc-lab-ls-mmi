@@ -6,6 +6,22 @@ from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright, expect
 
+def open_menu(page, top, *path):
+    """Open an MMI window through the real menu bar: top menu, then each submenu entry."""
+    page.locator('.mmi-top-btn', has_text=top).click()
+    for name in path[:-1]:
+        page.locator('.mmi-menu-list .has-sub > button', has_text=name).first.click()
+    page.locator('.mmi-menu-list [data-mmi-open]', has_text=path[-1]).first.click()
+
+
+def front(page, window_id):
+    """Bring an MMI window to the front through the menu (windows overlap like on the real MMI)."""
+    if window_id == 'graph':
+        open_menu(page, '열차스케줄', '온라인 열차그래프(O)')
+    else:
+        open_menu(page, '열차스케줄', '온라인열차스케줄 관리', '온라인 열차스케줄관리(G)')
+
+
 ROOT = Path(__file__).resolve().parent
 
 
@@ -68,8 +84,7 @@ def check(page, url, screenshot=False):
     page.locator('#stationSelect').select_option('guro')
     expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
     page.locator('#pauseBtn').click()
-    page.locator('#trainGraphMenu').click()
-    page.locator('#onlineGraphBtn').click()
+    open_menu(page, '열차스케줄', '온라인 열차그래프(O)')
     expect(page.locator('#diaSvg [data-dia-train]')).to_have_count(12)
     expect(page.locator('#diaSvg [data-dia-station], #diaSvg [data-dia-stop]')).to_have_count(33)
     expect(page.locator('#graphDetails tbody tr')).to_have_count(33)
@@ -118,8 +133,7 @@ def check(page, url, screenshot=False):
     page.locator('#graphFrom').select_option('cheongnyangni')
     page.locator('#graphTo').select_option('suwon')
     # All-station online schedule creation, atomic validation, edit/copy/cancel.
-    page.locator('#scheduleMenu').click()
-    page.locator('#onlineScheduleBtn').click()
+    open_menu(page, '열차스케줄', '온라인열차스케줄 관리', '온라인 열차스케줄관리(G)')
     expect(page.locator('#scheduleFrom option')).to_have_count(33)
     expect(page.locator('#scheduleTo option')).to_have_count(33)
     page.locator('#scheduleMode').select_option('create')
@@ -159,7 +173,9 @@ def check(page, url, screenshot=False):
     expect(page.locator('#graphTrain')).to_have_value('C2001')
     expect(page.locator('#graphDetails h3')).not_to_contain_text('운휴')
     expect(page.locator('#graphDetails')).to_contain_text('10:00:00')
+    front(page, 'graph')
     page.locator('#graphApplyDelay').click()
+    front(page, 'schedule')
     page.locator('#scheduleApply').click()
     expect(page.locator('#scheduleMessage')).to_contain_text('다시 조회')
     page.locator('#scheduleMode').select_option('create')

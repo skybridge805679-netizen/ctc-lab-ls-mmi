@@ -1,0 +1,48 @@
+/* ORPHEIA MMI shell — classic Windows look after the real MMI photos (2026-10-21); the school logo is not used */
+.mmi-shell{padding:0;overflow:visible;border:2px solid #6c7aa3;border-radius:4px;background:#f3f3f1;color:#111}
+.mmi-appbar{display:flex;align-items:center;gap:8px;padding:4px 10px;background:linear-gradient(#e9ecf5,#cfd5e6);border-bottom:1px solid #8c97b8;font-size:13px}
+.mmi-appicon{width:14px;height:14px;background:#3a5ea8;border:1px solid #1f3a73;border-radius:2px}
+.mmi-appnote{margin-left:auto;font-size:11px;color:#55607e}
+.mmi-menubar{display:flex;gap:2px;padding:2px 6px;background:#f0f0ee;border-bottom:1px solid #a6a6a2;position:relative;z-index:200}
+.mmi-menu-top{position:relative}
+.mmi-top-btn{padding:4px 12px;border:1px solid transparent;background:transparent;font-size:13px;cursor:default;color:#111}
+.mmi-top-btn:hover,.mmi-menu-top.open>.mmi-top-btn{background:#316ac5;color:#fff;border-color:#244e92}
+.mmi-menu-list{display:none;position:absolute;left:0;top:100%;min-width:230px;margin:0;padding:2px;list-style:none;background:#f6f6f4;border:1px solid #6d6d6a;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:300}
+.mmi-menu-top.open>.mmi-menu-list{display:block}
+.mmi-menu-list li{position:relative}
+.mmi-menu-list button{display:flex;justify-content:space-between;align-items:center;gap:18px;width:100%;padding:5px 12px;border:0;background:transparent;text-align:left;font-size:13px;color:#111;cursor:default;white-space:nowrap}
+.mmi-menu-list button:hover:not(:disabled),.mmi-menu-list .has-sub.open>button{background:#316ac5;color:#fff}
+.mmi-menu-list button:disabled{color:#8b8b88}
+.mmi-menu-list .mmi-menu-list{left:100%;top:-3px}
+.mmi-menu-list .has-sub.open>.mmi-menu-list{display:block}
+.mmi-desktop{position:relative;min-height:760px;background:linear-gradient(135deg,#f3f4f7,#e7eaf2);overflow:hidden;border-bottom:1px solid #8c97b8}
+.mmi-wallpaper{position:absolute;inset:0;pointer-events:none;display:flex;justify-content:space-around;align-items:center;gap:40px;padding:0 6%}
+.mmi-brand{display:flex;align-items:center;gap:16px;opacity:.55}
+.mmi-mascot img{height:190px;width:auto;display:block}
+.mmi-brand-text{display:flex;flex-direction:column;line-height:1}
+.mmi-brand-text b{font-size:46px;letter-spacing:.06em;color:#2e3a58}
+.mmi-brand-text em{font-style:normal;font-size:30px;font-weight:800;color:#c9a227;letter-spacing:.3em;margin-top:4px}
+.mmi-brand-text small{margin-top:8px;font-size:13px;color:#59627d;letter-spacing:.12em}
+.mmi-win{position:absolute;max-width:calc(100% - 8px);background:#ecebe6;border:1px solid #5d6c97;box-shadow:4px 4px 10px rgba(30,40,70,.35);display:flex;flex-direction:column}
+.mmi-win[hidden]{display:none}
+.mmi-title{display:flex;align-items:center;gap:6px;padding:3px 4px 3px 6px;background:linear-gradient(#bcc6e0,#9eabcf);border-bottom:1px solid #6d7ca8;cursor:move;user-select:none;font-size:12px}
+.mmi-win.active .mmi-title{background:linear-gradient(#8ea2d8,#5f78bf);color:#fff}
+.mmi-title-icon{width:11px;height:11px;background:#fff;border:1px solid #55658f}
+.mmi-title-text{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mmi-close{width:20px;height:18px;line-height:14px;padding:0;border:1px solid #7b2a22;background:#c9503f;color:#fff;font-size:11px;cursor:pointer}
+.mmi-close:hover{background:#e0604d}
+.mmi-win-body{overflow:auto;max-height:700px}
+.mmi-win-body>.panel{margin:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+.mmi-win .graph-panel>.panel-title{display:none}
+.mmi-win .mmi-window{margin:0;border:0;box-shadow:none}
+.mmi-pending{padding:18px 20px;font-size:13px;line-height:1.6;color:#33363f}
+.mmi-pending b{font-size:14px}
+.mmi-logs{display:grid;gap:0}
+.mmi-log{border-top:1px solid #8c97b8}
+.mmi-log-head{padding:2px 8px;background:#8d94b9;color:#fff;font-size:12px;font-weight:700}
+.mmi-log-scroll{height:104px;overflow:auto;background:#fff}
+.mmi-log table{width:100%;border-collapse:collapse;font-size:12px}
+.mmi-log th{position:sticky;top:0;background:#e6e6e2;text-align:left;padding:2px 8px;border-bottom:1px solid #b9b9b4;font-weight:600}
+.mmi-log td{padding:1px 8px;border-bottom:1px solid #f0f0ee;white-space:nowrap}
+.mmi-log th:nth-child(1),.mmi-log td:nth-child(1){width:64px}.mmi-log th:nth-child(2),.mmi-log td:nth-child(2){width:150px}
+.mmi-log tr.empty td{color:#8a8a86;text-align:center}

@@ -32,7 +32,7 @@ try:
    assert page.locator('[data-track-state="occupied"]').count()>0
    page.locator('[data-sim-clear="1A-1T"]').click()
    expect(page.locator('[data-track-state="occupied"]')).to_have_count(0)
-   assert not [u for u in requests if any(ext in u.lower() for ext in ['.jpg','.jpeg','.png','.webp'])],requests
+   assert not [u for u in requests if any(ext in u.lower() for ext in ['.jpg','.jpeg','.png','.webp']) and 'orpheia-mascot' not in u],requests  # the optional MMI mascot is decoration, not part of the LS
    assert not errors,errors
    page.close();print(f'PASS {width}px: 15 native scenes, no raster requests, equipment identifiers and track-state linkage')
   browser.close()
