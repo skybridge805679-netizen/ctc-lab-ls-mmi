@@ -57,7 +57,7 @@ for st in info:
    label=normalize(r['label']) if start<=(left+right)/2<=end else ''
    sections.append([round(start,1),round(row,1),round(end-start,1),label])
  # These six isolated-cell candidates were checked against enlarged source regions.
- reviewed_fallback={('yeongdeungpo','TT'):'6T',('guro','OT'):'55T',('geumjeong','TT'):'',('geumjeong','IT'):'4T',('uiwang','OT'):'6T'}
+ reviewed_fallback={('yeongdeungpo','TT'):'6T',('yeongdeungpo','ST'):'4T',('guro','OT'):'55T',('geumjeong','TT'):'',('geumjeong','IT'):'4T',('uiwang','OT'):'6T'}
  for c in sections:c[3]=reviewed_fallback.get((st['id'],c[3]),c[3])
  def local(p):return [round((p[0]-x)*iw/w,1),round((p[1]-y)*ih/h,1),*p[2:]]
  bx,by,bw,bh=st['bounds']

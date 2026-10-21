@@ -46,4 +46,9 @@ test('source station tracks, platforms, circuit identifiers and SP/SS symbols ar
  const C=Core.forStation('geumjeong'),svg=LS.render(N.catalog.geumjeong,W.data.geumjeong,C,C.initial()).svg;
  assert(svg.includes('B996T'));assert(svg.includes('B995T'));
 });
+test('all original rail boundary identifiers remain visible or retain their adjoining-cell alias',()=>{
+ for(const st of controlled){const C=Core.forStation(st.id),svg=LS.render(st,W.data[st.id],C,C.initial()).svg;
+  for(const rail of W.data[st.id].rails)for(const id of [rail[2]!==null?rail[0]:null,rail[3],rail[4]].filter(Boolean))assert(svg.includes('data-circuit-label="'+id+'"')||svg.includes('data-circuit-alias="'+id+'"'),st.id+' '+id);
+ }
+});
 console.log(n+' ls-view tests passed');
