@@ -1,0 +1,50 @@
+# 실물 MMI 사진(2026-10-21)에서 읽은 진로 이름. 「이 진로는 실제로 존재한다」는 증거이며 메뉴 전체 목록이 아니다.
+# 출처: 온라인 열차스케줄관리(CA028_02) K0004 하행, 온라인 열차 스케줄 수정(ON_MOD_TRN) K0013 상행, 알람 로그.
+cheongnyangni
+4A - RT_4A_B002T
+dongmyo
+1B - RT_1B_1T
+4A - RT_4A_B016T
+jonggak
+1A - RT_1A_1T
+4A - RT_4A_B046T
+underground-seoul
+1A - RT_1A_1T
+4A - RT_4A_B072T
+seoul
+1A - RT_1A_1T
+4A - RT_4A_B902T
+yongsan
+1A - RT_1A_1T
+4A - RT_4A_B916T
+26 - RT_26_AT
+noryangjin
+1A - RT_1A_1T
+4A - RT_4A_B928T
+yeongdeungpo
+1B - RT_1B_6T
+4E - RT_4E_B942T
+guro
+1B - RT_1B_3T
+4A - RT_4A_B950T
+geumcheon
+1A - RT_1A_2T
+4B - RT_4B_B968T
+2A - RT_2A_5T
+3B - RT_3B_B963T
+4A - RT_4A_B644T
+4A - RT_4A_B968T
+anyang
+2A - RT_2A_5T
+3B - RT_3B_B981T
+geumjeong
+2A - RT_2A_4T
+3B - RT_3B_B993T
+gunpo
+2A - RT_2A_4T
+3A - RT_3A_B999T
+uiwang
+2B - RT_2B_6T
+3B - RT_3B_B1011T
+suwon
+3C - RT_3C_B1035T
