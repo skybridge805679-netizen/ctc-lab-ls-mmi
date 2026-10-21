@@ -13,3 +13,6 @@
 4. `node tools/compare-route-menus.cjs`로 도출 결과와 대조, `node simulator/route-menus.test.cjs`로 확인.
 
 확정 목록이 없는 역은 LS 팝업이 도출된 진로 전체를 보여 준다. MMI 진로 목록은 매뉴얼 근거(지하서울 3A_B070T 등)를 위해 도출 전체를 유지한다.
+
+## 캡처로 채우기
+LS 팝업 캡처는 `python3 tools/parse-popup-screenshots.py <역id> <이미지…> --out answers/<역>-<날짜>-ocr.txt`로 읽는다. 처음 보는 도착지·배선에서 도출되지 않는 진로는 「check these」에 나온다. 안내는 [../../docs/LS캡처안내.md](../../docs/LS캡처안내.md).

@@ -72,3 +72,38 @@ for(const st of N.stations.filter(s=>s.controlled&&!MENUS[s.id])){
 md+=`\n---\n\n## 규모\n사용자 확인 완료 신호기 ${stats.answered} / ${stats.signals}. 장내·출발: 교재 확인 ✔ ${stats.m1}개, 규칙 추정 ○ ${stats.m2}개, 규칙 제외 ✗ ${stats.m3}개 / 입환 후보 ? ${stats.sh}개 / 칸 이름 후보 ${stats.cells}개.\n`;
 fs.writeFileSync(path.join(__dirname,'../docs/LS확인요청.md'),md);
 console.log('written',md.length,'chars',stats);
+
+// --- Capture guide: which popups to screenshot (signals not yet answered; fully-confirmed main signals are optional) ---
+{
+ const rows=[];let total=0,optional=0;
+ for(const st of N.stations.filter(s=>s.controlled&&!MENUS[s.id])){
+  const C=Core.forStation(st.id),ids=Object.keys(C.routes),need=[],opt=[],done=[];
+  for(const sig of Object.keys(C.signals).sort(nat)){
+   if(answers[st.id]?.[sig]){done.push(sig);continue;}
+   const rs=ids.filter(id=>C.routes[id].signal===sig);if(!rs.length)continue;
+   const shunt=C.signals[sig].kind==='입환',sure=!shunt&&rs.filter(id=>rule(C,id)).every(id=>!C.routes[id].geometryDerived)&&rs.every(id=>rule(C,id));
+   (sure?opt:need).push(sig);}
+  total+=need.length;optional+=opt.length;
+  rows.push(`| ${st.name} | ${need.join(' ')||'—'} | ${opt.join(' ')||'—'} | ${done.join(' ')||'—'} |`);}
+ fs.writeFileSync(path.join(__dirname,'../docs/LS캡처안내.md'),`# LS 팝업 캡처 안내
+
+손으로 쓰지 말고 **LS 신호기 팝업(\`[ 진로 제어 ]\` 목록)을 캡처**해서 채팅에 붙여 주세요. 제가 \`tools/parse-popup-screenshots.py\`로 읽어서 확정 목록으로 만듭니다.
+
+## 방법
+1. LS에서 신호기를 클릭해 팝업이 뜬 상태로 캡처합니다(팝업만 잘라도 되고, 화면 전체도 괜찮습니다). 글자가 작지 않게 원래 크기 이상으로 찍어 주세요.
+2. 한 메시지에 **역 이름을 먼저 쓰고**(예: 「노량진」) 그 역의 팝업 캡처를 여러 장 붙입니다. 순서는 상관없습니다. 한 장에 팝업 여러 개가 있어도 됩니다.
+3. 팝업의 신호기 이름(\`RT_23_…\`의 23)이 보이면 충분합니다. 진로가 하나도 없는 신호기는 「23 없음」처럼 글로 알려 주세요.
+4. 읽은 결과와 「확인 필요」 항목(처음 보는 칸 이름, 읽기 불확실한 글자)을 바로 돌려드립니다.
+
+## 캡처할 신호기 (역별)
+- **필수**: 입환 전체와, 장내·출발 중 규칙 추정(○)·제외(✗)가 들어 있는 신호기.
+- **선택**: 교재로 확인된(✔) 장내·출발 신호기(그대로일 가능성이 높음). 시간이 없으면 건너뛰어도 됩니다.
+- **완료**: 이미 답해 주신 신호기.
+
+| 역 | 필수 | 선택 | 완료 |
+|---|---|---|---|
+${rows.join('\n')}
+
+필수 ${total}개, 선택 ${optional}개. 진로 순서는 화면에 보이는 순서대로 기록합니다.
+`);
+ console.log('capture guide: required',total,'optional',optional);}

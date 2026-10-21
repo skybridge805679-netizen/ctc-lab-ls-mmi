@@ -29,6 +29,7 @@
 - 확인표는 `node tools/make-verification-sheet.cjs`로 생성. 표기: ✔ 교재 확인 93, ○ 규칙 추정 99, ✗ 규칙 제외 50, ? 입환 후보(답변 반영 후 238), 칸 이름 후보 58, ✅ 사용자 확인(용산 10개 신호기).
 - 규칙(장내=구내 선로, 출발=방향과 번호 짝·홀이 맞는 경계 선로, 청량리 `A1T`·`AT`만 예외)은 확인 5개 역 38개 중 37개 적중. 영등포 `3C-B619T2T`처럼 경계 이름이 특수하면 앞 숫자(619)로 판정한다.
 - **GPT가 할 일(답을 받은 뒤):**
+  **결정(2026-10-21): 사용자는 나머지 역도 전부 확인하기로 했다.** 단, 손으로 옮기지 않고 LS 팝업 **캡처**를 붙여 준다. [LS캡처안내.md](LS캡처안내.md)에 역별 필수 148개·선택 32개 신호기가 있다. 캡처는 `python3 tools/parse-popup-screenshots.py <역id> <이미지…> --out references/route-menus/answers/<역>-<날짜>-ocr.txt`로 읽는다(RapidOCR, 가짜 팝업 시험에서 공백·O/0 혼동 보정, 메뉴 순서 유지; 실제 LS 캡처 정확도는 미검증 — 출력의 「check these」를 확인할 것). 사용자 채팅에 붙인 이미지는 세션의 images 폴더에 파일로 저장된다.
   0. 답변은 `references/route-menus/answers/<역>-<날짜>.txt`에 정리한다(형식은 확정본과 같음). 현재 **용산 일부 10개 신호기**만 답변됨 — 나머지 신호기는 미확인이므로 확정본에 옮기지 말고(역 전체가 "확인됨"으로 표시되는 것을 막기 위해) 모든 신호기가 확인된 역만 `ls-route-menus-transcribed.txt`로 옮긴다. `tools/draft-route-menus.cjs`·`make-verification-sheet.cjs`가 answers를 읽어 초안·확인표를 갱신한다.
   1. 사용자의 「삭제/추가/순서/신호기」 답을 `references/route-menus/ls-route-menus-draft.txt`에 반영하고, 확정한 역을 `ls-route-menus-transcribed.txt`로 옮긴다(역 id 한 줄 + `신호기 - RT_신호기_도착지, …`). 순서는 줄에 적은 순서가 LS 팝업 순서가 된다.
   2. 「칸 이름 후보」가 도착지로 확인되면 `simulator/wiring.js` 해당 역 데이터에 `cells:[[선로,x,'이름']]`을 추가한다(x는 칸의 끝 좌표, `wings.js`의 `cells`에서 찾는다. 청량리 Y1T·종각/서울 BT가 예시). 통과형이라 다른 진로를 막지 않는다.
