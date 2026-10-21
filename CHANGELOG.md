@@ -1,3 +1,10 @@
+# 미출시 (MMI/그래프 작업, 브랜치 claude/practical-dirac-68tgp6)
+- ORPHEIA MMI 셸: 실물 사진 기준 메뉴바·창·알람/이벤트 로그. 송원대 로고 대신 ORPHEIA 패러디 배경(`assets/orpheia-mascot.png`는 선택 파일).
+- ORPHEIA CTC ONLINE T/G: 실물 구성의 열차 다이아(5분 축, 우측 눈금, 점선 열차).
+- [CA028_02] 온라인 열차스케줄관리 재작성: 경유역별 정보(도착/출발진로·운휴), 수정·복사·생성, 연동/개별 시각 수정, 전체/부분 운휴, 열차운행패턴선택 창, 확인 메시지 박스.
+- 경유역 기본 진로(`schedule-routes.js`): 사진 확인값은 `photo`, 나머지는 규칙 추정(`estimate`).
+- 알려진 문제: `ls-layout.browser.test.py`(종각 '시청'/'지하서울 ▶' 겹침)는 main의 GPT 변경에서 발생한 기존 실패.
+
 # v0.12.0 (2026-10-21)
 
 - PPT 원본과 대조한 61개 선로 열·226개 코드 배치를 기록하고 중간역의 빈 선로 칸을 해소. PDF에서 합쳐진 구간을 코드별로 분리.
@@ -62,13 +69,6 @@
 
 # 변경 이력
 
-
-## 미출시 (MMI/그래프 작업, 브랜치 claude/practical-dirac-68tgp6)
-- ORPHEIA MMI 셸: 실물 사진 기준 메뉴바·창·알람/이벤트 로그. 송원대 로고 대신 ORPHEIA 패러디 배경(`assets/orpheia-mascot.png`는 선택 파일).
-- ORPHEIA CTC ONLINE T/G: 실물 구성의 열차 다이아(5분 축, 우측 눈금, 점선 열차).
-- [CA028_02] 온라인 열차스케줄관리 재작성: 경유역별 정보(도착/출발진로·운휴), 수정·복사·생성, 연동/개별 시각 수정, 전체/부분 운휴, 열차운행패턴선택 창, 확인 메시지 박스.
-- 경유역 기본 진로(`schedule-routes.js`): 사진 확인값은 `photo`, 나머지는 규칙 추정(`estimate`).
-- 알려진 문제: `ls-layout.browser.test.py`(종각 '시청'/'지하서울 ▶' 겹침)는 main의 GPT 변경에서 발생한 기존 실패.
 
 ## v0.6.0 — 2026-10-21
 
