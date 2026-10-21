@@ -26,9 +26,10 @@
 
 ### v0.8.2 — 나머지 10개 역 확인 요청 (구현은 GPT)
 - **사용자가 [LS확인요청.md](LS확인요청.md)의 항목을 실제 LS에서 확인해 답한다.** 답을 받기 전에는 나머지 10개 역의 LS 메뉴를 바꾸지 않는다(도출 진로 전체 표시 유지).
-- 확인표는 `node tools/make-verification-sheet.cjs`로 생성. 표기: ✔ 교재 확인 93, ○ 규칙 추정 99, ✗ 규칙 제외 50, ? 입환 후보 258, 칸 이름 후보 58.
+- 확인표는 `node tools/make-verification-sheet.cjs`로 생성. 표기: ✔ 교재 확인 93, ○ 규칙 추정 99, ✗ 규칙 제외 50, ? 입환 후보(답변 반영 후 238), 칸 이름 후보 58, ✅ 사용자 확인(용산 10개 신호기).
 - 규칙(장내=구내 선로, 출발=방향과 번호 짝·홀이 맞는 경계 선로, 청량리 `A1T`·`AT`만 예외)은 확인 5개 역 38개 중 37개 적중. 영등포 `3C-B619T2T`처럼 경계 이름이 특수하면 앞 숫자(619)로 판정한다.
 - **GPT가 할 일(답을 받은 뒤):**
+  0. 답변은 `references/route-menus/answers/<역>-<날짜>.txt`에 정리한다(형식은 확정본과 같음). 현재 **용산 일부 10개 신호기**만 답변됨 — 나머지 신호기는 미확인이므로 확정본에 옮기지 말고(역 전체가 "확인됨"으로 표시되는 것을 막기 위해) 모든 신호기가 확인된 역만 `ls-route-menus-transcribed.txt`로 옮긴다. `tools/draft-route-menus.cjs`·`make-verification-sheet.cjs`가 answers를 읽어 초안·확인표를 갱신한다.
   1. 사용자의 「삭제/추가/순서/신호기」 답을 `references/route-menus/ls-route-menus-draft.txt`에 반영하고, 확정한 역을 `ls-route-menus-transcribed.txt`로 옮긴다(역 id 한 줄 + `신호기 - RT_신호기_도착지, …`). 순서는 줄에 적은 순서가 LS 팝업 순서가 된다.
   2. 「칸 이름 후보」가 도착지로 확인되면 `simulator/wiring.js` 해당 역 데이터에 `cells:[[선로,x,'이름']]`을 추가한다(x는 칸의 끝 좌표, `wings.js`의 `cells`에서 찾는다. 청량리 Y1T·종각/서울 BT가 예시). 통과형이라 다른 진로를 막지 않는다.
   3. `node tools/build-route-menus.cjs`(도출 불가능한 진로가 있으면 실패) → `node tools/compare-route-menus.cjs` → `node simulator/route-menus.test.cjs` → 브라우저 시험.
