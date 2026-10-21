@@ -242,8 +242,8 @@ def check(page, url, screenshot=False):
     page.locator('#graphSearch').fill('K1131')
     page.locator('#graphSpan').select_option('120')
     if screenshot:
-        page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-diagram.png'), style='#toast {visibility:hidden}')
-        page.locator('#schedulePanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-schedule-editor.png'), style='#toast {visibility:hidden}')
+        page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-diagram.png'), style='#toast {visibility:hidden}')
+        page.locator('#schedulePanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-schedule-editor.png'), style='#toast {visibility:hidden}')
     assert not errors, errors
 
 

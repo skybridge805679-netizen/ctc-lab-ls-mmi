@@ -70,12 +70,13 @@ try:
    saved=json.loads(Path(download.value.path()).read_text());assert saved['timetable']['trains'];assert saved['mmiLogs']['event'];assert saved['lsDisplay']['stations']['anyang']['windows']['1T'][0]['number']=='K1133'
    assert not errors,errors
    if width==1440:
+    page.evaluate("window.getSelection().removeAllRanges()")
     for wid in ['field','trainNumber','schedule']:page.evaluate('(id)=>SimMMI.close(id)',wid)
     graph();page.locator('#toast').evaluate('(e)=>e.style.visibility="hidden"')
-    page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-graph.png'),style='#toast {visibility:hidden!important}')
-    schedule();page.evaluate("document.querySelector('[data-mmi-window=\"schedule\"] .mmi-win-body').scrollTop=0");page.locator('[data-mmi-window="schedule"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-schedule.png'))
-    page.evaluate("SimMMI.close('schedule')");numbers();page.locator('[data-mmi-window="trainNumber"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-train-number.png'))
-    page.locator('#mmiShell').screenshot(path=str(ROOT.parent/'docs/preview-v0.14.0-mmi.png'))
+    page.locator('#graphPanel').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-graph.png'),style='#toast {visibility:hidden!important}')
+    schedule();page.evaluate("document.querySelector('[data-mmi-window=\"schedule\"] .mmi-win-body').scrollTop=0");page.locator('[data-mmi-window="schedule"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-schedule.png'))
+    page.evaluate("SimMMI.close('schedule')");numbers();page.locator('[data-mmi-window="trainNumber"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-train-number.png'))
+    page.locator('#mmiShell').screenshot(path=str(ROOT.parent/'docs/preview-v0.15.0-mmi.png'))
    print(f'PASS shared LS/MMI routes, train-number UID transfer, graph/schedule revision/cancel/logs, clock/export and dock/drag/reopen: {width}px',flush=True)
    page.close()
   browser.close()

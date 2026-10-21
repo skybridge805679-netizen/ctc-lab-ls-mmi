@@ -105,7 +105,7 @@ function placeholder(id,title,note){
 // Wallpaper parody of the school logo: the Orpheia mascot (assets/orpheia-mascot.png, optional) or a vector lyre + ORPHEIA.
 const LYRE='<svg viewBox="0 0 64 72" width="54" height="60" aria-hidden="true"><path d="M14 8c-8 8-8 26 2 34 4 3 8 5 12 5V12c0-3-3-5-6-4-3 1-5 3-8 0z" fill="none"/><path d="M12 10c-6 14-2 30 12 36 3 1 5 2 8 2s5-1 8-2c14-6 18-22 12-36" fill="none" stroke="#c9a227" stroke-width="4" stroke-linecap="round"/><path d="M20 12v34M28 10v38M36 10v38M44 12v34" stroke="#e3c25a" stroke-width="2.4" stroke-linecap="round"/><path d="M10 10h44" stroke="#c9a227" stroke-width="5" stroke-linecap="round"/><path d="M24 58h16l4 8H20z" fill="#c9a227"/></svg>';
 function brand(){
- const one=`<div class="mmi-brand"><span class="mmi-mascot">${LYRE}${root.SimMMITheme?.mascotUrl?`<img src="${esc(root.SimMMITheme.mascotUrl)}" alt="" onerror="this.remove()" onload="this.parentElement.querySelector('svg')?.remove()">`:''}</span><span class="mmi-brand-text"><b>ORPHEIA</b><em>MMI</em><small>電脳侍女 · LV.99</small></span></div>`;
+ const one=`<div class="mmi-brand"><span class="mmi-mascot">${LYRE}${root.SimMMITheme?.mascotUrl?`<img src="${esc(root.SimMMITheme.mascotUrl)}" alt="" onerror="this.remove()" onload="this.parentElement.querySelector('svg')?.remove()">`:''}</span><span class="mmi-brand-text"><b>ORPHEIA</b><em>MMI</em><small>RAIL CONTROL SYSTEM</small></span></div>`;
  return `<div class="mmi-wallpaper" aria-hidden="true">${one}${one}</div>`;
 }
 function buildMenu(){
@@ -132,7 +132,7 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><span class="mmi-appnote">전뇌시녀 오르페이아의 관제 보조 단말 · 메뉴와 창 구성은 실물 사진 기준</span></div>`;
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
  shell.querySelector('.mmi-ls-link').onclick=()=>$('lsDisplay').scrollIntoView({block:'start'});
  const toMMI=doc.createElement('button');toMMI.className='text-btn';toMMI.textContent='MMI 화면 ↓';toMMI.onclick=()=>shell.scrollIntoView({block:'start'});doc.querySelector('.ls-panel .panel-title').append(toMMI);
  shell.appendChild(buildMenu());
