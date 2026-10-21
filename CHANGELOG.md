@@ -1,3 +1,10 @@
+# v0.8.1 — 2026-10-21
+
+- LS 진로 메뉴를 실제 LS 목록(청량리·동묘앞·종각·지하서울·서울, 사용자 확인 95개)으로 제한. 확인 목록이 없는 역은 도출 진로 전체. MMI 진로 목록은 매뉴얼 근거를 위해 전체 유지.
+- 도착지가 궤도 칸 이름인 진로(청량리 Y1T, 종각·서울 BT)를 배선에 추가(`cells`).
+- 지하서울 3A는 LS에 RT_3A_B065T만 표시. 과제 5는 3A-B070T를 MMI에서 설정하도록 변경.
+- 도구: `tools/compare-route-menus.cjs`, `build-route-menus.cjs`, `draft-route-menus.cjs`. 나머지 10개 역 초안 `references/route-menus/ls-route-menus-draft.txt`.
+
 # v0.8.0 — 2026-10-21
 
 - LS를 PDF 배경 없이 **벡터로 다시 그렸다**(`ls-view.js`). 화면 폭 전체를 쓰고 가운데 정렬, 선로 이름은 선 막대 안, 장식 요소 제거.

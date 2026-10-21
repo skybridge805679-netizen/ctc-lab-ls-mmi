@@ -78,9 +78,9 @@ function fields(){const type=$('controlSelect').value;$('mmiApply').disabled=!N.
 function signalAction(id){
  const active=Object.keys(state.routes).find(key=>C.routes[key].signal===id);
  if(active){openAction(id+' 신호 정지·진로 해정','신호를 정지하고 진로를 해정하시겠습니까?<p>점유 중이면 신호만 정지하고 진로 쇄정을 유지합니다</p>',{type:'stop',id,source:'LS'});return;}
- const entries=Object.keys(C.routes).filter(key=>C.routes[key].signal===id);
+ const entries=C.lsMenu(id);
  if(!entries.length){toast(id+' 입환신호기의 진로목록은 아직 구현하지 않았습니다.',true);return;}
- openAction('[ 진로 제어 ]','<p>교재・대본 대조 경로와 배선 연결로 도출한 연습 경로를 구분합니다.</p>'+entries.map(key=>`<button type="button" class="route-choice" data-route-choice="${key}">RT_${key.replace('-','_')} <small>${C.routes[key].geometryDerived?'배선 연결 경로':'교재·대본 대조'}</small></button>`).join(''),null);
+ openAction('[ 진로 제어 ]','<p>'+(C.menuVerified?'실제 LS 팝업의 진로 목록입니다.':'교재・대본 대조 경로와 배선 연결로 도출한 연습 경로를 구분합니다. 이 역의 실제 LS 목록은 아직 확인되지 않았습니다.')+'</p>'+entries.map(key=>`<button type="button" class="route-choice" data-route-choice="${key}">RT_${key.replace('-','_')} <small>${C.menuVerified?'원본 LS 목록':C.routes[key].geometryDerived?'배선 연결 경로':'교재·대본 대조'}</small></button>`).join(''),null);
  $('dialogConfirm').hidden=true;
  document.querySelectorAll('[data-route-choice]').forEach(button=>button.onclick=()=>{$('actionDialog').close();$('dialogConfirm').hidden=false;run({type:'route',id:button.dataset.routeChoice,source:'LS'});});
 }

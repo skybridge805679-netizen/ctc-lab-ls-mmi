@@ -59,8 +59,16 @@ def exercise(page, url):
             page.locator('#mmiApply').click()
             expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
         elif index == 4:
-            route('3A', '3A-B070T')
+            page.locator('#controlSelect').select_option('route')
+            page.locator('#mmiSignal').select_option('3A')
+            page.locator('#mmiRoute').select_option('3A-B070T')
+            page.locator('#mmiApply').click()
+            expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
             release()
+            # The LS popup offers only RT_3A_B065T for this signal.
+            page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-signal="3A"]').click()
+            expect(page.locator('[data-route-choice]')).to_have_count(1)
+            page.locator('#actionDialog').evaluate('(d)=>d.close()')
             route('3A', '3A-B065T')
         elif index == 5:
             page.locator('#controlSelect').select_option('point')

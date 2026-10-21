@@ -32,7 +32,8 @@ test('rejected route commands and later reestablishment do not pass',()=>{
  assert.equal(cycle(session([mode,route,cancel,stop,route])),false);
 });
 test('route comparison enforces the documented order and final route',()=>{
- const other={type:'route',id:'3A-B070T'};
+ {const s=session([mode,{type:'route',id:'3A-B070T'},stop,route]);assert.equal(tasks[4].check(s.events,s),false,'B070T must be set from the MMI');}
+ const other={type:'route',id:'3A-B070T',source:'MMI'};
  for(const release of [stop,{type:'withdraw',id:'3A-B070T'}]){
   const s=session([mode,other,release,route]);assert.equal(tasks[4].check(s.events,s),true);
  }

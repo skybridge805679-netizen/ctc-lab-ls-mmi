@@ -24,10 +24,14 @@
 - `app.js`: PDF 시트·확대·전체노선 보기·LS 전환기 클릭 제거. 역 탭에 제어모드 색 점과 설정 진로 수 표시. 헤더(AUTO/CCM/LOCAL, 일괄정지, 역명) HTML 버튼.
 - 시험: `ls-view.test.cjs`(단위), `ls.browser.test.py`(246개 신호기 설정·해정, 중간역 이름판, 폭 채움/가운데 정렬, 제거된 요소 부재). 이전 `map.browser.test.py`·`station-views.browser.test.py`는 PDF 전제라 삭제했다.
 
+### v0.8.1 — LS 진로 메뉴 허용 목록 ([상세](진로목록-원본대조.md))
+- 사용자가 실제 LS에서 옮기고 확인한 5개 역(95개)을 허용 목록으로 적용. 나머지 10개 역은 `references/route-menus/ls-route-menus-draft.txt` 초안을 **사용자가 검수**해야 한다(장내·출발은 규칙 추정 190개, 입환 후보 258개).
+- 지하서울 3A는 LS에 B065T만 나온다(사용자 확인). MMI는 매뉴얼대로 B070T도 유지.
+
 ## 3. 실행·검증
 ```sh
 python3 -m http.server 8765 --directory simulator      # 또는 simulator/index.html 직접 열기(브라우저 정책에 따라 다름)
-for t in core practice network schedule wiring interlocking ls-view; do node simulator/$t.test.cjs; done
+for t in core practice network schedule wiring interlocking ls-view route-menus; do node simulator/$t.test.cjs; done
 python3 simulator/browser.test.py            # 10개 과제
 python3 simulator/ls.browser.test.py         # 새 LS
 python3 simulator/network.browser.test.py
@@ -55,6 +59,7 @@ wings 재생성: `pip install opencv-python-headless numpy rapidocr-onnxruntime`
 - [ ] 사용자에게 MMI 「선로전환기제어」 유지 여부 확인.
 
 **P1 — 기능**
+- [ ] 나머지 10개 역 LS 진로 목록 확정: 초안 검수(사용자) → `build-route-menus.cjs`. 메뉴 순서도 실제와 대조.
 - [ ] 접근구간을 신호기별 「열차 유무」에서 궤도 점유 기반으로 확장(열차 이동 모델과 함께).
 - [ ] 오버랩: 과주여유거리(일반 200m·전동차 150m) 반영, 용산 6번 통과 순서(출발 3B-B605T 먼저, 장내 2A-6T 나중), 대본에 나온 진로 외 확장.
 - [ ] 실무5 대본(대피 5종·침수·동·충돌·사상·고장·화재) 단계별 시나리오화와 채점, 교신 문안 연계. 근거는 `references/analysis/`와 실무5 PDF.

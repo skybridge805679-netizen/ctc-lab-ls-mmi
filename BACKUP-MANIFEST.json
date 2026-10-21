@@ -1,5 +1,5 @@
 {
-  "version": "0.8.0",
+  "version": "0.8.1",
   "backupDate": "2026-10-21",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 5048,
-      "sha256": "db3d8af7eec55cba725304eb88742114f30108103270224276cf61ebec72b539"
+      "bytes": 5705,
+      "sha256": "bc502a9834f50a5024f13a34ddbe5845a512cc6dd543edcf457aa288b8c0767a"
     },
     {
       "path": "README.md",
-      "bytes": 5488,
-      "sha256": "64e0b4b8addd800d543f6db4d4af00c4365f72c6711a475d3a712897c0fc92b1"
+      "bytes": 5564,
+      "sha256": "50754d67624d8e9d16479dcb3577106425e576a9215d1f6ded26ca034222d1ab"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -67,6 +67,11 @@
       "path": "archive/CTC-LAB-v0.8.0.zip",
       "bytes": 4524220,
       "sha256": "5bcffe6ddffe20e6d0ea3ef60fc08feb6837a71349929eeae8df5687f67f14f6"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.8.1.zip",
+      "bytes": 4530327,
+      "sha256": "996872da48135c64cfc3906e5520eae633cd76243e0e364861b33a4d77c264e0"
     },
     {
       "path": "docs/LS재작성.md",
@@ -175,13 +180,13 @@
     },
     {
       "path": "docs/preview-v0.8.0-seoul.png",
-      "bytes": 75976,
-      "sha256": "ff18b4182c47b79b25a22d28520409158c19f575f7a545a00e9f6eafb5ef977d"
+      "bytes": 76444,
+      "sha256": "aa0884919d0d2a3943ebf6c3145f3f763e9831a743fb2c0a207f0cfc1a28d9c7"
     },
     {
       "path": "docs/preview-v0.8.0-underground-seoul.png",
-      "bytes": 37945,
-      "sha256": "7c139f87ea1332492c0e9683a4fd8e9ca322027c82a74d2da6c9e869255d3f34"
+      "bytes": 38116,
+      "sha256": "93e702be736a38e7defa6228861efff0b1615a861d6df36aa0ce00823f66e26d"
     },
     {
       "path": "docs/preview-v0.8.0-yongsan.png",
@@ -210,8 +215,8 @@
     },
     {
       "path": "docs/인수인계-GPT.md",
-      "bytes": 7739,
-      "sha256": "0afc3f82842c94c4e6b9c1b16c264467ccf427a2f60f075622ddd24ad2705e58"
+      "bytes": 8365,
+      "sha256": "4342198e9794953874ab7cf1589b06626b5758ae762e3bee3c4f01ae5d47c547"
     },
     {
       "path": "docs/자료근거.md",
@@ -244,14 +249,19 @@
       "sha256": "d1ae8ded8c0606545631459ae5d0f34c745938466e8759330a7249c9c3ee41a0"
     },
     {
+      "path": "docs/진로목록-원본대조.md",
+      "bytes": 3834,
+      "sha256": "647fb7ef94fe2d3cdd90d50dcff2a42248fe1eb5d8b52858e0d459db13f84fa8"
+    },
+    {
       "path": "simulator/README.md",
       "bytes": 3337,
       "sha256": "86e523fd9809e4126f49e291deaec5b0acf8d42aeb1b749e39873b9413b1e7ab"
     },
     {
       "path": "simulator/app.js",
-      "bytes": 22735,
-      "sha256": "0c8e1821a51dc1b4d88967176ac24fb9de67cc02d0a400ddd30b4f91cd8fc190"
+      "bytes": 22858,
+      "sha256": "da621efde50179522ebec37aa5c03c18947e51a8abf2cbdb6dcdc605c834f7b5"
     },
     {
       "path": "simulator/assets/line-map/SOURCES.json",
@@ -380,13 +390,13 @@
     },
     {
       "path": "simulator/browser.test.py",
-      "bytes": 6391,
-      "sha256": "aa07d2bff096b1be1632937fae8ac8616a047dea2ec9aa652bcd8fd97465edc8"
+      "bytes": 6996,
+      "sha256": "df1ad1e9a1aa01d28bc3c72bf092c712682a71d024b6cc5356d938d061663d3d"
     },
     {
       "path": "simulator/core.js",
-      "bytes": 11251,
-      "sha256": "21d82ce71e75313e3795e381f72c4b039e9706472bd8ec6e4d21c378a586b3a3"
+      "bytes": 11711,
+      "sha256": "b8ac427cde5b1b37aaff50c1bf48a4e56e80f4b0d4c66ba4af1a4c3ea4d91736"
     },
     {
       "path": "simulator/core.test.cjs",
@@ -400,8 +410,8 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 14547,
-      "sha256": "f5fbab1ceaf59aaefbfab42ac47d94a19767c5604de4fe728f1e03d13d4cf5a4"
+      "bytes": 14591,
+      "sha256": "46575ba8bebe28628dbe6394573d6b66f7c2bc8dc872f34e6ed475864a705643"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -450,13 +460,23 @@
     },
     {
       "path": "simulator/practice.js",
-      "bytes": 5156,
-      "sha256": "cda3a43a2f725447c5313bca829f1ad5b803b180f6f6ae6f56c82508475317cb"
+      "bytes": 5368,
+      "sha256": "bbd121bd5fd8d24d97399cdc7596ba8fdbaa4865aaa79d59e8ef9c18711a919e"
     },
     {
       "path": "simulator/practice.test.cjs",
-      "bytes": 2887,
-      "sha256": "69d1292bbb8462fe687a9f3638512b68ae7d17a7b792611b7500bb56db92f781"
+      "bytes": 3048,
+      "sha256": "0943888572737ea062b0a308d39f5f417e0d05ab0243f960c4a4de0a7175725d"
+    },
+    {
+      "path": "simulator/route-menus.js",
+      "bytes": 1367,
+      "sha256": "1926480df3f86f338df39ab0cc198a47b4c777f33a5d78d7b8d2bf079f1e3127"
+    },
+    {
+      "path": "simulator/route-menus.test.cjs",
+      "bytes": 1736,
+      "sha256": "05db8b102d2bcd2d0c772469de0dd796602de4d5e84ef1e29f1ec7ee7bbfe038"
     },
     {
       "path": "simulator/schedule-ui.js",
@@ -495,8 +515,8 @@
     },
     {
       "path": "simulator/wiring.js",
-      "bytes": 22017,
-      "sha256": "b16ac6dae7015d601d45e6a1f156f9e88b3a19bad0d7587b3dab059fc2f3b8d4"
+      "bytes": 22551,
+      "sha256": "883a51d2d08ef4c1019c4b7dc3af0b260c08a2df6e768c506a71f61b0fad89ad"
     },
     {
       "path": "simulator/wiring.test.cjs",
@@ -505,13 +525,28 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 8011,
-      "sha256": "d19fda62c0568c1d2fd63e83bab6dc8c3cef4774f94ef97f2fd0990164827a61"
+      "bytes": 8575,
+      "sha256": "6dd4f2ac6126f0650f9158ebf4d0caf20b240488e4c3ef032235eec34fdc30d9"
     },
     {
       "path": "simulator/고증대조표.json",
       "bytes": 454,
       "sha256": "0fadb50525e6c6fceb673e39e2d38ebd851052b6a8f4f2642e53444900ffa500"
+    },
+    {
+      "path": "tools/build-route-menus.cjs",
+      "bytes": 1843,
+      "sha256": "caa37899c6b66c0363439335e5a8496e7d4b41f03c4e8392ec9349828868e9b4"
+    },
+    {
+      "path": "tools/compare-route-menus.cjs",
+      "bytes": 2864,
+      "sha256": "8beaf600e2cec703dd162f2e97377f1ea0a4542dbe510d212467890f22d8cd26"
+    },
+    {
+      "path": "tools/draft-route-menus.cjs",
+      "bytes": 1561,
+      "sha256": "c4949520ab47b0bab0849086c5e156bf159929be40dd9fa39a39019078011a32"
     },
     {
       "path": "tools/extract-wings.py",
