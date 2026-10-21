@@ -24,6 +24,18 @@
 - `app.js`: PDF 시트·확대·전체노선 보기·LS 전환기 클릭 제거. 역 탭에 제어모드 색 점과 설정 진로 수 표시. 헤더(AUTO/CCM/LOCAL, 일괄정지, 역명) HTML 버튼.
 - 시험: `ls-view.test.cjs`(단위), `ls.browser.test.py`(246개 신호기 설정·해정, 중간역 이름판, 폭 채움/가운데 정렬, 제거된 요소 부재). 이전 `map.browser.test.py`·`station-views.browser.test.py`는 PDF 전제라 삭제했다.
 
+### v0.8.2 — 나머지 10개 역 확인 요청 (구현은 GPT)
+- **사용자가 [LS확인요청.md](LS확인요청.md)의 항목을 실제 LS에서 확인해 답한다.** 답을 받기 전에는 나머지 10개 역의 LS 메뉴를 바꾸지 않는다(도출 진로 전체 표시 유지).
+- 확인표는 `node tools/make-verification-sheet.cjs`로 생성. 표기: ✔ 교재 확인 93, ○ 규칙 추정 99, ✗ 규칙 제외 50, ? 입환 후보 258, 칸 이름 후보 58.
+- 규칙(장내=구내 선로, 출발=방향과 번호 짝·홀이 맞는 경계 선로, 청량리 `A1T`·`AT`만 예외)은 확인 5개 역 38개 중 37개 적중. 영등포 `3C-B619T2T`처럼 경계 이름이 특수하면 앞 숫자(619)로 판정한다.
+- **GPT가 할 일(답을 받은 뒤):**
+  1. 사용자의 「삭제/추가/순서/신호기」 답을 `references/route-menus/ls-route-menus-draft.txt`에 반영하고, 확정한 역을 `ls-route-menus-transcribed.txt`로 옮긴다(역 id 한 줄 + `신호기 - RT_신호기_도착지, …`). 순서는 줄에 적은 순서가 LS 팝업 순서가 된다.
+  2. 「칸 이름 후보」가 도착지로 확인되면 `simulator/wiring.js` 해당 역 데이터에 `cells:[[선로,x,'이름']]`을 추가한다(x는 칸의 끝 좌표, `wings.js`의 `cells`에서 찾는다. 청량리 Y1T·종각/서울 BT가 예시). 통과형이라 다른 진로를 막지 않는다.
+  3. `node tools/build-route-menus.cjs`(도출 불가능한 진로가 있으면 실패) → `node tools/compare-route-menus.cjs` → `node simulator/route-menus.test.cjs` → 브라우저 시험.
+  4. 신호기 번호가 LS와 다르다는 답이 있으면 `wiring.js`의 신호기 데이터를 고치고 `ls-view.test.cjs`·`ls.browser`로 확인.
+  5. 문서(`진로목록-원본대조.md`, `구현현황.md`, 변경 이력)와 백업 목록·ZIP 갱신.
+- 구현 전 사용자에게 다시 확인할 것: MMI 진로 목록도 LS와 같게 제한할지(현재 MMI는 매뉴얼 근거로 도출 전체).
+
 ### v0.8.1 — LS 진로 메뉴 허용 목록 ([상세](진로목록-원본대조.md))
 - 사용자가 실제 LS에서 옮기고 확인한 5개 역(95개)을 허용 목록으로 적용. 나머지 10개 역은 `references/route-menus/ls-route-menus-draft.txt` 초안을 **사용자가 검수**해야 한다(장내·출발은 규칙 추정 190개, 입환 후보 258개).
 - 지하서울 3A는 LS에 B065T만 나온다(사용자 확인). MMI는 매뉴얼대로 B070T도 유지.

@@ -15,8 +15,8 @@ for(const l of fs.readFileSync(file,'utf8').split('\n').filter(Boolean)){
    user[st].add(m[1]+'-'+m[2]);}}}
 // Rule drafted from the transcribed stations: arrival signals end on station tracks; departure signals end on a
 // boundary track whose number parity matches the direction (even = down/right, odd = up/left).
-function mainRule(C,id){const r=C.routes[id],s=C.signals[r.signal],d=r.destination,m=d.match(/^B(\d+)T$/);
- if(s.kind==='장내')return !m;if(m){const even=(+m[1])%2===0;return s.dir===1?even:!even;}return /^(A1T|AT|Y1T)$/.test(d);}
+function mainRule(C,id){const r=C.routes[id],s=C.signals[r.signal],d=r.destination,m=d.match(/^B(\d+)T/);
+ if(s.kind==='장내')return !m;if(m){const even=(+m[1])%2===0;return s.dir===1?even:!even;}return /^(A1T|AT)$/.test(d);}
 const T={tp:0,fp:0,fn:0,user:0,found:0,shuntUser:0,shuntFound:0,shuntExtra:0};
 for(const [id,set] of Object.entries(user)){
  const C=Core.forStation(id),ours=new Set(Object.keys(C.routes)),sigs=new Set([...set].map(x=>x.split('-')[0]));
