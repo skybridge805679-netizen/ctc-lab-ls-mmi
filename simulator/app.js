@@ -17,17 +17,18 @@ const mapHotspots={
  'yongsan':[30,245,280,35],'noryangjin':[370,245,240,35],'yeongdeungpo':[790,245,260,35],'guro':[1110,245,265,35],'geumcheon':[1540,245,300,35],
  'anyang':[15,520,270,40],'geumjeong':[365,520,250,40],'gunpo':[630,520,200,40],'uiwang':[1070,520,270,40],'suwon':[1770,520,270,40]
 };
-function mapPages(){return $('mapSheet').value==='all'?[2,4,3]:[Number($('mapSheet').value)];}
+function stationView(){return $('mapSheet').value==='station';}
+function mapPages(){if(stationView())return [N.catalog[selectedStation].map.page];return $('mapSheet').value==='all'?[2,4,3]:[Number($('mapSheet').value)];}
 function sheetOffset(page){return mapPages().indexOf(page)*800;}
 function drawTracks(){
  const pages=mapPages(),svgElement=$('trackSvg');
- $('mapOverview').textContent=$('mapSheet').value==='1'?'전체 구간 제어':'노선 요약 보기';
+ $('mapOverview').textContent=stationView()?'전체노선 보기':'선택역 화면으로';
  let svg='';
  for(const [index,page]of pages.entries()){
   svg+=`<g data-sheet="${page}" transform="translate(0 ${index*800})"><image href="assets/line-map/page-${page}.jpg" width="2048" height="768"/>`;
   if(page===1){
    for(const [id,[x,y,w,h]]of Object.entries(mapHotspots))svg+=`<g data-map-station="${id}" tabindex="0" role="button" aria-label="${N.catalog[id].name} 구간으로 이동"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="transparent"/><title>${N.catalog[id].name} · ${stationStates[id].mode} · ${Object.keys(stationStates[id].routes).length} 진로</title></g>`;
-  }else for(const st of N.stations.filter(st=>st.controlled&&(st.map.page===page||st.map.copies?.some(c=>c.page===page)))){
+  }else for(const st of N.stations.filter(st=>st.controlled&&(!stationView()||st.id===selectedStation)&&(st.map.page===page||st.map.copies?.some(c=>c.page===page)))){
    const map=st.map,model=stationStates[st.id],core=BaseCore.forStation(st.id);
    const copy=map.page===page?{dx:0,dy:0}:map.copies.find(c=>c.page===page);
    svg+=`<g data-control-station="${st.id}" data-primary="${map.page===page}" transform="translate(${copy.dx} ${copy.dy})"><g transform="translate(${copy.headerDx||0} ${copy.headerDy||0})">`;
@@ -50,23 +51,25 @@ function drawTracks(){
   svg+='</g>';
  }
  const height=pages.length*800-32;
- svgElement.setAttribute('viewBox',`0 0 2048 ${height}`);svgElement.style.aspectRatio=`2048 / ${height}`;svgElement.style.width=(mapZoom*100)+'%';svgElement.style.minWidth='100%';
- svgElement.setAttribute('aria-label','청량리–수원 전체 배선 · 중간역 포함 · 확대 및 스크롤 가능');svgElement.innerHTML=svg;
+ const bounds=stationView()?N.catalog[selectedStation].map.view.bounds:[0,0,2048,height];
+ svgElement.setAttribute('viewBox',bounds.join(' '));svgElement.style.aspectRatio=`${bounds[2]} / ${bounds[3]}`;
+ document.querySelector('.track-frame').classList.toggle('station-view',stationView());svgElement.style.width=(mapZoom*100)+'%';svgElement.style.minWidth='100%';
+ svgElement.setAttribute('aria-label',stationView()?`${N.catalog[selectedStation].name} LS · ${N.catalog[selectedStation].map.view.intermediate.join(' · ')} · 관할 역간 포함`:'청량리–수원 전체 배선');svgElement.innerHTML=svg;
  $('mapZoomValue').textContent=Math.round(mapZoom*100)+'%';
  $('routeEvidence').innerHTML=Object.keys(state.routes).length?Object.keys(state.routes).map(id=>routeDetails(id)+`<div class="route-run-controls"><button data-sim-enter="${id}" ${state.routes[id].occupied?'disabled':''}>모의 열차 진입</button><button data-sim-clear="${id}" ${state.routes[id].occupied?'':'disabled'}>모의 열차 통과</button><span>${state.routes[id].occupied?'점유 · 진로 쇄정':'설정'} · ${state.routes[id].control==='continuous'?'연속제어':'단일제어'}</span></div>`).join(''):'<p class="evidence-empty">취급역의 CCM → 신호기 → 진로를 선택하세요. 중간역과 역간 배선은 화면에 그대로 유지됩니다.</p>';
 }
-$('mapOverview').onclick=()=>{$('mapSheet').value=$('mapSheet').value==='1'?'all':'1';render();};
-$('mapSheet').onchange=()=>{mapZoom=1;render();};
+$('mapOverview').onclick=()=>{$('mapSheet').value=stationView()?'1':'station';mapZoom=1;render();scrollToStation();};
+$('mapSheet').onchange=()=>{mapZoom=1;render();scrollToStation();};
 $('mapZoomIn').onclick=()=>{mapZoom=Math.min(6,mapZoom+0.5);drawTracks();};
 $('mapZoomOut').onclick=()=>{mapZoom=Math.max(1,mapZoom-0.5);drawTracks();};
 $('mapFit').onclick=()=>{mapZoom=1;drawTracks();};
 $('routeEvidence').onclick=e=>{const enter=e.target.closest('[data-sim-enter]'),clear=e.target.closest('[data-sim-clear]');if(enter)run({type:'occupy',id:enter.dataset.simEnter,source:'모의운행'});if(clear)run({type:'clear',id:clear.dataset.simClear,source:'모의운행'});};
-function scrollToStation(){const st=N.catalog[selectedStation],offset=sheetOffset(st.map.page),frame=document.querySelector('.track-frame');if(offset<0)return;const scale=$('trackSvg').getBoundingClientRect().width/2048;frame.scrollTo({top:Math.max(0,(offset+st.map.modes[0].y-25)*scale),left:Math.max(0,(st.map.modes[0].x-60)*scale-frame.clientWidth/4),behavior:'instant'});}
+function scrollToStation(){if(stationView()){document.querySelector('.track-frame').scrollTo(0,0);return;}const st=N.catalog[selectedStation],offset=sheetOffset(st.map.page),frame=document.querySelector('.track-frame');if(offset<0)return;const scale=$('trackSvg').getBoundingClientRect().width/2048;frame.scrollTo({top:Math.max(0,(offset+st.map.modes[0].y-25)*scale),left:Math.max(0,(st.map.modes[0].x-60)*scale-frame.clientWidth/4),behavior:'instant'});}
 function selectStation(id,scroll=true){
  if(!N.catalog[id]?.controlled)return;
  if($('actionDialog').open){toast('제어 확인창을 닫은 뒤 역을 변경하세요.',true);$('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedStation;return;}
  stationStates[selectedStation]=state;
- selectedStation=id;if($('mapSheet').value!=='all'&&Number($('mapSheet').value)!==N.catalog[id].map.page)$('mapSheet').value='all';C=BaseCore.forStation(id);state=stationStates[id];
+ selectedStation=id;if(scroll){$('mapSheet').value='station';mapZoom=1;}C=BaseCore.forStation(id);state=stationStates[id];
  $('stationSelect').value=id;$('lsStationSelect').value=id;
  fields();render();taskView();if(scroll)scrollToStation();
 }
@@ -76,19 +79,21 @@ $('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedStat
 $('stationSelect').onchange=e=>selectStation(e.target.value);$('lsStationSelect').onchange=e=>selectStation(e.target.value);
 $('stationTabs').innerHTML=N.stations.filter(st=>st.controlled).map(st=>`<button data-station="${st.id}">${st.name}</button>`).join('');
 $('stationTabs').onclick=e=>{const button=e.target.closest('[data-station]');if(button)selectStation(button.dataset.station);};
+for(const [id,step]of [['previousStation',-1],['nextStation',1]])$(id).onclick=()=>{const stations=N.stations.filter(s=>s.controlled),next=stations[stations.findIndex(s=>s.id===selectedStation)+step];if(next)selectStation(next.id);};
 function renderLogs(){$('logCount').textContent=state.logs.length+' events';$('logList').innerHTML=state.logs.length?state.logs.slice(0,100).map(l=>`<div class="log-row"><span class="log-time">${time(l.time)}</span><div><p>${escapeHTML(l.message)}</p><div class="log-meta">${escapeHTML(l.source)} · <span class="${l.result==='완료'?'result-ok':'result-bad'}">${l.result}</span></div></div></div>`).join(''):'<p class="empty">첫 조작을 기다리고 있습니다.</p>';}
 function render(){
  const st=N.catalog[selectedStation];
- $('stationScope').textContent=`${st.name} · ${st.controlled?'제어역 선택':'배선 조회'} · PDF ${st.map.page}쪽`;
+ $('stationScope').textContent=`${st.name} · ${st.map.view.intermediate.join(' · ')||'구내 및 역간'}`;
  document.querySelectorAll('[data-station]').forEach(b=>b.classList.toggle('selected',b.dataset.station===selectedStation));
  document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
  document.querySelector('.sessionbar>div:first-child').innerHTML=`<span class="live-dot"></span><b>조작·경로 확인</b><span class="bar-sep"></span><span>${st.name}</span><span class="muted">${st.code}</span>`;
  document.querySelector('.side-station').innerHTML=`<span class="live-dot"></span>${st.name} <small>${st.code}</small>`;
- document.querySelector('.fidelity-note').innerHTML=`전체 배선 · ${$('mapSheet').value==='all'?'청량리–수원 · PDF 2·4·3쪽':'PDF '+$('mapSheet').value+'쪽'}<b>확대해도 배선을 생략하지 않습니다</b>`;
- document.querySelector('.ls-bottom>span:first-child').textContent='청량리';
- document.querySelector('.ls-bottom>span:last-child').textContent='수원';
+ document.querySelector('.fidelity-note').innerHTML=`${stationView()?st.name+' LS · '+(st.map.view.intermediate.join(' · ')||'구내 및 역간'):'전체 배선 · PDF '+($('mapSheet').value==='all'?'2·4·3':$('mapSheet').value)+'쪽'}<b>관할 중간역·역간 포함</b>`;
+ const controlled=N.stations.filter(s=>s.controlled),index=controlled.findIndex(s=>s.id===selectedStation);
+ $('previousStation').textContent=index>0?'◀ '+controlled[index-1].name:'시점';$('previousStation').disabled=index===0;
+ $('nextStation').textContent=index<controlled.length-1?controlled[index+1].name+' ▶':'종점';$('nextStation').disabled=index===controlled.length-1;
  $('clock').textContent=time(state.clock);$('stateMode').textContent=st.controlled?state.mode:'비연동';$('stateOwner').textContent=state.mode==='LOCAL'?'현장역':'관제실';$('stateRoutes').textContent=Object.keys(state.routes).length+'개 설정';$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';
- $('lsStatus').textContent='전체 구간 스크롤 · 확대/축소 · 15개 취급역 직접 제어';
+ $('lsStatus').textContent=stationView()?'CCM → 신호기 → 진로 선택 · 좌우 화살표로 인접 취급역 이동':'전체노선 · 역 이름을 눌러 개별 LS 화면으로 이동';
  $('mmiState').textContent=`현재 ${state.mode} · LS와 같은 상태 · ${Object.keys(state.routes).length}개 진로 설정`;
  $('handoverBar').hidden=!state.pending;if(state.pending)$('handoverBar').innerHTML=`<span>${state.pending} 요청 · 가상 현장 응답 대기</span><button data-handover="yes">현장 수락</button><button data-handover="no">현장 거절</button>`;
  $('completedCount').textContent=`${completed.length} / ${tasks.length} 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();window.SimDiagram?.render();
@@ -118,6 +123,7 @@ $('taskSelect').innerHTML=tasks.map((t,i)=>`<option value="${i}">${String(i+1).p
 document.querySelectorAll('[data-practice]').forEach(b=>b.onclick=()=>{practice=b.dataset.practice;document.querySelectorAll('[data-practice]').forEach(x=>x.classList.toggle('selected',x===b));taskView();});
 $('lsDisplay').onclick=e=>{
  const station=e.target.closest('[data-map-station]');if(station){selectStation(station.dataset.mapStation);return;}
+ const control=e.target.closest('[data-select-control]');if(control){selectStation(control.dataset.selectControl);return;}
  const owner=e.target.closest('[data-control-station]');if(owner&&owner.dataset.controlStation!==selectedStation){if($('actionDialog').open)return;selectStation(owner.dataset.controlStation,false);}
  const mode=e.target.closest('[data-mode]'),signal=e.target.closest('[data-signal]'),point=e.target.closest('[data-point]'),stop=e.target.closest('[data-stop-all]');
  if(mode)openAction('역제어모드 설정',N.catalog[selectedStation].name+' '+mode.dataset.mode+' 모드로 전환하시겠습니까?',{type:'mode',value:mode.dataset.mode,source:'LS'});
@@ -143,7 +149,7 @@ $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toas
 for(const id of ['guideBtn','footerGuide'])$(id).onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
 $('overviewBtn').textContent='배선 확대 ↗';$('overviewBtn').onclick=()=>{const panel=document.querySelector('.ls-panel');panel.classList.toggle('expanded');$('overviewBtn').textContent=panel.classList.contains('expanded')?'확대 닫기 ↙':'배선 확대 ↗';};
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.6.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.6.1',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 setInterval(()=>{if(!paused&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value);for(const st of Object.values(stationStates))C.dispatch(st,{type:'tick',seconds});window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
 fields();render();taskView();
 

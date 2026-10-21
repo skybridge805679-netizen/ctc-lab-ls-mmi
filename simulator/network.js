@@ -924,6 +924,26 @@ const catalog={
     }
   }
 };
+// LS screen extents include the intermediate stations assigned to each control station.
+// These are display bounds, independent of referenceWindow used to register wiring.
+const stationViews={
+ 'cheongnyangni':[[0,15,510,225],['제기동']],
+ 'dongmyo':[[510,15,570,225],['신설동','동대문','종로5가','종로3가']],
+ 'jonggak':[[1060,15,525,225],['시청']],
+ 'underground-seoul':[[1585,15,463,225],[]],
+ 'seoul':[[0,275,510,340],['남영']],
+ 'yongsan':[[510,290,440,325],[]],
+ 'noryangjin':[[0,210,475,295],['대방','신길']],
+ 'yeongdeungpo':[[475,210,450,295],['신도림']],
+ 'guro':[[895,210,525,295],['가산디지털','독산']],
+ 'geumcheon':[[1420,210,628,295],['석수','관악']],
+ 'anyang':[[1260,25,440,250],['명학']],
+ 'geumjeong':[[1700,25,348,250],[]],
+ 'gunpo':[[0,400,505,280],['당정']],
+ 'uiwang':[[505,400,635,280],['성균관대','화서']],
+ 'suwon':[[1140,400,450,280],[]]
+};
+for(const [id,[bounds,intermediate]]of Object.entries(stationViews))catalog[id].map.view={bounds,intermediate};
 const stations=Object.values(catalog).sort((a,b)=>a.order-b.order);
 const api={catalog,stations};
 const wiring=typeof module!=='undefined'?require('./wiring.js'):root.SimWiring;

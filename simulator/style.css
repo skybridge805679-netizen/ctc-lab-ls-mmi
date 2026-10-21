@@ -18,3 +18,8 @@
 .mmi-panel{margin-top:16px}.mmi-window{display:grid;grid-template-columns:150px minmax(220px,1fr);gap:8px 16px}.mmi-window .window-caption,.mmi-window #mmiFields,.mmi-window .mmi-state,.mmi-window .mmi-actions{grid-column:1/-1}#mmiFields{min-height:0}.mmi-window select{max-width:100%}
 .expanded .track-frame{height:70vh;max-height:none}.expanded .track-frame svg{min-width:100%}.handover{position:static;background:#fff1d5;color:#573b14;padding:10px;display:flex;gap:12px;align-items:center}.handover[hidden]{display:none}
 @media(max-width:760px){.track-frame{height:60vh;min-height:300px}.mmi-window{grid-template-columns:1fr}.map-tools{width:100%}.mmi-panel .mmi-window>label,.mmi-panel .mmi-window>select{grid-column:1}.expanded .track-frame svg{min-width:100%}}
+/* Individual LS screens fit their complete jurisdiction; full sheets retain scrolling. */
+.track-frame.station-view{height:auto;min-height:0;max-height:none;background:#696e68}
+.track-frame.station-view svg{display:block}
+.ls-bottom button{color:inherit;white-space:nowrap}
+.ls-bottom button:disabled{opacity:.4;cursor:default}

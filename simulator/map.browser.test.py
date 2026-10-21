@@ -1,4 +1,4 @@
-"""Full sheets, all traced LS signals and station-independent controls (Chromium)."""
+"""Station jurisdictions, full sheets, all traced LS signals and station-independent controls (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -19,19 +19,21 @@ try:
             page = context.new_page(); errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='networkidle')
-            expect(page.locator('#mapSheet')).to_have_value('all')
-            expect(page.locator('#trackSvg image')).to_have_count(3)
-            expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 2368')
-            expect(page.locator('[data-primary="true"]')).to_have_count(15)
-            # Full canvas remains mounted when selecting ANY station or zooming.
+            expect(page.locator('#mapSheet')).to_have_value('station')
+            expect(page.locator('#trackSvg image')).to_have_count(1)
+            expect(page.locator('[data-primary="true"]')).to_have_count(1)
             stations = page.locator('#stationSelect option').evaluate_all('(os)=>os.map(o=>o.value)')
-            for _ in range(4 if width == 1440 else 10): page.locator('#mapZoomIn').click()
             tested = 0
             for station in stations:
                 page.locator('#stationSelect').select_option(station)
-                expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 2368')
-                expect(page.locator('#trackSvg image')).to_have_count(3)
-                if station=='anyang': assert page.locator('.track-frame').evaluate('(e)=>e.scrollTop')>0
+                bounds=page.evaluate('(id)=>SimNetwork.catalog[id].map.view.bounds.join(" ")',station)
+                expect(page.locator('#trackSvg')).to_have_attribute('viewBox', bounds)
+                expect(page.locator('#trackSvg image')).to_have_count(1)
+                expect(page.locator('[data-primary="true"]')).to_have_count(1)
+                expect(page.locator('#mapZoomValue')).to_have_text('100%')
+                assert page.locator('.track-frame').evaluate('(e)=>e.scrollTop')==0
+                if width==390:
+                    for _ in range(4): page.locator('#mapZoomIn').click()
                 layer = page.locator(f'[data-control-station="{station}"][data-primary="true"]')
                 layer.locator('[data-mode="CCM"]').click(); page.locator('#dialogConfirm').click()
                 expect(page.locator('#stateMode')).to_have_text('CCM')
@@ -68,6 +70,7 @@ try:
             expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
             # Duplicate PDF depictions share the same model, including their actual click regions.
             page.locator('#stationSelect').select_option('geumcheon')
+            page.locator('#mapSheet').select_option('all')
             copy = page.locator('[data-control-station="geumcheon"][data-primary="false"]')
             copy.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()
             expect(page.locator('[data-control-station="geumcheon"] [data-active-route="1A-1T"]')).to_have_count(2)
@@ -78,18 +81,18 @@ try:
                 expect(page.locator('#trackSvg')).to_have_attribute('viewBox', '0 0 2048 768')
             page.locator('#mapSheet').select_option('1')
             page.locator('[data-map-station="anyang"]').press('Enter')
-            expect(page.locator('#mapSheet')).to_have_value('all')
+            expect(page.locator('#mapSheet')).to_have_value('station')
             expect(page.locator('#stationSelect')).to_have_value('anyang')
             page.locator('#controlSelect').select_option('route');page.locator('#mmiSignal').select_option('1A');page.locator('#mmiRoute').select_option('1A-1T');page.locator('#mmiApply').click()
             if width == 1440:
                 page.locator('#mapFit').click()
                 page.locator('#stationSelect').select_option('anyang')
                 page.evaluate("window.scrollTo(0,document.querySelector('.ls-panel').getBoundingClientRect().top+window.scrollY-60);scrollToStation()")
-                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6-full-line.png'))
+                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6.1-anyang.png'))
                 for _ in range(3): page.locator('#mapZoomIn').click()
                 page.locator('#stationSelect').select_option('anyang')
                 page.evaluate("window.scrollTo(0,document.querySelector('.ls-panel').getBoundingClientRect().top+window.scrollY-60);scrollToStation()")
-                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6-anyang.png'))
+                page.screenshot(path=str(ROOT.parent/'docs/preview-v0.6.1-anyang-zoom.png'))
             assert not errors, errors
             context.close()
             print(f'PASS full sheets, {tested} LS signals, refuge/continuous/occupancy/all-stop, duplicate sheets, overview keyboard: {width}px', flush=True)
