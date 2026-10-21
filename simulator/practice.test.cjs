@@ -40,4 +40,13 @@ test('route comparison enforces the documented order and final route',()=>{
   const s=session(actions);assert.equal(tasks[4].check(s.events,s),false);
  }
 });
+test('approach-lock task needs a real lock, the timed release and a fresh route',()=>{
+ const seq=[mode,{type:'route',id:'1A-1T'},{type:'approach',signal:'1A'},{type:'stop',id:'1A'}];
+ const s=session(seq);assert.equal(tasks[9].check(s.events,s),false);
+ C.dispatch(s,{type:'route',id:'1A-1T',source:'LS'});assert.equal(s.routes['1A-1T'].lock.seconds,90,'rejected while locked');
+ C.dispatch(s,{type:'tick',seconds:90});assert.equal(tasks[9].check(s.events,s),false,'released but not re-set');
+ C.dispatch(s,{type:'route',id:'1A-1T',source:'LS'});assert.equal(tasks[9].check(s.events,s),true);
+ const plain=session([mode,{type:'route',id:'1A-1T'},{type:'stop',id:'1A'},{type:'route',id:'1A-1T'}]);
+ assert.equal(tasks[9].check(plain.events,plain),false,'no approaching train means no lock to wait for');
+});
 console.log(count+' practice tests passed');

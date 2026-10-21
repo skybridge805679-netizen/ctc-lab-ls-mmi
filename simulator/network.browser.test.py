@@ -54,7 +54,7 @@ def check(page, url, screenshot=False):
     page.locator('[data-control-station="cheongnyangni"][data-primary="true"] [data-signal="1A"]').click()
     page.locator('[data-route-choice="1A-1T"]').click()
     page.locator('#checkTask').click()
-    expect(page.locator('#completedCount')).to_have_text('0 / 9 완료')
+    expect(page.locator('#completedCount')).to_have_text('0 / 10 완료')
     expect(page.locator('#toast')).to_contain_text('지하서울로 전환')
     page.locator('#controlSelect').select_option('route')
     page.locator('input[name="routeAction"][value="withdraw"]').check()

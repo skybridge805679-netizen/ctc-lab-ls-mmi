@@ -1,6 +1,7 @@
 {
-  "version": "0.3",
-  "backupDate": "2026-10-20",
+  "version": "0.7.0",
+  "backupDate": "2026-10-21",
+  "scope": "루트·archive·docs·simulator. references는 references/MANIFEST.json 참조",
   "files": [
     {
       "path": ".gitignore",
@@ -9,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 771,
-      "sha256": "66a1155f812506582410048ccc279110f9edc2a2f37c0e2df29e532923e477e6"
+      "bytes": 4250,
+      "sha256": "93727eed7664513bb77b8d91834f65dfca965c16c182ebc3c8a6c3fceb7b24a8"
     },
     {
       "path": "README.md",
-      "bytes": 2013,
-      "sha256": "f0ae49ec88f2e26712eb1f8eb98c6fa7c9533c82517406d1e4feefd6668573f3"
+      "bytes": 5406,
+      "sha256": "085970e409b3716f0cf331688677ff3c3bb0fc1275c72d199771e2b730876434"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -33,29 +34,169 @@
       "sha256": "53201b52f258f30aa3c335ab67e230ac1afe6b2a0379fa5fca70e9e9388dd55a"
     },
     {
+      "path": "archive/CTC-LAB-v0.4.zip",
+      "bytes": 63377,
+      "sha256": "6d428ace01a588663a87ce57851c416442106e9e9e6006084c14198232c6b9bb"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.5.1.zip",
+      "bytes": 4476925,
+      "sha256": "8ad8fba120ec8b3fd04510ab7e68b5e06152eae0ad45ada702dc3d6799878df1"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.5.zip",
+      "bytes": 1102146,
+      "sha256": "d5bd9d6ae79704aa570849a720bfa1b17f7cee64b42e745a80c6876ece6264ee"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.6.0.zip",
+      "bytes": 4488098,
+      "sha256": "c0e39a7f4bee58794e35002a3a13da0c513390617daa8f440682f9d7b2655531"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.6.1.zip",
+      "bytes": 4491372,
+      "sha256": "c4235345a8acbbada58736cfea43b5b16b84b7db23b7523ca782180493b7a470"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.7.0.zip",
+      "bytes": 4497878,
+      "sha256": "c228c013c58898701042fb3e1738e07b0bce7601e5cc0baea36872ef518a66ec"
+    },
+    {
+      "path": "docs/PDF배선도교체.md",
+      "bytes": 2782,
+      "sha256": "d2e8bea6d8911e47c3b3b30591ba66faa06b5603301e02b44229b2e185cc8257"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
     },
     {
+      "path": "docs/preview-v0.5-diagram.png",
+      "bytes": 132631,
+      "sha256": "99f2e7f79e0222125bdc6e423b004262c5bacf182da59631b1508dfadcc974af"
+    },
+    {
+      "path": "docs/preview-v0.5-schedule.png",
+      "bytes": 77920,
+      "sha256": "04cfb67f9fd256bac623c0db132224b2476cbeb94c39a2a8bf8ab148c77cf408"
+    },
+    {
+      "path": "docs/preview-v0.5.1-overview.png",
+      "bytes": 147513,
+      "sha256": "a87059f6f93e7ad6a7849657862bb57c68cbb713c9958024ee9d449c7084fecb"
+    },
+    {
+      "path": "docs/preview-v0.5.1-station.png",
+      "bytes": 117683,
+      "sha256": "b3496244740d98ddee364827812f9d9d06327d26880d4e10ed9594818706bf5a"
+    },
+    {
+      "path": "docs/preview-v0.6-anyang.png",
+      "bytes": 265405,
+      "sha256": "7cde72a232d34dd54010588bd7f079dc4918598897e30724e51a832c4feae657"
+    },
+    {
+      "path": "docs/preview-v0.6-diagram.png",
+      "bytes": 132698,
+      "sha256": "7e38ce551e2201915b3c9fc3c509ff2c47b145489a26c1f8835f6bd2f8b0d6b0"
+    },
+    {
+      "path": "docs/preview-v0.6-full-line.png",
+      "bytes": 278042,
+      "sha256": "6ab6ebedd6ad79032a347649b0d2a93b741576903f9315822bdd4b6408ffe641"
+    },
+    {
+      "path": "docs/preview-v0.6-schedule.png",
+      "bytes": 77871,
+      "sha256": "375c211791d8e527b6e72b1571591051bd24a1375548cdc91e53e4dd04f02a13"
+    },
+    {
+      "path": "docs/preview-v0.6.1-anyang-zoom.png",
+      "bytes": 354009,
+      "sha256": "a29e7de1bd0ae8c69b2a14f5b89bf536ab0e069c08565e7c4066085cb814bd3a"
+    },
+    {
+      "path": "docs/preview-v0.6.1-anyang.png",
+      "bytes": 354009,
+      "sha256": "a29e7de1bd0ae8c69b2a14f5b89bf536ab0e069c08565e7c4066085cb814bd3a"
+    },
+    {
+      "path": "docs/preview-v0.6.1-cheongnyangni.png",
+      "bytes": 156809,
+      "sha256": "9f7e55f470f743286efce1e84cb51a4dfe0ea5f3fe6c18437b0ea878b2a9a2d4"
+    },
+    {
+      "path": "docs/preview-v0.6.1-diagram.png",
+      "bytes": 132812,
+      "sha256": "fce5c67eb6c88180e981085bcf9562b6115a19a8d37bd12f61af8309b65b0453"
+    },
+    {
+      "path": "docs/preview-v0.6.1-dongmyo.png",
+      "bytes": 170945,
+      "sha256": "064b02947e122e76db8e9da5ebaaba2b4392f5fd21edcc295d23164dfa1e5cee"
+    },
+    {
+      "path": "docs/preview-v0.6.1-guro.png",
+      "bytes": 264034,
+      "sha256": "770832beadfffdc1ef9638bf491b28200e3de3775cf8e3488cd9eebbebf2e5ef"
+    },
+    {
+      "path": "docs/preview-v0.6.1-schedule.png",
+      "bytes": 77413,
+      "sha256": "146b4a173751d1db9678a59e18e9a81421594350eca7d053ade20ec5d6f65c47"
+    },
+    {
+      "path": "docs/preview-v0.6.1-seoul.png",
+      "bytes": 257696,
+      "sha256": "38fbf67bb80108044ba7b954f425f253a55f6e6862c0eb92ade0bc932d3405c8"
+    },
+    {
+      "path": "docs/preview-v0.7.0-approach.png",
+      "bytes": 550477,
+      "sha256": "fb7f8719687a06d4370b2497c4ce1c8437df1eeddb271f36d8a0046ef3c61133"
+    },
+    {
+      "path": "docs/station-control-coverage.json",
+      "bytes": 27334,
+      "sha256": "010f025e578dd6e7c795caaa074829ecffa226afc8a08b968337c97b447be429"
+    },
+    {
       "path": "docs/개발로드맵.md",
-      "bytes": 2873,
-      "sha256": "afea157431c50a7409746d78a3df6ef5505b96447e7f267af9a44ff2bc76cb5d"
+      "bytes": 5174,
+      "sha256": "f5aebd862b61b390efcba992dcd1ef6cdf449a95da49bcd085a5dcd28cbaf7dd"
     },
     {
       "path": "docs/개발인수인계.md",
-      "bytes": 1988,
-      "sha256": "39ef8187765259fb9e85099bf95055381b7849d20319b532c2ce62968e32e891"
+      "bytes": 7155,
+      "sha256": "bbd415fc16e7b760786dad68e3f3358a1624ea2909367d1914c87ccf51bdce8c"
     },
     {
       "path": "docs/구현현황.md",
-      "bytes": 2085,
-      "sha256": "cebe4affd50565280d84fa75629f2e33cd99c0b29ea1cb450185e870764553e7"
+      "bytes": 4993,
+      "sha256": "c0179425cc605205fce7ef21722dd4c1177713ca46c84b187582e9299ce372c7"
     },
     {
       "path": "docs/자료근거.md",
-      "bytes": 2181,
-      "sha256": "531b775dff19799e38fa3d2d98401d7d51ae57aa33d1006652b7c5f5a9a483e3"
+      "bytes": 3873,
+      "sha256": "865e1beed647f8b8241df9a9a83dada924a14659e2d6677107e450f539bc1ae0"
+    },
+    {
+      "path": "docs/전체배선과역별제어.md",
+      "bytes": 6195,
+      "sha256": "8526adc84f08ebe5ae5844ce944df162722816ec1bba49e4760aa37db82c682a"
+    },
+    {
+      "path": "docs/전체역과열차다이아.md",
+      "bytes": 8550,
+      "sha256": "e60c293c9430ac53a3163cf5ec39315b32cd728d42330a8f727faa8383a3c694"
+    },
+    {
+      "path": "docs/접근쇄정과오버랩.md",
+      "bytes": 2153,
+      "sha256": "e59297576c2e7241d6ea463ebab538e6506ecda586bc4568757c53da38f52535"
     },
     {
       "path": "docs/제작지침.md",
@@ -63,14 +204,139 @@
       "sha256": "0a54228eaf7fd1f53887411b3a25d45e11786acbc5bfb4e9076d6116135d95ed"
     },
     {
+      "path": "docs/조작절차체크리스트.md",
+      "bytes": 3243,
+      "sha256": "d1ae8ded8c0606545631459ae5d0f34c745938466e8759330a7249c9c3ee41a0"
+    },
+    {
       "path": "simulator/README.md",
-      "bytes": 1638,
-      "sha256": "e900a4d1992ee98f654e9a0e359d9cab0c6c231108b3eb4b9db65c7d1c62823c"
+      "bytes": 3337,
+      "sha256": "86e523fd9809e4126f49e291deaec5b0acf8d42aeb1b749e39873b9413b1e7ab"
     },
     {
       "path": "simulator/app.js",
-      "bytes": 18671,
-      "sha256": "182e458ef01fd337eac5cbc56663f77ae330d3424a9a6f6780cf8fa67afdc690"
+      "bytes": 30271,
+      "sha256": "d9081524822f9e0414d4e4da234316c94e2c69831d1de234e9839d467de8ca1d"
+    },
+    {
+      "path": "simulator/assets/line-map/SOURCES.json",
+      "bytes": 1208,
+      "sha256": "89d0faada10767970025e748b0a63de3069ed897dacb67313bbb8f07b5540027"
+    },
+    {
+      "path": "simulator/assets/line-map/page-1.jpg",
+      "bytes": 1819091,
+      "sha256": "f6667766359453ae788476c4246697534f76022d92d157755dd43e8778be9375"
+    },
+    {
+      "path": "simulator/assets/line-map/page-2.jpg",
+      "bytes": 1220401,
+      "sha256": "ba9b267b6cbd399f148419a6d4042f69c98838c26f688b0c91d260616e4a5524"
+    },
+    {
+      "path": "simulator/assets/line-map/page-3.jpg",
+      "bytes": 1344618,
+      "sha256": "323779b8ec021386632b5d0c07d81ed416a6365b26498cb642c4c04c91e9b09a"
+    },
+    {
+      "path": "simulator/assets/line-map/page-4.jpg",
+      "bytes": 865686,
+      "sha256": "88a369eeb44ec5bbd8414e2a57d836328512e01b9667dc4fce361cc2c63e973b"
+    },
+    {
+      "path": "simulator/assets/stations/SOURCES.json",
+      "bytes": 3128,
+      "sha256": "eb7b0c677a11ca25d7662de2a5674aa4240a7e7eea9c3de3868b9f1f3585a160"
+    },
+    {
+      "path": "simulator/assets/stations/slide10.png",
+      "bytes": 88423,
+      "sha256": "f748a6219d354f277c61bbae8c854fbf071ffe13a89bbff01b85c1a87aede8a0"
+    },
+    {
+      "path": "simulator/assets/stations/slide11.png",
+      "bytes": 84743,
+      "sha256": "80639ab5cb3b7f107a7746aa079bcdd01b082f5891375f1c5dec3d716453bc89"
+    },
+    {
+      "path": "simulator/assets/stations/slide12.png",
+      "bytes": 79205,
+      "sha256": "338ca9faef16ad3b32dca1b78fbdb3375bf299793b725bf3dbd8a83c9d442411"
+    },
+    {
+      "path": "simulator/assets/stations/slide13.png",
+      "bytes": 43158,
+      "sha256": "72e3dc1ca78c8915bae58346d1881c1bd7adbff3609c5fa28345aa91e65e60d0"
+    },
+    {
+      "path": "simulator/assets/stations/slide14.png",
+      "bytes": 60704,
+      "sha256": "a348a5f6d756174475631d707c3fdf38f281246aa2aeeeeece842cff681485fa"
+    },
+    {
+      "path": "simulator/assets/stations/slide15.png",
+      "bytes": 62239,
+      "sha256": "7e725fc2f895a5f460b891d596b67e0c4156dd708696f608068f537ca633c404"
+    },
+    {
+      "path": "simulator/assets/stations/slide16.png",
+      "bytes": 41535,
+      "sha256": "d18b72a7928cee3d930f2319961dcb42f20a0a23e9eb466b58fe9eff7896ad90"
+    },
+    {
+      "path": "simulator/assets/stations/slide17.png",
+      "bytes": 84510,
+      "sha256": "9b965b38f0590d1831c1fd4b030f3738a3121f936644608799c8837c36f14e0a"
+    },
+    {
+      "path": "simulator/assets/stations/slide18.png",
+      "bytes": 52500,
+      "sha256": "cf95aa85da6fb02026b4702478d2789cb2a59e0d11b8b0e0db87c1ddb97e0b02"
+    },
+    {
+      "path": "simulator/assets/stations/slide19.png",
+      "bytes": 79959,
+      "sha256": "aa0032c00a70f8adcb8676c99addeda992107023bde3865df75a2052cd22ae64"
+    },
+    {
+      "path": "simulator/assets/stations/slide2.png",
+      "bytes": 43746,
+      "sha256": "f90318a0ab75ac8c9ca9ddc09a7ff6419d7f5d73bb048f61316c38344f122c73"
+    },
+    {
+      "path": "simulator/assets/stations/slide3.png",
+      "bytes": 58093,
+      "sha256": "e773e5c1d2a12579988104b5976f5298500878e47efb05c88c9ef55f6d3acec4"
+    },
+    {
+      "path": "simulator/assets/stations/slide4.png",
+      "bytes": 48211,
+      "sha256": "cf1255889803ed6e81a1b7913e6646013b2c1de9ab7eae98b89705bbe95ccbcf"
+    },
+    {
+      "path": "simulator/assets/stations/slide5.png",
+      "bytes": 46063,
+      "sha256": "b63695c5b854321a135d974a3fc2a27893add2d7ada5f0d5b976707bc16dbe47"
+    },
+    {
+      "path": "simulator/assets/stations/slide6.png",
+      "bytes": 68506,
+      "sha256": "56c8a0ee899745b634f53a4732c4ef1185ce85437cff0b98736bdf3282f7e758"
+    },
+    {
+      "path": "simulator/assets/stations/slide7.png",
+      "bytes": 76591,
+      "sha256": "2c7d794fcd8d22fbb65d185c63dcdc55a00222bc0dd4f480125b6a70535dd47c"
+    },
+    {
+      "path": "simulator/assets/stations/slide8.png",
+      "bytes": 64142,
+      "sha256": "42a143ab6e36044710db1db524978b0e7adda2c28ab447313c8173a67fc4aaab"
+    },
+    {
+      "path": "simulator/assets/stations/slide9.png",
+      "bytes": 84541,
+      "sha256": "0806869db44a0454ba463423933acce169f243e86f2f0847b6ae605cfa695541"
     },
     {
       "path": "simulator/assets/underground-seoul-original.png",
@@ -78,9 +344,14 @@
       "sha256": "b63695c5b854321a135d974a3fc2a27893add2d7ada5f0d5b976707bc16dbe47"
     },
     {
+      "path": "simulator/browser.test.py",
+      "bytes": 6287,
+      "sha256": "4d2cb55f5332b4d72b31562999f15ad089eee2ddfe5b8debe7c9e36d88c38bbc"
+    },
+    {
       "path": "simulator/core.js",
-      "bytes": 6206,
-      "sha256": "93cdfb77128cbefb376b707ed6e0414dd39244dfe7bfe639ded6166e2c197ebd"
+      "bytes": 11251,
+      "sha256": "21d82ce71e75313e3795e381f72c4b039e9706472bd8ec6e4d21c378a586b3a3"
     },
     {
       "path": "simulator/core.test.cjs",
@@ -88,19 +359,109 @@
       "sha256": "d0770ea510b3af2f30acb6a916b95dfb5c4b01e8404892f7b2cd4c76d9f264fe"
     },
     {
+      "path": "simulator/diagram-ui.js",
+      "bytes": 7755,
+      "sha256": "37b294373488f03b55f5554dd0f7e3b2888ae965e9a8f09fb97b0c8b50f34c42"
+    },
+    {
       "path": "simulator/index.html",
-      "bytes": 8691,
-      "sha256": "cfba5256581f70e3ea537d55d62f3afc75e7eb1b3835831a061dc3dafb195829"
+      "bytes": 15201,
+      "sha256": "48429bde65859fc430acd45fe968a4b8de2bccf39b3e8b401cec519a91595eb7"
+    },
+    {
+      "path": "simulator/interlocking.browser.test.py",
+      "bytes": 4313,
+      "sha256": "a4b81b60a96890d5274e9b35fdf91e28313bcdae5cf35b0f7bff9c61afefa18c"
+    },
+    {
+      "path": "simulator/interlocking.js",
+      "bytes": 1233,
+      "sha256": "af4afecf1d4f79bb1ad8165428c2803e9e981448d55833495763da2b75f66fcd"
+    },
+    {
+      "path": "simulator/interlocking.test.cjs",
+      "bytes": 4373,
+      "sha256": "e4d7f2b899ac0cf0b5ae5d5a4a9fc8a763e5238aaac9383db8179b9435cc6ebf"
+    },
+    {
+      "path": "simulator/map.browser.test.py",
+      "bytes": 7475,
+      "sha256": "67a85216743b9921bad974232d78ba659ab7679cc69e85ed1958f69ac1b7dd51"
+    },
+    {
+      "path": "simulator/network.browser.test.py",
+      "bytes": 12057,
+      "sha256": "87c63f931ff2957404e3713b5118e4eb9ad41f9cfd0f8d090368acf193b2c6e3"
+    },
+    {
+      "path": "simulator/network.js",
+      "bytes": 19729,
+      "sha256": "38edfe55612976ddce04d6e71528b9aaa8a381d515d31ba4ca8d5038354a8043"
+    },
+    {
+      "path": "simulator/network.test.cjs",
+      "bytes": 4808,
+      "sha256": "ad456a190864efac8da62ed82a7a68e7cb56ff62d703c080b221721496f5367a"
+    },
+    {
+      "path": "simulator/practice.js",
+      "bytes": 5136,
+      "sha256": "9b7686bb630fb4a2bae86cf3a8fe10f1c97331e912098698ddba0edafbd0cf21"
+    },
+    {
+      "path": "simulator/practice.test.cjs",
+      "bytes": 2887,
+      "sha256": "69d1292bbb8462fe687a9f3638512b68ae7d17a7b792611b7500bb56db92f781"
+    },
+    {
+      "path": "simulator/schedule-ui.js",
+      "bytes": 5965,
+      "sha256": "0e307dbd3efa05e7f77e05bd486205e42f13cd0751584c026dd4ca1015c389b0"
+    },
+    {
+      "path": "simulator/schedule.test.cjs",
+      "bytes": 3209,
+      "sha256": "8e7f0e8e329e263ca24eb1fb0ed8fbdbf5f4925e7e7dd2506560ea65dd51d51f"
+    },
+    {
+      "path": "simulator/station-views.browser.test.py",
+      "bytes": 2720,
+      "sha256": "690919ed308034a153a7ea90307ea6c9997d05b4c8329fef4642787c139d36da"
+    },
+    {
+      "path": "simulator/station-views.test.cjs",
+      "bytes": 1048,
+      "sha256": "cb3d809cf3dd7e922e63f62a0a0e971dfd95c4b4d3e7b1e185d320be71b943c0"
     },
     {
       "path": "simulator/style.css",
-      "bytes": 15094,
-      "sha256": "32653d9e41aa84d7bebfea452fe840ba8b45f7ecca025f082b9c53c83e4115cb"
+      "bytes": 24196,
+      "sha256": "92543cc3037f0c02d9391461ca9ec46165a43b9aece304ab413b04603f155bc8"
+    },
+    {
+      "path": "simulator/timetable.js",
+      "bytes": 6212,
+      "sha256": "d50324d1a47ff691becc6cceefab74f7ea645d3b277be37926f2b99444cc22de"
+    },
+    {
+      "path": "simulator/wiring.alignment.test.py",
+      "bytes": 1805,
+      "sha256": "a11eeca03cac0a4a2476fc5efb8ff1f778bc59bef950f795f9f8b2d2ae6b8edc"
+    },
+    {
+      "path": "simulator/wiring.js",
+      "bytes": 22017,
+      "sha256": "b16ac6dae7015d601d45e6a1f156f9e88b3a19bad0d7587b3dab059fc2f3b8d4"
+    },
+    {
+      "path": "simulator/wiring.test.cjs",
+      "bytes": 4179,
+      "sha256": "c69aac71dafd8b7589a98f39d76a4bbcf0702f144aa80253670f2688dd7c12de"
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 905,
-      "sha256": "f5f02e29248dd88f76668f52ce420c18883ad8c27a961752b06933b2d9c6e9aa"
+      "bytes": 7242,
+      "sha256": "2e0aba66654b50db40109a99f9ddb90e756fc647d97709f0096ac5e534ac3b29"
     },
     {
       "path": "simulator/고증대조표.json",

@@ -1,8 +1,8 @@
 # CTC LAB — LS·MMI 관제 조작 연습
 
-매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.6.1: 관할 중간역을 포함한 15개 개별 LS 화면, 15개 취급역의 진로·입환·전환기 제어, 온라인 다이아·33개 역 스케줄 관리.**
+매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.7.0: 접근쇄정(장내 90초·출발 30초)·오버랩(교재 근거 3개 진로) 추가, LS 표시 가독성 개선. v0.6.1: 관할 중간역을 포함한 15개 개별 LS 화면, 15개 취급역의 진로·입환·전환기 제어, 온라인 다이아·33개 역 스케줄 관리.**
 
-[v0.6.1 실행본 ZIP](archive/CTC-LAB-v0.6.1.zip)을 내려받아 압축을 풀어도 됩니다.
+[v0.7.0 실행본 ZIP](archive/CTC-LAB-v0.7.0.zip)을 내려받아 압축을 풀어도 됩니다.
 
 ## 바로 실행
 저장소를 내려받고 `simulator/index.html`을 브라우저로 여세요. 빌드나 외부 라이브러리가 필요 없습니다.
@@ -45,7 +45,7 @@ node simulator/schedule.test.cjs
 node simulator/wiring.test.cjs
 node --check simulator/app.js
 ```
-Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test.py`로 데스크톱·모바일에서 9개 과제 전체를 검증합니다. `python3 simulator/map.browser.test.py`는 전체 시트 유지와 15개 역의 246개 신호기 조작, 대피선·점유·연속제어를 검증합니다. `python3 simulator/wiring.alignment.test.py`는 Pillow로 원본 선로 픽셀과 경로 위치를 대조합니다. 추가로 `python3 simulator/network.browser.test.py`는 15개 역과 다이아·온라인 스케줄 관리 전체 흐름을 검증합니다. 파일 직접 실행 검증은 브라우저 정책이 허용하는 환경에서 `--include-file`을 추가합니다.
+Playwright와 Chromium이 있는 환경에서는 `python3 simulator/browser.test.py`로 데스크톱·모바일에서 10개 과제 전체를 검증합니다. `python3 simulator/map.browser.test.py`는 전체 시트 유지와 15개 역의 246개 신호기 조작, 대피선·점유·연속제어를 검증합니다. `python3 simulator/wiring.alignment.test.py`는 Pillow로 원본 선로 픽셀과 경로 위치를 대조합니다. 추가로 `python3 simulator/network.browser.test.py`는 15개 역과 다이아·온라인 스케줄 관리 전체 흐름을 검증합니다. 파일 직접 실행 검증은 브라우저 정책이 허용하는 환경에서 `--include-file`을 추가합니다.
 
 ## 문서 안내
 - [제작 지침](docs/제작지침.md): 목표, 고증 원칙, 구현 판단 기준

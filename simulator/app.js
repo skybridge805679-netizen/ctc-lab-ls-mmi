@@ -20,6 +20,19 @@ const mapHotspots={
 function stationView(){return $('mapSheet').value==='station';}
 function mapPages(){if(stationView())return [N.catalog[selectedStation].map.page];return $('mapSheet').value==='all'?[2,4,3]:[Number($('mapSheet').value)];}
 function sheetOffset(page){return mapPages().indexOf(page)*800;}
+const statusLabel={SET:'설정',OCCUPIED:'점유',LOCKED:'쇄정',APPROACH_LOCK:'접근쇄정'};
+function boardTrains(){const ids=[...new Set(Object.values(C.routes).filter(r=>C.lockSeconds(r.signal)).map(r=>r.signal))];return ids.map(id=>{const on=!!state.approach?.[id],sec=C.lockSeconds(id);return `<button class="train-chip ${on?'on':''}" data-approach-toggle="${id}" aria-pressed="${on}" title="${id} 외방 접근구간 열차 ${on?'제거':'투입'}">${id}<small>${on?'접근 열차 있음':'열차 없음'} · ${sec}초</small></button>`;}).join('');}
+function drawBoard(){
+ const rows=C.lockTable(state),active=Object.keys(state.routes);
+ const head='<div class="board-head"><h3>진로 · 쇄정 현황</h3><span>접근쇄정은 접근 열차가 있을 때만 걸립니다 · 장내 90초 / 출발 30초</span></div>';
+ const trains=C.lockSeconds&&Object.keys(C.routes).length?`<div class="board-trains"><b>접근 열차 투입</b><div>${boardTrains()}</div></div>`:'';
+ const list=rows.length?rows.map(r=>{const a=state.routes[r.id],pct=r.total?Math.round((r.total-r.remaining)/r.total*100):0;
+  return `<article class="lock-row ${a.occupied?'occupied':a.lock?'locked':'set'}" data-lock-row="${r.id}"><header><b>${escapeHTML(r.id)}</b><span class="chip ${a.occupied?'occupied':a.lock?'locked':'set'}">${statusLabel[a.status]||a.status}</span><span class="muted">${a.control==='continuous'?'연속제어':'단일제어'}</span></header>`
+  +(a.lock?`<div class="lock-timer" role="progressbar" aria-valuemin="0" aria-valuemax="${r.total}" aria-valuenow="${r.total-r.remaining}"><i style="width:${pct}%"></i><span>접근쇄정 남은 <b data-lock-remaining>${r.remaining}</b>초 / ${r.total}초</span></div>`:'')
+  +(r.overlap?`<p class="overlap-note"><span class="chip overlap">오버랩</span> ${escapeHTML(r.overlap.note)}${Object.keys(r.overlap.points).length?' · 전환기 '+Object.entries(r.overlap.points).map(([p,v])=>p+(v==='N'?' 정위':' 반위')).join(', ')+' 쇄정':''}</p>`:'')
+  +`<div class="route-run-controls"><button data-sim-enter="${r.id}" ${a.occupied||a.lock?'disabled':''}>모의 열차 진입</button><button data-sim-clear="${r.id}" ${a.occupied?'':'disabled'}>모의 열차 통과</button></div>${routeDetails(r.id)}</article>`;}).join(''):'<p class="evidence-empty">설정된 진로가 없습니다. 취급역의 CCM → 신호기 → 진로를 선택하세요.</p>';
+ $('routeEvidence').innerHTML=head+trains+`<div class="lock-list">${list}</div>`;
+}
 function drawTracks(){
  const pages=mapPages(),svgElement=$('trackSvg');
  $('mapOverview').textContent=stationView()?'전체노선 보기':'선택역 화면으로';
@@ -39,13 +52,20 @@ function drawTracks(){
    const last=map.modes[2];
    svg+=`<g data-stop-all="true" role="button" tabindex="0" aria-label="${st.name} 신호기 일괄정지"><rect x="${last.x+29}" y="${last.y-5}" width="40" height="29" fill="transparent"/><title>${st.name} 신호기 일괄정지</title></g>`;
    svg+='</g>';
-   for(const [id,active]of Object.entries(model.routes))svg+=`<path data-active-route="${id}" data-route-station="${st.id}" d="${map.paths[id]}" stroke="${active.occupied?'#ff453b':'#36ed06'}" stroke-width="3.2" stroke-opacity="0.68" fill="none" pointer-events="none"/>`;
+   for(const [id,active]of Object.entries(model.routes)){
+    const cls=active.occupied?'occupied':active.lock?'locked':'set',color={occupied:'#ff453b',locked:'#ffb02e',set:'#36ed06'}[cls];
+    svg+=`<path class="route-halo" d="${map.paths[id]}" stroke="#101820" stroke-width="7" stroke-opacity="0.55" fill="none" pointer-events="none"/><path class="route-line ${cls}" data-active-route="${id}" data-route-station="${st.id}" data-route-state="${cls}" d="${map.paths[id]}" stroke="${color}" stroke-width="4.4" stroke-opacity="0.92" ${cls==='locked'?'stroke-dasharray="9 6"':''} fill="none" pointer-events="none"/>`;
+    for(const pid of Object.keys(core.overlapOf(id)?.points||{})){const pp=map.points[pid];if(pp)svg+=`<circle class="overlap-ring" data-overlap-point="${pid}" cx="${pp.x}" cy="${pp.y}" r="9" fill="none" stroke="#c58bff" stroke-width="2.2" stroke-dasharray="3 2" pointer-events="none"/>`;}
+   }
    for(const [id,signal]of Object.entries(core.signals)){
     const pos=map.signals[id],lampX=pos.x+pos.dir*3.3;
-    if(model.signals[id]==='GO')svg+=`<ellipse cx="${lampX}" cy="${pos.y}" rx="2.5" ry="1.8" fill="${signal.kind==='입환'?'#fff':'#36ed06'}" stroke="#151515" stroke-width="0.4"/>`;
+    const approaching=model.approach?.[id],lockedHere=Object.keys(model.routes).some(r=>model.routes[r].lock&&core.routes[r].signal===id);
+    if(model.signals[id]==='GO')svg+=`<ellipse class="lamp-go" cx="${lampX}" cy="${pos.y}" rx="3.6" ry="2.7" fill="${signal.kind==='입환'?'#fff':'#36ed06'}" stroke="#0b0f14" stroke-width="0.9"/>`;
+    else if(lockedHere)svg+=`<ellipse class="lamp-lock" cx="${lampX}" cy="${pos.y}" rx="3.6" ry="2.7" fill="#ff453b" stroke="#ffb02e" stroke-width="1.4"/>`;
+    if(approaching)svg+=`<g class="approach-train" data-approach-train="${id}" pointer-events="none"><rect x="${pos.x-pos.dir*30-8}" y="${pos.y-4}" width="16" height="8" rx="2" fill="#2f6ee8" stroke="#fff" stroke-width="1"/><path d="M${pos.x-pos.dir*18} ${pos.y}h8" stroke="#fff" stroke-width="1.4"/><title>${id} 외방 접근 열차</title></g>`;
     svg+=`<g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${st.name} ${id} ${signal.kind}신호기"><rect x="${pos.x-6}" y="${pos.y-2.4}" width="12" height="4.8" fill="transparent"/><title>${st.name} ${id} ${signal.kind}신호기</title></g>`;
    }
-   for(const [id,pos]of Object.entries(map.points))svg+=`<g class="point-hit" data-point="${id}" role="button" tabindex="0" aria-label="${st.name} ${id} 선로전환기"><rect x="${pos.x-3}" y="${pos.y-3}" width="6" height="6" fill="${model.points[id]==='R'?'#ffb02e88':'transparent'}" stroke="${model.blockedPoints.includes(id)?'#ff453b':'#acd8ed'}" stroke-width="0.5"/><title>${st.name} ${id} · ${model.points[id]}${model.blockedPoints.includes(id)?' · 쇄정':''}</title></g>`;
+   for(const [id,pos]of Object.entries(map.points))svg+=`<g class="point-hit" data-point="${id}" role="button" tabindex="0" aria-label="${st.name} ${id} 선로전환기"><rect x="${pos.x-4}" y="${pos.y-4}" width="8" height="8" rx="1" fill="${model.points[id]==='R'?'#ffb02ecc':'#0b0f1466'}" stroke="${model.blockedPoints.includes(id)?'#ff453b':'#d6eefb'}" stroke-width="1"/><text class="point-flag" x="${pos.x}" y="${pos.y+2.6}" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" pointer-events="none">${model.points[id]}</text><title>${st.name} ${id} · ${model.points[id]}${model.blockedPoints.includes(id)?' · 쇄정':''}</title></g>`;
    const first=map.modes[0];svg+=`<g data-select-control="${st.id}" role="button" tabindex="0" aria-label="${st.name} MMI 제어역 선택"><rect x="${first.x+140+(copy.headerDx||0)}" y="${first.y-10+(copy.headerDy||0)}" width="85" height="42" fill="transparent" stroke="${st.id===selectedStation?'#53c9ff':'transparent'}" stroke-width="1.2"/><title>${st.name} MMI 제어역 선택</title></g></g>`;
   }
   svg+='</g>';
@@ -56,14 +76,14 @@ function drawTracks(){
  document.querySelector('.track-frame').classList.toggle('station-view',stationView());svgElement.style.width=(mapZoom*100)+'%';svgElement.style.minWidth='100%';
  svgElement.setAttribute('aria-label',stationView()?`${N.catalog[selectedStation].name} LS · ${N.catalog[selectedStation].map.view.intermediate.join(' · ')} · 관할 역간 포함`:'청량리–수원 전체 배선');svgElement.innerHTML=svg;
  $('mapZoomValue').textContent=Math.round(mapZoom*100)+'%';
- $('routeEvidence').innerHTML=Object.keys(state.routes).length?Object.keys(state.routes).map(id=>routeDetails(id)+`<div class="route-run-controls"><button data-sim-enter="${id}" ${state.routes[id].occupied?'disabled':''}>모의 열차 진입</button><button data-sim-clear="${id}" ${state.routes[id].occupied?'':'disabled'}>모의 열차 통과</button><span>${state.routes[id].occupied?'점유 · 진로 쇄정':'설정'} · ${state.routes[id].control==='continuous'?'연속제어':'단일제어'}</span></div>`).join(''):'<p class="evidence-empty">취급역의 CCM → 신호기 → 진로를 선택하세요. 중간역과 역간 배선은 화면에 그대로 유지됩니다.</p>';
+ drawBoard();
 }
 $('mapOverview').onclick=()=>{$('mapSheet').value=stationView()?'1':'station';mapZoom=1;render();scrollToStation();};
 $('mapSheet').onchange=()=>{mapZoom=1;render();scrollToStation();};
 $('mapZoomIn').onclick=()=>{mapZoom=Math.min(6,mapZoom+0.5);drawTracks();};
 $('mapZoomOut').onclick=()=>{mapZoom=Math.max(1,mapZoom-0.5);drawTracks();};
 $('mapFit').onclick=()=>{mapZoom=1;drawTracks();};
-$('routeEvidence').onclick=e=>{const enter=e.target.closest('[data-sim-enter]'),clear=e.target.closest('[data-sim-clear]');if(enter)run({type:'occupy',id:enter.dataset.simEnter,source:'모의운행'});if(clear)run({type:'clear',id:clear.dataset.simClear,source:'모의운행'});};
+$('routeEvidence').onclick=e=>{const tg=e.target.closest('[data-approach-toggle]');if(tg){run({type:'approach',signal:tg.dataset.approachToggle,present:!state.approach?.[tg.dataset.approachToggle],source:'모의운행'});return;}const enter=e.target.closest('[data-sim-enter]'),clear=e.target.closest('[data-sim-clear]');if(enter)run({type:'occupy',id:enter.dataset.simEnter,source:'모의운행'});if(clear)run({type:'clear',id:clear.dataset.simClear,source:'모의운행'});};
 function scrollToStation(){if(stationView()){document.querySelector('.track-frame').scrollTo(0,0);return;}const st=N.catalog[selectedStation],offset=sheetOffset(st.map.page),frame=document.querySelector('.track-frame');if(offset<0)return;const scale=$('trackSvg').getBoundingClientRect().width/2048;frame.scrollTo({top:Math.max(0,(offset+st.map.modes[0].y-25)*scale),left:Math.max(0,(st.map.modes[0].x-60)*scale-frame.clientWidth/4),behavior:'instant'});}
 function selectStation(id,scroll=true){
  if(!N.catalog[id]?.controlled)return;
@@ -133,7 +153,7 @@ $('lsDisplay').onclick=e=>{
 };
 $('trackSvg').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
 $('lsDisplay').oncontextmenu=e=>{e.preventDefault();openAction('베이스스캔','가상 상태정보를 재수신합니다.<select id="lsScope" aria-label="베이스스캔 범위"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>',()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));};
-$('actionDialog').addEventListener('close',()=>{if(!dialogAction)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
+$('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
 $('handoverBar').onclick=e=>{const b=e.target.closest('[data-handover]');if(b)run({type:'handover',accept:b.dataset.handover==='yes',source:'현장'});};
 $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>document.querySelector(`input[name="${n}"]:checked`).value;
  if(type==='mode')run({type,value:checked('mmiMode'),source:'MMI'});
@@ -149,8 +169,9 @@ $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toas
 for(const id of ['guideBtn','footerGuide'])$(id).onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
 $('overviewBtn').textContent='배선 확대 ↗';$('overviewBtn').onclick=()=>{const panel=document.querySelector('.ls-panel');panel.classList.toggle('expanded');$('overviewBtn').textContent=panel.classList.contains('expanded')?'확대 닫기 ↙':'배선 확대 ↗';};
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.6.1',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-setInterval(()=>{if(!paused&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value);for(const st of Object.values(stationStates))C.dispatch(st,{type:'tick',seconds});window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.7.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+const lockSig=()=>Object.entries(state.routes).map(([id,r])=>id+(r.lock?'L':'')).join();
+setInterval(()=>{if(!paused&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig();for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,{type:'tick',seconds});if(lockSig()!==before)render();else for(const row of document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
 fields();render();taskView();
 
 window.SimDiagram.init({clock:()=>state.clock,selectStation});

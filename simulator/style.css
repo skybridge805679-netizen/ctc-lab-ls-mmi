@@ -23,3 +23,39 @@
 .track-frame.station-view svg{display:block}
 .ls-bottom button{color:inherit;white-space:nowrap}
 .ls-bottom button:disabled{opacity:.4;cursor:default}
+
+/* v0.7 readability: state colours always paired with a label or pattern, larger hit targets, mobile pan instead of shrink */
+:root{--c-set:#1aa64a;--c-occ:#e0382e;--c-lock:#d98a00;--c-ovl:#8d4fd6;--c-train:#2f6ee8}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 16px;font-size:13px;color:#2b3a4a}
+.legend span{display:inline-flex;align-items:center;gap:7px}.legend .legend-note{margin-left:auto;color:#5d6b79}
+.legend .sw{display:inline-block;width:26px;height:0;border-top:5px solid var(--c-set);border-radius:2px;position:relative}
+.legend .sw.occupied{border-top-color:var(--c-occ)}.legend .sw.locked{border-top:5px dashed var(--c-lock)}
+.legend .sw.overlap{width:14px;height:14px;border:2px dashed var(--c-ovl);border-radius:50%}
+.legend .sw.train{width:18px;height:10px;border:1px solid #fff;background:var(--c-train);border-radius:2px;box-shadow:0 0 0 1px #2b3a4a}
+.track-frame text{paint-order:stroke;stroke:#101820;stroke-width:.6px}
+.track-frame .signal-hit:hover rect,.track-frame .signal-hit:focus rect{fill:#7fd4ff44;stroke:#7fd4ff;stroke-width:1.2}
+.track-frame .point-hit:hover rect,.track-frame .point-hit:focus rect{stroke:#fff;stroke-width:1.6}
+.track-frame [tabindex]:focus-visible{outline:none}
+.track-frame .route-line.locked{animation:lockdash 1.2s linear infinite}
+@keyframes lockdash{to{stroke-dashoffset:-30}}
+@media(prefers-reduced-motion:reduce){.track-frame .route-line.locked{animation:none}}
+.route-evidence{max-height:none;padding:14px 16px;background:#fff}
+.board-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:10px}.board-head h3{margin:0;font-size:15px}.board-head span{font-size:12px;color:#5d6b79}
+.board-trains{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px;margin-bottom:12px;background:#eef4fb;border:1px solid #cfdcec;border-radius:6px;font-size:13px}
+.board-trains>div{display:flex;flex-wrap:wrap;gap:6px}
+.train-chip{display:flex;flex-direction:column;align-items:flex-start;min-width:96px;padding:6px 10px;background:#fff;border:1.5px solid #9fb4cc;border-radius:6px;font-weight:700;color:#1d3550;cursor:pointer}
+.train-chip small{font-weight:400;font-size:11px;color:#5d6b79}.train-chip.on{background:var(--c-train);border-color:var(--c-train);color:#fff}.train-chip.on small{color:#e3ecff}
+.lock-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.lock-row{border:1.5px solid #cfd8e2;border-left-width:6px;border-radius:6px;padding:10px 12px;background:#fff}
+.lock-row.set{border-left-color:var(--c-set)}.lock-row.occupied{border-left-color:var(--c-occ)}.lock-row.locked{border-left-color:var(--c-lock);background:#fff9ee}
+.lock-row header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.lock-row header b{font-size:16px}
+.chip{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid currentColor;background:#fff}
+.chip.set{color:#0e7a33}.chip.occupied{color:#b3261e}.chip.locked{color:#8a5600}.chip.overlap{color:#6a32b0}
+.lock-timer{position:relative;height:24px;background:#f0e3c8;border-radius:4px;overflow:hidden;margin:6px 0}
+.lock-timer i{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(135deg,#ffc247 0 8px,#ffd77f 8px 16px);transition:width .9s linear}
+.lock-timer span{position:relative;display:block;line-height:24px;padding:0 8px;font-size:12px;color:#3d2a00}
+.overlap-note{margin:6px 0;font-size:12px;color:#40286b}
+.lock-row .route-detail{font-size:12px;color:#4a5866;margin-top:6px}.lock-row .route-detail p{margin:2px 0}
+.lock-row .route-run-controls button{min-height:36px}.lock-row .route-run-controls button:disabled{opacity:.45;cursor:not-allowed}
+.point-states{margin:12px 0 0;font-size:13px;color:#2b3a4a}
+@media(max-width:760px){.track-frame svg{min-width:720px}.track-frame.station-view svg{min-width:720px}.legend .legend-note{margin-left:0;width:100%}.lock-list{grid-template-columns:1fr}.board-head span{width:100%}}

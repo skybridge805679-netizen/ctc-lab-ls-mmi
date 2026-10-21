@@ -19,7 +19,7 @@ def exercise(page, url):
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.on('dialog', lambda dialog: dialog.accept())
     page.goto(url, wait_until='networkidle')
-    expect(page.locator('#taskSelect option')).to_have_count(9)
+    expect(page.locator('#taskSelect option')).to_have_count(10)
 
     def confirm():
         page.locator('#dialogConfirm').click()
@@ -40,7 +40,7 @@ def exercise(page, url):
         confirm()
         expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
 
-    for index in range(9):
+    for index in range(10):
         page.locator('#taskSelect').select_option(str(index))
         page.locator('#startTask').click()
         page.locator('#checkTask').click()
@@ -88,11 +88,23 @@ def exercise(page, url):
             page.locator('#checkTask').click()
             expect(page.locator('#taskResult')).not_to_have_class('complete-banner')
             release()
+        elif index == 9:
+            route('1A', '1A-1T')
+            page.locator('[data-approach-toggle="1A"]').click()
+            page.locator('[data-control-station="underground-seoul"][data-primary="true"] [data-signal="1A"]').click()
+            confirm()
+            expect(page.locator('[data-lock-row="1A-1T"] .chip.locked')).to_have_text('접근쇄정')
+            page.locator('#checkTask').click()
+            expect(page.locator('#taskResult')).not_to_have_class('complete-banner')
+            for _ in range(9):
+                page.locator('#skipBtn').click()
+            expect(page.locator('[data-lock-row]')).to_have_count(0)
+            route('1A', '1A-1T')
         page.locator('#checkTask').click()
         expect(page.locator('#taskResult')).to_have_class('complete-banner')
-        expect(page.locator('#completedCount')).to_have_text(f'{index+1} / 9 완료')
+        expect(page.locator('#completedCount')).to_have_text(f'{index+1} / 10 완료')
     page.reload(wait_until='networkidle')
-    expect(page.locator('#completedCount')).to_have_text('9 / 9 완료')
+    expect(page.locator('#completedCount')).to_have_text('10 / 10 완료')
     assert not errors, errors
 
 
@@ -116,7 +128,7 @@ try:
             context = browser.new_context(viewport={'width': width, 'height': height})
             exercise(context.new_page(), url)
             context.close()
-            print(f'PASS all 9 tasks, incomplete checks, persistence: {width}x{height} {url.split(":")[0]}')
+            print(f'PASS all 10 tasks, incomplete checks, persistence: {width}x{height} {url.split(":")[0]}')
         browser.close()
 finally:
     server.shutdown()
