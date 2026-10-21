@@ -5,6 +5,7 @@
 // same local coordinates. No background image is used.
 const W=1280,TOP=50,BOTTOM=50,GAP=64,PADX=26,BAR=21;
 const COLOR={set:'#2fe872',occupied:'#ff5a4f',locked:'#ffb02e'};
+const detailsData=typeof module!=='undefined'?require('./schematic-details.js'):root.SimSchematicDetails;
 const wingsData=typeof module!=='undefined'?require('./wings.js'):root.SimWings;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const through=n=>/^B\d+T$/.test(n||'');
@@ -16,18 +17,20 @@ function railY(def,railId,x){
 function onSeg(p,a,b){const cross=(p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]);return Math.abs(cross)<.5&&p[0]>=Math.min(a[0],b[0])-.5&&p[0]<=Math.max(a[0],b[0])+.5&&p[1]>=Math.min(a[1],b[1])-.5&&p[1]<=Math.max(a[1],b[1])+.5;}
 // Parts of the extracted strips that lie outside the traced station rails.
 function wingOf(st,def){
- const raw=wingsData?.[st.id];if(!raw)return {cells:[],diags:[],platforms:[],plates:[],labels:[],signals:[]};
+ const original=wingsData?.[st.id],detail=detailsData[st.id];const raw=original?{...original,cells:detail.cells}:null;if(!raw)return {cells:[],diags:[],platforms:[],plates:[],labels:[],signals:[]};
  const xs=def.rails.flatMap(r=>r[1].map(p=>p[0])),lo=Math.min(...xs),hi=Math.max(...xs),out=x=>x<lo-1||x>hi+1;
  const cx=poly=>poly.reduce((a,p)=>a+p[0],0)/poly.length,cy=poly=>poly.reduce((a,p)=>a+p[1],0)/poly.length;
  const ys=def.rails.flatMap(r=>r[1].map(p=>p[1])),band=y=>y>=Math.min(...ys)-60;
+ const [bx,by,bw,bh]=st.map.view.bounds,[ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
+ const inBounds=(x,y)=>{const px=ox+x*rw/iw,py=oy+y*rh/ih;return px>=bx&&px<=bx+bw&&py>=by&&py<=by+bh;};
  const plates=[...raw.plates].sort((a,b)=>a[0]-b[0]),names=st.map.view?.intermediate||[];
  return {
   cells:raw.cells.filter(c=>out(c[0]+c[2]/2)),
-  diags:raw.diags.filter(p=>band(cy(p))&&(Math.max(...p.map(q=>q[0]))>hi+1||Math.min(...p.map(q=>q[0]))<lo-1)),
-  platforms:raw.platforms.filter(p=>out((p[0]+p[2])/2)&&band((p[1]+p[3])/2)),
+  diags:raw.diags.filter(p=>inBounds(cx(p),cy(p))&&band(cy(p))&&(Math.max(...p.map(q=>q[0]))>hi+1||Math.min(...p.map(q=>q[0]))<lo-1)),
+  platforms:raw.platforms.filter(p=>inBounds((p[0]+p[2])/2,(p[1]+p[3])/2)&&band((p[1]+p[3])/2)),
   plates:plates.map((p,i)=>({box:p,name:plates.length===names.length?names[i]:''})),
-  labels:raw.labels.filter(l=>out(l[0])&&band(l[1])),
-  signals:raw.signals.filter(s=>out(s[0])&&band(s[1]))
+  labels:raw.labels.filter(l=>inBounds(l[0],l[1])&&out(l[0])&&band(l[1])),
+  signals:raw.signals.filter(s=>inBounds(s[0],s[1])&&out(s[0])&&band(s[1]))
  };
 }
 function layout(def,wing){
@@ -47,20 +50,37 @@ function layout(def,wing){
  return {sx,sy,H:Math.round(top+(maxY-minY)*sy+BOTTOM),pt:([x,y])=>[+(PADX+(x-minX)*sx).toFixed(1),+(top+(y-minY)*sy).toFixed(1)]};
 }
 function render(st,def,core,model,nb={}){
- const wing=wingOf(st,def),L=layout(def,wing),T=L.pt,[ox,oy,w,h]=st.map.referenceWindow,[iw,ih]=def.size;
+ const wing=wingOf(st,def),detail=detailsData[st.id],L=layout(def,wing),T=L.pt,[ox,oy,w,h]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(px,py)=>[(px-ox)*iw/w,(py-oy)*ih/h];
  const pathLocal=d=>{const n=d.match(/-?\d+(?:\.\d+)?/g).map(Number),pts=[];for(let i=0;i<n.length;i+=2)pts.push(T(toLocal(n[i],n[i+1])));return pts;};
- let bed='',top='',tags='',routes='',points='',signals='',trains='',under='',wOuter='',wInner='',wText='',wPlates='',wSig='';
+ let bed='',top='',tags='',routes='',points='',signals='',trains='',under='',wOuter='',wInner='',wText='',wPlates='',wSig='',insideCells='',sourceSymbols='';
  const stroke=(pts)=>'M'+pts.map(p=>p.join(' ')).join('L');
  const railYAt=(r,x)=>railY(def,r,x);
  // --- wings (outside the traced station): track-circuit cells, diagonals, platforms, plates, labels, signals
  const fit=(label,width,size)=>{const need=label.length*size*.62;return need>width?` textLength="${Math.max(8,width-1).toFixed(1)}" lengthAdjust="spacingAndGlyphs"`:'';};
- for(const c of wing.cells){
+ const xs=def.rails.flatMap(r=>r[1].map(p=>p[0])),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...def.rails.flatMap(r=>r[1].map(p=>p[1])));
+ const stationCells=detail.cells.filter(c=>c[0]+c[2]/2>=minX-1&&c[0]+c[2]/2<=maxX+1&&c[1]>=minY-60);
+
+ const routeParts=Object.entries(model.routes).map(([id,a])=>({id,state:a.occupied?'occupied':a.lock?'locked':'set',pts:pathLocal(core.routes[id].path)}));
+ function cellMarkup(c,index,inner){
   const [X,Y]=T([c[0],c[1]]),cw=c[2]*L.sx;
-  wOuter+=`<rect x="${(X-1.6).toFixed(1)}" y="${Y-BAR/2-3}" width="${(cw+3.2).toFixed(1)}" height="${BAR+6}" rx="2"/>`;
-  wInner+=`<rect x="${(X+1).toFixed(1)}" y="${Y-BAR/2}" width="${Math.max(2,cw-2).toFixed(1)}" height="${BAR}" rx="1"/>`;
-  if(c[3])wText+=`<text class="cell-name" x="${(X+cw/2).toFixed(1)}" y="${Y+4.6}" text-anchor="middle"${fit(c[3],cw-5,13)}>${esc(c[3])}</text>`;
+  const active=routeParts.find(r=>r.pts.slice(1).some((q,i)=>{const p=r.pts[i];return Math.abs(q[1]-p[1])<.5&&Math.abs(Y-p[1])<5&&Math.min(p[0],q[0])<X+cw-2&&Math.max(p[0],q[0])>X+2;}));
+  const state=active?.state||'clear';
+  const content=`<g class="track-cell ${state}" data-track-section="${st.id}-${index}" data-track-circuit="${esc(c[3])}" data-track-state="${state}"><rect class="cell-bed" x="${(X+1).toFixed(1)}" y="${Y-BAR/2}" width="${Math.max(2,cw-2).toFixed(1)}" height="${BAR}" rx="1"/><title>${esc(c[3]||'원본 무기명 구간')} · ${state}</title></g>`;
+  let text='';const labels=c[3].split(' · ').filter(Boolean);
+  labels.forEach((label,i)=>text+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${(X+cw*(i+.5)/labels.length).toFixed(1)}" y="${Y+4.6}" text-anchor="middle"${fit(label,cw/labels.length-5,13)}>${esc(label)}</text>`);
+  if(inner)insideCells+=content;else{wOuter+=`<rect x="${(X-1.6).toFixed(1)}" y="${Y-BAR/2-3}" width="${(cw+3.2).toFixed(1)}" height="${BAR+6}" rx="2"/>`;wInner+=content;}
+  wText+=text;
  }
+ wing.cells.forEach((c,i)=>cellMarkup(c,i,false));
+ stationCells.forEach((c,i)=>cellMarkup(c,i+wing.cells.length,true));
+ // Source capsule marks and SP/SS boards are independent vector symbols.
+ for(const [x,y,w,h]of detail.capsules){
+  if(!detail.cells.some(c=>Math.abs(c[1]-y)<30&&x>=c[0]-8&&x<=c[0]+c[2]+8))continue;
+  if(def.signals.some(s=>Math.abs(s[2]-x)<22&&Math.abs(s[3]-y)<14))continue;
+  const [X,Y]=T([x,y]);sourceSymbols+=`<g data-source-symbol="capsule"><path d="M${X-9} ${Y}H${X+9}" stroke="#03070a" stroke-width="9" stroke-linecap="round"/><path d="M${X+11} ${Y-5}V${Y+5}" stroke="#8ca2b4" stroke-width="1.5"/><title>원본 캡슐 표시</title></g>`;
+ }
+ for(const [x,y,label]of detail.markers){const [X,Y]=T([x,y]);sourceSymbols+=`<g data-source-symbol="${label}">${label==='SP'?`<path d="M${X-15} ${Y-24}H${X+15}L${X} ${Y+3}Z" fill="#e44338" stroke="#080d12" stroke-width="2"/><text x="${X}" y="${Y-11}" fill="#fff" font-size="11" text-anchor="middle">SP</text>`:`<rect x="${X-10}" y="${Y-24}" width="20" height="30" fill="#fff" stroke="#080d12" stroke-width="2"/><path d="M${X-9} ${Y+4}L${X+9} ${Y-22}" stroke="#e44338" stroke-width="6"/><text x="${X}" y="${Y-29}" fill="#dce8f3" font-size="11" text-anchor="middle">SS</text>`}<title>원본 ${label} 표지</title></g>`;}
  for(const p of wing.diags){const pts=p.map(q=>T(q).join(',')).join(' ');wOuter+=`<polygon class="diag" points="${pts}"/>`;wInner+=`<polygon class="diag-in" points="${pts}"/>`;}
  for(const p of wing.platforms){const [a,b]=T([p[0],p[1]]),[c,d]=T([p[2],p[3]]);under+=`<rect class="platform ${p[4]==='c'?'cyan':'orange'}" x="${a}" y="${b}" width="${(c-a).toFixed(1)}" height="${(d-b).toFixed(1)}" rx="3"/>`;}
  const topRow=Math.min(...def.rails.map(r=>Math.min(...r[1].map(q=>T(q)[1]))),...wing.cells.map(c=>T([c[0],c[1]])[1]));
@@ -68,13 +88,15 @@ function render(st,def,core,model,nb={}){
  for(const p of wing.plates){const [a]=T([p.box[0],0]),[c]=T([p.box[2],0]),cxm=(a+c)/2,wd=Math.max(c-a,p.name.length*24+28),ht=40,rowY=nearTop(cxm-170,cxm+170,p.box[3]-6),b=rowY-(rowY-topRow<4?96:70)-ht+ht;
   under+=`<path class="stn-line" d="M${cxm.toFixed(1)} ${b+ht}V${rowY-6}"/>`;
   wPlates+=`<g class="inter-station" data-inter-station="${esc(p.name)}"><rect class="plate" x="${(cxm-wd/2).toFixed(1)}" y="${b}" width="${wd.toFixed(1)}" height="${ht}" rx="4"/><text class="plate-name" x="${cxm.toFixed(1)}" y="${(b+ht/2+7).toFixed(1)}" text-anchor="middle">${esc(p.name)}</text><title>${esc(p.name)} · 관할 중간역(조작 없음)</title></g>`;}
- for(const l of wing.labels){const [X,Y]=T([l[0],l[1]]);wText+=`<text class="wing-label" x="${X}" y="${Y+5}" text-anchor="middle">${esc(l[2])}</text>`;}
+ const partAnnotations=(wingsData[st.id].labels||[]).filter(l=>/^\d{2}[AB]$/.test(l[2])&&l[0]>=minX&&l[0]<=maxX&&l[1]>=minY-60);
+ for(const l of [...wing.labels,...partAnnotations]){const [X,Y]=T([l[0],l[1]]);wText+=`<text class="wing-label" x="${X}" y="${Y+5}" text-anchor="middle">${esc(l[2])}</text>`;}
  for(const s of wing.signals){const [X,Y]=T([s[0],s[1]]),d=s[3];wSig+=`<g class="signal wing" data-wing-signal="${esc(s[2])}"><path class="mast" d="M${X} ${Y}h${d*13}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="8"/><text class="sig-name" x="${X-d*13}" y="${Y+5.5}" text-anchor="${d===1?'end':'start'}">${esc(s[2])}</text></g>`;}
  // --- traced station rails
  for(const [id,poly,,left,right] of def.rails){
   const pts=poly.map(T);bed+=`<path d="${stroke(pts)}"/>`;top+=`<path d="${stroke(pts)}"/>`;
+  if(poly.length&&def.rails.find(r=>r[0]===id)[2]!==null){const targetX=def.rails.find(r=>r[0]===id)[2],target=T([targetX,railYAt(id,targetX)]);if(!stationCells.some(c=>c[3].split(' · ').includes(id)))tags+=`<text class="rail-name" data-circuit-label="${esc(id)}" x="${target[0]}" y="${target[1]+4.6}" text-anchor="middle">${esc(id)}</text>`;}
   const a=pts[0],b=pts.at(-1),free=end=>!def.rails.some(r=>r[0]!==id&&r[1].slice(1).some((q,i)=>onSeg(end,r[1][i],q)));
-  const nameAt=(x,y,label)=>{tags+=`<text class="rail-name" x="${x}" y="${y+4.6}" text-anchor="middle">${esc(label)}</text>`;};
+  const nameAt=(x,y,label)=>{if(stationCells.some(c=>c[3].split(' · ').includes(label)&&Math.abs(T([c[0]+c[2]/2,c[1]])[1]-y)<8))return;tags+=`<text class="rail-name" x="${x}" y="${y+4.6}" text-anchor="middle">${esc(label)}</text>`;};
   const lt=through(left)&&wing.cells.length,rt=through(right)&&wing.cells.length;let named=false;
   const row=wing.cells.filter(c=>Math.abs(c[1]-poly.at(-1)[1])<10);
   if(rt){const nxt=row.filter(c=>c[0]>=poly.at(-1)[0]-2).sort((p,q)=>p[0]-q[0])[0];if(nxt&&nxt[0]-poly.at(-1)[0]>1){const q=T([nxt[0],poly.at(-1)[1]]);bed+=`<path d="M${b.join(' ')}L${q.join(' ')}"/>`;top+=`<path d="M${b.join(' ')}L${q.join(' ')}"/>`;}}
@@ -87,6 +109,7 @@ function render(st,def,core,model,nb={}){
  for(const [pid,a,x,b,z] of def.links){
   const p=T([x,railYAt(a,x)]),q=T([z,railYAt(b,z)]);bed+=`<path d="M${p.join(' ')}L${q.join(' ')}"/>`;top+=`<path d="M${p.join(' ')}L${q.join(' ')}"/>`;
   mid[pid]=[(p[0]+q[0])/2,(p[1]+q[1])/2];
+  const blade=mid[pid],R=model.points[pid]==='R';points+=`<path class="point-blade ${R?'reverse':'normal'}" data-point-blade="${pid}" data-position="${model.points[pid]}" d="M${blade[0]-6} ${blade[1]+(R?5:0)}L${blade[0]+6} ${blade[1]-(R?5:0)}"/>`;
  }
  for(const [id,active] of Object.entries(model.routes)){
   const cls=active.occupied?'occupied':active.lock?'locked':'set',pts=pathLocal(core.routes[id].path);
@@ -123,7 +146,7 @@ function render(st,def,core,model,nb={}){
  const edgeY=Math.min(...def.rails.map(r=>T(r[1][0])[1]),...wing.cells.map(c=>T([c[0],c[1]])[1]))-26;
  if(nb.left)tags+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(nb.left)}</text>`;
  if(nb.right)tags+=`<text class="nb-tag" x="${W-12}" y="${edgeY}" text-anchor="end">${esc(nb.right)} ▶</text>`;
- return {height:L.H,width:W,svg:`${under}<g class="wing-outer">${wOuter}</g><g class="bed-outer">${bed}</g><g class="wing-inner">${wInner}</g><g class="bed-inner">${top}</g>${wText}${wPlates}${wSig}${routes}${tags}${points}${signals}${trains}`};
+ return {height:L.H,width:W,svg:`${under}<g class="wing-outer">${wOuter}</g><g class="bed-outer">${bed}</g><g class="wing-inner">${wInner}</g><g class="bed-inner">${top}</g>${insideCells}${routes}${wText}${wPlates}${wSig}${sourceSymbols}${tags}${points}${signals}${trains}`};
 }
 const api={render,layout,wingOf};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

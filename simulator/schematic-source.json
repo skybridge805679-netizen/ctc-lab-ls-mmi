@@ -1,0 +1,7964 @@
+{
+  "source": "1.전체노선.pdf, pages 2–4",
+  "coordinateSystem": [
+    2048,
+    768
+  ],
+  "pages": {
+    "2": {
+      "sections": [
+        {
+          "id": "p2-section-1",
+          "x": 666.667,
+          "y": 113.422,
+          "width": 38.044,
+          "height": 6.044,
+          "candidate": "22AT",
+          "label": "22AT"
+        },
+        {
+          "id": "p2-section-2",
+          "x": 1222.4,
+          "y": 129.067,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p2-section-3",
+          "x": 1806.933,
+          "y": 129.067,
+          "width": 70.4,
+          "height": 10.311,
+          "candidate": "TIR",
+          "label": ""
+        },
+        {
+          "id": "p2-section-4",
+          "x": 217.956,
+          "y": 129.422,
+          "width": 79.289,
+          "height": 10.311,
+          "candidate": "1T",
+          "label": "1T"
+        },
+        {
+          "id": "p2-section-5",
+          "x": 708.622,
+          "y": 129.422,
+          "width": 46.578,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-6",
+          "x": 1059.556,
+          "y": 131.2,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-7",
+          "x": 1087.644,
+          "y": 131.2,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-8",
+          "x": 1115.733,
+          "y": 131.2,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "C67",
+          "label": ""
+        },
+        {
+          "id": "p2-section-9",
+          "x": 1146.667,
+          "y": 131.2,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-10",
+          "x": 1282.844,
+          "y": 131.2,
+          "width": 50.844,
+          "height": 6.044,
+          "candidate": "S1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-11",
+          "x": 1375.644,
+          "y": 131.2,
+          "width": 15.644,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-12",
+          "x": 1392.356,
+          "y": 131.2,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-13",
+          "x": 1423.289,
+          "y": 131.2,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-14",
+          "x": 1451.378,
+          "y": 131.2,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-15",
+          "x": 1482.311,
+          "y": 131.2,
+          "width": 28.089,
+          "height": 6.044,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p2-section-16",
+          "x": 1511.822,
+          "y": 131.2,
+          "width": 28.089,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-17",
+          "x": 1541.333,
+          "y": 131.2,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-18",
+          "x": 1572.267,
+          "y": 131.2,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-19",
+          "x": 1602.844,
+          "y": 131.2,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-20",
+          "x": 1630.933,
+          "y": 131.2,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-21",
+          "x": 1661.867,
+          "y": 131.2,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "CU",
+          "label": ""
+        },
+        {
+          "id": "p2-section-22",
+          "x": 1720.889,
+          "y": 131.2,
+          "width": 31.644,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p2-section-23",
+          "x": 1753.6,
+          "y": 131.2,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p2-section-24",
+          "x": 1878.4,
+          "y": 131.2,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-25",
+          "x": 1965.511,
+          "y": 131.2,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "Y1T",
+          "label": "Y1T"
+        },
+        {
+          "id": "p2-section-26",
+          "x": 129.778,
+          "y": 131.556,
+          "width": 87.467,
+          "height": 6.044,
+          "candidate": "22T",
+          "label": "22T"
+        },
+        {
+          "id": "p2-section-27",
+          "x": 483.911,
+          "y": 131.556,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-28",
+          "x": 513.422,
+          "y": 131.556,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-29",
+          "x": 544.356,
+          "y": 131.556,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "32",
+          "label": ""
+        },
+        {
+          "id": "p2-section-30",
+          "x": 613.333,
+          "y": 131.556,
+          "width": 54.756,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-31",
+          "x": 669.156,
+          "y": 131.556,
+          "width": 38.4,
+          "height": 6.044,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p2-section-32",
+          "x": 801.422,
+          "y": 131.556,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-33",
+          "x": 830.933,
+          "y": 131.556,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-34",
+          "x": 857.6,
+          "y": 131.556,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-35",
+          "x": 888.533,
+          "y": 131.556,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-36",
+          "x": 916.622,
+          "y": 131.556,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-37",
+          "x": 944.356,
+          "y": 131.556,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-38",
+          "x": 972.444,
+          "y": 131.556,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-39",
+          "x": 1003.378,
+          "y": 131.556,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-40",
+          "x": 1030.044,
+          "y": 131.556,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-41",
+          "x": 51.556,
+          "y": 131.911,
+          "width": 46.222,
+          "height": 5.689,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p2-section-42",
+          "x": 298.311,
+          "y": 131.911,
+          "width": 71.822,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-43",
+          "x": 423.822,
+          "y": 131.911,
+          "width": 28.089,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-44",
+          "x": 452.978,
+          "y": 131.911,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-45",
+          "x": 573.867,
+          "y": 132.267,
+          "width": 38.044,
+          "height": 5.333,
+          "candidate": "BUI4I",
+          "label": ""
+        },
+        {
+          "id": "p2-section-46",
+          "x": 98.844,
+          "y": 132.622,
+          "width": 29.867,
+          "height": 4.978,
+          "candidate": "KI",
+          "label": ""
+        },
+        {
+          "id": "p2-section-47",
+          "x": 1905.778,
+          "y": 149.333,
+          "width": 15.289,
+          "height": 6.044,
+          "candidate": "F",
+          "label": ""
+        },
+        {
+          "id": "p2-section-48",
+          "x": 1922.133,
+          "y": 149.333,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "S1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-49",
+          "x": 104.533,
+          "y": 150.044,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "MT",
+          "label": "MT"
+        },
+        {
+          "id": "p2-section-50",
+          "x": 139.378,
+          "y": 150.044,
+          "width": 45.511,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p2-section-51",
+          "x": 1222.4,
+          "y": 165.689,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-52",
+          "x": 1806.933,
+          "y": 165.689,
+          "width": 70.4,
+          "height": 9.956,
+          "candidate": "2T",
+          "label": "2T"
+        },
+        {
+          "id": "p2-section-53",
+          "x": 217.956,
+          "y": 166.044,
+          "width": 79.289,
+          "height": 10.311,
+          "candidate": "PEE",
+          "label": ""
+        },
+        {
+          "id": "p2-section-54",
+          "x": 708.622,
+          "y": 166.044,
+          "width": 48.0,
+          "height": 9.956,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p2-section-55",
+          "x": 1602.844,
+          "y": 167.467,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-56",
+          "x": 1630.933,
+          "y": 167.467,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-57",
+          "x": 1661.867,
+          "y": 167.467,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-58",
+          "x": 1691.378,
+          "y": 167.467,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "B065T",
+          "label": "B065T"
+        },
+        {
+          "id": "p2-section-59",
+          "x": 1720.889,
+          "y": 167.467,
+          "width": 31.644,
+          "height": 6.044,
+          "candidate": "X1T",
+          "label": "X1T"
+        },
+        {
+          "id": "p2-section-60",
+          "x": 1753.6,
+          "y": 167.467,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-61",
+          "x": 1878.4,
+          "y": 167.467,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "02T",
+          "label": "02T"
+        },
+        {
+          "id": "p2-section-62",
+          "x": 1965.511,
+          "y": 167.467,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p2-section-63",
+          "x": 1999.289,
+          "y": 167.467,
+          "width": 37.689,
+          "height": 6.044,
+          "candidate": "B067T",
+          "label": "B067T"
+        },
+        {
+          "id": "p2-section-64",
+          "x": 613.333,
+          "y": 167.822,
+          "width": 54.756,
+          "height": 6.044,
+          "candidate": "ST",
+          "label": "ST"
+        },
+        {
+          "id": "p2-section-65",
+          "x": 669.156,
+          "y": 167.822,
+          "width": 38.044,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p2-section-66",
+          "x": 757.689,
+          "y": 167.822,
+          "width": 15.644,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p2-section-67",
+          "x": 774.756,
+          "y": 167.822,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "B017T",
+          "label": "B017T"
+        },
+        {
+          "id": "p2-section-68",
+          "x": 801.422,
+          "y": 167.822,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-69",
+          "x": 830.933,
+          "y": 167.822,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-70",
+          "x": 857.6,
+          "y": 167.822,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-71",
+          "x": 888.533,
+          "y": 167.822,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-72",
+          "x": 916.622,
+          "y": 167.822,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-73",
+          "x": 944.356,
+          "y": 167.822,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "OB",
+          "label": ""
+        },
+        {
+          "id": "p2-section-74",
+          "x": 988.089,
+          "y": 167.822,
+          "width": 40.889,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-75",
+          "x": 1030.044,
+          "y": 167.822,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-76",
+          "x": 1059.556,
+          "y": 167.822,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-77",
+          "x": 1087.644,
+          "y": 167.822,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p2-section-78",
+          "x": 1115.733,
+          "y": 167.822,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p2-section-79",
+          "x": 1146.667,
+          "y": 167.822,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-80",
+          "x": 1282.844,
+          "y": 167.822,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-81",
+          "x": 1336.178,
+          "y": 167.822,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p2-section-82",
+          "x": 51.556,
+          "y": 168.178,
+          "width": 46.222,
+          "height": 5.689,
+          "candidate": "AIT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-83",
+          "x": 129.778,
+          "y": 168.178,
+          "width": 87.467,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-84",
+          "x": 298.311,
+          "y": 168.178,
+          "width": 71.822,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-85",
+          "x": 423.822,
+          "y": 168.178,
+          "width": 28.089,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-86",
+          "x": 452.978,
+          "y": 168.178,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-87",
+          "x": 483.911,
+          "y": 168.178,
+          "width": 26.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-88",
+          "x": 512.0,
+          "y": 168.178,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-89",
+          "x": 544.356,
+          "y": 168.178,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-90",
+          "x": 573.867,
+          "y": 168.178,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-91",
+          "x": 1423.289,
+          "y": 168.178,
+          "width": 27.022,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-92",
+          "x": 1451.378,
+          "y": 168.178,
+          "width": 29.511,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-93",
+          "x": 1481.956,
+          "y": 168.178,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "2",
+          "label": ""
+        },
+        {
+          "id": "p2-section-94",
+          "x": 1511.822,
+          "y": 168.178,
+          "width": 28.089,
+          "height": 5.689,
+          "candidate": "SS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-95",
+          "x": 1540.978,
+          "y": 168.178,
+          "width": 30.222,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-96",
+          "x": 1572.267,
+          "y": 168.178,
+          "width": 29.511,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-97",
+          "x": 666.667,
+          "y": 186.311,
+          "width": 37.689,
+          "height": 5.689,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p2-section-98",
+          "x": 104.178,
+          "y": 397.511,
+          "width": 50.844,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-99",
+          "x": 12.089,
+          "y": 399.644,
+          "width": 60.089,
+          "height": 5.689,
+          "candidate": "B074T",
+          "label": "B074T"
+        },
+        {
+          "id": "p2-section-100",
+          "x": 73.244,
+          "y": 399.644,
+          "width": 29.867,
+          "height": 5.689,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p2-section-101",
+          "x": 156.089,
+          "y": 399.644,
+          "width": 70.4,
+          "height": 5.689,
+          "candidate": "SOAT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-102",
+          "x": 246.044,
+          "y": 399.644,
+          "width": 61.156,
+          "height": 5.689,
+          "candidate": "B902T",
+          "label": "B902T"
+        },
+        {
+          "id": "p2-section-103",
+          "x": 104.178,
+          "y": 415.644,
+          "width": 50.844,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-104",
+          "x": 26.667,
+          "y": 417.778,
+          "width": 45.511,
+          "height": 5.689,
+          "candidate": "B069T",
+          "label": "B069T"
+        },
+        {
+          "id": "p2-section-105",
+          "x": 73.244,
+          "y": 417.778,
+          "width": 29.867,
+          "height": 5.689,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p2-section-106",
+          "x": 156.089,
+          "y": 417.778,
+          "width": 52.267,
+          "height": 5.689,
+          "candidate": "55BT",
+          "label": "55BT"
+        },
+        {
+          "id": "p2-section-107",
+          "x": 209.422,
+          "y": 417.778,
+          "width": 36.978,
+          "height": 5.689,
+          "candidate": "S4AAT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-108",
+          "x": 1629.867,
+          "y": 421.689,
+          "width": 61.511,
+          "height": 9.956,
+          "candidate": "Z",
+          "label": ""
+        },
+        {
+          "id": "p2-section-109",
+          "x": 1612.444,
+          "y": 424.533,
+          "width": 16.0,
+          "height": 5.689,
+          "candidate": "F",
+          "label": ""
+        },
+        {
+          "id": "p2-section-110",
+          "x": 1693.511,
+          "y": 424.533,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-111",
+          "x": 13.511,
+          "y": 435.911,
+          "width": 13.511,
+          "height": 3.2,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-112",
+          "x": 1630.222,
+          "y": 440.178,
+          "width": 61.867,
+          "height": 10.311,
+          "candidate": "I0",
+          "label": ""
+        },
+        {
+          "id": "p2-section-113",
+          "x": 1374.222,
+          "y": 443.022,
+          "width": 60.8,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-114",
+          "x": 1436.8,
+          "y": 443.022,
+          "width": 55.822,
+          "height": 6.044,
+          "candidate": "B620T",
+          "label": "B620T"
+        },
+        {
+          "id": "p2-section-115",
+          "x": 1517.156,
+          "y": 443.022,
+          "width": 71.111,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p2-section-116",
+          "x": 1590.044,
+          "y": 443.022,
+          "width": 39.111,
+          "height": 6.044,
+          "candidate": "25T",
+          "label": "25T"
+        },
+        {
+          "id": "p2-section-117",
+          "x": 1693.511,
+          "y": 443.022,
+          "width": 39.822,
+          "height": 6.044,
+          "candidate": "I",
+          "label": ""
+        },
+        {
+          "id": "p2-section-118",
+          "x": 1735.467,
+          "y": 443.022,
+          "width": 51.556,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-119",
+          "x": 1846.756,
+          "y": 443.022,
+          "width": 13.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-120",
+          "x": 1806.578,
+          "y": 443.733,
+          "width": 38.756,
+          "height": 5.333,
+          "candidate": "BG221",
+          "label": ""
+        },
+        {
+          "id": "p2-section-121",
+          "x": 39.467,
+          "y": 451.911,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-122",
+          "x": 738.489,
+          "y": 451.911,
+          "width": 49.067,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-123",
+          "x": 1097.244,
+          "y": 452.267,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-124",
+          "x": 99.911,
+          "y": 454.044,
+          "width": 56.533,
+          "height": 6.044,
+          "candidate": "O8BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-125",
+          "x": 493.867,
+          "y": 454.044,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-126",
+          "x": 576.356,
+          "y": 454.044,
+          "width": 25.956,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p2-section-127",
+          "x": 603.378,
+          "y": 454.044,
+          "width": 133.689,
+          "height": 6.044,
+          "candidate": "27BT",
+          "label": "27BT"
+        },
+        {
+          "id": "p2-section-128",
+          "x": 316.089,
+          "y": 454.4,
+          "width": 44.089,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-129",
+          "x": 361.244,
+          "y": 454.4,
+          "width": 43.733,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-130",
+          "x": 406.044,
+          "y": 454.4,
+          "width": 45.156,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-131",
+          "x": 452.267,
+          "y": 454.4,
+          "width": 39.822,
+          "height": 5.689,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p2-section-132",
+          "x": 868.622,
+          "y": 454.4,
+          "width": 25.6,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-133",
+          "x": 895.289,
+          "y": 454.4,
+          "width": 22.756,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-134",
+          "x": 919.111,
+          "y": 454.4,
+          "width": 22.756,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-135",
+          "x": 942.933,
+          "y": 454.4,
+          "width": 27.022,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-136",
+          "x": 971.022,
+          "y": 454.4,
+          "width": 49.422,
+          "height": 6.044,
+          "candidate": "B926T",
+          "label": "B926T"
+        },
+        {
+          "id": "p2-section-137",
+          "x": 1021.511,
+          "y": 454.4,
+          "width": 36.978,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p2-section-138",
+          "x": 1157.689,
+          "y": 454.4,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-139",
+          "x": 1229.511,
+          "y": 454.4,
+          "width": 23.822,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-140",
+          "x": 813.867,
+          "y": 454.756,
+          "width": 27.022,
+          "height": 5.333,
+          "candidate": "ZI",
+          "label": ""
+        },
+        {
+          "id": "p2-section-141",
+          "x": 1059.556,
+          "y": 454.756,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p2-section-142",
+          "x": 1630.578,
+          "y": 458.667,
+          "width": 58.311,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-143",
+          "x": 1690.667,
+          "y": 461.156,
+          "width": 55.822,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-144",
+          "x": 1747.911,
+          "y": 461.156,
+          "width": 39.822,
+          "height": 6.044,
+          "candidate": "52AT",
+          "label": "52AT"
+        },
+        {
+          "id": "p2-section-145",
+          "x": 1847.111,
+          "y": 461.156,
+          "width": 13.156,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-146",
+          "x": 1410.844,
+          "y": 461.511,
+          "width": 24.178,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-147",
+          "x": 1436.089,
+          "y": 461.511,
+          "width": 54.756,
+          "height": 5.689,
+          "candidate": "B619T2T",
+          "label": ""
+        },
+        {
+          "id": "p2-section-148",
+          "x": 1492.267,
+          "y": 461.511,
+          "width": 58.311,
+          "height": 5.689,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p2-section-149",
+          "x": 1551.644,
+          "y": 461.511,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p2-section-150",
+          "x": 1590.044,
+          "y": 461.511,
+          "width": 39.111,
+          "height": 5.689,
+          "candidate": "26T",
+          "label": "26T"
+        },
+        {
+          "id": "p2-section-151",
+          "x": 1807.289,
+          "y": 462.222,
+          "width": 38.4,
+          "height": 4.978,
+          "candidate": "BG2Z11",
+          "label": ""
+        },
+        {
+          "id": "p2-section-152",
+          "x": 39.467,
+          "y": 470.4,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-153",
+          "x": 1097.244,
+          "y": 470.4,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-154",
+          "x": 738.133,
+          "y": 470.756,
+          "width": 49.422,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-155",
+          "x": 99.911,
+          "y": 472.178,
+          "width": 69.333,
+          "height": 6.4,
+          "candidate": "OBAT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-156",
+          "x": 170.311,
+          "y": 472.533,
+          "width": 46.578,
+          "height": 5.689,
+          "candidate": "O4BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-157",
+          "x": 217.956,
+          "y": 472.533,
+          "width": 19.911,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-158",
+          "x": 288.711,
+          "y": 472.533,
+          "width": 13.867,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-159",
+          "x": 303.644,
+          "y": 472.533,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-160",
+          "x": 341.333,
+          "y": 472.533,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "SE",
+          "label": ""
+        },
+        {
+          "id": "p2-section-161",
+          "x": 379.378,
+          "y": 472.533,
+          "width": 35.2,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-162",
+          "x": 416.0,
+          "y": 472.533,
+          "width": 35.2,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-163",
+          "x": 452.267,
+          "y": 472.533,
+          "width": 39.822,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-164",
+          "x": 1157.689,
+          "y": 472.533,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-165",
+          "x": 1191.467,
+          "y": 472.533,
+          "width": 15.644,
+          "height": 6.044,
+          "candidate": "Y1T",
+          "label": "Y1T"
+        },
+        {
+          "id": "p2-section-166",
+          "x": 1208.178,
+          "y": 472.533,
+          "width": 31.289,
+          "height": 6.044,
+          "candidate": "B929T",
+          "label": "B929T"
+        },
+        {
+          "id": "p2-section-167",
+          "x": 494.578,
+          "y": 472.889,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-168",
+          "x": 525.156,
+          "y": 472.889,
+          "width": 71.467,
+          "height": 6.044,
+          "candidate": "B915T",
+          "label": "B915T"
+        },
+        {
+          "id": "p2-section-169",
+          "x": 597.689,
+          "y": 472.889,
+          "width": 78.933,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p2-section-170",
+          "x": 677.689,
+          "y": 472.889,
+          "width": 59.378,
+          "height": 6.044,
+          "candidate": "27AT",
+          "label": "27AT"
+        },
+        {
+          "id": "p2-section-171",
+          "x": 788.622,
+          "y": 472.889,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "YITIT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-172",
+          "x": 832.0,
+          "y": 472.889,
+          "width": 36.978,
+          "height": 5.689,
+          "candidate": "Y1IT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-173",
+          "x": 904.889,
+          "y": 472.889,
+          "width": 18.133,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-174",
+          "x": 924.8,
+          "y": 472.889,
+          "width": 45.156,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-175",
+          "x": 983.111,
+          "y": 472.889,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-176",
+          "x": 1068.089,
+          "y": 472.889,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-177",
+          "x": 39.467,
+          "y": 488.533,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-178",
+          "x": 738.133,
+          "y": 488.889,
+          "width": 49.422,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-179",
+          "x": 1097.244,
+          "y": 488.889,
+          "width": 59.378,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-180",
+          "x": 99.911,
+          "y": 491.022,
+          "width": 99.556,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-181",
+          "x": 486.044,
+          "y": 491.022,
+          "width": 16.356,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-182",
+          "x": 504.178,
+          "y": 491.022,
+          "width": 52.978,
+          "height": 5.689,
+          "candidate": "S",
+          "label": ""
+        },
+        {
+          "id": "p2-section-183",
+          "x": 604.444,
+          "y": 491.022,
+          "width": 31.289,
+          "height": 5.689,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-184",
+          "x": 636.8,
+          "y": 491.022,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p2-section-185",
+          "x": 666.311,
+          "y": 491.022,
+          "width": 70.756,
+          "height": 5.689,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p2-section-186",
+          "x": 788.622,
+          "y": 491.022,
+          "width": 86.756,
+          "height": 5.689,
+          "candidate": "52T",
+          "label": "52T"
+        },
+        {
+          "id": "p2-section-187",
+          "x": 877.511,
+          "y": 491.022,
+          "width": 32.711,
+          "height": 5.689,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-188",
+          "x": 912.0,
+          "y": 491.022,
+          "width": 25.244,
+          "height": 5.689,
+          "candidate": "BT",
+          "label": "BT"
+        },
+        {
+          "id": "p2-section-189",
+          "x": 971.022,
+          "y": 491.022,
+          "width": 56.533,
+          "height": 5.689,
+          "candidate": "B612T",
+          "label": "B612T"
+        },
+        {
+          "id": "p2-section-190",
+          "x": 1028.622,
+          "y": 491.022,
+          "width": 67.556,
+          "height": 5.689,
+          "candidate": "X1T",
+          "label": "X1T"
+        },
+        {
+          "id": "p2-section-191",
+          "x": 1158.044,
+          "y": 491.022,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-192",
+          "x": 1257.6,
+          "y": 491.022,
+          "width": 33.778,
+          "height": 5.689,
+          "candidate": "S",
+          "label": ""
+        },
+        {
+          "id": "p2-section-193",
+          "x": 1292.444,
+          "y": 491.022,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-194",
+          "x": 1321.956,
+          "y": 491.022,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p2-section-195",
+          "x": 1351.467,
+          "y": 491.022,
+          "width": 28.8,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-196",
+          "x": 1631.289,
+          "y": 496.0,
+          "width": 57.6,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-197",
+          "x": 1609.6,
+          "y": 497.778,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p2-section-198",
+          "x": 1690.311,
+          "y": 497.778,
+          "width": 32.0,
+          "height": 6.044,
+          "candidate": "S6BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-199",
+          "x": 39.467,
+          "y": 507.022,
+          "width": 59.378,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-200",
+          "x": 738.133,
+          "y": 507.022,
+          "width": 49.422,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-201",
+          "x": 1097.244,
+          "y": 507.022,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-202",
+          "x": 99.911,
+          "y": 509.156,
+          "width": 35.911,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-203",
+          "x": 508.8,
+          "y": 509.156,
+          "width": 50.489,
+          "height": 6.044,
+          "candidate": "B605T",
+          "label": "B605T"
+        },
+        {
+          "id": "p2-section-204",
+          "x": 560.0,
+          "y": 509.156,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p2-section-205",
+          "x": 594.844,
+          "y": 509.156,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p2-section-206",
+          "x": 630.044,
+          "y": 509.156,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-207",
+          "x": 656.711,
+          "y": 509.156,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p2-section-208",
+          "x": 685.867,
+          "y": 509.156,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "2BAT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-209",
+          "x": 712.533,
+          "y": 509.156,
+          "width": 24.533,
+          "height": 6.044,
+          "candidate": "28T",
+          "label": "28T"
+        },
+        {
+          "id": "p2-section-210",
+          "x": 971.022,
+          "y": 509.156,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-211",
+          "x": 1004.8,
+          "y": 509.156,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-212",
+          "x": 1066.667,
+          "y": 509.156,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p2-section-213",
+          "x": 1158.044,
+          "y": 509.156,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-214",
+          "x": 1254.044,
+          "y": 509.156,
+          "width": 37.333,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-215",
+          "x": 1292.8,
+          "y": 509.156,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-216",
+          "x": 1330.489,
+          "y": 509.156,
+          "width": 35.556,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-217",
+          "x": 1368.178,
+          "y": 509.156,
+          "width": 48.711,
+          "height": 6.044,
+          "candidate": "OT",
+          "label": "OT"
+        },
+        {
+          "id": "p2-section-218",
+          "x": 233.6,
+          "y": 509.511,
+          "width": 68.622,
+          "height": 5.689,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-219",
+          "x": 303.644,
+          "y": 509.511,
+          "width": 55.111,
+          "height": 5.689,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-220",
+          "x": 359.822,
+          "y": 509.511,
+          "width": 64.711,
+          "height": 5.689,
+          "candidate": "B602T",
+          "label": "B602T"
+        },
+        {
+          "id": "p2-section-221",
+          "x": 425.6,
+          "y": 509.511,
+          "width": 66.489,
+          "height": 5.689,
+          "candidate": "RE",
+          "label": ""
+        },
+        {
+          "id": "p2-section-222",
+          "x": 788.622,
+          "y": 509.511,
+          "width": 67.911,
+          "height": 5.689,
+          "candidate": "531",
+          "label": ""
+        },
+        {
+          "id": "p2-section-223",
+          "x": 876.089,
+          "y": 509.511,
+          "width": 33.422,
+          "height": 5.689,
+          "candidate": "FO1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-224",
+          "x": 39.467,
+          "y": 525.156,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "1",
+          "label": ""
+        },
+        {
+          "id": "p2-section-225",
+          "x": 738.133,
+          "y": 525.511,
+          "width": 49.422,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-226",
+          "x": 99.911,
+          "y": 527.289,
+          "width": 92.8,
+          "height": 6.044,
+          "candidate": "60T",
+          "label": "60T"
+        },
+        {
+          "id": "p2-section-227",
+          "x": 721.067,
+          "y": 527.289,
+          "width": 16.0,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p2-section-228",
+          "x": 194.133,
+          "y": 527.644,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "I",
+          "label": ""
+        },
+        {
+          "id": "p2-section-229",
+          "x": 231.822,
+          "y": 527.644,
+          "width": 70.756,
+          "height": 5.689,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-230",
+          "x": 303.644,
+          "y": 527.644,
+          "width": 55.111,
+          "height": 5.689,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-231",
+          "x": 359.822,
+          "y": 527.644,
+          "width": 64.711,
+          "height": 5.689,
+          "candidate": "B601T",
+          "label": "B601T"
+        },
+        {
+          "id": "p2-section-232",
+          "x": 425.6,
+          "y": 527.644,
+          "width": 66.489,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-233",
+          "x": 494.222,
+          "y": 527.644,
+          "width": 20.267,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-234",
+          "x": 788.622,
+          "y": 527.644,
+          "width": 49.067,
+          "height": 6.044,
+          "candidate": "54T",
+          "label": "54T"
+        },
+        {
+          "id": "p2-section-235",
+          "x": 1630.933,
+          "y": 531.911,
+          "width": 57.956,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-236",
+          "x": 1689.956,
+          "y": 534.044,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "S6AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-237",
+          "x": 1539.2,
+          "y": 534.4,
+          "width": 90.311,
+          "height": 5.689,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p2-section-238",
+          "x": 738.133,
+          "y": 543.644,
+          "width": 49.422,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-239",
+          "x": 788.622,
+          "y": 545.422,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "5DAT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-240",
+          "x": 681.956,
+          "y": 545.778,
+          "width": 26.667,
+          "height": 5.689,
+          "candidate": "25AT",
+          "label": "25AT"
+        },
+        {
+          "id": "p2-section-241",
+          "x": 710.044,
+          "y": 546.133,
+          "width": 27.022,
+          "height": 5.333,
+          "candidate": "26BT",
+          "label": "26BT"
+        },
+        {
+          "id": "p2-section-242",
+          "x": 738.133,
+          "y": 562.133,
+          "width": 49.422,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-243",
+          "x": 646.756,
+          "y": 564.267,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p2-section-244",
+          "x": 669.156,
+          "y": 564.267,
+          "width": 67.911,
+          "height": 6.044,
+          "candidate": "25BT",
+          "label": "25BT"
+        },
+        {
+          "id": "p2-section-245",
+          "x": 788.622,
+          "y": 564.267,
+          "width": 56.533,
+          "height": 5.689,
+          "candidate": "SOBT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-246",
+          "x": 846.222,
+          "y": 564.267,
+          "width": 21.689,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-247",
+          "x": 1630.933,
+          "y": 567.822,
+          "width": 60.444,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-248",
+          "x": 1261.511,
+          "y": 570.667,
+          "width": 31.289,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-249",
+          "x": 1293.867,
+          "y": 570.667,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-250",
+          "x": 1323.378,
+          "y": 570.667,
+          "width": 40.533,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-251",
+          "x": 1366.044,
+          "y": 570.667,
+          "width": 68.978,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-252",
+          "x": 1458.844,
+          "y": 570.667,
+          "width": 51.2,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p2-section-253",
+          "x": 1511.467,
+          "y": 570.667,
+          "width": 118.044,
+          "height": 6.044,
+          "candidate": "22T",
+          "label": "22T"
+        },
+        {
+          "id": "p2-section-254",
+          "x": 1693.156,
+          "y": 570.667,
+          "width": 63.289,
+          "height": 6.044,
+          "candidate": "541",
+          "label": ""
+        },
+        {
+          "id": "p2-section-255",
+          "x": 1757.511,
+          "y": 570.667,
+          "width": 35.911,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p2-section-256",
+          "x": 1817.244,
+          "y": 570.667,
+          "width": 19.556,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p2-section-257",
+          "x": 1837.867,
+          "y": 570.667,
+          "width": 24.533,
+          "height": 6.044,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p2-section-258",
+          "x": 1630.933,
+          "y": 586.311,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "TT",
+          "label": "TT"
+        },
+        {
+          "id": "p2-section-259",
+          "x": 1234.844,
+          "y": 588.8,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-260",
+          "x": 1261.511,
+          "y": 588.8,
+          "width": 31.289,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-261",
+          "x": 1293.867,
+          "y": 588.8,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-262",
+          "x": 1323.378,
+          "y": 588.8,
+          "width": 40.533,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-263",
+          "x": 1366.044,
+          "y": 588.8,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "DL",
+          "label": ""
+        },
+        {
+          "id": "p2-section-264",
+          "x": 1400.889,
+          "y": 588.8,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p2-section-265",
+          "x": 1436.089,
+          "y": 588.8,
+          "width": 21.689,
+          "height": 6.044,
+          "candidate": "B941T",
+          "label": "B941T"
+        },
+        {
+          "id": "p2-section-266",
+          "x": 1458.844,
+          "y": 588.8,
+          "width": 170.667,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p2-section-267",
+          "x": 1693.156,
+          "y": 588.8,
+          "width": 84.978,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p2-section-268",
+          "x": 1779.556,
+          "y": 588.8,
+          "width": 20.978,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p2-section-269",
+          "x": 1801.6,
+          "y": 588.8,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "B943T",
+          "label": "B943T"
+        },
+        {
+          "id": "p2-section-270",
+          "x": 1837.867,
+          "y": 588.8,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        }
+      ],
+      "platforms": [
+        {
+          "x": 720.711,
+          "y": 118.756,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 456.178,
+          "y": 119.467,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 549.333,
+          "y": 119.467,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 831.644,
+          "y": 119.467,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 918.044,
+          "y": 119.467,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1032.533,
+          "y": 119.467,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1542.4,
+          "y": 119.467,
+          "width": 20.267,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1240.178,
+          "y": 121.244,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 242.133,
+          "y": 141.867,
+          "width": 28.444,
+          "height": 22.4,
+          "kind": "platform"
+        },
+        {
+          "x": 1827.911,
+          "y": 141.867,
+          "width": 28.444,
+          "height": 22.4,
+          "kind": "platform"
+        },
+        {
+          "x": 1240.178,
+          "y": 177.778,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 456.178,
+          "y": 179.911,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 549.333,
+          "y": 179.911,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 831.644,
+          "y": 179.911,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 918.044,
+          "y": 179.911,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1032.533,
+          "y": 179.911,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1541.689,
+          "y": 179.911,
+          "width": 21.333,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 720.711,
+          "y": 181.333,
+          "width": 23.822,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 746.667,
+          "y": 444.8,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1109.689,
+          "y": 445.511,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 419.2,
+          "y": 462.578,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 55.822,
+          "y": 463.644,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 746.667,
+          "y": 481.778,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1109.689,
+          "y": 482.133,
+          "width": 26.311,
+          "height": 2.133,
+          "kind": "platform"
+        },
+        {
+          "x": 1646.578,
+          "y": 543.644,
+          "width": 26.311,
+          "height": 22.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1837.156,
+          "y": 556.8,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1372.444,
+          "y": 563.556,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1264.356,
+          "y": 563.911,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1264.0,
+          "y": 595.911,
+          "width": 20.978,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1372.089,
+          "y": 596.622,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1646.578,
+          "y": 597.333,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1837.156,
+          "y": 601.956,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1646.933,
+          "y": 433.067,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1646.933,
+          "y": 469.689,
+          "width": 25.956,
+          "height": 22.4,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 56.178,
+          "y": 481.067,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1109.689,
+          "y": 484.978,
+          "width": 26.311,
+          "height": 2.844,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 56.178,
+          "y": 499.2,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 56.178,
+          "y": 518.044,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1109.689,
+          "y": 518.044,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 747.022,
+          "y": 519.111,
+          "width": 25.6,
+          "height": 5.689,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 56.178,
+          "y": 536.178,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 747.022,
+          "y": 555.378,
+          "width": 25.6,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        }
+      ]
+    },
+    "3": {
+      "sections": [
+        {
+          "id": "p3-section-1",
+          "x": 416.711,
+          "y": 124.8,
+          "width": 20.267,
+          "height": 9.956,
+          "candidate": "V",
+          "label": ""
+        },
+        {
+          "id": "p3-section-2",
+          "x": 838.044,
+          "y": 128.0,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-3",
+          "x": 1857.778,
+          "y": 128.0,
+          "width": 66.133,
+          "height": 10.311,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p3-section-4",
+          "x": 1436.089,
+          "y": 128.356,
+          "width": 53.689,
+          "height": 9.956,
+          "candidate": "T",
+          "label": ""
+        },
+        {
+          "id": "p3-section-5",
+          "x": 794.667,
+          "y": 129.778,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-6",
+          "x": 899.556,
+          "y": 130.133,
+          "width": 41.244,
+          "height": 5.689,
+          "candidate": "O4T",
+          "label": "O4T"
+        },
+        {
+          "id": "p3-section-7",
+          "x": 1411.911,
+          "y": 130.133,
+          "width": 23.111,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-8",
+          "x": 1490.844,
+          "y": 130.133,
+          "width": 27.378,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-9",
+          "x": 1784.889,
+          "y": 130.133,
+          "width": 71.822,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-10",
+          "x": 1924.978,
+          "y": 130.133,
+          "width": 40.178,
+          "height": 6.044,
+          "candidate": "1",
+          "label": ""
+        },
+        {
+          "id": "p3-section-11",
+          "x": 838.044,
+          "y": 146.133,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-12",
+          "x": 1857.778,
+          "y": 146.133,
+          "width": 66.133,
+          "height": 10.311,
+          "candidate": "A",
+          "label": ""
+        },
+        {
+          "id": "p3-section-13",
+          "x": 1436.089,
+          "y": 146.489,
+          "width": 53.689,
+          "height": 10.311,
+          "candidate": "Z5",
+          "label": ""
+        },
+        {
+          "id": "p3-section-14",
+          "x": 960.0,
+          "y": 147.911,
+          "width": 17.422,
+          "height": 6.044,
+          "candidate": "OATIT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-15",
+          "x": 404.622,
+          "y": 148.267,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "OT",
+          "label": "OT"
+        },
+        {
+          "id": "p3-section-16",
+          "x": 431.289,
+          "y": 148.267,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "DT",
+          "label": "DT"
+        },
+        {
+          "id": "p3-section-17",
+          "x": 480.0,
+          "y": 148.267,
+          "width": 18.133,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-18",
+          "x": 499.556,
+          "y": 148.267,
+          "width": 19.2,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-19",
+          "x": 519.822,
+          "y": 148.267,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-20",
+          "x": 555.378,
+          "y": 148.267,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p3-section-21",
+          "x": 577.422,
+          "y": 148.267,
+          "width": 19.911,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-22",
+          "x": 599.111,
+          "y": 148.267,
+          "width": 22.4,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-23",
+          "x": 623.644,
+          "y": 148.267,
+          "width": 33.067,
+          "height": 6.044,
+          "candidate": "CD",
+          "label": ""
+        },
+        {
+          "id": "p3-section-24",
+          "x": 658.133,
+          "y": 148.267,
+          "width": 36.978,
+          "height": 6.044,
+          "candidate": "B966T",
+          "label": "B966T"
+        },
+        {
+          "id": "p3-section-25",
+          "x": 715.733,
+          "y": 148.267,
+          "width": 66.489,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p3-section-26",
+          "x": 783.289,
+          "y": 148.267,
+          "width": 53.689,
+          "height": 5.689,
+          "candidate": "27T",
+          "label": "27T"
+        },
+        {
+          "id": "p3-section-27",
+          "x": 899.556,
+          "y": 148.267,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "07BT",
+          "label": "07BT"
+        },
+        {
+          "id": "p3-section-28",
+          "x": 935.111,
+          "y": 148.267,
+          "width": 23.822,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-29",
+          "x": 978.844,
+          "y": 148.267,
+          "width": 58.667,
+          "height": 5.689,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-30",
+          "x": 1038.578,
+          "y": 148.267,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "B968T",
+          "label": "B968T"
+        },
+        {
+          "id": "p3-section-31",
+          "x": 1082.311,
+          "y": 148.267,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-32",
+          "x": 1122.844,
+          "y": 148.267,
+          "width": 35.556,
+          "height": 6.044,
+          "candidate": "UUCE",
+          "label": ""
+        },
+        {
+          "id": "p3-section-33",
+          "x": 1159.467,
+          "y": 148.267,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "S",
+          "label": ""
+        },
+        {
+          "id": "p3-section-34",
+          "x": 1188.978,
+          "y": 148.267,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "SO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-35",
+          "x": 1215.644,
+          "y": 148.267,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-36",
+          "x": 1240.889,
+          "y": 148.267,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-37",
+          "x": 1744.0,
+          "y": 148.267,
+          "width": 48.0,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p3-section-38",
+          "x": 1793.067,
+          "y": 148.267,
+          "width": 63.644,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-39",
+          "x": 1924.978,
+          "y": 148.267,
+          "width": 48.356,
+          "height": 6.044,
+          "candidate": "51T",
+          "label": "51T"
+        },
+        {
+          "id": "p3-section-40",
+          "x": 1268.978,
+          "y": 148.622,
+          "width": 49.422,
+          "height": 6.044,
+          "candidate": "B982T",
+          "label": "B982T"
+        },
+        {
+          "id": "p3-section-41",
+          "x": 1344.711,
+          "y": 148.622,
+          "width": 59.378,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p3-section-42",
+          "x": 1527.111,
+          "y": 148.622,
+          "width": 56.533,
+          "height": 6.044,
+          "candidate": "O3BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-43",
+          "x": 1654.756,
+          "y": 148.622,
+          "width": 21.333,
+          "height": 5.689,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-44",
+          "x": 1677.511,
+          "y": 148.622,
+          "width": 26.667,
+          "height": 5.689,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-45",
+          "x": 1405.156,
+          "y": 148.978,
+          "width": 29.867,
+          "height": 5.689,
+          "candidate": "25AT",
+          "label": "25AT"
+        },
+        {
+          "id": "p3-section-46",
+          "x": 1490.844,
+          "y": 148.978,
+          "width": 35.556,
+          "height": 5.689,
+          "candidate": "OOT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-47",
+          "x": 1584.711,
+          "y": 149.333,
+          "width": 28.444,
+          "height": 5.333,
+          "candidate": "UI",
+          "label": ""
+        },
+        {
+          "id": "p3-section-48",
+          "x": 294.756,
+          "y": 164.267,
+          "width": 68.978,
+          "height": 10.311,
+          "candidate": "M",
+          "label": ""
+        },
+        {
+          "id": "p3-section-49",
+          "x": 838.044,
+          "y": 164.267,
+          "width": 60.444,
+          "height": 10.311,
+          "candidate": "I",
+          "label": ""
+        },
+        {
+          "id": "p3-section-50",
+          "x": 1436.089,
+          "y": 164.622,
+          "width": 53.689,
+          "height": 10.311,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p3-section-51",
+          "x": 1122.844,
+          "y": 166.044,
+          "width": 35.556,
+          "height": 6.044,
+          "candidate": "M4",
+          "label": ""
+        },
+        {
+          "id": "p3-section-52",
+          "x": 117.689,
+          "y": 166.4,
+          "width": 41.956,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-53",
+          "x": 161.422,
+          "y": 166.4,
+          "width": 44.089,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-54",
+          "x": 206.933,
+          "y": 166.4,
+          "width": 41.6,
+          "height": 6.044,
+          "candidate": "B628T",
+          "label": "B628T"
+        },
+        {
+          "id": "p3-section-55",
+          "x": 250.311,
+          "y": 166.4,
+          "width": 41.956,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p3-section-56",
+          "x": 364.8,
+          "y": 166.4,
+          "width": 38.756,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-57",
+          "x": 409.6,
+          "y": 166.4,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-58",
+          "x": 430.933,
+          "y": 166.4,
+          "width": 46.578,
+          "height": 6.044,
+          "candidate": "ET",
+          "label": "ET"
+        },
+        {
+          "id": "p3-section-59",
+          "x": 478.933,
+          "y": 166.4,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "B630T",
+          "label": "B630T"
+        },
+        {
+          "id": "p3-section-60",
+          "x": 521.6,
+          "y": 166.4,
+          "width": 33.067,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-61",
+          "x": 556.089,
+          "y": 166.4,
+          "width": 15.644,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-62",
+          "x": 573.511,
+          "y": 166.4,
+          "width": 16.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-63",
+          "x": 592.0,
+          "y": 166.4,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-64",
+          "x": 623.644,
+          "y": 166.4,
+          "width": 33.422,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-65",
+          "x": 658.133,
+          "y": 166.4,
+          "width": 36.978,
+          "height": 6.044,
+          "candidate": "B642T",
+          "label": "B642T"
+        },
+        {
+          "id": "p3-section-66",
+          "x": 715.733,
+          "y": 166.4,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p3-section-67",
+          "x": 759.467,
+          "y": 166.4,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p3-section-68",
+          "x": 795.733,
+          "y": 166.4,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "25AT",
+          "label": "25AT"
+        },
+        {
+          "id": "p3-section-69",
+          "x": 899.556,
+          "y": 166.4,
+          "width": 36.267,
+          "height": 6.044,
+          "candidate": "O7AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-70",
+          "x": 937.244,
+          "y": 166.4,
+          "width": 33.067,
+          "height": 6.044,
+          "candidate": "OAT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-71",
+          "x": 984.178,
+          "y": 166.4,
+          "width": 53.333,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p3-section-72",
+          "x": 1038.578,
+          "y": 166.4,
+          "width": 42.667,
+          "height": 5.689,
+          "candidate": "B644T",
+          "label": "B644T"
+        },
+        {
+          "id": "p3-section-73",
+          "x": 1082.311,
+          "y": 166.4,
+          "width": 39.467,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-74",
+          "x": 1159.467,
+          "y": 166.4,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-75",
+          "x": 1188.978,
+          "y": 166.4,
+          "width": 25.6,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-76",
+          "x": 1215.644,
+          "y": 166.4,
+          "width": 24.178,
+          "height": 5.689,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-77",
+          "x": 1240.889,
+          "y": 166.4,
+          "width": 25.6,
+          "height": 5.689,
+          "candidate": "LS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-78",
+          "x": 1705.244,
+          "y": 166.4,
+          "width": 67.911,
+          "height": 6.044,
+          "candidate": "SO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-79",
+          "x": 1774.222,
+          "y": 166.4,
+          "width": 115.911,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-80",
+          "x": 1891.556,
+          "y": 166.4,
+          "width": 103.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-81",
+          "x": 1996.089,
+          "y": 166.4,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-82",
+          "x": 1268.978,
+          "y": 166.756,
+          "width": 49.422,
+          "height": 6.044,
+          "candidate": "B658T",
+          "label": "B658T"
+        },
+        {
+          "id": "p3-section-83",
+          "x": 1344.711,
+          "y": 166.756,
+          "width": 36.978,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-84",
+          "x": 1382.756,
+          "y": 166.756,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p3-section-85",
+          "x": 1490.844,
+          "y": 166.756,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "O3AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-86",
+          "x": 1547.022,
+          "y": 166.756,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-87",
+          "x": 1584.711,
+          "y": 166.756,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "ET",
+          "label": "ET"
+        },
+        {
+          "id": "p3-section-88",
+          "x": 1677.511,
+          "y": 166.756,
+          "width": 26.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-89",
+          "x": 294.756,
+          "y": 182.4,
+          "width": 68.978,
+          "height": 10.311,
+          "candidate": "EE",
+          "label": ""
+        },
+        {
+          "id": "p3-section-90",
+          "x": 838.044,
+          "y": 182.756,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-91",
+          "x": 1436.089,
+          "y": 182.756,
+          "width": 53.689,
+          "height": 10.311,
+          "candidate": "9",
+          "label": ""
+        },
+        {
+          "id": "p3-section-92",
+          "x": 118.4,
+          "y": 184.533,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-93",
+          "x": 160.711,
+          "y": 184.533,
+          "width": 44.8,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-94",
+          "x": 206.933,
+          "y": 184.533,
+          "width": 40.889,
+          "height": 6.044,
+          "candidate": "B627T",
+          "label": "B627T"
+        },
+        {
+          "id": "p3-section-95",
+          "x": 249.6,
+          "y": 184.533,
+          "width": 43.022,
+          "height": 6.044,
+          "candidate": "CT",
+          "label": "CT"
+        },
+        {
+          "id": "p3-section-96",
+          "x": 364.8,
+          "y": 184.533,
+          "width": 38.756,
+          "height": 6.044,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-97",
+          "x": 409.244,
+          "y": 184.533,
+          "width": 20.267,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-98",
+          "x": 431.289,
+          "y": 184.533,
+          "width": 33.422,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-99",
+          "x": 466.489,
+          "y": 184.533,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "Y1T",
+          "label": "Y1T"
+        },
+        {
+          "id": "p3-section-100",
+          "x": 521.244,
+          "y": 184.533,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-101",
+          "x": 555.378,
+          "y": 184.533,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-102",
+          "x": 592.356,
+          "y": 184.533,
+          "width": 31.289,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-103",
+          "x": 626.133,
+          "y": 184.533,
+          "width": 30.578,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-104",
+          "x": 696.178,
+          "y": 184.533,
+          "width": 40.533,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-105",
+          "x": 738.133,
+          "y": 184.533,
+          "width": 36.978,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p3-section-106",
+          "x": 899.556,
+          "y": 184.533,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "DOAT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-107",
+          "x": 970.667,
+          "y": 184.533,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "B1T",
+          "label": "B1T"
+        },
+        {
+          "id": "p3-section-108",
+          "x": 996.267,
+          "y": 184.533,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "BT",
+          "label": "BT"
+        },
+        {
+          "id": "p3-section-109",
+          "x": 1038.578,
+          "y": 184.533,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "B641T",
+          "label": "B641T"
+        },
+        {
+          "id": "p3-section-110",
+          "x": 1082.311,
+          "y": 184.533,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-111",
+          "x": 1122.844,
+          "y": 184.533,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-112",
+          "x": 1156.622,
+          "y": 184.533,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p3-section-113",
+          "x": 1209.956,
+          "y": 184.533,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-114",
+          "x": 1240.889,
+          "y": 184.533,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "YJ",
+          "label": ""
+        },
+        {
+          "id": "p3-section-115",
+          "x": 776.178,
+          "y": 184.889,
+          "width": 35.2,
+          "height": 5.689,
+          "candidate": "25BT",
+          "label": "25BT"
+        },
+        {
+          "id": "p3-section-116",
+          "x": 1268.978,
+          "y": 184.889,
+          "width": 26.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-117",
+          "x": 1344.711,
+          "y": 184.889,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-118",
+          "x": 1379.911,
+          "y": 184.889,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "22AT",
+          "label": "22AT"
+        },
+        {
+          "id": "p3-section-119",
+          "x": 1490.844,
+          "y": 184.889,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-120",
+          "x": 1547.022,
+          "y": 184.889,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p3-section-121",
+          "x": 1584.711,
+          "y": 184.889,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "YIT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-122",
+          "x": 1614.222,
+          "y": 184.889,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "B657T",
+          "label": "B657T"
+        },
+        {
+          "id": "p3-section-123",
+          "x": 1654.756,
+          "y": 184.889,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-124",
+          "x": 1677.511,
+          "y": 184.889,
+          "width": 26.667,
+          "height": 6.044,
+          "candidate": "S",
+          "label": ""
+        },
+        {
+          "id": "p3-section-125",
+          "x": 1705.244,
+          "y": 184.889,
+          "width": 69.333,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-126",
+          "x": 1775.644,
+          "y": 184.889,
+          "width": 117.333,
+          "height": 5.689,
+          "candidate": "TT",
+          "label": "TT"
+        },
+        {
+          "id": "p3-section-127",
+          "x": 1895.111,
+          "y": 184.889,
+          "width": 99.911,
+          "height": 5.689,
+          "candidate": "TT",
+          "label": "TT"
+        },
+        {
+          "id": "p3-section-128",
+          "x": 1996.089,
+          "y": 184.889,
+          "width": 32.711,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-129",
+          "x": 943.289,
+          "y": 187.022,
+          "width": 26.311,
+          "height": 3.556,
+          "candidate": "VUU",
+          "label": ""
+        },
+        {
+          "id": "p3-section-130",
+          "x": 1857.778,
+          "y": 200.889,
+          "width": 66.133,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-131",
+          "x": 838.044,
+          "y": 201.244,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "LL",
+          "label": ""
+        },
+        {
+          "id": "p3-section-132",
+          "x": 1436.089,
+          "y": 201.244,
+          "width": 53.689,
+          "height": 9.956,
+          "candidate": "0",
+          "label": ""
+        },
+        {
+          "id": "p3-section-133",
+          "x": 425.6,
+          "y": 202.311,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-134",
+          "x": 459.022,
+          "y": 202.311,
+          "width": 19.556,
+          "height": 6.044,
+          "candidate": "YT1T",
+          "label": ""
+        },
+        {
+          "id": "p3-section-135",
+          "x": 480.356,
+          "y": 202.311,
+          "width": 13.156,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p3-section-136",
+          "x": 495.289,
+          "y": 202.311,
+          "width": 23.822,
+          "height": 6.044,
+          "candidate": "B951T",
+          "label": "B951T"
+        },
+        {
+          "id": "p3-section-137",
+          "x": 520.889,
+          "y": 202.311,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "LS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-138",
+          "x": 554.667,
+          "y": 202.311,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-139",
+          "x": 573.156,
+          "y": 202.311,
+          "width": 17.422,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-140",
+          "x": 592.711,
+          "y": 202.311,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p3-section-141",
+          "x": 624.356,
+          "y": 202.311,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-142",
+          "x": 696.178,
+          "y": 203.022,
+          "width": 68.978,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-143",
+          "x": 766.222,
+          "y": 203.022,
+          "width": 70.756,
+          "height": 6.044,
+          "candidate": "26AT",
+          "label": "26AT"
+        },
+        {
+          "id": "p3-section-144",
+          "x": 1718.044,
+          "y": 203.022,
+          "width": 45.156,
+          "height": 6.044,
+          "candidate": "B993T",
+          "label": "B993T"
+        },
+        {
+          "id": "p3-section-145",
+          "x": 1791.644,
+          "y": 203.022,
+          "width": 65.067,
+          "height": 6.044,
+          "candidate": "22T",
+          "label": "22T"
+        },
+        {
+          "id": "p3-section-146",
+          "x": 1924.978,
+          "y": 203.022,
+          "width": 48.356,
+          "height": 6.044,
+          "candidate": "52T",
+          "label": "52T"
+        },
+        {
+          "id": "p3-section-147",
+          "x": 995.2,
+          "y": 203.378,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B965T",
+          "label": "B965T"
+        },
+        {
+          "id": "p3-section-148",
+          "x": 1038.578,
+          "y": 203.378,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-149",
+          "x": 1082.311,
+          "y": 203.378,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-150",
+          "x": 1122.844,
+          "y": 203.378,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-151",
+          "x": 1156.622,
+          "y": 203.378,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-152",
+          "x": 1209.956,
+          "y": 203.378,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-153",
+          "x": 1240.889,
+          "y": 203.378,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-154",
+          "x": 1268.978,
+          "y": 203.378,
+          "width": 26.667,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-155",
+          "x": 1344.711,
+          "y": 203.378,
+          "width": 55.111,
+          "height": 5.689,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p3-section-156",
+          "x": 1400.889,
+          "y": 203.378,
+          "width": 34.133,
+          "height": 5.689,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p3-section-157",
+          "x": 1490.844,
+          "y": 203.378,
+          "width": 35.556,
+          "height": 5.689,
+          "candidate": "4T",
+          "label": "4T"
+        },
+        {
+          "id": "p3-section-158",
+          "x": 1527.111,
+          "y": 203.378,
+          "width": 56.533,
+          "height": 5.689,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-159",
+          "x": 1654.756,
+          "y": 203.378,
+          "width": 21.333,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-160",
+          "x": 1677.511,
+          "y": 203.378,
+          "width": 26.667,
+          "height": 5.689,
+          "candidate": "1",
+          "label": ""
+        },
+        {
+          "id": "p3-section-161",
+          "x": 899.556,
+          "y": 203.733,
+          "width": 24.533,
+          "height": 5.689,
+          "candidate": "5T",
+          "label": "5T"
+        },
+        {
+          "id": "p3-section-162",
+          "x": 925.511,
+          "y": 203.733,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "SOBT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-163",
+          "x": 961.067,
+          "y": 203.733,
+          "width": 33.067,
+          "height": 5.689,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p3-section-164",
+          "x": 1584.711,
+          "y": 204.089,
+          "width": 28.444,
+          "height": 4.978,
+          "candidate": "YI",
+          "label": ""
+        },
+        {
+          "id": "p3-section-165",
+          "x": 1857.778,
+          "y": 219.022,
+          "width": 66.133,
+          "height": 10.311,
+          "candidate": "5IT",
+          "label": "5IT"
+        },
+        {
+          "id": "p3-section-166",
+          "x": 838.044,
+          "y": 219.378,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-167",
+          "x": 1436.089,
+          "y": 219.378,
+          "width": 53.689,
+          "height": 9.956,
+          "candidate": "ZTT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-168",
+          "x": 1811.2,
+          "y": 221.156,
+          "width": 45.511,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p3-section-169",
+          "x": 1924.978,
+          "y": 221.156,
+          "width": 40.178,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-170",
+          "x": 779.733,
+          "y": 221.511,
+          "width": 57.244,
+          "height": 5.689,
+          "candidate": "26BT",
+          "label": "26BT"
+        },
+        {
+          "id": "p3-section-171",
+          "x": 1365.689,
+          "y": 221.511,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "CT",
+          "label": "CT"
+        },
+        {
+          "id": "p3-section-172",
+          "x": 1396.622,
+          "y": 221.511,
+          "width": 38.4,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p3-section-173",
+          "x": 1490.844,
+          "y": 221.511,
+          "width": 27.378,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-174",
+          "x": 899.556,
+          "y": 221.867,
+          "width": 16.356,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-175",
+          "x": 387.911,
+          "y": 276.267,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-176",
+          "x": 294.4,
+          "y": 292.267,
+          "width": 69.333,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-177",
+          "x": 108.8,
+          "y": 294.044,
+          "width": 24.533,
+          "height": 6.044,
+          "candidate": "SS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-178",
+          "x": 134.4,
+          "y": 294.4,
+          "width": 59.022,
+          "height": 6.044,
+          "candidate": "B948T",
+          "label": "B948T"
+        },
+        {
+          "id": "p3-section-179",
+          "x": 210.133,
+          "y": 294.4,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p3-section-180",
+          "x": 253.867,
+          "y": 294.4,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p3-section-181",
+          "x": 364.8,
+          "y": 294.4,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-182",
+          "x": 394.667,
+          "y": 294.4,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-183",
+          "x": 430.578,
+          "y": 294.4,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "O3AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-184",
+          "x": 458.667,
+          "y": 294.4,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "FIT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-185",
+          "x": 294.4,
+          "y": 310.4,
+          "width": 69.333,
+          "height": 10.311,
+          "candidate": "SST",
+          "label": ""
+        },
+        {
+          "id": "p3-section-186",
+          "x": 108.8,
+          "y": 312.178,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-187",
+          "x": 135.467,
+          "y": 312.178,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-188",
+          "x": 160.711,
+          "y": 312.533,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "B9A49T",
+          "label": ""
+        },
+        {
+          "id": "p3-section-189",
+          "x": 194.489,
+          "y": 312.533,
+          "width": 42.667,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-190",
+          "x": 263.822,
+          "y": 312.533,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p3-section-191",
+          "x": 364.8,
+          "y": 312.533,
+          "width": 59.378,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-192",
+          "x": 430.222,
+          "y": 312.533,
+          "width": 27.022,
+          "height": 6.044,
+          "candidate": "O3BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-193",
+          "x": 458.667,
+          "y": 312.533,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "F2T",
+          "label": "F2T"
+        },
+        {
+          "id": "p3-section-194",
+          "x": 238.222,
+          "y": 315.378,
+          "width": 24.533,
+          "height": 3.2,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-195",
+          "x": 294.4,
+          "y": 328.889,
+          "width": 69.333,
+          "height": 9.956,
+          "candidate": "M",
+          "label": ""
+        },
+        {
+          "id": "p3-section-196",
+          "x": 204.444,
+          "y": 331.022,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-197",
+          "x": 233.956,
+          "y": 331.022,
+          "width": 34.489,
+          "height": 5.689,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p3-section-198",
+          "x": 364.8,
+          "y": 331.022,
+          "width": 64.356,
+          "height": 5.689,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p3-section-199",
+          "x": 1495.822,
+          "y": 487.111,
+          "width": 59.022,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-200",
+          "x": 1395.911,
+          "y": 489.244,
+          "width": 98.489,
+          "height": 6.044,
+          "candidate": "32AT",
+          "label": "32AT"
+        },
+        {
+          "id": "p3-section-201",
+          "x": 676.267,
+          "y": 505.244,
+          "width": 64.0,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-202",
+          "x": 1495.822,
+          "y": 505.6,
+          "width": 59.022,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-203",
+          "x": 574.578,
+          "y": 507.378,
+          "width": 100.978,
+          "height": 6.044,
+          "candidate": "26BT",
+          "label": "26BT"
+        },
+        {
+          "id": "p3-section-204",
+          "x": 740.978,
+          "y": 507.378,
+          "width": 48.711,
+          "height": 6.044,
+          "candidate": "Z1T",
+          "label": "Z1T"
+        },
+        {
+          "id": "p3-section-205",
+          "x": 790.756,
+          "y": 507.378,
+          "width": 55.111,
+          "height": 6.044,
+          "candidate": "O3BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-206",
+          "x": 846.933,
+          "y": 507.378,
+          "width": 28.089,
+          "height": 6.044,
+          "candidate": "FT",
+          "label": "FT"
+        },
+        {
+          "id": "p3-section-207",
+          "x": 1464.533,
+          "y": 507.378,
+          "width": 30.222,
+          "height": 6.044,
+          "candidate": "32BT",
+          "label": "32BT"
+        },
+        {
+          "id": "p3-section-208",
+          "x": 162.133,
+          "y": 523.733,
+          "width": 66.489,
+          "height": 10.311,
+          "candidate": "1T",
+          "label": "1T"
+        },
+        {
+          "id": "p3-section-209",
+          "x": 676.622,
+          "y": 523.733,
+          "width": 63.644,
+          "height": 10.311,
+          "candidate": "2T",
+          "label": "2T"
+        },
+        {
+          "id": "p3-section-210",
+          "x": 1495.822,
+          "y": 523.733,
+          "width": 59.022,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-211",
+          "x": 13.867,
+          "y": 525.867,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B1000T",
+          "label": "B1000T"
+        },
+        {
+          "id": "p3-section-212",
+          "x": 57.244,
+          "y": 525.867,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p3-section-213",
+          "x": 75.022,
+          "y": 525.867,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p3-section-214",
+          "x": 229.333,
+          "y": 525.867,
+          "width": 116.978,
+          "height": 6.044,
+          "candidate": "O3BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-215",
+          "x": 365.511,
+          "y": 525.867,
+          "width": 35.911,
+          "height": 6.044,
+          "candidate": "B1002T",
+          "label": "B1002T"
+        },
+        {
+          "id": "p3-section-216",
+          "x": 415.289,
+          "y": 525.867,
+          "width": 22.756,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-217",
+          "x": 464.356,
+          "y": 525.867,
+          "width": 67.911,
+          "height": 6.044,
+          "candidate": "B1012T",
+          "label": "B1012T"
+        },
+        {
+          "id": "p3-section-218",
+          "x": 533.333,
+          "y": 525.867,
+          "width": 40.178,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p3-section-219",
+          "x": 574.578,
+          "y": 525.867,
+          "width": 66.489,
+          "height": 6.044,
+          "candidate": "25BT",
+          "label": "25BT"
+        },
+        {
+          "id": "p3-section-220",
+          "x": 642.133,
+          "y": 525.867,
+          "width": 33.422,
+          "height": 6.044,
+          "candidate": "26AT",
+          "label": "26AT"
+        },
+        {
+          "id": "p3-section-221",
+          "x": 740.978,
+          "y": 525.867,
+          "width": 99.556,
+          "height": 6.044,
+          "candidate": "O3AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-222",
+          "x": 841.6,
+          "y": 525.867,
+          "width": 34.489,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p3-section-223",
+          "x": 961.422,
+          "y": 525.867,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p3-section-224",
+          "x": 1016.178,
+          "y": 525.867,
+          "width": 12.8,
+          "height": 6.044,
+          "candidate": "1",
+          "label": ""
+        },
+        {
+          "id": "p3-section-225",
+          "x": 1030.044,
+          "y": 525.867,
+          "width": 14.578,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-226",
+          "x": 1046.4,
+          "y": 525.867,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-227",
+          "x": 1076.622,
+          "y": 525.867,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-228",
+          "x": 1103.644,
+          "y": 525.867,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B1036T",
+          "label": "B1036T"
+        },
+        {
+          "id": "p3-section-229",
+          "x": 1168.0,
+          "y": 525.867,
+          "width": 111.289,
+          "height": 6.044,
+          "candidate": "22AT",
+          "label": "22AT"
+        },
+        {
+          "id": "p3-section-230",
+          "x": 1280.356,
+          "y": 525.867,
+          "width": 71.467,
+          "height": 6.044,
+          "candidate": "25BT",
+          "label": "25BT"
+        },
+        {
+          "id": "p3-section-231",
+          "x": 1391.289,
+          "y": 525.867,
+          "width": 44.089,
+          "height": 6.044,
+          "candidate": "28BT",
+          "label": "28BT"
+        },
+        {
+          "id": "p3-section-232",
+          "x": 1436.444,
+          "y": 525.867,
+          "width": 58.311,
+          "height": 6.044,
+          "candidate": "29T",
+          "label": "29T"
+        },
+        {
+          "id": "p3-section-233",
+          "x": 1353.244,
+          "y": 526.222,
+          "width": 36.978,
+          "height": 5.689,
+          "candidate": "277",
+          "label": ""
+        },
+        {
+          "id": "p3-section-234",
+          "x": 676.622,
+          "y": 541.867,
+          "width": 63.644,
+          "height": 10.311,
+          "candidate": "T",
+          "label": ""
+        },
+        {
+          "id": "p3-section-235",
+          "x": 1495.822,
+          "y": 541.867,
+          "width": 59.022,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-236",
+          "x": 162.133,
+          "y": 542.222,
+          "width": 66.489,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-237",
+          "x": 415.289,
+          "y": 544.0,
+          "width": 22.756,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-238",
+          "x": 464.356,
+          "y": 544.0,
+          "width": 67.911,
+          "height": 6.044,
+          "candidate": "B690T",
+          "label": "B690T"
+        },
+        {
+          "id": "p3-section-239",
+          "x": 533.333,
+          "y": 544.0,
+          "width": 40.178,
+          "height": 6.044,
+          "candidate": "XIT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-240",
+          "x": 574.578,
+          "y": 544.0,
+          "width": 37.689,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p3-section-241",
+          "x": 612.978,
+          "y": 544.0,
+          "width": 62.578,
+          "height": 6.044,
+          "candidate": "25AT",
+          "label": "25AT"
+        },
+        {
+          "id": "p3-section-242",
+          "x": 740.978,
+          "y": 544.0,
+          "width": 104.889,
+          "height": 6.044,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-243",
+          "x": 846.933,
+          "y": 544.0,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-244",
+          "x": 877.156,
+          "y": 544.0,
+          "width": 12.8,
+          "height": 6.044,
+          "candidate": "DT",
+          "label": "DT"
+        },
+        {
+          "id": "p3-section-245",
+          "x": 891.022,
+          "y": 544.0,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "B692T",
+          "label": "B692T"
+        },
+        {
+          "id": "p3-section-246",
+          "x": 1147.022,
+          "y": 544.0,
+          "width": 19.911,
+          "height": 6.044,
+          "candidate": "X1T",
+          "label": "X1T"
+        },
+        {
+          "id": "p3-section-247",
+          "x": 1168.0,
+          "y": 544.0,
+          "width": 75.022,
+          "height": 6.044,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p3-section-248",
+          "x": 1244.089,
+          "y": 544.0,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p3-section-249",
+          "x": 1281.067,
+          "y": 544.0,
+          "width": 41.6,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p3-section-250",
+          "x": 1324.089,
+          "y": 544.0,
+          "width": 56.533,
+          "height": 6.044,
+          "candidate": "25AT",
+          "label": "25AT"
+        },
+        {
+          "id": "p3-section-251",
+          "x": 1381.689,
+          "y": 544.0,
+          "width": 52.267,
+          "height": 6.044,
+          "candidate": "2BAT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-252",
+          "x": 1434.667,
+          "y": 544.0,
+          "width": 59.733,
+          "height": 6.044,
+          "candidate": "80T",
+          "label": "80T"
+        },
+        {
+          "id": "p3-section-253",
+          "x": 13.867,
+          "y": 544.356,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "B678T",
+          "label": "B678T"
+        },
+        {
+          "id": "p3-section-254",
+          "x": 75.022,
+          "y": 544.356,
+          "width": 86.044,
+          "height": 5.689,
+          "candidate": "22AT",
+          "label": "22AT"
+        },
+        {
+          "id": "p3-section-255",
+          "x": 229.333,
+          "y": 544.356,
+          "width": 70.756,
+          "height": 5.689,
+          "candidate": "O3AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-256",
+          "x": 301.156,
+          "y": 544.356,
+          "width": 45.156,
+          "height": 5.689,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-257",
+          "x": 961.422,
+          "y": 544.356,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "SS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-258",
+          "x": 1016.178,
+          "y": 544.356,
+          "width": 12.8,
+          "height": 6.044,
+          "candidate": "T",
+          "label": ""
+        },
+        {
+          "id": "p3-section-259",
+          "x": 1030.044,
+          "y": 544.356,
+          "width": 14.578,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-260",
+          "x": 1046.4,
+          "y": 544.356,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-261",
+          "x": 1076.622,
+          "y": 544.356,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-262",
+          "x": 1103.644,
+          "y": 544.356,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B714T",
+          "label": "B714T"
+        },
+        {
+          "id": "p3-section-263",
+          "x": 162.133,
+          "y": 560.356,
+          "width": 66.489,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-264",
+          "x": 676.622,
+          "y": 560.356,
+          "width": 63.644,
+          "height": 9.956,
+          "candidate": "2",
+          "label": ""
+        },
+        {
+          "id": "p3-section-265",
+          "x": 1148.089,
+          "y": 562.133,
+          "width": 82.133,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-266",
+          "x": 1231.289,
+          "y": 562.133,
+          "width": 49.422,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p3-section-267",
+          "x": 1281.778,
+          "y": 562.133,
+          "width": 62.933,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p3-section-268",
+          "x": 1345.778,
+          "y": 562.133,
+          "width": 85.333,
+          "height": 6.044,
+          "candidate": "26AT",
+          "label": "26AT"
+        },
+        {
+          "id": "p3-section-269",
+          "x": 1432.178,
+          "y": 562.133,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-270",
+          "x": 13.867,
+          "y": 562.489,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B673T",
+          "label": "B673T"
+        },
+        {
+          "id": "p3-section-271",
+          "x": 75.022,
+          "y": 562.489,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-272",
+          "x": 229.333,
+          "y": 562.489,
+          "width": 70.756,
+          "height": 6.044,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-273",
+          "x": 301.156,
+          "y": 562.489,
+          "width": 45.156,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p3-section-274",
+          "x": 365.511,
+          "y": 562.489,
+          "width": 35.911,
+          "height": 6.044,
+          "candidate": "B675T",
+          "label": "B675T"
+        },
+        {
+          "id": "p3-section-275",
+          "x": 415.289,
+          "y": 562.489,
+          "width": 22.756,
+          "height": 5.689,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p3-section-276",
+          "x": 464.356,
+          "y": 562.489,
+          "width": 44.444,
+          "height": 6.044,
+          "candidate": "B685T",
+          "label": "B685T"
+        },
+        {
+          "id": "p3-section-277",
+          "x": 534.756,
+          "y": 562.489,
+          "width": 48.356,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-278",
+          "x": 584.178,
+          "y": 562.489,
+          "width": 91.378,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p3-section-279",
+          "x": 740.978,
+          "y": 562.489,
+          "width": 84.267,
+          "height": 6.044,
+          "candidate": "O4AT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-280",
+          "x": 826.311,
+          "y": 562.489,
+          "width": 27.733,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-281",
+          "x": 873.956,
+          "y": 562.489,
+          "width": 48.0,
+          "height": 6.044,
+          "candidate": "B687T",
+          "label": "B687T"
+        },
+        {
+          "id": "p3-section-282",
+          "x": 923.378,
+          "y": 562.489,
+          "width": 17.422,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-283",
+          "x": 941.867,
+          "y": 562.489,
+          "width": 18.489,
+          "height": 6.044,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p3-section-284",
+          "x": 961.422,
+          "y": 562.489,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-285",
+          "x": 1016.178,
+          "y": 562.489,
+          "width": 12.8,
+          "height": 6.044,
+          "candidate": "3",
+          "label": ""
+        },
+        {
+          "id": "p3-section-286",
+          "x": 1030.044,
+          "y": 562.489,
+          "width": 14.578,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-287",
+          "x": 1046.4,
+          "y": 562.489,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "1",
+          "label": ""
+        },
+        {
+          "id": "p3-section-288",
+          "x": 1101.867,
+          "y": 562.489,
+          "width": 45.156,
+          "height": 5.689,
+          "candidate": "B709T",
+          "label": "B709T"
+        },
+        {
+          "id": "p3-section-289",
+          "x": 162.133,
+          "y": 578.489,
+          "width": 66.489,
+          "height": 10.311,
+          "candidate": "EE",
+          "label": ""
+        },
+        {
+          "id": "p3-section-290",
+          "x": 676.622,
+          "y": 578.489,
+          "width": 63.644,
+          "height": 10.311,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p3-section-291",
+          "x": 1495.822,
+          "y": 578.489,
+          "width": 59.022,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p3-section-292",
+          "x": 13.867,
+          "y": 580.622,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B999T",
+          "label": "B999T"
+        },
+        {
+          "id": "p3-section-293",
+          "x": 57.244,
+          "y": 580.622,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p3-section-294",
+          "x": 75.022,
+          "y": 580.622,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p3-section-295",
+          "x": 229.333,
+          "y": 580.622,
+          "width": 86.044,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-296",
+          "x": 316.444,
+          "y": 580.622,
+          "width": 49.422,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p3-section-297",
+          "x": 415.289,
+          "y": 580.622,
+          "width": 22.756,
+          "height": 6.044,
+          "candidate": "8",
+          "label": ""
+        },
+        {
+          "id": "p3-section-298",
+          "x": 464.356,
+          "y": 580.622,
+          "width": 44.444,
+          "height": 6.044,
+          "candidate": "B1011T",
+          "label": "B1011T"
+        },
+        {
+          "id": "p3-section-299",
+          "x": 534.756,
+          "y": 580.622,
+          "width": 51.2,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-300",
+          "x": 587.022,
+          "y": 580.622,
+          "width": 40.178,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p3-section-301",
+          "x": 628.267,
+          "y": 580.622,
+          "width": 47.289,
+          "height": 6.044,
+          "candidate": "27BT",
+          "label": "27BT"
+        },
+        {
+          "id": "p3-section-302",
+          "x": 740.978,
+          "y": 580.622,
+          "width": 59.733,
+          "height": 6.044,
+          "candidate": "DOAT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-303",
+          "x": 801.778,
+          "y": 580.622,
+          "width": 60.8,
+          "height": 6.044,
+          "candidate": "O4BT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-304",
+          "x": 923.378,
+          "y": 580.622,
+          "width": 17.422,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-305",
+          "x": 941.867,
+          "y": 580.622,
+          "width": 18.489,
+          "height": 6.044,
+          "candidate": "J",
+          "label": ""
+        },
+        {
+          "id": "p3-section-306",
+          "x": 961.422,
+          "y": 580.622,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-307",
+          "x": 1016.178,
+          "y": 580.622,
+          "width": 12.8,
+          "height": 6.044,
+          "candidate": "CC",
+          "label": ""
+        },
+        {
+          "id": "p3-section-308",
+          "x": 1030.044,
+          "y": 580.622,
+          "width": 14.578,
+          "height": 6.044,
+          "candidate": "S",
+          "label": ""
+        },
+        {
+          "id": "p3-section-309",
+          "x": 1045.689,
+          "y": 580.622,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-310",
+          "x": 1101.867,
+          "y": 580.622,
+          "width": 46.578,
+          "height": 6.044,
+          "candidate": "B1035T",
+          "label": "B1035T"
+        },
+        {
+          "id": "p3-section-311",
+          "x": 1149.511,
+          "y": 580.622,
+          "width": 30.933,
+          "height": 5.689,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p3-section-312",
+          "x": 1181.511,
+          "y": 580.622,
+          "width": 104.889,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p3-section-313",
+          "x": 1287.467,
+          "y": 580.622,
+          "width": 139.378,
+          "height": 5.689,
+          "candidate": "26BT",
+          "label": "26BT"
+        },
+        {
+          "id": "p3-section-314",
+          "x": 1427.911,
+          "y": 580.622,
+          "width": 66.844,
+          "height": 5.689,
+          "candidate": "ST",
+          "label": "ST"
+        },
+        {
+          "id": "p3-section-315",
+          "x": 509.867,
+          "y": 581.333,
+          "width": 23.822,
+          "height": 5.333,
+          "candidate": "A",
+          "label": ""
+        },
+        {
+          "id": "p3-section-316",
+          "x": 880.0,
+          "y": 581.333,
+          "width": 41.956,
+          "height": 5.333,
+          "candidate": "BIUIGI",
+          "label": ""
+        },
+        {
+          "id": "p3-section-317",
+          "x": 1495.822,
+          "y": 595.911,
+          "width": 59.022,
+          "height": 10.311,
+          "candidate": "6T",
+          "label": "6T"
+        },
+        {
+          "id": "p3-section-318",
+          "x": 676.622,
+          "y": 596.622,
+          "width": 63.644,
+          "height": 10.311,
+          "candidate": "OT",
+          "label": "OT"
+        },
+        {
+          "id": "p3-section-319",
+          "x": 518.044,
+          "y": 598.756,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "ET",
+          "label": "ET"
+        },
+        {
+          "id": "p3-section-320",
+          "x": 550.4,
+          "y": 598.756,
+          "width": 73.956,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p3-section-321",
+          "x": 625.422,
+          "y": 598.756,
+          "width": 49.778,
+          "height": 6.044,
+          "candidate": "27AT",
+          "label": "27AT"
+        },
+        {
+          "id": "p3-section-322",
+          "x": 740.978,
+          "y": 598.756,
+          "width": 32.0,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-323",
+          "x": 774.044,
+          "y": 598.756,
+          "width": 36.267,
+          "height": 6.044,
+          "candidate": "SOBT",
+          "label": ""
+        },
+        {
+          "id": "p3-section-324",
+          "x": 1453.156,
+          "y": 598.756,
+          "width": 13.867,
+          "height": 5.333,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-325",
+          "x": 1468.444,
+          "y": 598.756,
+          "width": 25.956,
+          "height": 6.044,
+          "candidate": "33T",
+          "label": "33T"
+        },
+        {
+          "id": "p3-section-326",
+          "x": 1495.822,
+          "y": 614.4,
+          "width": 59.378,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p3-section-327",
+          "x": 1476.622,
+          "y": 616.889,
+          "width": 17.778,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        }
+      ],
+      "platforms": [
+        {
+          "x": 596.978,
+          "y": 133.333,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 523.733,
+          "y": 134.044,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1873.422,
+          "y": 138.667,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 854.4,
+          "y": 157.156,
+          "width": 27.378,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1128.533,
+          "y": 157.156,
+          "width": 22.756,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1219.911,
+          "y": 157.156,
+          "width": 11.733,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1690.311,
+          "y": 157.156,
+          "width": 11.378,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1458.489,
+          "y": 157.867,
+          "width": 13.867,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 855.822,
+          "y": 193.778,
+          "width": 24.533,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1127.822,
+          "y": 193.778,
+          "width": 23.467,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1459.2,
+          "y": 193.778,
+          "width": 12.8,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1690.311,
+          "y": 193.778,
+          "width": 11.378,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1218.133,
+          "y": 194.133,
+          "width": 13.511,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1873.422,
+          "y": 211.556,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 524.089,
+          "y": 215.111,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 596.978,
+          "y": 216.178,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 108.089,
+          "y": 280.178,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 319.289,
+          "y": 303.289,
+          "width": 19.911,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 108.089,
+          "y": 325.333,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 414.933,
+          "y": 511.644,
+          "width": 21.689,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 963.911,
+          "y": 513.422,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1047.111,
+          "y": 513.422,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1512.533,
+          "y": 516.267,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 177.778,
+          "y": 534.4,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 691.2,
+          "y": 535.467,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 178.133,
+          "y": 571.022,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 691.2,
+          "y": 571.022,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 415.289,
+          "y": 594.844,
+          "width": 22.756,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 963.911,
+          "y": 595.911,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1047.111,
+          "y": 595.911,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1512.178,
+          "y": 607.289,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1444.978,
+          "y": 157.867,
+          "width": 12.8,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1445.333,
+          "y": 193.778,
+          "width": 13.867,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1512.889,
+          "y": 534.4,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1511.822,
+          "y": 552.889,
+          "width": 25.956,
+          "height": 22.4,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 1511.822,
+          "y": 589.156,
+          "width": 25.956,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        }
+      ]
+    },
+    "4": {
+      "sections": [
+        {
+          "id": "p4-section-1",
+          "x": 672.0,
+          "y": 301.867,
+          "width": 61.511,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-2",
+          "x": 1603.556,
+          "y": 302.933,
+          "width": 60.089,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-3",
+          "x": 735.644,
+          "y": 304.711,
+          "width": 16.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-4",
+          "x": 654.578,
+          "y": 305.067,
+          "width": 16.0,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-5",
+          "x": 1172.978,
+          "y": 305.067,
+          "width": 24.889,
+          "height": 6.044,
+          "candidate": "OT",
+          "label": "OT"
+        },
+        {
+          "id": "p4-section-6",
+          "x": 1199.289,
+          "y": 305.067,
+          "width": 23.822,
+          "height": 6.044,
+          "candidate": "DT",
+          "label": "DT"
+        },
+        {
+          "id": "p4-section-7",
+          "x": 1247.644,
+          "y": 305.067,
+          "width": 18.133,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p4-section-8",
+          "x": 1267.2,
+          "y": 305.067,
+          "width": 18.844,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-9",
+          "x": 1287.467,
+          "y": 305.067,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-10",
+          "x": 1322.667,
+          "y": 305.067,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-11",
+          "x": 1344.711,
+          "y": 305.067,
+          "width": 19.556,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-12",
+          "x": 1366.044,
+          "y": 305.067,
+          "width": 22.4,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-13",
+          "x": 1390.222,
+          "y": 305.067,
+          "width": 33.422,
+          "height": 6.044,
+          "candidate": "BS",
+          "label": ""
+        },
+        {
+          "id": "p4-section-14",
+          "x": 1424.711,
+          "y": 305.067,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "B966T",
+          "label": "B966T"
+        },
+        {
+          "id": "p4-section-15",
+          "x": 1481.956,
+          "y": 305.067,
+          "width": 66.133,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p4-section-16",
+          "x": 1549.156,
+          "y": 305.067,
+          "width": 53.333,
+          "height": 6.044,
+          "candidate": "271",
+          "label": ""
+        },
+        {
+          "id": "p4-section-17",
+          "x": 1664.711,
+          "y": 305.067,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "07BT",
+          "label": "07BT"
+        },
+        {
+          "id": "p4-section-18",
+          "x": 1699.911,
+          "y": 305.067,
+          "width": 23.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-19",
+          "x": 1743.644,
+          "y": 305.067,
+          "width": 58.311,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-20",
+          "x": 1803.022,
+          "y": 305.067,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B968T",
+          "label": "B968T"
+        },
+        {
+          "id": "p4-section-21",
+          "x": 1846.044,
+          "y": 305.067,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "BS",
+          "label": ""
+        },
+        {
+          "id": "p4-section-22",
+          "x": 1886.578,
+          "y": 305.067,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-23",
+          "x": 1922.844,
+          "y": 305.067,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-24",
+          "x": 1952.356,
+          "y": 305.067,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-25",
+          "x": 1978.667,
+          "y": 305.067,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p4-section-26",
+          "x": 2003.911,
+          "y": 305.067,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-27",
+          "x": 672.711,
+          "y": 320.356,
+          "width": 61.156,
+          "height": 10.311,
+          "candidate": "2T",
+          "label": "2T"
+        },
+        {
+          "id": "p4-section-28",
+          "x": 1063.467,
+          "y": 321.067,
+          "width": 68.622,
+          "height": 10.311,
+          "candidate": "M",
+          "label": ""
+        },
+        {
+          "id": "p4-section-29",
+          "x": 1603.556,
+          "y": 321.067,
+          "width": 60.089,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-30",
+          "x": 1886.578,
+          "y": 322.844,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-31",
+          "x": 417.422,
+          "y": 323.2,
+          "width": 61.156,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-32",
+          "x": 480.356,
+          "y": 323.2,
+          "width": 55.467,
+          "height": 6.044,
+          "candidate": "B620T",
+          "label": "B620T"
+        },
+        {
+          "id": "p4-section-33",
+          "x": 560.0,
+          "y": 323.2,
+          "width": 70.756,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p4-section-34",
+          "x": 632.889,
+          "y": 323.2,
+          "width": 38.4,
+          "height": 6.044,
+          "candidate": "25T",
+          "label": "25T"
+        },
+        {
+          "id": "p4-section-35",
+          "x": 735.289,
+          "y": 323.2,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "57T",
+          "label": "57T"
+        },
+        {
+          "id": "p4-section-36",
+          "x": 776.889,
+          "y": 323.2,
+          "width": 51.556,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-37",
+          "x": 887.467,
+          "y": 323.2,
+          "width": 41.956,
+          "height": 6.044,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p4-section-38",
+          "x": 930.844,
+          "y": 323.2,
+          "width": 44.089,
+          "height": 6.044,
+          "candidate": "44",
+          "label": ""
+        },
+        {
+          "id": "p4-section-39",
+          "x": 976.356,
+          "y": 323.2,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "B628T",
+          "label": "B628T"
+        },
+        {
+          "id": "p4-section-40",
+          "x": 1019.378,
+          "y": 323.2,
+          "width": 41.956,
+          "height": 6.044,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p4-section-41",
+          "x": 1133.156,
+          "y": 323.2,
+          "width": 38.4,
+          "height": 6.044,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-42",
+          "x": 1177.6,
+          "y": 323.2,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-43",
+          "x": 1198.933,
+          "y": 323.2,
+          "width": 46.578,
+          "height": 6.044,
+          "candidate": "ET",
+          "label": "ET"
+        },
+        {
+          "id": "p4-section-44",
+          "x": 1246.933,
+          "y": 323.2,
+          "width": 40.533,
+          "height": 6.044,
+          "candidate": "B630T",
+          "label": "B630T"
+        },
+        {
+          "id": "p4-section-45",
+          "x": 1288.889,
+          "y": 323.2,
+          "width": 33.067,
+          "height": 6.044,
+          "candidate": "2",
+          "label": ""
+        },
+        {
+          "id": "p4-section-46",
+          "x": 1323.378,
+          "y": 323.2,
+          "width": 15.644,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-47",
+          "x": 1340.444,
+          "y": 323.2,
+          "width": 17.067,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-48",
+          "x": 1359.289,
+          "y": 323.2,
+          "width": 29.156,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-49",
+          "x": 1390.222,
+          "y": 323.2,
+          "width": 33.422,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-50",
+          "x": 1424.711,
+          "y": 323.2,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "B642T",
+          "label": "B642T"
+        },
+        {
+          "id": "p4-section-51",
+          "x": 1481.956,
+          "y": 323.2,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p4-section-52",
+          "x": 1525.333,
+          "y": 323.2,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p4-section-53",
+          "x": 1561.6,
+          "y": 323.2,
+          "width": 40.889,
+          "height": 6.044,
+          "candidate": "20AT",
+          "label": "20AT"
+        },
+        {
+          "id": "p4-section-54",
+          "x": 1664.711,
+          "y": 323.2,
+          "width": 36.267,
+          "height": 6.044,
+          "candidate": "O7AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-55",
+          "x": 1702.044,
+          "y": 323.2,
+          "width": 33.067,
+          "height": 6.044,
+          "candidate": "OAT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-56",
+          "x": 1748.978,
+          "y": 323.2,
+          "width": 52.978,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p4-section-57",
+          "x": 1803.022,
+          "y": 323.2,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "B644T",
+          "label": "B644T"
+        },
+        {
+          "id": "p4-section-58",
+          "x": 1846.044,
+          "y": 323.2,
+          "width": 39.467,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-59",
+          "x": 1922.844,
+          "y": 323.2,
+          "width": 28.444,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-60",
+          "x": 1952.356,
+          "y": 323.2,
+          "width": 25.244,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-61",
+          "x": 1978.667,
+          "y": 323.2,
+          "width": 24.178,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-62",
+          "x": 2003.911,
+          "y": 323.2,
+          "width": 25.244,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-63",
+          "x": 848.0,
+          "y": 323.911,
+          "width": 38.4,
+          "height": 5.333,
+          "candidate": "BG221",
+          "label": ""
+        },
+        {
+          "id": "p4-section-64",
+          "x": 154.667,
+          "y": 332.444,
+          "width": 58.667,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-65",
+          "x": 29.156,
+          "y": 334.578,
+          "width": 49.067,
+          "height": 5.689,
+          "candidate": "B926T",
+          "label": "B926T"
+        },
+        {
+          "id": "p4-section-66",
+          "x": 79.289,
+          "y": 334.578,
+          "width": 36.622,
+          "height": 5.689,
+          "candidate": "XT",
+          "label": "XT"
+        },
+        {
+          "id": "p4-section-67",
+          "x": 214.756,
+          "y": 334.578,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "SIAT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-68",
+          "x": 285.867,
+          "y": 334.578,
+          "width": 23.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-69",
+          "x": 116.978,
+          "y": 334.933,
+          "width": 36.267,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p4-section-70",
+          "x": 673.067,
+          "y": 338.489,
+          "width": 57.6,
+          "height": 10.311,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-71",
+          "x": 1063.467,
+          "y": 339.2,
+          "width": 68.622,
+          "height": 9.956,
+          "candidate": "M",
+          "label": ""
+        },
+        {
+          "id": "p4-section-72",
+          "x": 1603.556,
+          "y": 339.2,
+          "width": 60.089,
+          "height": 10.311,
+          "candidate": "E",
+          "label": ""
+        },
+        {
+          "id": "p4-section-73",
+          "x": 454.4,
+          "y": 341.333,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-74",
+          "x": 479.644,
+          "y": 341.333,
+          "width": 54.4,
+          "height": 6.044,
+          "candidate": "B619T2T",
+          "label": ""
+        },
+        {
+          "id": "p4-section-75",
+          "x": 535.467,
+          "y": 341.333,
+          "width": 57.956,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p4-section-76",
+          "x": 594.489,
+          "y": 341.333,
+          "width": 36.267,
+          "height": 6.044,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p4-section-77",
+          "x": 632.533,
+          "y": 341.333,
+          "width": 38.756,
+          "height": 6.044,
+          "candidate": "26T",
+          "label": "26T"
+        },
+        {
+          "id": "p4-section-78",
+          "x": 732.444,
+          "y": 341.333,
+          "width": 55.467,
+          "height": 6.044,
+          "candidate": "OT",
+          "label": "OT"
+        },
+        {
+          "id": "p4-section-79",
+          "x": 789.333,
+          "y": 341.333,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-80",
+          "x": 829.867,
+          "y": 341.333,
+          "width": 16.711,
+          "height": 6.044,
+          "candidate": "Y1T",
+          "label": "Y1T"
+        },
+        {
+          "id": "p4-section-81",
+          "x": 848.356,
+          "y": 341.333,
+          "width": 38.4,
+          "height": 6.044,
+          "candidate": "B621T",
+          "label": "B621T"
+        },
+        {
+          "id": "p4-section-82",
+          "x": 888.533,
+          "y": 341.333,
+          "width": 40.889,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-83",
+          "x": 930.489,
+          "y": 341.333,
+          "width": 44.444,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-84",
+          "x": 976.356,
+          "y": 341.333,
+          "width": 40.533,
+          "height": 5.689,
+          "candidate": "B627T",
+          "label": "B627T"
+        },
+        {
+          "id": "p4-section-85",
+          "x": 1019.022,
+          "y": 341.333,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "CT",
+          "label": "CT"
+        },
+        {
+          "id": "p4-section-86",
+          "x": 1133.156,
+          "y": 341.333,
+          "width": 38.4,
+          "height": 5.689,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-87",
+          "x": 1177.6,
+          "y": 341.333,
+          "width": 19.911,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-88",
+          "x": 1199.289,
+          "y": 341.333,
+          "width": 33.422,
+          "height": 5.689,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-89",
+          "x": 1288.533,
+          "y": 341.333,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-90",
+          "x": 1322.667,
+          "y": 341.333,
+          "width": 34.844,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-91",
+          "x": 1359.289,
+          "y": 341.333,
+          "width": 31.289,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-92",
+          "x": 1393.067,
+          "y": 341.333,
+          "width": 30.578,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-93",
+          "x": 1462.4,
+          "y": 341.333,
+          "width": 40.533,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p4-section-94",
+          "x": 1504.356,
+          "y": 341.333,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "23AT",
+          "label": "23AT"
+        },
+        {
+          "id": "p4-section-95",
+          "x": 1542.044,
+          "y": 341.333,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "25BT",
+          "label": "25BT"
+        },
+        {
+          "id": "p4-section-96",
+          "x": 1664.711,
+          "y": 341.333,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "SOAT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-97",
+          "x": 1735.467,
+          "y": 341.333,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "B1T",
+          "label": "B1T"
+        },
+        {
+          "id": "p4-section-98",
+          "x": 1760.711,
+          "y": 341.333,
+          "width": 41.244,
+          "height": 6.044,
+          "candidate": "BT",
+          "label": "BT"
+        },
+        {
+          "id": "p4-section-99",
+          "x": 1803.022,
+          "y": 341.333,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "B641T",
+          "label": "B641T"
+        },
+        {
+          "id": "p4-section-100",
+          "x": 1846.044,
+          "y": 341.333,
+          "width": 39.467,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-101",
+          "x": 1886.578,
+          "y": 341.333,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-102",
+          "x": 1920.0,
+          "y": 341.333,
+          "width": 51.911,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-103",
+          "x": 1972.978,
+          "y": 341.333,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-104",
+          "x": 2003.911,
+          "y": 341.333,
+          "width": 26.667,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-105",
+          "x": 1708.089,
+          "y": 343.822,
+          "width": 26.311,
+          "height": 3.556,
+          "candidate": "VUJUI",
+          "label": ""
+        },
+        {
+          "id": "p4-section-106",
+          "x": 154.667,
+          "y": 350.578,
+          "width": 58.667,
+          "height": 9.956,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p4-section-107",
+          "x": 29.156,
+          "y": 352.711,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-108",
+          "x": 55.467,
+          "y": 352.711,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-109",
+          "x": 80.711,
+          "y": 352.711,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "B927T",
+          "label": "B927T"
+        },
+        {
+          "id": "p4-section-110",
+          "x": 103.111,
+          "y": 352.711,
+          "width": 20.622,
+          "height": 6.044,
+          "candidate": "BT",
+          "label": "BT"
+        },
+        {
+          "id": "p4-section-111",
+          "x": 125.156,
+          "y": 352.711,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p4-section-112",
+          "x": 214.4,
+          "y": 352.711,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p4-section-113",
+          "x": 1603.556,
+          "y": 357.689,
+          "width": 60.089,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-114",
+          "x": 1193.956,
+          "y": 359.111,
+          "width": 30.578,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-115",
+          "x": 1226.667,
+          "y": 359.111,
+          "width": 19.556,
+          "height": 5.689,
+          "candidate": "YTIT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-116",
+          "x": 1248.0,
+          "y": 359.111,
+          "width": 13.156,
+          "height": 5.689,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p4-section-117",
+          "x": 1262.933,
+          "y": 359.111,
+          "width": 23.467,
+          "height": 5.689,
+          "candidate": "B951T",
+          "label": "B951T"
+        },
+        {
+          "id": "p4-section-118",
+          "x": 1288.533,
+          "y": 359.111,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-119",
+          "x": 1321.956,
+          "y": 359.111,
+          "width": 16.711,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-120",
+          "x": 1340.444,
+          "y": 359.111,
+          "width": 17.067,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-121",
+          "x": 1359.644,
+          "y": 359.111,
+          "width": 29.867,
+          "height": 5.689,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p4-section-122",
+          "x": 1391.289,
+          "y": 359.111,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "CC",
+          "label": ""
+        },
+        {
+          "id": "p4-section-123",
+          "x": 1462.756,
+          "y": 359.467,
+          "width": 68.622,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p4-section-124",
+          "x": 1532.444,
+          "y": 359.822,
+          "width": 70.044,
+          "height": 5.689,
+          "candidate": "26AT",
+          "label": "26AT"
+        },
+        {
+          "id": "p4-section-125",
+          "x": 1664.711,
+          "y": 360.178,
+          "width": 24.533,
+          "height": 6.044,
+          "candidate": "56T",
+          "label": "56T"
+        },
+        {
+          "id": "p4-section-126",
+          "x": 1690.311,
+          "y": 360.178,
+          "width": 34.133,
+          "height": 6.044,
+          "candidate": "SOBT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-127",
+          "x": 1725.867,
+          "y": 360.178,
+          "width": 32.711,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p4-section-128",
+          "x": 1759.644,
+          "y": 360.178,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "B965T",
+          "label": "B965T"
+        },
+        {
+          "id": "p4-section-129",
+          "x": 1803.022,
+          "y": 360.178,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-130",
+          "x": 1846.044,
+          "y": 360.178,
+          "width": 39.467,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-131",
+          "x": 1886.578,
+          "y": 360.178,
+          "width": 32.711,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-132",
+          "x": 1920.0,
+          "y": 360.178,
+          "width": 52.267,
+          "height": 5.689,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p4-section-133",
+          "x": 1972.978,
+          "y": 360.178,
+          "width": 29.867,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-134",
+          "x": 2003.911,
+          "y": 360.178,
+          "width": 26.667,
+          "height": 5.689,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p4-section-135",
+          "x": 154.667,
+          "y": 368.711,
+          "width": 58.667,
+          "height": 9.956,
+          "candidate": "ZT",
+          "label": "ZT"
+        },
+        {
+          "id": "p4-section-136",
+          "x": 29.156,
+          "y": 370.844,
+          "width": 55.822,
+          "height": 5.689,
+          "candidate": "B612T",
+          "label": "B612T"
+        },
+        {
+          "id": "p4-section-137",
+          "x": 86.044,
+          "y": 370.844,
+          "width": 67.556,
+          "height": 5.689,
+          "candidate": "X1T",
+          "label": "X1T"
+        },
+        {
+          "id": "p4-section-138",
+          "x": 214.756,
+          "y": 370.844,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "O2AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-139",
+          "x": 313.6,
+          "y": 370.844,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-140",
+          "x": 348.444,
+          "y": 370.844,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "7",
+          "label": ""
+        },
+        {
+          "id": "p4-section-141",
+          "x": 377.6,
+          "y": 370.844,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-142",
+          "x": 407.111,
+          "y": 370.844,
+          "width": 16.356,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-143",
+          "x": 673.422,
+          "y": 375.822,
+          "width": 57.244,
+          "height": 9.956,
+          "candidate": "ST",
+          "label": "ST"
+        },
+        {
+          "id": "p4-section-144",
+          "x": 1603.556,
+          "y": 375.822,
+          "width": 60.089,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-145",
+          "x": 652.089,
+          "y": 377.6,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "L",
+          "label": ""
+        },
+        {
+          "id": "p4-section-146",
+          "x": 732.444,
+          "y": 377.6,
+          "width": 31.644,
+          "height": 6.044,
+          "candidate": "S6BT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-147",
+          "x": 1545.6,
+          "y": 377.956,
+          "width": 56.889,
+          "height": 5.689,
+          "candidate": "26BT",
+          "label": "26BT"
+        },
+        {
+          "id": "p4-section-148",
+          "x": 1664.711,
+          "y": 378.311,
+          "width": 16.356,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-149",
+          "x": 154.667,
+          "y": 386.844,
+          "width": 58.667,
+          "height": 9.956,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-150",
+          "x": 29.156,
+          "y": 388.978,
+          "width": 32.356,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-151",
+          "x": 62.578,
+          "y": 388.978,
+          "width": 28.089,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-152",
+          "x": 123.733,
+          "y": 388.978,
+          "width": 29.156,
+          "height": 5.689,
+          "candidate": "AT",
+          "label": "AT"
+        },
+        {
+          "id": "p4-section-153",
+          "x": 214.756,
+          "y": 388.978,
+          "width": 32.356,
+          "height": 5.689,
+          "candidate": "O2BT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-154",
+          "x": 310.044,
+          "y": 388.978,
+          "width": 37.333,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-155",
+          "x": 348.444,
+          "y": 388.978,
+          "width": 36.622,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-156",
+          "x": 386.133,
+          "y": 388.978,
+          "width": 35.2,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-157",
+          "x": 422.4,
+          "y": 388.978,
+          "width": 38.044,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-158",
+          "x": 673.067,
+          "y": 411.378,
+          "width": 57.6,
+          "height": 10.311,
+          "candidate": "5T",
+          "label": "5T"
+        },
+        {
+          "id": "p4-section-159",
+          "x": 582.044,
+          "y": 413.867,
+          "width": 89.6,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p4-section-160",
+          "x": 732.089,
+          "y": 413.867,
+          "width": 40.889,
+          "height": 6.044,
+          "candidate": "56AT",
+          "label": "56AT"
+        },
+        {
+          "id": "p4-section-161",
+          "x": 1156.267,
+          "y": 432.356,
+          "width": 20.267,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-162",
+          "x": 673.067,
+          "y": 447.289,
+          "width": 60.444,
+          "height": 10.311,
+          "candidate": "TT",
+          "label": "TT"
+        },
+        {
+          "id": "p4-section-163",
+          "x": 1063.467,
+          "y": 448.356,
+          "width": 68.622,
+          "height": 9.956,
+          "candidate": "SO",
+          "label": ""
+        },
+        {
+          "id": "p4-section-164",
+          "x": 317.867,
+          "y": 450.133,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-165",
+          "x": 349.867,
+          "y": 450.133,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "OS",
+          "label": ""
+        },
+        {
+          "id": "p4-section-166",
+          "x": 379.022,
+          "y": 450.133,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "2",
+          "label": ""
+        },
+        {
+          "id": "p4-section-167",
+          "x": 409.956,
+          "y": 450.133,
+          "width": 68.622,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-168",
+          "x": 502.044,
+          "y": 450.133,
+          "width": 50.844,
+          "height": 6.044,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p4-section-169",
+          "x": 554.667,
+          "y": 450.133,
+          "width": 116.978,
+          "height": 6.044,
+          "candidate": "22T",
+          "label": "22T"
+        },
+        {
+          "id": "p4-section-170",
+          "x": 734.933,
+          "y": 450.133,
+          "width": 62.933,
+          "height": 5.689,
+          "candidate": "O4T",
+          "label": "O4T"
+        },
+        {
+          "id": "p4-section-171",
+          "x": 798.933,
+          "y": 450.133,
+          "width": 35.556,
+          "height": 5.689,
+          "candidate": "51BT",
+          "label": "51BT"
+        },
+        {
+          "id": "p4-section-172",
+          "x": 858.311,
+          "y": 450.133,
+          "width": 19.556,
+          "height": 5.689,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-173",
+          "x": 878.933,
+          "y": 450.133,
+          "width": 24.533,
+          "height": 5.689,
+          "candidate": "OO",
+          "label": ""
+        },
+        {
+          "id": "p4-section-174",
+          "x": 904.533,
+          "y": 450.489,
+          "width": 58.667,
+          "height": 6.044,
+          "candidate": "B948T",
+          "label": "B948T"
+        },
+        {
+          "id": "p4-section-175",
+          "x": 979.556,
+          "y": 450.489,
+          "width": 42.311,
+          "height": 6.044,
+          "candidate": "22BT",
+          "label": "22BT"
+        },
+        {
+          "id": "p4-section-176",
+          "x": 1022.933,
+          "y": 450.489,
+          "width": 39.111,
+          "height": 6.044,
+          "candidate": "24AT",
+          "label": "24AT"
+        },
+        {
+          "id": "p4-section-177",
+          "x": 1133.156,
+          "y": 450.489,
+          "width": 24.889,
+          "height": 6.044,
+          "candidate": "F",
+          "label": ""
+        },
+        {
+          "id": "p4-section-178",
+          "x": 1163.022,
+          "y": 450.489,
+          "width": 29.511,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-179",
+          "x": 1226.311,
+          "y": 451.2,
+          "width": 32.356,
+          "height": 5.333,
+          "candidate": "F",
+          "label": ""
+        },
+        {
+          "id": "p4-section-180",
+          "x": 1198.578,
+          "y": 452.978,
+          "width": 26.667,
+          "height": 3.556,
+          "candidate": "YVUJAI",
+          "label": ""
+        },
+        {
+          "id": "p4-section-181",
+          "x": 673.067,
+          "y": 465.422,
+          "width": 60.444,
+          "height": 9.956,
+          "candidate": "Z",
+          "label": ""
+        },
+        {
+          "id": "p4-section-182",
+          "x": 1063.467,
+          "y": 466.489,
+          "width": 68.622,
+          "height": 9.956,
+          "candidate": "BEET",
+          "label": ""
+        },
+        {
+          "id": "p4-section-183",
+          "x": 291.2,
+          "y": 468.267,
+          "width": 25.6,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-184",
+          "x": 317.867,
+          "y": 468.267,
+          "width": 30.933,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-185",
+          "x": 349.867,
+          "y": 468.267,
+          "width": 28.444,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-186",
+          "x": 379.022,
+          "y": 468.267,
+          "width": 29.867,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-187",
+          "x": 409.956,
+          "y": 468.267,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-188",
+          "x": 444.8,
+          "y": 468.267,
+          "width": 33.778,
+          "height": 6.044,
+          "candidate": "",
+          "label": ""
+        },
+        {
+          "id": "p4-section-189",
+          "x": 479.644,
+          "y": 468.267,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "B941T",
+          "label": "B941T"
+        },
+        {
+          "id": "p4-section-190",
+          "x": 502.044,
+          "y": 468.267,
+          "width": 169.6,
+          "height": 6.044,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p4-section-191",
+          "x": 735.289,
+          "y": 468.267,
+          "width": 84.267,
+          "height": 6.044,
+          "candidate": "O1AT",
+          "label": ""
+        },
+        {
+          "id": "p4-section-192",
+          "x": 820.622,
+          "y": 468.267,
+          "width": 21.333,
+          "height": 6.044,
+          "candidate": "YT",
+          "label": "YT"
+        },
+        {
+          "id": "p4-section-193",
+          "x": 878.933,
+          "y": 468.267,
+          "width": 25.244,
+          "height": 6.044,
+          "candidate": "SO",
+          "label": ""
+        },
+        {
+          "id": "p4-section-194",
+          "x": 905.244,
+          "y": 468.267,
+          "width": 24.178,
+          "height": 6.044,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p4-section-195",
+          "x": 963.911,
+          "y": 468.622,
+          "width": 42.311,
+          "height": 5.689,
+          "candidate": "21BT",
+          "label": "21BT"
+        },
+        {
+          "id": "p4-section-196",
+          "x": 1032.889,
+          "y": 468.622,
+          "width": 29.156,
+          "height": 5.689,
+          "candidate": "24BT",
+          "label": "24BT"
+        },
+        {
+          "id": "p4-section-197",
+          "x": 1133.156,
+          "y": 468.622,
+          "width": 59.378,
+          "height": 5.689,
+          "candidate": "0",
+          "label": ""
+        },
+        {
+          "id": "p4-section-198",
+          "x": 1226.311,
+          "y": 469.333,
+          "width": 32.356,
+          "height": 4.978,
+          "candidate": "4",
+          "label": ""
+        },
+        {
+          "id": "p4-section-199",
+          "x": 1007.289,
+          "y": 471.111,
+          "width": 24.533,
+          "height": 3.2,
+          "candidate": "UAMI",
+          "label": ""
+        },
+        {
+          "id": "p4-section-200",
+          "x": 1198.222,
+          "y": 471.111,
+          "width": 26.667,
+          "height": 3.2,
+          "candidate": "VUJUI",
+          "label": ""
+        },
+        {
+          "id": "p4-section-201",
+          "x": 1063.467,
+          "y": 484.622,
+          "width": 68.622,
+          "height": 9.956,
+          "candidate": "SSEOEFEEREESSI",
+          "label": ""
+        },
+        {
+          "id": "p4-section-202",
+          "x": 973.867,
+          "y": 486.756,
+          "width": 28.089,
+          "height": 5.689,
+          "candidate": "21AT",
+          "label": "21AT"
+        },
+        {
+          "id": "p4-section-203",
+          "x": 1003.022,
+          "y": 486.756,
+          "width": 34.133,
+          "height": 5.689,
+          "candidate": "23BT",
+          "label": "23BT"
+        },
+        {
+          "id": "p4-section-204",
+          "x": 1133.156,
+          "y": 486.756,
+          "width": 64.356,
+          "height": 5.689,
+          "candidate": "51BT",
+          "label": "51BT"
+        }
+      ],
+      "platforms": [
+        {
+          "x": 1363.911,
+          "y": 290.489,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1291.022,
+          "y": 291.2,
+          "width": 26.667,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 1619.911,
+          "y": 313.956,
+          "width": 27.378,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1892.267,
+          "y": 313.956,
+          "width": 22.756,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1982.933,
+          "y": 313.956,
+          "width": 11.733,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 166.756,
+          "y": 325.689,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1621.333,
+          "y": 350.222,
+          "width": 24.533,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1891.556,
+          "y": 350.578,
+          "width": 23.467,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1981.156,
+          "y": 350.578,
+          "width": 13.511,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 166.756,
+          "y": 361.956,
+          "width": 26.311,
+          "height": 2.844,
+          "kind": "platform"
+        },
+        {
+          "x": 1291.378,
+          "y": 371.556,
+          "width": 26.667,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1363.911,
+          "y": 372.622,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 688.711,
+          "y": 423.111,
+          "width": 26.311,
+          "height": 22.044,
+          "kind": "platform"
+        },
+        {
+          "x": 878.222,
+          "y": 436.267,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 416.0,
+          "y": 443.022,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 324.267,
+          "y": 443.378,
+          "width": 22.044,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1088.0,
+          "y": 459.378,
+          "width": 19.911,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 320.0,
+          "y": 475.378,
+          "width": 19.911,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 416.0,
+          "y": 475.733,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 688.711,
+          "y": 476.444,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 878.222,
+          "y": 481.067,
+          "width": 26.311,
+          "height": 6.044,
+          "kind": "platform"
+        },
+        {
+          "x": 1088.0,
+          "y": 494.933,
+          "width": 19.911,
+          "height": 5.689,
+          "kind": "platform"
+        },
+        {
+          "x": 689.067,
+          "y": 313.244,
+          "width": 25.6,
+          "height": 6.044,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 689.067,
+          "y": 349.511,
+          "width": 25.6,
+          "height": 22.756,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 166.756,
+          "y": 364.8,
+          "width": 26.311,
+          "height": 3.2,
+          "kind": "platform-cyan"
+        },
+        {
+          "x": 166.756,
+          "y": 397.867,
+          "width": 26.311,
+          "height": 5.689,
+          "kind": "platform-cyan"
+        }
+      ]
+    }
+  }
+}

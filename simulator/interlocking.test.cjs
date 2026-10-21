@@ -58,4 +58,20 @@ test('Yeongdeungpo 1A-1T requires the 4B overlap signal to be released first',()
  const r=C.dispatch(s,{type:'route',id:'1A-1T'});assert.equal(r.ok,false);assert.match(r.message,/4B/);
  C.dispatch(s,{type:'stop',id:'4B'});assert(C.dispatch(s,{type:'route',id:'1A-1T'}).ok);
 });
+test('an existing overlap rejects opposing point settings regardless of route order',()=>{
+ for(const [protectedRoute,conflict]of [['2B-6T','3A-B963T'],['1B-1T','4B-B968T']])for(const order of [[protectedRoute,conflict],[conflict,protectedRoute]]){
+  const [C,s]=ccm('geumcheon');assert(C.dispatch(s,{type:'route',id:order[0]}).ok);
+  const before=JSON.stringify({routes:s.routes,points:s.points,signals:s.signals});
+  const result=C.dispatch(s,{type:'route',id:order[1]});assert.equal(result.ok,false,order.join(' -> '));assert.match(result.message,/오버랩/);
+  assert.equal(JSON.stringify({routes:s.routes,points:s.points,signals:s.signals}),before);
+ }
+});
+test('all-stop does not restart a lock timer when other routes are still set',()=>{
+ const [C,s]=ccm('geumcheon');
+ C.dispatch(s,{type:'route',id:'1A-2T'});C.dispatch(s,{type:'route',id:'2A-5T'});
+ C.dispatch(s,{type:'approach',signal:'1A'});C.dispatch(s,{type:'stop',id:'1A'});
+ const deadline=s.routes['1A-2T'].lock.until;C.dispatch(s,{type:'tick',seconds:20});
+ const stopped=C.dispatch(s,{type:'stopAll'});assert(stopped.ok);assert.match(stopped.message,/70초/);assert.equal(s.routes['1A-2T'].lock.until,deadline);
+ assert(!s.routes['2A-5T']);C.dispatch(s,{type:'tick',seconds:70});assert(!s.routes['1A-2T']);
+});
 console.log(n+' interlocking tests passed');

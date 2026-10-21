@@ -56,12 +56,12 @@ try:
                 expect(page.locator('#stateMode')).to_have_text('CCM')
                 signals = stage.locator('[data-signal]').evaluate_all('(els)=>els.map(e=>e.dataset.signal)')
                 for signal in signals:
-                    stage.locator(f'[data-signal="{signal}"]').dispatch_event('click')
+                    stage.locator(f'[data-signal="{signal}"]').click()
                     choice = page.locator('[data-route-choice]').first
                     route = choice.get_attribute('data-route-choice'); choice.click()
                     expect(stage.locator(f'[data-active-route="{route}"]')).to_have_count(1)
                     expect(page.locator('#stateRoutes')).to_have_text('1개 설정')
-                    stage.locator(f'[data-signal="{signal}"]').dispatch_event('click'); page.locator('#dialogConfirm').click()
+                    stage.locator(f'[data-signal="{signal}"]').click(); page.locator('#dialogConfirm').click()
                     expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
                     tested += 1
                 print(f'PASS {width}px {station}: {len(signals)} signals set / visible path / release, fills and centres', flush=True)
@@ -87,7 +87,7 @@ try:
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:
                     page.select_option('#lsStationSelect', station)
-                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.8.0-{station}.png'))
+                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.9.0-{station}.png'))
             assert not errors, errors
             context.close()
             print(f'PASS vector LS: {tested} signals, navigation, continuous/occupancy, removed controls: {width}px', flush=True)

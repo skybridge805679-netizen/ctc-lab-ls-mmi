@@ -114,3 +114,12 @@
 .ls-svg .wing-label{fill:#e6eef6;font-size:14px;font-weight:700;paint-order:stroke;stroke:#0f1923;stroke-width:3px}
 .ls-svg .platform.orange{fill:#f5a623;stroke:none;stroke-dasharray:none}.ls-svg .platform.cyan{fill:#19d3e8;stroke:none;stroke-dasharray:none}
 .ls-svg .signal.wing .lamp{stroke:#05090d;stroke-width:2.5}
+
+/* Native track sections share route state with the core, and keep their identifiers selectable. */
+.ls-svg .track-cell .cell-bed{fill:#c2ccd6;stroke:#081018;stroke-width:1}
+.ls-svg .track-cell.set .cell-bed{fill:#2fe872}.ls-svg .track-cell.occupied .cell-bed{fill:#ff5a4f}.ls-svg .track-cell.locked .cell-bed{fill:#ffb02e}
+.ls-svg .cell-name{pointer-events:none;user-select:text}
+
+.ls-equipment{display:grid;grid-template-columns:repeat(6,auto);gap:3px 4px;color:#9fb2c4;font-size:10px}
+.ls-equipment span{border:1px solid #42566a;border-radius:3px;padding:2px 4px;text-align:center}
+.ls-svg .point-blade{fill:none;stroke:#7fd4ff;stroke-width:3;pointer-events:none}.ls-svg .point-blade.reverse{stroke:#ffb02e}

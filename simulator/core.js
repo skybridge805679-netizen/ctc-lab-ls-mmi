@@ -7,11 +7,20 @@
  const overlapOf=id=>IL.rulesFor(config.id,id);
  const lockSeconds=signal=>IL.approach.seconds[signals[signal]?.kind]||0;
  const remaining=(s,r)=>Math.max(0,Math.ceil(r.lock.until-s.clock));
- function overlapBlocker(s,id,skip){// another active route whose overlap points clash with these positions
-  const o=overlapOf(id);if(!o)return null;
-  for(const other of Object.keys(s.routes)){if(other===skip)continue;const r=routes[other];
-   for(const [pid,pos] of Object.entries(o.points))if((r.pointLocks||[]).includes(pid)&&r.pointPositions[pid]!==pos)return other;
-   const oo=overlapOf(other);if(oo)for(const [pid,pos] of Object.entries(o.points))if(oo.points[pid]&&oo.points[pid]!==pos)return other;}
+ function overlapBlocker(s,id,skip){
+  const requested=overlapOf(id),candidate=routes[id];
+  for(const other of Object.keys(s.routes)){
+   if(other===skip)continue;
+   const active=routes[other],existing=overlapOf(other);
+   for(const [pid,pos]of Object.entries(requested?.points||{})){
+    if((active.pointLocks||[]).includes(pid)&&active.pointPositions[pid]!==pos)return other;
+    if(existing?.points[pid]&&existing.points[pid]!==pos)return other;
+   }
+   for(const [pid,pos]of Object.entries(existing?.points||{})){
+    if((candidate.pointLocks||[]).includes(pid)&&candidate.pointPositions[pid]!==pos)return other;
+   }
+   if(existing?.clearSignals?.includes(candidate.signal))return other;
+  }
   return null;
  }
  function initial(){return {mode:'AUTO',pending:null,clock:0,points:Object.fromEntries(Object.keys(points).map(id=>[id,'N'])),signals:Object.fromEntries(Object.keys(signals).map(id=>[id,'STOP'])),routes:{},approach:{},occupied:{},blockedPoints:[],logs:[],events:[],scans:{current:0,all:0},scanUntil:0,inspected:[]};}
@@ -66,8 +75,8 @@
    const ids=a.type==='withdraw'?[a.id]:Object.keys(s.routes).filter(id=>a.type==='stopAll'||routes[id].signal===a.id);
    if(!ids.length||!s.routes[ids[0]])return log(false,'설정된 진로가 없습니다.');
    if(ids.every(id=>s.routes[id]?.lock))return log(false,ids.join(', ')+' 이미 접근쇄정 중 · 남은 '+Math.max(...ids.map(id=>remaining(s,s.routes[id])))+'초');
-   let waiting=0;
-   for(const id of ids){const sig=routes[id].signal,seconds=lockSeconds(sig);s.signals[sig]='STOP';s.routes[id].control='single';
+   let waiting=Math.max(0,...ids.filter(id=>s.routes[id]?.lock).map(id=>remaining(s,s.routes[id])));
+   for(const id of ids){if(s.routes[id].lock)continue;const sig=routes[id].signal,seconds=lockSeconds(sig);s.signals[sig]='STOP';s.routes[id].control='single';
     if(s.routes[id].occupied)s.routes[id].status='LOCKED';
     else if(s.approach[sig]&&seconds){s.routes[id].status='APPROACH_LOCK';s.routes[id].lock={start:s.clock,seconds,until:s.clock+seconds};waiting=Math.max(waiting,seconds);}
     else delete s.routes[id];}
