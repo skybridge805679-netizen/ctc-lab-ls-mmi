@@ -3,6 +3,8 @@
 const details=typeof module!=='undefined'?require('./schematic-details.js'):root.SimSchematicDetails;
 const switchView=typeof module!=='undefined'?require('./ls-switches.js'):root.SimLSSwitches;
 const inventory=typeof module!=='undefined'?require('./wings.js'):root.SimWings;
+const trainWindows=typeof module!=='undefined'?require('./train-windows.js'):root.SimTrainWindows;
+const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -81,7 +83,7 @@ function layout(def,wing){
  const weights=knots.slice(1).map((x,i)=>{const lo=knots[i],mid=(x+lo)/2,span=spans.find(([a,b])=>mid>=a&&mid<=b);return span?Math.max(1,100/((span[1]-span[0])*sx)):1;});
  const cumulative=[0];weights.forEach((w,i)=>cumulative.push(cumulative.at(-1)+(knots[i+1]-knots[i])*w));
  const xAt=x=>{let i=0;while(i<weights.length-1&&x>knots[i+1])i++;return PADDING+(cumulative[i]+(x-knots[i])*weights[i])*(WIDTH-2*PADDING)/cumulative.at(-1);};
- const top=72,yAt=y=>top+(y-minY)*sy;
+ const top=140,yAt=y=>top+(y-minY)*sy;
  return {sx,sy,H:Math.max(460,Math.ceil(yAt(maxY)+72)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
@@ -135,6 +137,45 @@ function render(st,def,core,model,neighbours={}){
  }
  let platforms='',rails='',sections='',labels='',routes='',symbols='',plates='',pointSymbols='',signalSymbols='',trains='',leaders='',annotations='';
  const occupiedBoxes=[];
+ let trainShapes='';
+ let cached=windowLayouts.get(def)?.get(st.id);
+ if(!cached){
+ const windowBoxes=[];
+ const obstacles=[...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...wing.platforms.map(p=>{const a=T([p[0],p[1]]),b=T([p[2],p[3]]);return [a[0],a[1],b[0],a[1]+Math.max(8,b[1]-a[1])];}),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
+ const capsulePositions=[];
+ for(const [x,y]of data.capsules){
+  if(!data.cells.some(c=>Math.abs(c[1]-y)<30&&x>=c[0]-8&&x<=c[0]+c[2]+8)||def.signals.some(s=>Math.abs(s[2]-x)<22&&Math.abs(s[3]-y)<14))continue;
+  const [X,rawY]=T([x,y]),near=cells.filter(c=>X>=c.x-8&&X<=c.x+c.width+8).sort((a,b)=>Math.abs(a.y-rawY)-Math.abs(b.y-rawY))[0];
+  const Y=near&&Math.abs(near.y-rawY)<Math.max(17,L.sy*30)?near.y+(rawY<near.y?-17:17):rawY;
+  capsulePositions.push([X,Y]);obstacles.push([X-8,Y-5,X+11,Y+5]);
+ }
+ for(const item of trainWindows.data[st.id]||[]){
+  const code=item.anchorCode||item.code,inline=item.side==='inline';
+  const cell=cells.find(c=>c.label.split(' · ').includes(code)||c.label.replaceAll(' · ','')===code);
+  const rail=def.rails.find(r=>r[0]===code||r[3]===code||r[4]===code);
+  let cx,cy;
+  if(inline&&rail?.[0]===code){[cx,cy]=T([rail[2]??(rail[1][0][0]+rail[1].at(-1)[0])/2,railY(def,code,rail[2]??rail[1][0][0])]);}
+  else if(cell){cx=cell.x+cell.width*item.fraction;cy=cell.y;}
+  else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[cx,cy]=T(p);cx+=rail[3]===code?42:rail[4]===code?-42:0;}
+  else throw new Error(st.id+' train window anchor missing: '+code);
+  const width=inline?100:80,height=inline?28:20;
+  const x=Math.max(4,Math.min(WIDTH-width-4,cx-width/2)),y=cy+(inline?-height/2:item.side==='above'?-50:30);
+  windowBoxes.push({item,inline,x,y,width,height,cy});
+ }
+ // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
+ const windowTop=Math.min(...paths.flat().map(p=>p[1]));
+ for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),x=(a+b)/2,w=Math.max(b-a,plate.name.length*16+18);obstacles.push([x-w/2,windowTop-130,x+w/2,windowTop-105]);}
+ for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
+ const windowLanes=new Map();for(const b of windowBoxes.filter(b=>!b.inline)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
+ for(const lane of windowLanes.values()){let best;for(const dy of (Array.from({length:41},(_,i)=>lane[0].item.side==='above'?-28-i*2:20+i*2))){let cost=0,choices=[];for(const b of lane){let chosen;for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32]){const x=Math.max(4,Math.min(WIDTH-width-4,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;const score=hits*10000+(80-width)+Math.abs(dx)*2;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};}cost+=chosen.cost;choices.push(chosen);}cost+=Math.abs(dy-(lane[0].item.side==='above'?-50:30));if(!best||cost<best.cost)best={cost,choices};}lane.forEach((b,i)=>{Object.assign(b,best.choices[i]);obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);});}
+ cached={windowBoxes,capsulePositions};if(!windowLayouts.has(def))windowLayouts.set(def,new Map());windowLayouts.get(def).set(st.id,cached);
+ }
+ const {windowBoxes,capsulePositions}=cached;
+ for(const {item,inline,x,y,width,height,cy}of windowBoxes){
+  occupiedBoxes.push([x-3,y-3,x+width+3,y+height+3]);
+  trainShapes+=`<g class="ls-train-slot ${inline?'inline':'detached'}" data-train-slot="${esc(item.slot)}" data-window-code="${esc(item.code)}" data-window-side="${item.side}" data-window-rail-y="${cy}" role="button" tabindex="0" aria-label="${esc(item.code)} 열차번호 입력"><rect x="${x}" y="${y}" width="${width}" height="${height}"/><title>${esc(item.code)} 열차번호 입력</title></g>`;
+ }
+
  for(const p of wing.platforms){
   const [x,y]=T([p[0],p[1]]),[right,bottom]=T([p[2],p[3]]);
   platforms+=`<rect class="platform ${p[4]==='c'?'cyan':'orange'}" x="${x}" y="${y}" width="${right-x}" height="${Math.max(8,bottom-y)}" rx="2"/>`;
@@ -148,7 +189,8 @@ function render(st,def,core,model,neighbours={}){
   const atomic=c.label.replaceAll(' · ','');
   const tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   tokens.forEach((label,i)=>{
-   const x=c.x+c.width*(i+.5)/tokens.length,width=c.width/tokens.length;
+   let x=c.x+c.width*(i+.5)/tokens.length;const width=c.width/tokens.length;
+   if(trainWindows.data[st.id]?.some(w=>w.side==='inline'&&w.code===label)){const box=occupiedBoxes.find(b=>x>b[0]&&x<b[2]&&c.y>b[1]&&c.y<b[3]);if(box)x=box[2]+label.length*3.6+4;}
    const fit=label.length*7.2>width-6?` textLength="${Math.max(12,width-6)}" lengthAdjust="spacingAndGlyphs"`:'';
    labels+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${x}" y="${c.y+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
    occupiedBoxes.push([x-Math.min(width-3,label.length*7)/2,c.y-8,x+Math.min(width-3,label.length*7)/2,c.y+8]);
@@ -176,11 +218,9 @@ function render(st,def,core,model,neighbours={}){
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
   const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),x=(left+right)/2,width=Math.max(right-left,plate.name.length*16+18);
-  const near=wing.platforms.filter(p=>Math.abs(T([(p[0]+p[2])/2,0])[0]-x)<150).map(p=>T([p[0],p[1]])[1]);
-  const platformY=near.length?Math.min(...near):topRow;
-  const localRails=cells.filter(c=>x>=c.x-20&&x<=c.x+c.width+20).map(c=>c.y).sort((a,b)=>Math.abs(a-platformY)-Math.abs(b-platformY));
-  const y=(localRails[0]??topRow)-48;
-  plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><path class="stn-line" d="M${x} ${y+24}V${(near.length?Math.min(...near):topRow)-9}"/><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
+  // Station names have their own upper band; train-number windows stay on straight row baselines.
+  const y=topRow-130;
+  plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
   occupiedBoxes.push([x-width/2-3,y-4,x+width/2+3,y+36]);
  }
  for(const [x,y,label]of data.markers){
@@ -188,11 +228,7 @@ function render(st,def,core,model,neighbours={}){
   symbols+=`<g data-source-symbol="${label}">${label==='SP'?`<path d="M${X-13} ${Y-23}H${X+13}L${X} ${Y}Z" class="sp-board"/><text x="${X}" y="${Y-10}" class="board-label" text-anchor="middle">SP</text>`:`<rect x="${X-9}" y="${Y-23}" width="18" height="28" class="ss-board"/><path d="M${X-8} ${Y+3}L${X+8} ${Y-21}" class="ss-stripe"/><text x="${X}" y="${Y-29}" class="board-label" text-anchor="middle">SS</text>`}<title>원본 ${label} 표지</title></g>`;
   occupiedBoxes.push([X-16,Y-38,X+16,Y+6]);
  }
- for(const [x,y]of data.capsules){
-  if(!data.cells.some(c=>Math.abs(c[1]-y)<30&&x>=c[0]-8&&x<=c[0]+c[2]+8)||def.signals.some(s=>Math.abs(s[2]-x)<22&&Math.abs(s[3]-y)<14))continue;
-  const [X,rawY]=T([x,y]);const near=cells.filter(c=>X>=c.x-8&&X<=c.x+c.width+8).sort((a,b)=>Math.abs(a.y-rawY)-Math.abs(b.y-rawY))[0];
-  const Y=near&&Math.abs(near.y-rawY)<17?near.y+(rawY<near.y?-17:17):rawY;symbols+=`<g data-source-symbol="capsule"><path class="capsule" d="M${X-7} ${Y}h14"/><path class="capsule-stop" d="M${X+10} ${Y-4}v8"/><title>원본 캡슐 표시</title></g>`;
- }
+ for(const [X,Y]of capsulePositions)symbols+=`<g data-source-symbol="capsule"><path class="capsule" d="M${X-7} ${Y}h14"/><path class="capsule-stop" d="M${X+10} ${Y-4}v8"/><title>원본 캡슐 표시</title></g>`;
  const segments=[...paths.flatMap(poly=>poly.slice(1).map((p,i)=>[poly[i],p])),...def.links.map(([,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])])];
  const touchesRail=box=>segments.some(([a,b])=>{
   const r=[box[0]-BAR/2-1,box[1]-BAR/2-1,box[2]+BAR/2+1,box[3]+BAR/2+1];
@@ -256,7 +292,7 @@ function render(st,def,core,model,neighbours={}){
  const edgeY=topRow-28;
  if(neighbours.left)plates+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(neighbours.left)}</text>`;
  if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
- return {width:WIDTH,height:L.H,svg:`${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}`};
+ return {width:WIDTH,height:L.H,svg:`${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

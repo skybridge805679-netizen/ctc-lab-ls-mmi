@@ -9,7 +9,7 @@ const time=t=>`${Math.floor(t/60).toString().padStart(2,'0')}:${(t%60).toString(
 const tasks=window.SimPractice.tasks;
 completed=[...new Set(completed.filter(i=>Number.isInteger(i)&&i>=0&&i<tasks.length))];
 function toast(msg,error=false){$('toast').textContent=msg;$('toast').className='show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').className='',5000);}
-function run(a){let r;if(a.type==='tick'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);r={ok:true};}else if(a.type==='scan'&&a.scope==='all'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);r={ok:true,message:'전체 15개 취급역 상태 재수신'};}else r=C.dispatch(state,a);render();if(a.type!=='tick')toast(r.message,!r.ok);return r;}
+function run(a){let r;if(a.type==='tick'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);r={ok:true};}else if(a.type==='scan'&&a.scope==='all'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);r={ok:true,message:'전체 15개 취급역 상태 재수신'};}else if(a.type==='lsOperation'){r=window.SimLSUI.dispatch(a.operation);state.logs.unshift({time:state.clock,source:'LS',action:a.operation.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)state.events.push({...a,time:state.clock});}else r=C.dispatch(state,a);render();if(a.type!=='tick')toast(r.message,!r.ok);return r;}
 function openAction(title,body,action,label='예 · 실행'){$('dialogConfirm').hidden=false;$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;dialogAction=action;$('actionDialog').returnValue='';$('dialogConfirm').textContent=label;$('actionDialog').showModal();}
 function routeDetails(id){const r=C.routes[id];return `<div class="route-detail"><b>${escapeHTML(id)}</b><p>${r.pathTracks.join(' → ')}</p><p class="evidence">${r.evidence}</p><p>${r.source.map(escapeHTML).join('<br>')}</p><p class="pending-note">배선 연결 연습 모델 · 경로의 공유 구간·전환기를 쇄정합니다. 실설비 진로표와 세부 연동조건은 별도 검증 대상입니다</p></div>`;}
 const statusLabel={SET:'설정',OCCUPIED:'점유',LOCKED:'쇄정',APPROACH_LOCK:'접근쇄정'};
@@ -30,13 +30,13 @@ function drawTracks(){
  const head=`<div class="ls-head"><div class="ls-modes" role="group" aria-label="${st.name} 역제어모드">${['AUTO','CCM','LOCAL'].map(m=>`<button type="button" class="mode-btn ${m.toLowerCase()} ${state.mode===m?'on':''}" data-mode="${m}" aria-pressed="${state.mode===m}">${m}</button>`).join('')}</div><button type="button" class="stop-all" data-stop-all="true">신호기 일괄정지</button><div class="ls-name"><b>${escapeHTML(st.name)}</b><span>${st.code}</span></div><div class="ls-equipment" aria-label="원본 장치 표시">${['N1','N2','C','REC','UPS','ShP','EIS1','EIS2','DTS1','DTS2','RC'].map(name=>`<span data-equipment="${name}" title="${name} · 장치 통신 상태 미연결">${name}</span>`).join('')}</div></div>`;
  $('lsStage').dataset.controlStation=selectedStation;
  $('lsStage').innerHTML=head+`<svg id="trackSvg" class="ls-svg" viewBox="0 0 ${view.width} ${view.height}" role="img" aria-label="${escapeHTML(st.name)} LS 선로 배선">${view.svg}</svg>`;
- drawBoard();
+ window.SimLSUI.decorate();drawBoard();
 }
 $('routeEvidence').onclick=e=>{const tg=e.target.closest('[data-approach-toggle]');if(tg){run({type:'approach',signal:tg.dataset.approachToggle,present:!state.approach?.[tg.dataset.approachToggle],source:'모의운행'});return;}const enter=e.target.closest('[data-sim-enter]'),clear=e.target.closest('[data-sim-clear]');if(enter)run({type:'occupy',id:enter.dataset.simEnter,source:'모의운행'});if(clear)run({type:'clear',id:clear.dataset.simClear,source:'모의운행'});};
 function selectStation(id,scroll=true){
  if(!N.catalog[id]?.controlled)return;
  if($('actionDialog').open){toast('제어 확인창을 닫은 뒤 역을 변경하세요.',true);$('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedStation;return;}
- stationStates[selectedStation]=state;
+ window.SimLSUI.stationChanged();stationStates[selectedStation]=state;
  selectedStation=id;C=BaseCore.forStation(id);state=stationStates[id];
  $('stationSelect').value=id;$('lsStationSelect').value=id;
  fields();render();taskView();
@@ -61,7 +61,7 @@ function render(){
  $('previousStation').textContent=index>0?'◀ '+controlled[index-1].name:'시점';$('previousStation').disabled=index===0;
  $('nextStation').textContent=index<controlled.length-1?controlled[index+1].name+' ▶':'종점';$('nextStation').disabled=index===controlled.length-1;
  $('clock').textContent=time(state.clock);$('stateMode').textContent=st.controlled?state.mode:'비연동';$('stateOwner').textContent=state.mode==='LOCAL'?'현장역':'관제실';$('stateRoutes').textContent=Object.keys(state.routes).length+'개 설정';$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';
- $('lsStatus').textContent='CCM → 신호기 클릭 → 진로 선택 · 우클릭: 베이스스캔';
+ $('lsStatus').textContent='CCM → 신호기 클릭 → 진로 선택 · 우클릭: 화면 메뉴 · 열번창: 열차번호 제어';
  $('mmiState').textContent=`현재 ${state.mode} · LS와 같은 상태 · ${Object.keys(state.routes).length}개 진로 설정`;
  $('handoverBar').hidden=!state.pending;if(state.pending)$('handoverBar').innerHTML=`<span>${state.pending} 요청 · 가상 현장 응답 대기</span><button data-handover="yes">현장 수락</button><button data-handover="no">현장 거절</button>`;
  $('completedCount').textContent=`${completed.length} / ${tasks.length} 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();window.SimDiagram?.render();
@@ -95,7 +95,7 @@ $('lsDisplay').onclick=e=>{
  else if(stop)openAction('신호기 일괄정지',N.catalog[selectedStation].name+'의 설정 신호기를 모두 정지합니다. 점유 중인 진로는 쇄정을 유지합니다.',{type:'stopAll',source:'LS'});
 };
 $('lsStage').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
-$('lsDisplay').oncontextmenu=e=>{e.preventDefault();openAction('베이스스캔','가상 상태정보를 재수신합니다.<select id="lsScope" aria-label="베이스스캔 범위"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>',()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));};
+
 $('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
 $('handoverBar').onclick=e=>{const b=e.target.closest('[data-handover]');if(b)run({type:'handover',accept:b.dataset.handover==='yes',source:'현장'});};
 $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>document.querySelector(`input[name="${n}"]:checked`).value;
@@ -106,14 +106,15 @@ $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('cont
  if(type==='scan')run({type,scope:checked('mmiScope'),source:'MMI'});
 };
 $('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
-$('resetBtn').onclick=()=>{if(!confirm('현재 상태와 조작 기록을 초기화할까요?'))return;const clock=state.clock;state=C.initial();state.clock=clock;stationStates[selectedStation]=state;activeTask=null;paused=false;$('pauseBtn').textContent='Ⅱ 일시정지';fields();render();taskView();};
+$('resetBtn').onclick=()=>{if(!confirm('현재 상태와 조작 기록을 초기화할까요?'))return;const clock=state.clock;state=C.initial();state.clock=clock;stationStates[selectedStation]=state;window.SimLSUI.reset(selectedStation);activeTask=null;paused=false;$('pauseBtn').textContent='Ⅱ 일시정지';fields();render();taskView();};
 $('startTask').onclick=startTask;$('nextTask').onclick=()=>{taskIndex=(taskIndex+1)%tasks.length;taskView();};
 $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toast('지하서울로 전환해 과제를 확인하세요.',true);if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart),state);if(ok){if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
 for(const id of ['guideBtn','footerGuide'])$(id).onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.10.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.13.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 const lockSig=()=>Object.entries(state.routes).map(([id,r])=>id+(r.lock?'L':'')).join();
-setInterval(()=>{if(!paused&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig();for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,{type:'tick',seconds});if(lockSig()!==before)render();else for(const row of document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
+setInterval(()=>{if(!paused&&!window.SimLSUI.isInteracting()&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig();for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,{type:'tick',seconds});if(lockSig()!==before)render();else for(const row of document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
+window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates}),run,render,openAction,toast,selectStation});
 fields();render();taskView();
 
 window.SimDiagram.init({clock:()=>state.clock,selectStation});

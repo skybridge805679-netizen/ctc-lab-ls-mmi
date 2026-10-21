@@ -51,7 +51,7 @@ try:
                     assert box['fill'] > 0.9, box
                 assert stage.locator('#trackSvg').evaluate('(s)=>s.getBoundingClientRect().width <= s.parentElement.clientWidth+1'), 'diagram is cropped inside station screen'
                 assert abs(box['left'] - box['right']) < 90, box
-                assert box['top'] < 130 and box['bottom'] < 250, box
+                assert box['top'] < 160 and box['bottom'] < 250, box
                 assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'page scrolls horizontally'
                 stage.locator('[data-mode="CCM"]').click(); page.locator('#dialogConfirm').click()
                 expect(page.locator('#stateMode')).to_have_text('CCM')
@@ -88,7 +88,7 @@ try:
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:
                     page.select_option('#lsStationSelect', station)
-                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.12.0-{station}.png'))
+                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.13.0-{station}.png'))
             assert not errors, errors
             context.close()
             print(f'PASS vector LS: {tested} signals, navigation, continuous/occupancy, removed controls: {width}px', flush=True)

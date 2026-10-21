@@ -84,7 +84,8 @@ def exercise(page, url):
                 page.locator(f'[data-handover="{response}"]').click()
             expect(page.locator('#stateMode')).to_have_text('LOCAL')
         elif index == 7:
-            page.locator('#lsDisplay').click(button='right')
+            page.locator('#lsDisplay .fidelity-note').click(button='right')
+            page.locator('[data-context-action="scan-current"]').click()
             confirm()
             page.locator('#controlSelect').select_option('scan')
             page.locator('input[name="mmiScope"][value="all"]').check()

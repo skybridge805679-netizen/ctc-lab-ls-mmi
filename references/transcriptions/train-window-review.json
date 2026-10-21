@@ -1,0 +1,262 @@
+{
+  "source": "PPT original white rectangles; codes/rows reviewed against slides 2–19",
+  "overrides": {
+    "2:1446,435": {
+      "code": "B002T",
+      "fraction": 0.5
+    },
+    "2:49,552": {
+      "code": "MT",
+      "fraction": -0.5,
+      "side": "above"
+    },
+    "2:50,665": {
+      "code": "A1T",
+      "fraction": 0.5
+    },
+    "3:19,449": {
+      "code": "B008T",
+      "fraction": 0.5
+    },
+    "3:1623,449": {
+      "code": "B030T",
+      "fraction": 0.5
+    },
+    "3:1791,449": {
+      "code": "B034T",
+      "fraction": 0.5
+    },
+    "3:9,659": {
+      "code": "B007T",
+      "fraction": 0.5
+    },
+    "3:1629,659": {
+      "code": "B031T",
+      "fraction": 0.5
+    },
+    "3:473,696": {
+      "code": "DT",
+      "fraction": 0.5
+    },
+    "4:1067,434": {
+      "code": "B046T",
+      "fraction": 0.5
+    },
+    "4:1720,434": {
+      "code": "B060T",
+      "fraction": 0.5
+    },
+    "4:24,663": {
+      "code": "B035T",
+      "fraction": 0.5
+    },
+    "4:224,663": {
+      "code": "B039T",
+      "fraction": 0.5
+    },
+    "5:21,666": {
+      "code": "B059T",
+      "fraction": 0.5
+    },
+    "6:33,204": {
+      "code": "B074T",
+      "fraction": 0.5
+    },
+    "6:887,210": {
+      "code": "B902T",
+      "fraction": 0.5
+    },
+    "7:1619,451": {
+      "code": "B919T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "7:12,509": {
+      "code": "B606T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "7:39,681": {
+      "code": "B605T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "8:1723,349": {
+      "code": "B618T2T",
+      "fraction": 0.5
+    },
+    "8:43,452": {
+      "code": "B923T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "8:231,452": {
+      "code": "B927T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "8:1702,637": {
+      "code": "B619T1T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "10:1349,255": {
+      "code": "B956T",
+      "fraction": 0.5
+    },
+    "10:1572,322": {
+      "code": "B636T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "10:1772,322": {
+      "code": "B640T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "10:1401,323": {
+      "code": "B632T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "10:1271,416": {
+      "code": "B631T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "10:1713,416": {
+      "code": "B637T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "10:1147,642": {
+      "code": "F1T",
+      "fraction": 0.5
+    },
+    "11:47,368": {
+      "code": "B642T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "11:7,416": {
+      "code": "B639T",
+      "fraction": 0.5
+    },
+    "11:1480,416": {
+      "code": "B643T",
+      "fraction": 0
+    },
+    "12:382,325": {
+      "code": "B658T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "12:1775,374": {
+      "code": "B657T",
+      "fraction": 0.9,
+      "side": "below"
+    },
+    "12:455,421": {
+      "code": "B655T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "12:235,422": {
+      "code": "B653T",
+      "side": "below",
+      "fraction": 0.25
+    },
+    "13:78,412": {
+      "code": "B659T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "14:477,416": {
+      "code": "B667T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "14:1614,416": {
+      "code": "B671T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "14:1680,480": {
+      "code": "B997T",
+      "fraction": 0.9,
+      "side": "below",
+      "anchorCode": "B995T"
+    },
+    "15:40,408": {
+      "code": "B673T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "15:1720,408": {
+      "code": "B675T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "15:40,470": {
+      "code": "B999T",
+      "fraction": 0.5
+    },
+    "16:954,409": {
+      "code": "B679T",
+      "fraction": 0.95,
+      "side": "below"
+    },
+    "16:1618,409": {
+      "code": "B683T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "17:1768,319": {
+      "code": "B692T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "17:66,321": {
+      "code": "B690T",
+      "fraction": 0.5,
+      "side": "above",
+      "anchorCode": "B714T"
+    },
+    "18:139,316": {
+      "code": "B694T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "18:614,316": {
+      "code": "B700T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "18:988,316": {
+      "code": "B704T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "18:1557,316": {
+      "code": "B710T",
+      "fraction": 0.5,
+      "side": "above"
+    },
+    "18:71,414": {
+      "code": "B689T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "18:596,415": {
+      "code": "B693T",
+      "fraction": 0.5,
+      "side": "below"
+    },
+    "19:32,479": {
+      "code": "B1033T",
+      "fraction": 0.5,
+      "side": "below",
+      "anchorCode": "B1035T"
+    }
+  }
+}

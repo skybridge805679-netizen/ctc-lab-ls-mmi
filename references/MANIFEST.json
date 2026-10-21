@@ -197,15 +197,29 @@
       "path": "references/transcriptions/README.md",
       "original_name": "README.md",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 896,
-      "sha256": "dc13c97c90738f0c9edf746f840d357d1a545b4491d2200e6e151f970f16e315"
+      "bytes": 1877,
+      "sha256": "e4c20b9ba4aa0eba035e3afbbf26d93d23cd275899716a4d001eaab4e56c8290"
     },
     {
       "path": "references/transcriptions/intermediate-circuits.json",
       "original_name": "intermediate-circuits.json",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 16849,
-      "sha256": "c7d83372d819962397701093551699003268d0f04bca988c6ffbdb60b8c35613"
+      "bytes": 17819,
+      "sha256": "8b48885eee97a9d929a82210c1b745d900aa18b5d5e84e58c89a24225ed9d9dd"
+    },
+    {
+      "path": "references/transcriptions/train-window-review.json",
+      "original_name": "train-window-review.json",
+      "source": "Derived placement inventory reviewed against user-provided 배선도(관제교육장).pptx; original assets preserved",
+      "bytes": 4919,
+      "sha256": "169e7bced867adfd106bfa57cdf71254d16399863a104358bc728cc7d915349b"
+    },
+    {
+      "path": "references/transcriptions/train-windows.json",
+      "original_name": "train-windows.json",
+      "source": "Derived placement inventory reviewed against user-provided 배선도(관제교육장).pptx; original assets preserved",
+      "bytes": 101568,
+      "sha256": "2e4ee57a4e3ce3e9694b0935a68d7eadbed266b0bce4943a1f1ce5e8ecd1b044"
     }
   ],
   "pending_attachments": [],
