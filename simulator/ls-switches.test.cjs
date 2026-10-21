@@ -27,3 +27,13 @@ assert.equal(count,118);console.log('PASS all 118 switch groups change physical 
  assert(C.dispatch(state,{type:'point',id:'58',value:'N'}).ok);assert.deepEqual(scene('seoul',state).connectors.find(c=>c.id==='58').points,n58.points);
  console.log('PASS photographed Seoul 4C route connects 58/56/55, holds its shape through approach locking, then permits N');
 }
+
+{
+ const C=Core.forStation('seoul'),s=C.initial(),normal=scene('seoul',s),c=normal.connectors.find(c=>c.id==='58');
+ assert.equal(c.kind,'scissors');assert(Math.abs(c.endpoints[1][0]-c.endpoints[0][0])>80,'reserve a broad source-like scissors footprint');assert(c.glyphMask);assert.equal(c.fullPoints.length,5);
+ C.dispatch(s,{type:'mode',value:'CCM'});assert(C.dispatch(s,{type:'route',id:'4C-B902T'}).ok);
+ const selected=scene('seoul',s).connectors.find(c=>c.id==='58');assert(!selected.glyphMask);
+ const view=LS.render(N.catalog.seoul,W.data.seoul,C,s),route=view.svg.match(/data-active-route="4C-B902T"[^>]*d="([^"]+)"/)[1];
+ for(const p of selected.fullPoints.slice(1,-1))assert(route.includes(p.join(' ')),'green route must follow the pinched scissors neck');
+ console.log('PASS source-shaped scissors slot opens in N and the established route follows its complete R geometry');
+}

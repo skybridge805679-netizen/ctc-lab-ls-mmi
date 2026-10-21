@@ -35,6 +35,17 @@ test('Geumcheon 4T/5T crossover has no OCR glyphs rendered as horizontal track b
  assert(!cells.some(([x,y,w,label])=>x>160&&x<220&&y>440&&y<460),'false horizontal bars inside 21/22 crossing');
  assert(cells.some(c=>c[3]==='21AT'));assert(cells.some(c=>c[3]==='21BT'));
 });
+test('all intermediate cells carry codes, including merged PDF sections and the Gwanak handover',()=>{
+ for(const st of controlled)assert(LS.wingOf(st,W.data[st.id]).cells.every(c=>c[3]),st.id+' blank intermediate circuit');
+ const lowest=LS.sceneOf(N.catalog.uiwang).cells.filter(c=>Math.abs(c[1]-546)<2&&c[0]>1320).map(c=>c[3]);assert(lowest.includes('B1031T'));assert(!lowest.includes('B1033T'),'do not invent an extra block absent from slide 18');
+ const expectCodes={geumcheon:['B970T','B972T','B974T','B646T','B648T','B650T'],anyang:['B976T','B978T','B980T','B647T','B649T','B651T','B653T'],jonggak:['B058T','B060T','B062T'],noryangjin:['B616T1T','B616T2T','B618T1T','B618T2T','B617T1T','B617T2T'],geumjeong:['B670T','B672T','B674T','B676T','B665T','B667T','B669T','B671T']};
+ for(const [id,names]of Object.entries(expectCodes)){const C=Core.forStation(id),svg=LS.render(N.catalog[id],W.data[id],C,C.initial()).svg;for(const name of names)assert(svg.includes('data-circuit-label="'+name+'"'),id+' '+name);}
+});
+test('a boundary route does not colour newly labelled adjoining blocks',()=>{
+ const C=Core.forStation('guro'),state=C.initial();C.dispatch(state,{type:'mode',value:'CCM'});assert(C.dispatch(state,{type:'route',id:'4A-B950T'}).ok);
+ const v=LS.render(N.catalog.guro,W.data.guro,C,state);
+ for(const code of ['B952T','B954T','B956T'])assert(v.svg.includes('data-track-circuit="'+code+'" data-track-state="clear"'),code+' must remain outside the B950T route');
+});
 test('route lines, approach trains and overlap rings are drawn from the same state',()=>{
  const st=N.catalog.geumcheon,C=Core.forStation('geumcheon'),s=C.initial();
  C.dispatch(s,{type:'mode',value:'CCM'});C.dispatch(s,{type:'route',id:'2B-6T'});C.dispatch(s,{type:'approach',signal:'2B'});C.dispatch(s,{type:'stop',id:'2B'});

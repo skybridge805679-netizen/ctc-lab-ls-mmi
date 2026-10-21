@@ -1,5 +1,5 @@
 {
-  "version": "0.11.1",
+  "version": "0.12.0",
   "backupDate": "2026-10-21",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 7399,
-      "sha256": "09cba4be781e3b6e4de33d5a5b0644ad13bc5fa721a849b808a128a3ca38a4ab"
+      "bytes": 7998,
+      "sha256": "9493ab8fe0d9a5c44d41f1b59ca157334b29ff3b097ac16d1540c2b5b28a5c08"
     },
     {
       "path": "README.md",
-      "bytes": 5925,
-      "sha256": "d5a16281c2b4f5d144add5ab9c125ad010924802c9013da6dcc038c3f10971a1"
+      "bytes": 6306,
+      "sha256": "3194240e9d913216b101f10aef70563674c8e34db9dddd8b238766a6f0eaf9a9"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -37,6 +37,11 @@
       "path": "archive/CTC-LAB-v0.11.1.zip",
       "bytes": 4559783,
       "sha256": "d3b46934caf8f3dc7b056520d28acd5c11c59ce74d4482ab3bd81e7c348001db"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.12.0.zip",
+      "bytes": 4563784,
+      "sha256": "e74bbab00539aa7d6f667017cf0b97a60d1ab0fa3897b39853f96e352f5e16f5"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -379,6 +384,91 @@
       "sha256": "cea8e27ea3af4920645d2ce1d9253bf3ce5cf8e30a95b8a32130fce24a0fc613"
     },
     {
+      "path": "docs/preview-v0.12.0-anyang.png",
+      "bytes": 85621,
+      "sha256": "325aa32c0ad111eca22b379da5ca255b0bab2a9027e598b9ccd75e3d369462f1"
+    },
+    {
+      "path": "docs/preview-v0.12.0-cheongnyangni.png",
+      "bytes": 47637,
+      "sha256": "2cc37fff0761cedad72e79f5b1459b590763024e3511a6a698e003a742106c73"
+    },
+    {
+      "path": "docs/preview-v0.12.0-dongmyo.png",
+      "bytes": 56698,
+      "sha256": "a0dd79feff331ddfeb1163956d20f0e59e4b154bc5746cc62ba852f2179c8b10"
+    },
+    {
+      "path": "docs/preview-v0.12.0-geumcheon.png",
+      "bytes": 86849,
+      "sha256": "4c982d778dda19654f2188b0674ed516901905ad92b9504def38cf6d7b573912"
+    },
+    {
+      "path": "docs/preview-v0.12.0-geumjeong.png",
+      "bytes": 49687,
+      "sha256": "e27d5c78c538ab3a403eca9354defac3efc6bb65a688812025e2e83b2889b75d"
+    },
+    {
+      "path": "docs/preview-v0.12.0-gunpo.png",
+      "bytes": 64199,
+      "sha256": "9f7d8c49570ed31ecc79e155ec8367d65c33f5bec3e7259e5d87559ec09f6dbe"
+    },
+    {
+      "path": "docs/preview-v0.12.0-guro.png",
+      "bytes": 90252,
+      "sha256": "65bf095b3f61f22f4e6323880913b46eb14fe6acf6c8308521d886d017ed2a5d"
+    },
+    {
+      "path": "docs/preview-v0.12.0-jonggak.png",
+      "bytes": 48776,
+      "sha256": "5f75f430fc3a3d298626552f036a8acb9d53ab25e30c81bc8731e2fd934a2010"
+    },
+    {
+      "path": "docs/preview-v0.12.0-noryangjin.png",
+      "bytes": 68744,
+      "sha256": "a41e37846eb9b4078707c5fb91a83c1112be70db43404648dd1e1c215b368368"
+    },
+    {
+      "path": "docs/preview-v0.12.0-seoul-switch-normal.png",
+      "bytes": 77956,
+      "sha256": "befe33b0ac1b522fbee3d1d83d5656d4be9133e19b38d06d942266ae16fb0390"
+    },
+    {
+      "path": "docs/preview-v0.12.0-seoul-switch-route.png",
+      "bytes": 79573,
+      "sha256": "8b7441c5976edac84beb4023f07362e9139a660a24fa7a895b74cff7595e8136"
+    },
+    {
+      "path": "docs/preview-v0.12.0-seoul.png",
+      "bytes": 84915,
+      "sha256": "10bb97da04ffbb158e9bba5e38dae0dfbb9b485410f0dc85148d2df3b5f3c8be"
+    },
+    {
+      "path": "docs/preview-v0.12.0-suwon.png",
+      "bytes": 77163,
+      "sha256": "74433aad147109f02ed7fc1b915a1eb7a3b7b328baa7e600e7844873b8319615"
+    },
+    {
+      "path": "docs/preview-v0.12.0-uiwang.png",
+      "bytes": 105851,
+      "sha256": "f2a6b9aa199a2e1d3350fc15e620eb6600b996da9c49ead4deda4bb474f6f02f"
+    },
+    {
+      "path": "docs/preview-v0.12.0-underground-seoul.png",
+      "bytes": 48066,
+      "sha256": "b04b2f147c1ae097d8e34adeb3ca038a7e94732417aa634bec607bd98dcc2dfc"
+    },
+    {
+      "path": "docs/preview-v0.12.0-yeongdeungpo.png",
+      "bytes": 93627,
+      "sha256": "f38973a632db3c206129dea3b5f1d1ef300b9ce2898ca2a2686a22a9a22384cf"
+    },
+    {
+      "path": "docs/preview-v0.12.0-yongsan.png",
+      "bytes": 99583,
+      "sha256": "38ff75d381beef2e0de25bd333559e0a6503efc632ea8c2e38e2de3a09ba4f9b"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -571,7 +661,7 @@
     {
       "path": "simulator/README.md",
       "bytes": 2310,
-      "sha256": "9f689a9299721f3bc7c6bef930c7e7b8e36a7a556ec6338c833a804260c5b5a6"
+      "sha256": "d2e77dd60c77832e115a93f1a85ee8e885de1aa5226cb8b95109d3bcf6e3abdb"
     },
     {
       "path": "simulator/app.js",
@@ -726,7 +816,7 @@
     {
       "path": "simulator/index.html",
       "bytes": 14882,
-      "sha256": "0547127d6d7ccacc78203ee946600d87ace02b50519532a0c53bf5a205efb9ee"
+      "sha256": "cc47e944c7be6277bfa5724b31dc4556241e92281da21958714de65871c98d6f"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -751,37 +841,37 @@
     {
       "path": "simulator/ls-switches.browser.test.py",
       "bytes": 2943,
-      "sha256": "2c92d5275758ebe76f64036ea5db1d7bf37cf96e4706b69e158b832be4ad86da"
+      "sha256": "b52c3fa372226de74d201a77a17adfb5c462ec5ffea8a7506ad6090e57b84783"
     },
     {
       "path": "simulator/ls-switches.js",
-      "bytes": 4220,
-      "sha256": "5558b5aeef71923f83b4b844e5d3ab9483d736019346f26b8392581e624dba2b"
+      "bytes": 5473,
+      "sha256": "0293a8476b45fac43f8ecf6d1ac803367211476f6823185fa91cc67df55716f5"
     },
     {
       "path": "simulator/ls-switches.test.cjs",
-      "bytes": 2349,
-      "sha256": "e21a6033847d60c6aaac47315d2a46482af45c70a2cca5d481ad644e2eebcd70"
+      "bytes": 3239,
+      "sha256": "b6e76f3ac10932820827fdfdf675f81bef0c5ea4cd628e13226b7afe45b8d7f5"
     },
     {
       "path": "simulator/ls-view.js",
-      "bytes": 18529,
-      "sha256": "d13eb0fd981338c199a5423c52f1c47beccd76ff0d07f2404aaaea712a323108"
+      "bytes": 21711,
+      "sha256": "1842a16dbf80856741d3489b584af23c1231110e145fcf12992f94f1687cec9e"
     },
     {
       "path": "simulator/ls-view.test.cjs",
-      "bytes": 4969,
-      "sha256": "b99e29988e42e7443163bb5729312ba0b7f24b1bcafdb45226aa8b28a08136fe"
+      "bytes": 6449,
+      "sha256": "0464f181c360e93ecb94c3bee6d1c4a3d5a52c0e0f13700ec96fc705f71e304c"
     },
     {
       "path": "simulator/ls.browser.test.py",
       "bytes": 6991,
-      "sha256": "7b6035128dbbcd3d2b8cf8d8a4a7bf71b82922001aefefb5ec7e28d5fc8bf18c"
+      "sha256": "87ae4e506ae6ef649e7f1e52332579fe37135140f45999c12dda6a8ea933fc91"
     },
     {
       "path": "simulator/network.browser.test.py",
       "bytes": 11930,
-      "sha256": "77ff68ea0536521fd84b7c5a07d2c021131eca2bcbd31226134e1e62fd39ea30"
+      "sha256": "e936406d23cd1b8700bbcc4ab05ca9169c8b2ab3eb7f8eefb22987750aa12c72"
     },
     {
       "path": "simulator/network.js",
@@ -825,8 +915,8 @@
     },
     {
       "path": "simulator/schematic-details.js",
-      "bytes": 30377,
-      "sha256": "0d29d372f066df54fbf1b350dfff5862bdfe411f6ccdf2ab8d6a34355cab7d03"
+      "bytes": 36287,
+      "sha256": "381efebb8d8fd50253e2f5c4dd215421f9357d67f5d44c3d71771f1ba47e314b"
     },
     {
       "path": "simulator/schematic-source.json",
@@ -836,7 +926,7 @@
     {
       "path": "simulator/schematic.browser.test.py",
       "bytes": 2405,
-      "sha256": "4d7caf2decde53f47cac7bf329221533b4286babc54f6d047cc031eeb6842591"
+      "sha256": "c41a39d3995a02e744ba61a26c556b3c4f626bffe9ae595733c99f70f948c8f5"
     },
     {
       "path": "simulator/station-views.test.cjs",
@@ -880,8 +970,8 @@
     },
     {
       "path": "tools/build-schematic-details.py",
-      "bytes": 4840,
-      "sha256": "fd7a67d4ddf01ef570e6c0e387ff4a205ff9412f1d4a689aa7b4d8aac7e881df"
+      "bytes": 5010,
+      "sha256": "93eb50f4c4068b6aad061d6721779cf5763abf4119b1d48e70939c151b0d8953"
     },
     {
       "path": "tools/compare-route-menus.cjs",

@@ -192,6 +192,20 @@
       "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
       "bytes": 1341,
       "sha256": "55b5d7bde48f3f2b2c950216b430aa7edcbab869cb3cdc279bf655b074e4b3ee"
+    },
+    {
+      "path": "references/transcriptions/README.md",
+      "original_name": "README.md",
+      "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
+      "bytes": 896,
+      "sha256": "dc13c97c90738f0c9edf746f840d357d1a545b4491d2200e6e151f970f16e315"
+    },
+    {
+      "path": "references/transcriptions/intermediate-circuits.json",
+      "original_name": "intermediate-circuits.json",
+      "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
+      "bytes": 16849,
+      "sha256": "c7d83372d819962397701093551699003268d0f04bca988c6ffbdb60b8c35613"
     }
   ],
   "pending_attachments": [],

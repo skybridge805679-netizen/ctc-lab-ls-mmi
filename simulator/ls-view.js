@@ -18,11 +18,25 @@ function railY(def,id,x){
 }
 // 관악 belongs to the Anyang screen. Move its complete source strip, retaining the source registration.
 const GWANAK={cut:1496,dx:-1607.4,dy:108.8};
-function sceneOf(st){
+function sourceSceneOf(st){
  const data=details[st.id];if(!['geumcheon','anyang'].includes(st.id))return data;
  const g=details.geumcheon,{cut,dx,dy}=GWANAK;
  if(st.id==='geumcheon')return {...data,cells:data.cells.filter(c=>c[0]<cut).map(([x,y,w,label])=>[x,y,Math.min(w,cut-x),label]),capsules:data.capsules.filter(c=>c[0]<cut)};
  return {...data,cells:[...data.cells.filter(c=>c[0]>=109),...g.cells.filter(c=>c[0]+c[2]>cut).map(([x,y,w,label])=>[Math.max(x,cut)+dx,y+dy,x+w-Math.max(x,cut),label])],capsules:[...data.capsules,...g.capsules.filter(c=>c[0]>=cut).map(([x,y,...rest])=>[x+dx,y+dy,...rest])]};
+}
+function sceneOf(st){
+ const data=sourceSceneOf(st);let cells=data.cells;
+ for(const [x,y]of data.ignoreCells||[])cells=cells.filter(c=>Math.abs(c[0]-x)>1||Math.abs(c[1]-y)>2);
+ for(const strip of data.strips||[]){
+  const {left,right,y,codes}=strip,next=[];
+  for(const c of cells){
+   const [x,row,w,label]=c;if(Math.abs(row-y)>6||x+w<=left||x>=right){next.push(c);continue;}
+   if(x<left)next.push([x,row,left-x,label]);if(x+w>right)next.push([right,row,x+w-right,label]);
+  }
+  const w=(right-left)/codes.length;
+  codes.forEach((label,i)=>next.push([left+i*w,y,w-2,label]));cells=next;
+ }
+ return {...data,cells:cells.filter(c=>c[2]>=2)};
 }
 function wingOf(st,def){
  const original=inventory[st.id],data=sceneOf(st),{cut,dx,dy}=GWANAK;
@@ -40,7 +54,7 @@ function wingOf(st,def){
   diags:source.diags.filter(p=>inside(mean(p,0),mean(p,1))&&band(mean(p,1))&&(Math.max(...p.map(q=>q[0]))>hi+1||Math.min(...p.map(q=>q[0]))<lo-1)),
   platforms:source.platforms.filter(p=>(inside((p[0]+p[2])/2,(p[1]+p[3])/2)||(st.id==='anyang'&&p[0]<0))&&band((p[1]+p[3])/2)),
   plates:plates.map((box,i)=>({box,name:st.map.view.intermediate[i]||''})),
-  labels:source.labels.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1])),
+  labels:source.labels.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1])&&!def.signals.some(s=>s[0]===p[2].replace(/^0+/,''))),
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
@@ -60,9 +74,15 @@ function layout(def,wing){
  const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
  const pitch=Math.min(...pitches,80);
  const sx=(WIDTH-2*PADDING)/(maxX-minX),sy=Math.max(sx,80/pitch);
- const top=72;
- const yAt=y=>top+(y-minY)*sy;
- return {sx,sy,H:Math.max(460,Math.ceil(yAt(maxY)+72)),pt:([x,y])=>[+(PADDING+(x-minX)*sx).toFixed(2),+yAt(y).toFixed(2)]};
+ // Reserve the original broad scissors footprint after increasing the rail spacing.
+ // One monotone X transform moves rails, cells, signals and active routes together.
+ const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z)]);
+ const knots=[...new Set([minX,maxX,...spans.flat()])].sort((a,b)=>a-b);
+ const weights=knots.slice(1).map((x,i)=>{const lo=knots[i],mid=(x+lo)/2,span=spans.find(([a,b])=>mid>=a&&mid<=b);return span?Math.max(1,100/((span[1]-span[0])*sx)):1;});
+ const cumulative=[0];weights.forEach((w,i)=>cumulative.push(cumulative.at(-1)+(knots[i+1]-knots[i])*w));
+ const xAt=x=>{let i=0;while(i<weights.length-1&&x>knots[i+1])i++;return PADDING+(cumulative[i]+(x-knots[i])*weights[i])*(WIDTH-2*PADDING)/cumulative.at(-1);};
+ const top=72,yAt=y=>top+(y-minY)*sy;
+ return {sx,sy,H:Math.max(460,Math.ceil(yAt(maxY)+72)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
 function render(st,def,core,model,neighbours={}){
@@ -76,11 +96,27 @@ function render(st,def,core,model,neighbours={}){
   let [x,y,w,label]=source;
   const nearby=rows.filter(row=>Math.abs(row-y)<6).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y));
   if(nearby.length)y=nearby[0];
-  const [X,Y]=T([x,y]);return {index,source,x:X,y:Y,width:w*L.sx,label};
+  const [X,Y]=T([x,y]);return {index,source,x:X,y:Y,width:T([x+w,y])[0]-X,label};
  });
- const active=Object.entries(model.routes).map(([id,state])=>({id,state:state.occupied?'occupied':state.lock?'locked':'set',points:routePoints(core.routes[id].path)}));
+ const switches=switchView.build(st,def,core,model,T);
+ const projectRoute=(points,destination)=>{
+  const out=[points[0]],near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<.1;
+  for(let i=1;i<points.length;i++){
+   const a=points[i-1],b=points[i],c=switches.connectors.find(c=>c.kind==='scissors'&&((near(a,c.endpoints[0])&&near(b,c.endpoints[1]))||(near(a,c.endpoints[1])&&near(b,c.endpoints[0]))));
+   if(c){const shape=near(a,c.endpoints[0])?c.fullPoints:[...c.fullPoints].reverse();out.push(...shape.slice(1).map(p=>[...p]));}else out.push(b);
+  }
+  // Stop at the named boundary section, rather than painting adjoining intermediate blocks.
+  if(/^B\d{3,4}T(?:[12]T)?$/.test(destination)&&out.length>1){
+   const a=out.at(-2),b=out.at(-1);
+   if(Math.abs(a[1]-b[1])<.1)for(const c of cells.filter(c=>c.label.replaceAll(' · ','')===destination&&Math.abs(c.y-b[1])<6)){
+    if(b[0]>a[0]&&c.x+c.width>a[0]&&c.x+c.width<b[0])b[0]=c.x+c.width;
+    else if(b[0]<a[0]&&c.x<a[0]&&c.x>b[0])b[0]=c.x;
+   }
+  }return out;
+ };
+ const active=Object.entries(model.routes).map(([id,state])=>({id,state:state.occupied?'occupied':state.lock?'locked':'set',points:projectRoute(routePoints(core.routes[id].path),core.routes[id].destination)}));
  const onRoute=cell=>active.find(route=>route.points.slice(1).some((b,i)=>{const a=route.points[i];return Math.abs(a[1]-b[1])<.5&&Math.abs(a[1]-cell.y)<5&&Math.min(a[0],b[0])<cell.x+cell.width-2&&Math.max(a[0],b[0])>cell.x+2;}));
- const paths=def.rails.map(r=>r[1].map(T));
+ const paths=[...def.rails.map(r=>r[1].map(T)),...(data.joins||[]).map(poly=>poly.map(T))];
  const pointAnchors={};
  for(const [id,a,x,b,z]of def.links){const p=T([x,railY(def,a,x)]),q=T([z,railY(def,b,z)]);pointAnchors[id]=[(p[0]+q[0])/2,(p[1]+q[1])/2];}
  // Adjacent source cells form continuous rail runs; circuit boundaries are drawn once as ticks, never nested boxes.
@@ -105,11 +141,12 @@ function render(st,def,core,model,neighbours={}){
   occupiedBoxes.push([x-3,y-3,right+3,bottom+3]);
  }
  for(const points of paths)rails+=`<path d="${dpath(points)}"/>`;
- for(const polygon of wing.diags)rails+=`<polygon class="rail-join" points="${polygon.map(p=>T(p).join(',')).join(' ')}"/>`;
+ for(const polygon of (data.joins?.length?[]:wing.diags))rails+=`<polygon class="rail-join" points="${polygon.map(p=>T(p).join(',')).join(' ')}"/>`;
  for(const c of cells){
   const state=onRoute(c)?.state||'clear';
   sections+=`<g class="track-cell ${state}" data-track-section="${st.id}-${c.index}" data-track-circuit="${esc(c.label)}" data-track-state="${state}"><rect class="cell-bed" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/><title>${esc(c.label||'원본 무기명 구간')} · ${state}</title></g>`;
-  const tokens=c.label.split(' · ').filter(Boolean);
+  const atomic=c.label.replaceAll(' · ','');
+  const tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   tokens.forEach((label,i)=>{
    const x=c.x+c.width*(i+.5)/tokens.length,width=c.width/tokens.length;
    const fit=label.length*7.2>width-6?` textLength="${Math.max(12,width-6)}" lengthAdjust="spacingAndGlyphs"`:'';
@@ -140,7 +177,9 @@ function render(st,def,core,model,neighbours={}){
  for(const plate of wing.plates){
   const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),x=(left+right)/2,width=Math.max(right-left,plate.name.length*16+18);
   const near=wing.platforms.filter(p=>Math.abs(T([(p[0]+p[2])/2,0])[0]-x)<150).map(p=>T([p[0],p[1]])[1]);
-  const y=(near.length?Math.min(...near):topRow)-48;
+  const platformY=near.length?Math.min(...near):topRow;
+  const localRails=cells.filter(c=>x>=c.x-20&&x<=c.x+c.width+20).map(c=>c.y).sort((a,b)=>Math.abs(a-platformY)-Math.abs(b-platformY));
+  const y=(localRails[0]??topRow)-48;
   plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><path class="stn-line" d="M${x} ${y+24}V${(near.length?Math.min(...near):topRow)-9}"/><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
   occupiedBoxes.push([x-width/2-3,y-4,x+width/2+3,y+36]);
  }
@@ -200,7 +239,9 @@ function render(st,def,core,model,neighbours={}){
  for(const [id,pos]of Object.entries(core.points)){
   const anchor=pointAnchors[id]||T(toLocal(pos.x,pos.y)),R=model.points[id]==='R',locked=model.blockedPoints.includes(id);
   const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>T(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
-  const label=takeLabel(id,anchor,'point',id,surveyed||[anchor[0],anchor[1]-13]);
+  const scissors=switches.connectors.find(c=>c.id===id&&c.kind==='scissors');
+  const preferred=scissors?[scissors.endpoints[0][0]+(scissors.endpoints[1][0]-scissors.endpoints[0][0])*.25,scissors.endpoints[0][1]+(scissors.endpoints[0][1]<scissors.endpoints[1][1]?-24:24)]:surveyed||[anchor[0],anchor[1]-13];
+  const label=takeLabel(id,anchor,'point',id,preferred);
   pointSymbols+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-label="${id}">${label.svg}<title>${id} · ${R?'반위':'정위'}${locked?' · 수동 쇄정':''}</title></g>`;
   if(overlapPoints.has(id))pointSymbols+=`<circle class="overlap-ring" data-overlap-point="${id}" cx="${label.x}" cy="${label.y}" r="18"/>`;
  }
@@ -215,7 +256,6 @@ function render(st,def,core,model,neighbours={}){
  const edgeY=topRow-28;
  if(neighbours.left)plates+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(neighbours.left)}</text>`;
  if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
- const switches=switchView.build(st,def,core,model,T);
  return {width:WIDTH,height:L.H,svg:`${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}`};
 }
 const api={render,layout,wingOf,sceneOf};

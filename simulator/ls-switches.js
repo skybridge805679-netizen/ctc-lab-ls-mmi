@@ -7,7 +7,7 @@ function onSegment(p,a,b){return Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b
 function at(rail,x){const poly=rail[1];for(let i=1;i<poly.length;i++){const a=poly[i-1],b=poly[i];if(x>=Math.min(a[0],b[0])&&x<=Math.max(a[0],b[0])&&b[0]!==a[0])return [x,a[1]+(x-a[0])*(b[1]-a[1])/(b[0]-a[0])];}throw Error('Switch anchor is off rail '+rail[0]);}
 function towards(a,b,distance,limit=.44){const length=Math.hypot(b[0]-a[0],b[1]-a[1]);const t=Math.min(limit,distance/(length||1));return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
 function build(st,def,core,model,T){
- const rails=new Map(def.rails.map(r=>[r[0],r])),cuts=[],connectors=[],states=[];
+ const rails=new Map(def.rails.map(r=>[r[0],r])),cuts=[],connectors=[],states=[],glyphMasks=[];
  const locked=new Set(Object.keys(model.routes).flatMap(id=>[...(core.routes[id].pointLocks||[]),...Object.keys(core.overlapOf(id)?.points||{})]));
  const flags=id=>({id,position:model.points[id]||'N',locked:locked.has(id)||model.blockedPoints.includes(id)});
  const cut=(id,a,b)=>cuts.push({id,points:[a,b]});
@@ -17,11 +17,23 @@ function build(st,def,core,model,T){
  };
  for(const [id,a,x,b,z]of def.links){
   const p=T(at(rails.get(a),x)),q=T(at(rails.get(b),z)),state=flags(id),R=state.position==='R';
+  const paired=def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5);
+  const center=[(p[0]+q[0])/2,(p[1]+q[1])/2],neck=Math.min(6,Math.abs(q[0]-p[0])*.18),left=[center[0]-neck,center[1]],right=[center[0]+neck,center[1]];
+  const fullPoints=paired?[p,left,center,right,q]:[p,q];
+  // The original scissors symbol has a pinched horizontal neck and a narrow central isolation slot.
+  let glyphMask='';
+  if(!R){
+   glyphMask='scissors-gap-'+st.id+'-'+id;
+   const len=Math.hypot(q[0]-p[0],q[1]-p[1]),nx=-(q[1]-p[1])/len,ny=(q[0]-p[0])/len;
+   const slot=paired?`<rect x="${center[0]-2}" y="${center[1]-BAR}" width="4" height="${BAR*2}" fill="black"/>`:`<path d="M${center[0]-nx*BAR} ${center[1]-ny*BAR}L${center[0]+nx*BAR} ${center[1]+ny*BAR}" stroke="black" stroke-width="4"/>`;
+   glyphMasks.push(`<mask id="${glyphMask}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="1680" height="2400"><rect x="-40" y="-40" width="1680" height="2400" fill="white"/>${slot}</mask>`);
+   cut(id,[center[0]-2,center[1]],[center[0]+2,center[1]]);
+  }
   // With the diagonal selected, its two alternate straight continuations have real gaps.
   if(R){const direction=Math.sign(q[0]-p[0])||1;mainGap(id,a,p,direction);mainGap(id,b,q,-direction);}
-  // A normal crossover remains attached at its heel; only the toe is open.
-  const points=R?[p,q]:[towards(p,q,OFFSET+GAP),q];
-  connectors.push({...state,kind:'crossover',points});states.push({...state,kind:'crossover',connected:R});
+  // In N the original central isolation slot separates the two arms.
+  const points=R?fullPoints:paired?[p,left,right,q]:[p,center,q];
+  connectors.push({...state,kind:paired?'scissors':'crossover',points,fullPoints,endpoints:[p,q],glyphMask});states.push({...state,kind:'crossover',connected:R});
  }
  // Terminal rail joins (sidings and refuge tracks) also contain blades; they are not independent crossovers.
  for(const rail of def.rails){
@@ -40,8 +52,8 @@ function build(st,def,core,model,T){
   }
  }
  const maskId='switch-shape-'+st.id;
- const mask=`<defs><mask id="${maskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="1680" height="2400"><rect x="-40" y="-40" width="1680" height="2400" fill="white"/>${cuts.map(c=>`<path data-switch-gap="${c.id}" d="${dpath(c.points)}" fill="none" stroke="black" stroke-width="${BAR+2}" stroke-linecap="butt"/>`).join('')}</mask></defs>`;
- const svg=connectors.map(c=>`<path class="switch-connection" data-switch-connection="${c.id}" data-position="${c.position}" data-connected="${c.position==='R'}" data-locked="${c.locked}" d="${dpath(c.points)}"/>`).join('');
+ const mask=`<defs>${glyphMasks.join('')}<mask id="${maskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="1680" height="2400"><rect x="-40" y="-40" width="1680" height="2400" fill="white"/>${cuts.map(c=>`<path data-switch-gap="${c.id}" d="${dpath(c.points)}" fill="none" stroke="black" stroke-width="${BAR+2}" stroke-linecap="butt"/>`).join('')}</mask></defs>`;
+ const svg=connectors.map(c=>`<path class="switch-connection" data-switch-connection="${c.id}" data-switch-form="${c.kind}" ${c.glyphMask?`mask="url(#${c.glyphMask})"`:""} data-position="${c.position}" data-connected="${c.position==='R'}" data-locked="${c.locked}" d="${dpath(c.points)}"/>`).join('');
  const metadata=states.map(s=>`<g data-switch-geometry="${s.id}" data-position="${s.position}" data-locked="${s.locked}" data-connected="${s.connected}" data-switch-kind="${s.kind}"><title>${s.id} ${s.position==='R'?'반위 · 분기 연결':'정위 · 직선 연결'}${s.locked?' · 쇄정':''}</title></g>`).join('');
  return {mask,maskId,svg,metadata,states,cuts,connectors};
 }
