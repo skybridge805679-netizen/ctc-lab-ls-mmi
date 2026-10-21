@@ -63,9 +63,11 @@ def exercise(page, url):
             release()
             route('3A', '3A-B065T')
         elif index == 5:
+            page.locator('#controlSelect').select_option('point')
             for point in ['21', '22']:
-                page.locator(f'[data-control-station="underground-seoul"][data-primary="true"] [data-point="{point}"]').click()
-                confirm()
+                page.locator('#mmiPoint').select_option(point)
+                page.locator('input[name="pointPosition"][value="R"]').check()
+                page.locator('#mmiApply').click()
                 expect(page.locator('.point-states')).to_contain_text(point+' 반위')
         elif index == 6:
             for response in ['no', 'yes']:

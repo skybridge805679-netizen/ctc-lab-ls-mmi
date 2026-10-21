@@ -38,6 +38,7 @@ def exercise(page, url, width):
     expect(row.locator('.chip.set')).to_have_text('설정')
     expect(row.locator('.overlap-note')).to_contain_text('26')
     expect(page.locator('[data-overlap-point="26"]')).to_have_count(1)
+    expect(page.locator('[data-point-label="26"]')).to_have_count(1)
 
     # No approaching train: stop releases immediately.
     click_svg('[data-signal="2B"]')
@@ -64,8 +65,10 @@ def exercise(page, url, width):
     expect(row.locator('[data-lock-remaining]')).to_have_text(__import__('re').compile(r'^(8[5-9]|90)$'))
 
     # Overlap point cannot be moved while the route (or its lock) exists.
-    click_svg('[data-control-station="geumcheon"][data-primary="true"] [data-point="26"]')
-    confirm()
+    page.locator('#controlSelect').select_option('point')
+    page.locator('#mmiPoint').select_option('26')
+    page.locator('input[name="pointPosition"][value="R"]').check()
+    page.locator('#mmiApply').click()
     expect(page.locator('#toast')).to_contain_text('오버랩 쇄정 전환기')
 
     # Time alone releases it after 90 s; the skip button adds 10 s at a time.

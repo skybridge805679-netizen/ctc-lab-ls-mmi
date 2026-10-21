@@ -24,10 +24,9 @@ def check(page, url, screenshot=False):
         page.locator('#lsStationSelect').select_option(station['id'])
         expect(page.locator('#stationSelect')).to_have_value(station['id'])
         expect(page.locator('#stationScope')).to_contain_text(station['label'].split(' [')[0].split(' ·')[0])
-        assert page.locator('#trackSvg image').first.evaluate('(e)=>{const i=new Image();i.src=e.getAttribute("href");return i.src.length>0}')
-        image_path = page.locator('#trackSvg image').first.get_attribute('href')
-        response = page.request.get(url+image_path)
-        assert response.ok and len(response.body()) > 1000, image_path
+        # The LS is drawn as vector; no background image may be used.
+        expect(page.locator('#trackSvg image')).to_have_count(0)
+        expect(page.locator('#trackSvg .bed-inner path').first).to_be_attached()
         if '비연동' in station['label']:
             expect(page.locator('#mmiApply')).to_be_disabled()
             continue

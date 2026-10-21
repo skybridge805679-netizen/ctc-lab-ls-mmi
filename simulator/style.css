@@ -59,3 +59,58 @@
 .lock-row .route-run-controls button{min-height:36px}.lock-row .route-run-controls button:disabled{opacity:.45;cursor:not-allowed}
 .point-states{margin:12px 0 0;font-size:13px;color:#2b3a4a}
 @media(max-width:760px){.track-frame svg{min-width:720px}.track-frame.station-view svg{min-width:720px}.legend .legend-note{margin-left:0;width:100%}.lock-list{grid-template-columns:1fr}.board-head span{width:100%}}
+
+/* v0.8 LS redraw: vector diagram, dark control-room canvas, centred and full width */
+.ls-display{background:#0f1923;margin:12px 16px 0;border-radius:8px;overflow:hidden;min-height:0}
+.fidelity-note{background:#16232f;color:#a9bccd;border-bottom:1px solid #243645}.fidelity-note b{color:#ffb02e}
+.ls-stage{padding:16px 18px 6px;overflow-x:auto;background:#0f1923}
+.ls-head{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;justify-content:center;margin-bottom:6px}
+.ls-modes{display:flex;gap:6px}
+.mode-btn,.stop-all{min-height:40px;padding:0 16px;border:2px solid #4a6177;border-radius:6px;background:#1b2b3a;color:#dce8f3;font-weight:800;font-size:15px;letter-spacing:.04em;cursor:pointer}
+.mode-btn:hover,.stop-all:hover{border-color:#7fd4ff}.mode-btn:focus-visible,.stop-all:focus-visible{outline:3px solid #7fd4ff;outline-offset:2px}
+.mode-btn.on.auto{background:#2fe872;border-color:#2fe872;color:#06210f}.mode-btn.on.ccm{background:#ffe14a;border-color:#ffe14a;color:#2a2400}.mode-btn.on.local{background:#ffb02e;border-color:#ffb02e;color:#2a1700}
+.stop-all{background:#3a1b1b;border-color:#a34a4a;color:#ffd7d3}
+.ls-name{display:flex;align-items:baseline;gap:10px;padding:6px 16px;border:2px solid #4a6177;border-radius:6px;background:#05090d;color:#fff}.ls-name b{font-size:20px}.ls-name span{font-size:15px;color:#9fb2c4;font-variant-numeric:tabular-nums}
+.ls-svg{display:block;width:100%;height:auto;min-width:760px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;touch-action:pan-x pan-y}
+.ls-svg .bed-outer path{fill:none;stroke:#04080c;stroke-width:21;stroke-linejoin:round}
+.ls-svg .bed-inner path{fill:none;stroke:#c2ccd6;stroke-width:12;stroke-linejoin:round}
+.ls-svg .route-halo{fill:none;stroke:#04080c;stroke-width:17;stroke-linejoin:round;opacity:.65;pointer-events:none}
+.ls-svg .route-line{fill:none;stroke-width:10;stroke-linejoin:round;pointer-events:none;stroke-opacity:.96}
+.ls-svg .route-line.locked{animation:lockdash 1.2s linear infinite}
+.ls-svg .rail-tag{fill:#8ea2b5;font-size:15px;font-weight:600}
+.ls-svg .point-tag rect{fill:#1d3042;stroke:#6f8aa3;stroke-width:1.5}.ls-svg .point-tag text{fill:#dbe7f2;font-size:15px;font-weight:700}
+.ls-svg .point-tag.rev rect{fill:#ffb02e;stroke:#ffb02e}.ls-svg .point-tag.rev text{fill:#2a1a00}.ls-svg .point-tag.locked rect{stroke:#ff5a4f;stroke-width:3}
+.ls-svg .overlap-ring{fill:none;stroke:#c58bff;stroke-width:3;stroke-dasharray:6 4;pointer-events:none}
+.ls-svg .mast{fill:none;stroke:#b9c9d8;stroke-width:3}
+.ls-svg .lamp{stroke:#05090d;stroke-width:2.5}.ls-svg .lamp.stop{fill:#e5392e}.ls-svg .lamp.go{fill:#2fe872}.ls-svg .lamp.go.shunt{fill:#f4f8fb}.ls-svg .lamp.lock{stroke:#ffb02e;stroke-width:4}
+.ls-svg .sig-name{fill:#eef4f9;font-size:17px;font-weight:700;paint-order:stroke;stroke:#0f1923;stroke-width:3px;stroke-linejoin:round}
+.ls-svg .signal.shunt .sig-name{fill:#b7c7d6;font-size:15px;font-weight:600}
+.ls-svg .signal-hit{cursor:pointer}.ls-svg .signal-hit:hover rect,.ls-svg .signal-hit:focus rect{fill:rgba(127,212,255,.18);stroke:#7fd4ff;stroke-width:2;rx:6}.ls-svg [tabindex]:focus-visible{outline:none}
+.ls-svg .approach-train rect{fill:#2f6ee8;stroke:#fff;stroke-width:2}.ls-svg .approach-train path{stroke:#fff;stroke-width:3}.ls-svg .approach-train text{fill:#fff;font-size:13px;font-weight:700}
+.ls-bottom{background:#16232f;color:#a9bccd;border-top:1px solid #243645}.ls-bottom .text-btn{color:#cfe3f5}
+.station-tabs button{position:relative}
+@media(max-width:760px){.ls-head{justify-content:flex-start}.ls-stage{padding:12px 10px 4px}}
+
+.station-tabs button{display:inline-flex;align-items:center;gap:6px}
+.tab-dot{width:9px;height:9px;border-radius:50%;background:#2fe872;border:1.5px solid #fff;box-shadow:0 0 0 1px #8aa0b3}.tab-dot.ccm{background:#ffe14a}.tab-dot.local{background:#ffb02e}
+.tab-count{min-width:18px;padding:0 5px;border-radius:9px;background:#2f6ee8;color:#fff;font-size:11px;line-height:18px;text-align:center}.tab-count:empty{display:none}
+.station-tabs button.selected .tab-dot{border-color:#fff}
+
+.ls-svg .ext-outer path{fill:none;stroke:#04080c;stroke-width:17}.ls-svg .ext-inner path{fill:none;stroke:#7f91a3;stroke-width:9}
+.ls-svg .platform{fill:#1c2d3d;stroke:#4f677c;stroke-width:1.5;stroke-dasharray:5 4}
+.ls-svg .stn-line{stroke:#6f879c;stroke-width:2;stroke-dasharray:3 5;fill:none}
+.ls-svg .plate{fill:#05090d;stroke:#7f91a3;stroke-width:2}.ls-svg .plate-name{fill:#fff;font-size:21px;font-weight:800;letter-spacing:.08em}
+.ls-svg .nb-tag{fill:#cfe3f5;font-size:16px;font-weight:700;paint-order:stroke;stroke:#0f1923;stroke-width:3px}
+
+/* v0.8 rails: thicker bars so track names sit inside, inter-station rails continue to the screen edge */
+.ls-svg .bed-outer path{stroke-width:27}.ls-svg .bed-inner path{stroke-width:21}
+.ls-svg .route-halo{stroke-width:20}.ls-svg .route-line{stroke-width:12}
+.ls-svg .rail-name{fill:#16222d;font-size:13px;font-weight:800;letter-spacing:.02em}
+.ls-svg .platform{fill:#1b2c3c}
+/* wings: extracted track-circuit strips of the jurisdiction stations */
+.ls-svg .wing-outer rect,.ls-svg .wing-outer polygon{fill:#04080c;stroke:#04080c;stroke-width:3;stroke-linejoin:round}
+.ls-svg .wing-inner rect,.ls-svg .wing-inner polygon{fill:#c2ccd6;stroke:none}
+.ls-svg .cell-name{fill:#16222d;font-size:13px;font-weight:800;letter-spacing:.02em}
+.ls-svg .wing-label{fill:#e6eef6;font-size:14px;font-weight:700;paint-order:stroke;stroke:#0f1923;stroke-width:3px}
+.ls-svg .platform.orange{fill:#f5a623;stroke:none;stroke-dasharray:none}.ls-svg .platform.cyan{fill:#19d3e8;stroke:none;stroke-dasharray:none}
+.ls-svg .signal.wing .lamp{stroke:#05090d;stroke-width:2.5}
