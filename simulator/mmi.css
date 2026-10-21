@@ -46,3 +46,16 @@
 .mmi-log td{padding:1px 8px;border-bottom:1px solid #f0f0ee;white-space:nowrap}
 .mmi-log th:nth-child(1),.mmi-log td:nth-child(1){width:64px}.mmi-log th:nth-child(2),.mmi-log td:nth-child(2){width:150px}
 .mmi-log tr.empty td{color:#8a8a86;text-align:center}
+
+/* graph window: plot first (as on the real T/G), training tools below it */
+.mmi-win .graph-panel{display:flex;flex-direction:column}
+.mmi-win .graph-panel>.tg-menubar{order:0}.mmi-win .graph-panel>.graph-scroll{order:1}
+.mmi-win .graph-panel>#graphMessage{order:2}.mmi-win .graph-panel>.graph-toolbar{order:3}
+.mmi-win .graph-panel>.graph-notice{order:4}.mmi-win .graph-panel>#graphDetails{order:5}
+.mmi-win .graph-scroll{overflow:auto;background:#fff}
+.mmi-win #diaSvg{display:block;width:100%;height:auto}
+.mmi-win:has(#diaSvg) .mmi-win-body{max-height:none}
+.tg-menubar{display:flex;gap:2px;padding:1px 4px;background:#f0f0ee;border-bottom:1px solid #a6a6a2}
+.tg-menu{padding:3px 10px;border:1px solid transparent;background:transparent;font-size:12px;color:#111;cursor:default}
+.tg-menu:hover{background:#316ac5;color:#fff}
+.mmi-win .graph-scroll{max-height:none;overflow-y:visible}

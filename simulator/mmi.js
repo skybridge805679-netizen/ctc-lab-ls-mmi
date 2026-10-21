@@ -32,7 +32,11 @@ function renderLogs(){
  }
 }
 function log(kind,text,date=new Date()){logRows[kind].unshift({time:stamp(date),text});if(logRows[kind].length>500)logRows[kind].length=500;renderLogs();}
-const stationLabel=id=>{const s=N?.catalog[id];return s?{name:s.name,code:s.code}:{name:id,code:''};};
+// Station names and codes as the real MMI shows them (photos): Cheongnyangni is 지하청량리; the 18 jurisdiction stations have codes too.
+const REAL_NAME={cheongnyangni:'지하청량리'};
+const REAL_CODE={'제기동':'010001','신설동':'010002','동대문':'010011','종로5가':'010012','종로3가':'010013','시청':'010021','남영':'010041','대방':'010051','신길':'010061','신도림':'010071','가산디지털':'010081','독산':'010082','석수':'010091','관악':'010092','명학':'010101','당정':'010121','성균관대':'010131','화서':'010132'};
+function stationInfo(id){const s=N?.catalog[id];if(!s)return {name:id,code:''};return {name:REAL_NAME[id]||s.name,code:s.controlled?s.code:(REAL_CODE[s.name]||'')};}
+const stationLabel=stationInfo;
 const routeText=id=>'RT_'+id.replace('-','_');
 // Alarm log: route set / release. Event log: mode change and base scan. A new state object (reset) is a silent baseline.
 const seen={};
@@ -68,13 +72,17 @@ function createWindow(id,{title,x=24,y=24,width,body,host=null,onClose=null}){
  if(host)new MutationObserver(()=>{el.hidden=host.hidden;}).observe(host,{attributes:true,attributeFilter:['hidden']});
  return w;
 }
+function fitDesktop(){
+ if(!desktop)return;let bottom=0;for(const w of Object.values(windows))if(!w.el.hidden)bottom=Math.max(bottom,w.el.offsetTop+w.el.offsetHeight);
+ desktop.style.minHeight=Math.max(760,bottom+16)+'px';
+}
 function open(id){
  const w=windows[id];if(!w){return null;}
  // an already open window is only brought to the front (re-running the opener would reload its draft)
  if(w.host&&w.host.hidden){w.host.hidden=false;w.opener?.();}
- w.el.hidden=false;focus(w);return w;
+ w.el.hidden=false;focus(w);fitDesktop();return w;
 }
-function close(id){const w=windows[id];if(!w)return;if(w.host){const btn=w.closer?$(w.closer):null;if(btn)btn.click();w.host.hidden=true;}w.el.hidden=true;}
+function close(id){const w=windows[id];if(!w)return;if(w.host){const btn=w.closer?$(w.closer):null;if(btn)btn.click();w.host.hidden=true;}w.el.hidden=true;fitDesktop();}
 const isOpen=id=>!!windows[id]&&!windows[id].el.hidden;
 
 // windows that exist on the real MMI but are not implemented yet
@@ -124,7 +132,12 @@ function init(){
  field.classList.add('mmi-field');
  createWindow('field',{title:'현장설비제어',x:18,y:14,width:560,host:field});
  windows.field.el.hidden=false;
- if(graph){const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:40,y:24,width:1180,host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';}
+ if(graph){
+  const bar=doc.createElement('div');bar.className='tg-menubar';
+  bar.innerHTML=['파일(F)','편집(E)','보기(V)','Dia 보기(V)','화면설정(D)','즐겨찾기','도움말(H)'].map(n=>`<button type="button" class="tg-menu" title="원본 메뉴 항목을 아직 확인하지 못했습니다">${n}</button>`).join('');
+  graph.insertBefore(bar,graph.firstChild);
+  bar.addEventListener('click',e=>{if(e.target.closest('.tg-menu'))$('graphMessage').textContent='이 메뉴의 원본 항목은 아직 확인하지 못했습니다. 아래 교육용 도구로 시간 범위·검색·지연·운휴를 조작하세요.';});
+  const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  placeholder('trainNumber','[CA012_01] 열차번호제어','열차번호제어 화면(작업구분 삽입·삭제·수정·이동·교환, 제어영역 리스트)은 사진으로 구조만 확인했으며 아직 구현하지 않았습니다.');
  placeholder('trace','열차추적(T)');
@@ -137,5 +150,5 @@ function init(){
  renderLogs();
 }
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
-root.SimMMI={open,close,isOpen,log,sync,syncAll,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

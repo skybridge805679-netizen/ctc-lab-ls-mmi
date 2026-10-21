@@ -188,6 +188,7 @@ def check(page, url, screenshot=False):
     page.locator('#scheduleFind').click()
     expect(page.locator('#scheduleTrain')).to_have_value('K2001')
     expect(page.locator('#scheduleCancelled')).to_be_checked()
+    front(page, 'graph')
     with page.expect_download() as info:
         page.locator('#graphExport').click()
     final = json.loads(Path(info.value.path()).read_text())
