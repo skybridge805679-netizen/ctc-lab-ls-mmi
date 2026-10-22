@@ -39,10 +39,15 @@ const stamp=d=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'nume
 function renderLogs(){
  for(const kind of ['alarm','event']){
   const body=$(kind+'LogBody');if(!body)continue;
-  body.innerHTML=logRows[kind].length?logRows[kind].slice(0,200).map(r=>`<tr><td>[안내]</td><td>${r.time}</td><td>${esc(r.text)}</td></tr>`).join(''):`<tr class="empty"><td colspan="3">기록 없음</td></tr>`;
+  body.innerHTML=logRows[kind].length?logRows[kind].slice(0,200).map(r=>`<tr><td>[${LEVELS[r.level||'I']}]</td><td>${r.time}</td><td>${esc(r.text)}</td></tr>`).join(''):`<tr class="empty"><td colspan="3">기록 없음</td></tr>`;
  }
 }
-function log(kind,text,date=new Date()){logRows[kind].unshift({time:stamp(date),text});if(logRows[kind].length>500)logRows[kind].length=500;renderLogs();}
+// 경고 종류 (실기1 p.87): 중대한 오류(F) · 오류(E) · 경고(W) · 안내(I) · 디버깅(D)
+const LEVELS={F:'중대한 오류',E:'오류',W:'경고',I:'안내',D:'디버깅'};
+// operator histories shown by the 시스템 조회 windows
+const history={train:[],mode:[],field:[],ack:[],schedule:[]};
+function record(kind,row){history[kind].unshift({time:stamp(new Date()),...row});if(history[kind].length>500)history[kind].length=500;}
+function log(kind,text,date=new Date(),level='I'){logRows[kind].unshift({time:stamp(date),text,level});if(logRows[kind].length>500)logRows[kind].length=500;renderLogs();}
 // Station names and codes as the real MMI shows them (photos): Cheongnyangni is 지하청량리; the 18 jurisdiction stations have codes too.
 const REAL_NAME={cheongnyangni:'지하청량리'};
 const REAL_CODE={'제기동':'010001','신설동':'010002','동대문':'010011','종로5가':'010012','종로3가':'010013','시청':'010021','남영':'010041','대방':'010051','신길':'010061','신도림':'010071','가산디지털':'010081','독산':'010082','석수':'010091','관악':'010092','명학':'010101','당정':'010121','성균관대':'010131','화서':'010132'};
@@ -60,15 +65,16 @@ function renderAlarm(){
   alarmEl=doc.createElement('div');alarmEl.className='mmi-alarm';alarmEl.setAttribute('role','alertdialog');alarmEl.setAttribute('aria-label','알람메시지');alarmEl.hidden=true;
   alarmEl.innerHTML=`<div class="mmi-alarm-title"><span>알람메시지</span><button type="button" class="mmi-alarm-x" aria-label="알람메시지 닫기">✕</button></div><div class="mmi-alarm-body"><div class="mmi-alarm-side"></div><div class="mmi-alarm-main"><div class="mmi-alarm-cap" id="alarmCount"></div><div class="mmi-alarm-box" id="alarmText"></div></div></div><div class="mmi-alarm-foot"><button type="button" data-alarm-mute>알람음 소거</button><button type="button" data-alarm-ok id="alarmOk">확인</button></div>`;
   doc.body.appendChild(alarmEl);
-  const ack=()=>{alarms.length=0;mute();alarmEl.hidden=true;};
+  const ack=()=>{for(const a of alarms)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});alarms.length=0;mute();alarmEl.hidden=true;};
   alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=ack;alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
  }
  $('alarmCount').textContent=`메시지 내용 (미확인 알람 갯수 : ${alarms.length}개)`;
  $('alarmText').innerHTML=alarms.slice().reverse().map(a=>`<p><label><input type="checkbox" disabled></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
  alarmEl.hidden=!alarms.length;
 }
-function raiseAlarm(text,state=''){
- alarms.push({time:stamp(new Date()),text,state});if(alarms.length>50)alarms.shift();renderAlarm();
+function raiseAlarm(text,state='',level='E',station=''){
+ log('alarm',state?`${text} [${state}]`:text,undefined,level);
+ alarms.push({time:stamp(new Date()),text,state,level,station});if(alarms.length>50)alarms.shift();renderAlarm();
  alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
 }
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
@@ -76,13 +82,15 @@ function sync(stationId,state,action,result){
  // 제어 확인 (photo 2026-10-22): a control command outside CCM is refused with a modal error box, not an alarm pop-up
  if(action&&result&&result.ok===false&&CONTROL.includes(action.type)&&state.mode!=='CCM'){alertBox('CCM 모드가 아니므로 제어할 수 없습니다.',null,{title:'제어 확인',icon:'error'});return;}
  if(action&&result&&result.ok===false&&action.type!=='tick'){const info=stationInfo(stationId),who=`${info.name}${info.code?`(${info.code})`:''}역`;
-  if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가');else if(result.message)raiseAlarm(`${who} ${result.message}`);}
+  if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가','E',info.name);else if(result.message)raiseAlarm(`${who} ${result.message}`,'','E',info.name);}
  const st=stationLabel(stationId),prev=seen[stationId],now=new Set(Object.keys(state.routes));
  if(!prev||prev.state!==state){seen[stationId]={state,routes:now,mode:state.mode};return;}
- for(const id of now)if(!prev.routes.has(id))log('alarm',`${st.name}역 ${routeText(id)}진로설정`);
- for(const id of prev.routes)if(!now.has(id))log('alarm',`${st.name}역 ${routeText(id)}진로해정`);
- if(state.mode!==prev.mode)log('event',`${st.name}[${st.code}] ${state.mode} MODE로 전환`);
- if(action?.type==='lsOperation'&&result?.ok)log('event',`${stationLabel(action.operation.station).name} 열차표시 · ${action.operation.op}`);
+ for(const id of now)if(!prev.routes.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로설정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로설정`});}
+ for(const id of prev.routes)if(!now.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로해정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로해정`});}
+ if(state.mode!==prev.mode){log('event',`${st.name}[${st.code}] ${state.mode} MODE로 전환`);record('mode',{station:st.name,text:`${prev.mode} → ${state.mode}`});}
+ if(action?.type==='point'&&result?.ok)record('field',{station:st.name,kind:'선로전환기',text:`${action.id} ${action.value==='R'?'반위':'정위'} 전환`});
+ if((action?.type==='stop'||action?.type==='stopAll')&&result?.ok)record('field',{station:st.name,kind:'신호기',text:action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`});
+ if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});}
  if(action?.type==='scan'&&result?.ok)log('event',action.scope==='all'?'전체 제어역 Basescan 수신':`${st.name}역 Basescan 수신`);
  seen[stationId]={state,routes:now,mode:state.mode};
 }
@@ -197,7 +205,7 @@ function init(){
  renderLogs();root.addEventListener('resize',()=>{for(const w of Object.values(windows))if(!w.el.hidden)place(w);fitDesktop();});
 }
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
-function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);});}
+function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

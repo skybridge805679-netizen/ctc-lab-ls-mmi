@@ -106,6 +106,7 @@ def run(page, url):
     expect(page.locator('#trainPositionsBody tr')).to_have_count(12)
     page.locator('[data-mmi-window="trainPositions"] .mmi-close').click()
     menu(page, '시스템 조회', '실적조회', '운휴열차조회')
+    page.locator('#cancelledListSearch').click()
     expect(page.locator('#cancelledListBody tr.empty')).to_have_count(1)
     page.locator('[data-mmi-window="cancelledList"] .mmi-close').click()
     # 도구모음설정: log panes toggle

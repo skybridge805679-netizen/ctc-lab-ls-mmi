@@ -56,7 +56,7 @@ function initScheduleId(){
   if(!idmSchedule){mmi().alertBox('예약할 열차스케줄 ID를 목록에서 선택하세요.');return;}
   if(!picked.size){mmi().alertBox('스케줄을 적용할 운행일을 달력에서 선택하세요.');return;}
   const sch=SCHEDULES.find(s=>s.id===idmSchedule),days=[...picked].sort();for(const k of days)assigned.set(k,sch);picked.clear();idmRender();
-  mmi().log('event',`온라인 ID 예약적용 [${sch.id}] ${days.join(',')}`);mmi().alertBox(`[${sch.id}] ${sch.name} 예약적용 완료 (${days.length}일)`);
+  mmi().log('event',`온라인 ID 예약적용 [${sch.id}] ${days.join(',')}`);mmi().record('schedule',{type:'idReserve',train:'',text:JSON.stringify({id:sch.id,days}),console:'MMI-1'});mmi().alertBox(`[${sch.id}] ${sch.name} 예약적용 완료 (${days.length}일)`);
  };
  $('idmOffline').onclick=()=>mmi().alertBox('오프라인 ID 실시간변경은 구현하지 않았습니다. 원본 화면을 확인하지 못했습니다.');
  $('idmClose').onclick=()=>close('scheduleId');
@@ -154,33 +154,12 @@ function initTrace(){
  win.opener=load;
 }
 
-// ---------------------------------------------------------------- 시스템 조회 lists (screens not photographed: tables are the simulator's own)
-const nameOf=id=>N.catalog[id]?.name??id;
-const REPORTS={
- trainPositions:{title:'열차위치목록 조회',cols:['열차번호','방향','상태','현재 위치'],rows:()=>model().trains.map(t=>{const p=T.position(t,clock());return [t.id,t.direction==='down'?'하행':'상행',t.cancelled?'운휴':p?p.status:'미운행',p?(p.nextStation?`${nameOf(p.station)}→${nameOf(p.nextStation)}`:nameOf(p.station)):''];})},
- cancelledList:{title:'운휴열차조회',cols:['열차번호','방향','운휴 구간'],rows:()=>model().trains.filter(t=>t.calls.some(c=>c.cancelled)).map(t=>{const cx=t.calls.filter(c=>c.cancelled);return [t.id,t.direction==='down'?'하행':'상행',t.cancelled?'전체':`${nameOf(cx[0].station)}~${nameOf(cx.at(-1).station)}`];})},
- createdList:{title:'임시열차 조회',cols:['열차번호','구분','시발','종착','시발시각'],rows:()=>model().changes.filter(c=>c.type==='create'||c.type==='copy').map(c=>{const t=model().trains.find(x=>x.id===c.id);return t?[t.id,c.type==='copy'?'복사 생성':'신규 생성',nameOf(t.calls[0].station),nameOf(t.calls.at(-1).station),T.clock(t.calls[0].departure)]:[c.id,c.type,'','',''];})},
- delayList:{title:'지연열차조회',cols:['열차번호','변경역','지연(분)'],rows:()=>model().changes.filter(c=>c.type==='delay').map(c=>[c.id,nameOf(c.station),c.minutes])},
- scheduleHistory:{title:'온라인 스케줄 이력',cols:['순번','종류','열차번호','내용'],rows:()=>model().changes.map((c,i)=>[i+1,c.type,c.id??'',c.station?`${nameOf(c.station)}${c.minutes?` ${c.minutes}분`:''}`:c.sourceId?`원본 ${c.sourceId}`:''])},
- alarmEvent:{title:'알람/이벤트조회',cols:['구분','시간','내용'],rows:()=>{const l=mmi().getLogs();return [...l.alarm.map(r=>['알람',r.time,r.text]),...l.event.map(r=>['이벤트',r.time,r.text])].sort((a,b)=>b[1].localeCompare(a[1]));}},
- manualTrain:{title:'열차번호 수동조작 이력',cols:['시간','내용'],rows:()=>mmi().getLogs().event.filter(r=>r.text.includes('열차표시')).map(r=>[r.time,r.text])},
- manualMode:{title:'역제어모드 수동조작 이력',cols:['시간','내용'],rows:()=>mmi().getLogs().event.filter(r=>r.text.includes('MODE')).map(r=>[r.time,r.text])},
- manualField:{title:'현장설비 수동조작 이력',cols:['시간','내용'],rows:()=>mmi().getLogs().alarm.map(r=>[r.time,r.text])}
-};
-function initReports(){
- Object.entries(REPORTS).forEach(([id,def],k)=>{
-  const draw=()=>{const rows=def.rows();$(id+'Body').innerHTML=rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr class="empty"><td colspan="${def.cols.length}">조회된 내용이 없습니다</td></tr>`;$(id+'Count').textContent=`총 ${rows.length}건`;};
-  const w=mmi().createWindow(id,{title:def.title,x:90+k*16,y:60+k*16,width:640,body:`<div class="rpt"><div class="idm-table rpt-table"><table><thead><tr>${def.cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody id="${id}Body"></tbody></table></div><div class="idm-note">${esc(SAMPLE_NOTE)} <span id="${id}Count"></span></div><div class="idm-buttons"><button type="button" class="sched-btn" id="${id}Refresh">조회</button><button type="button" class="sched-btn" id="${id}Close">닫기</button></div></div>`});
-  $(id+'Refresh').onclick=draw;$(id+'Close').onclick=()=>close(id);w.opener=draw;draw();
- });
-}
-
 // ---------------------------------------------------------------- menu actions (도구모음설정)
 function act(name,button){
  const target={logAlarm:'#alarmLogBody',logEvent:'#eventLogBody'}[name];if(!target)return;
  const pane=doc.querySelector(target).closest('.mmi-log'),on=pane.hidden;pane.hidden=!on;button.setAttribute('aria-checked',String(on));
  doc.querySelector('.mmi-logs').classList.toggle('single',[...doc.querySelectorAll('.mmi-log')].filter(p=>!p.hidden).length<2);
 }
-function init(api){host=api;initScheduleId();initEntry();initTrace();initReports();}
+function init(api){host=api;initScheduleId();initEntry();initTrace();root.SimMMIReports.init(host);}
 root.SimMMIWindows={init,act,notices:()=>structuredClone(notices),assigned:()=>[...assigned]};
 })(window);

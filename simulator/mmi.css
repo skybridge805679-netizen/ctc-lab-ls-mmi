@@ -188,3 +188,8 @@
 .sched-actual{margin-left:4px;color:#1d6b3b;font-size:10px}
 .sched-calls input:disabled{background:#eceae4;color:#666}
 #lsDisplay{position:relative}
+.rpt-cond{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 6px;padding:4px 8px 6px;border:1px solid #9a9a96}
+.rpt-cond label{display:flex;align-items:center;gap:6px}.rpt-cond legend{padding:0 4px}
+.rpt-cond input,.rpt-cond select{font-size:12px}
+.rpt-opt input[type=checkbox]{margin-right:2px}
+.rpt-table{height:300px}.idm-table tr.sel td{background:#316ac5;color:#fff}
