@@ -4,7 +4,9 @@
 // state / operator events match (in order); the spoken 'say' lines are ticked by the operator. Grading is this simulator's own.
 const doc=document,$=id=>doc.getElementById(id),SC=()=>root.SimScenarios;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const mmi=()=>root.SimMMI;
+const mmi=()=>root.SimMMI,EM=()=>root.SimEmergency;
+const all=()=>SC().list.concat(EM().list);
+const isEm=sc=>sc?.group==='emergency';
 let host=null,run=null,timer=null,passed=false;
 // ---- the trains of the scenario on the LS 열번창 (direction + number), moved as the script advances
 const lsm=()=>root.SimLSUI.getModel();
@@ -14,8 +16,8 @@ function findRow(number){
 }
 function clearNumbers(numbers){for(const n of numbers){let f;while((f=findRow(n)))root.SimLSUI.dispatch({op:'delete',...f});}}
 function placeCast(){
- const sc=run.sc;clearNumbers(run.cast.map(c=>c.id));
- for(const c of run.cast){const r=root.SimLSUI.dispatch({op:'insert',station:sc.station,slot:c.slot,number:c.id,direction:c.dir});if(!r.ok)mmi().log('event',`열차번호 표시 실패 · ${c.id} · ${r.message}`);}
+ const sc=run.sc;clearNumbers(isEm(sc)?EM().numbersOf(sc):run.cast.map(c=>c.id));
+ for(const c of run.cast){const r=root.SimLSUI.dispatch({op:'insert',station:c.station||sc.station,slot:c.slot,number:c.id,direction:c.dir});if(!r.ok)mmi().log('event',`열차번호 표시 실패 · ${c.id} · ${r.message}`);}
 }
 function moveCast(key,slot){
  const c=run.cast.find(x=>x.key===key);if(!c)return;
@@ -37,13 +39,13 @@ function runQueue(){
  if(moved)mmi().render();
 }
 const station=()=>host.context().stationStates[run.sc.station];
-const ctx=()=>({state:station(),model:root.SimDiagram.getModel()});
+const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:root.SimLSUI.getModel()});
 function render(){
  const box=$('scSteps');if(!run){box.innerHTML='';return;}
  const fill=t=>SC().fill(t,run),firstOpen=run.sc.steps.findIndex((s,i)=>s.kind==='do'&&!run.done[i]);
  box.innerHTML=run.sc.steps.map((s,i)=>s.kind==='do'
   ?`<li class="sc-do ${run.done[i]?'done':''} ${i===firstOpen?'current':''}"><span class="sc-mark">${run.done[i]?'✔':i===firstOpen?'▶':'○'}</span><span>${esc(fill(s.text))}${i===firstOpen&&s.hint?`<small class="sc-hint">힌트: ${esc(s.hint)}</small>`:''}</span></li>`
-  :`<li class="sc-say ${run.done[i]?'done':''}"><label><input type="checkbox" data-say="${i}" ${run.done[i]?'checked':''}><span>${esc(fill(s.text))}</span></label></li>`).join('');
+  :`<li class="sc-say ${run.done[i]?'done':''}"><label><input type="checkbox" data-say="${i}" ${run.done[i]?'checked':''}>${s.lines?`<span class="sc-lines"><b>${s.no}. ${esc(s.heading||'')}</b>${s.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</span>`:`<span>${esc(fill(s.text))}</span>`}</label></li>`).join('');
  const total=run.sc.steps.length,doneCount=run.done.filter(Boolean).length;
  $('scProgress').textContent=`진행 ${doneCount}/${total}`;
  const doOpen=run.sc.steps.some((s,i)=>s.kind==='do'&&!run.done[i]),sayOpen=run.sc.steps.some((s,i)=>s.kind==='say'&&!run.done[i]);
@@ -51,16 +53,30 @@ function render(){
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
-function evaluate(){if(!run)return;if(SC().advance(run,ctx()))render();fireBeats();runQueue();}
-const current=()=>SC().list.find(s=>s.id===$('scSelect').value);
+function evaluate(){if(!run)return;if(SC().advance(run,ctx()))render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of run.sc.stations)mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
+const current=()=>all().find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
- const sc=current(),ids=SC().candidates(sc,root.SimDiagram.getModel());
+ const sc=current();$('scTrainRow').hidden=isEm(sc);if(isEm(sc)){$('scTrainNote').textContent='';return;}
+ const ids=SC().candidates(sc,root.SimDiagram.getModel());
  $('scTrainList').innerHTML=ids.map(id=>`<option value="${esc(id)}">`).join('');
  if(!ids.includes($('scTrain').value))$('scTrain').value=ids[0]||'';
  $('scTrainNote').textContent=ids.length?`${sc.direction==='up'?'상행':'하행'} · ${doc.getElementById('scSelect').selectedOptions[0].textContent.split(' ')[0]}에 서는 열차 ${ids.length}개`:'이 역에 서는 열차가 현재 시간표에 없습니다. 열차스케줄 관리에서 열차를 만들거나 번호를 직접 입력하세요.';
 }
+function startEmergency(sc){
+ host.selectStation(sc.station);
+ EM().seed(sc,host.context().stationStates);
+ for(const st of sc.stations)mmi().rebase(st);
+ run=SC().newRun(sc,'');passed=false;run.fired=new Set();run.queue=[];
+ run.cast=EM().castFor(sc).map(c=>({key:c.number,id:c.number,dir:c.dir,slot:c.slot,station:c.station}));placeCast();
+ $('scProblem').innerHTML=`<b>상황</b> ${esc(sc.problem)}<br>${sc.trains.map(t=>`<small>${esc(t)}</small>`).join('<br>')}<br><small>LS 열번창 등장 열차: ${run.cast.map(c=>`${esc(c.id)}(${c.dir==='up'?'상':'하'} · ${esc(mmi().stationInfo(c.station).name)})`).join(' / ')} — 비연동역에 있는 열차는 구술로만 다룹니다 · 출처: ${esc(sc.source)}</small>`;
+ $('scNotes').innerHTML=sc.notes.map(n=>`<li>${esc(n)}</li>`).join('');
+ host.run({type:'tick',seconds:0});
+ mmi().log('event',`실기 시나리오 시작 · ${sc.title}`);
+ render();
+}
 function start(){
+ if(isEm(current()))return startEmergency(current());
  const sc=current(),train=$('scTrain').value.trim().toUpperCase();
  if(sc.steps.some(s=>s.kind==='do'&&/스케줄 수정/.test(s.text))&&!root.SimDiagram.getModel().trains.some(t=>t.id===train&&t.calls.some(c=>c.station===sc.station))){mmi().alertBox(`스케줄 수정 단계가 있어 ${train||'고장열차'}가 이 역에 서는 시간표 열차여야 합니다. 열차를 선택하세요.`);return;}
  host.selectStation(sc.station);
@@ -75,13 +91,15 @@ function start(){
 }
 function init(api){
  host=api;
- const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5종)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</select></label><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
+ const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5종 · 비상시 조치 9종)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect"><optgroup label="부본선 대피">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="비상시 조치">${EM().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup></select></label><span id="scTrainRow"><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small></span><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
 <div id="scProblem" class="sc-problem">시나리오를 고르고 [시작]을 누르세요.</div>
 <ol id="scSteps" class="sc-steps"></ol>
 <div id="scStatus" class="trc-msg" role="status"></div>
 <ul id="scNotes" class="sc-notes"></ul>
+<details class="sc-variants"><summary>상황변경 시 대응 요령 (비상시조치 평가 참고 원문)</summary><pre id="scVariants"></pre></details>
 <div class="idm-note">교육용 구성 — 대본은 references/scenarios의 실기 대본이며, 열차번호는 지금 시간표의 열차를 고르거나 직접 입력합니다(시간표는 수시로 바뀌는 자료라 고정하지 않았습니다). 조작 인식과 채점은 이 시뮬레이터의 기능입니다. 시작하면 해당 역의 상태가 AUTO + 시나리오 초기 진로로 바뀝니다.</div>
 <div class="idm-buttons"><button type="button" class="sched-btn" id="scClose">닫기</button></div></div>`});
+ $('scVariants').textContent=EM().variants.lines.join('\n');
  $('scStart').onclick=start;$('scSelect').onchange=fillTrains;win.opener=fillTrains;$('scClose').onclick=()=>mmi().close('scenario');
  $('scSteps').onchange=e=>{const i=e.target.dataset?.say;if(i===undefined||!run)return;run.done[Number(i)]=e.target.checked;render();};
  mmi().onEvent(e=>{if(!run)return;run.events.push(e);evaluate();});

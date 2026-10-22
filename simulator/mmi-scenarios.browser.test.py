@@ -19,7 +19,7 @@ def run(page, url):
     page.goto(url, wait_until='networkidle')
     page.locator('#mmiScenarioBtn').click()
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')
-    assert page.locator('#scSelect option').count() == 5
+    assert page.locator('#scSelect option').count() == 14
     do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
     # the timetable is user data: rename every train and drop the first up train -> the choices follow the current timetable
     page.evaluate("""()=>{const m=SimDiagram.getModel();for(const t of m.trains)t.id=(t.direction==='up'?'U':'D')+t.id.slice(1);
