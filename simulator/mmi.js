@@ -30,6 +30,7 @@ const MENUS=[
   {label:'실적조회',items:[{label:'역실적 조회',open:'stationActual'},{label:'열차실적 조회',open:'trainActual'},{sep:true},{label:'운휴열차조회',open:'cancelledList'},{label:'임시열차 조회',open:'createdList'},{label:'지연열차조회',open:'delayList'}]}]},
  {label:'시스템 관리',items:[
   {label:'제어화면 관리',items:[{label:'운영자선호화면 설정',open:'preferredScreen'},{sep:true},{label:'모니터 위치 설정',open:'monitorPos'},{label:'RAIL Track ROUTE',open:'railRoute'},{label:'FTS 스케줄편집',open:'ftsEdit'}]},
+  {label:'노트관리',open:'noteManage'},
   {label:'(이 메뉴의 다른 항목은 미확인)',disabled:true}]}
 ];
 const windows={};let host=null,zTop=20,desktop,logRows={alarm:[],event:[]};
@@ -126,6 +127,15 @@ function alertBox(text,done,opts={}){
  shield.appendChild(box);doc.body.appendChild(shield);shield.showModal();
  const ok=box.querySelector('button');ok.focus();ok.onclick=()=>{shield.close();shield.remove();done?.();};shield.addEventListener('cancel',e=>{e.preventDefault();ok.click();});
 }
+// 예/아니오 확인 상자 (the real MMI asks "[예]를 선택" before deleting or saving)
+function confirmBox(text,onYes,opts={}){
+ const shield=doc.createElement('dialog');shield.className='mmi-shield';
+ const box=doc.createElement('div');box.className='mmi-alert';box.setAttribute('role','alertdialog');
+ box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">${esc(opts.title||'확인')}</span></div><p><span>${esc(text)}</span></p><div class="mmi-confirm-row"><button type="button" id="mmiConfirmYes">예(Y)</button><button type="button" id="mmiConfirmNo">아니오(N)</button></div>`;
+ shield.appendChild(box);doc.body.appendChild(shield);shield.showModal();
+ const end=yes=>{shield.close();shield.remove();if(yes)onYes?.();};
+ box.querySelector('#mmiConfirmYes').onclick=()=>end(true);box.querySelector('#mmiConfirmNo').onclick=()=>end(false);shield.addEventListener('cancel',e=>{e.preventDefault();end(false);});
+}
 function fitDesktop(){
  if(!desktop)return;let bottom=0;for(const w of Object.values(windows))if(!w.el.hidden)bottom=Math.max(bottom,w.el.offsetTop+w.el.offsetHeight);
  desktop.style.minHeight=Math.max(760,bottom+16)+'px';
@@ -196,6 +206,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
+ root.SimNotes.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
@@ -207,5 +218,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

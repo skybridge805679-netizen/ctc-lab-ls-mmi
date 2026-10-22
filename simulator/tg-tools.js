@@ -74,7 +74,7 @@ const ACTIONS={
  copy(){if(!selectedTrain())return;copied=selectedTrain();status(`${copied} 열차를 복사했습니다. (붙여놓기를 해야 열차가 생성됩니다)`);},
  paste(){if(!copied){status('복사한 열차가 없습니다.');return;}root.SimScheduleUI.open('copy',copied);status(`${copied} 붙여넣기 · 열차스케줄 추가 창`);},
  create(){root.SimScheduleUI.open('create');$('schedulePatternOpen').click();status('열차생성 · 패턴을 선택하세요.');},
- edit(){root.SimScheduleUI.open('edit',selectedTrain());status(`${selectedTrain()} 열차정보수정`);},
+ edit(){if(notes?.selected()&&notes.edit()){status('선택한 노트를 수정합니다.');return;}root.SimScheduleUI.open('edit',selectedTrain());status(`${selectedTrain()} 열차정보수정`);},
  note(){notes?notes.open():status('노트편집을 사용할 수 없습니다.');},
  jumpNow(){const L=D().layout();$('graphStart').value=hhmm(Math.max(-8*3600,D().clock()-Number($('graphSpan').value)*60/6));fire('graphStart');status('현재 시각으로 이동했습니다.');},
  timeIn(){const v=step(SPANS,Number($('graphSpan').value),-1);ensureOption($('graphSpan'),v,`${v}분`);$('graphSpan').value=String(v);fire('graphSpan');status(`시간축 확대 · ${v}분`);},

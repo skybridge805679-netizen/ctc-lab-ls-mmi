@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;const options_={tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
+ const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
@@ -27,7 +27,7 @@
   for(let t=Math.ceil(start/minor)*minor;t<=start+span;t+=minor){
    const s=sod(t),hour=s%3600===0,half=s%1800===0,px=x(t).toFixed(1),mm=String(Math.floor((s%3600)/60)).padStart(2,'0');
    svg+=`<line x1="${px}" y1="${plotTop}" x2="${px}" y2="${plotTop+plotH}" stroke="${hour?'#1b1b1b':half?'#555':'#cfd3dc'}" stroke-width="${hour?1.4:1}" ${hour||half?'':'stroke-dasharray="1 3"'}/>`;
-   svg+=hour?`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="9" font-weight="700" fill="#ffd400">${Number(T.clock(t).slice(0,2))}:00</text>`:`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="8.5" fill="${half?'#ffd400':'#fff'}">${mm}</text>`;
+   svg+=hour?`<text x="${px}" y="${plotTop-(span>10800?17:5)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffd400">${Number(T.clock(t).slice(0,2))}:00</text>`:`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="8.5" fill="${half?'#ffd400':'#fff'}">${mm}</text>`;
   }
   for(const st of N.stations.slice(from,to+1)){
    const i=info(st.id),ry=y(st.order);
@@ -56,8 +56,17 @@
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
    const pos=T.position(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
   }
+  for(const n of options_.notes){
+   const a=n.fromSec===null?start:n.fromSec,b=n.toSec===null?start+span:n.toSec,o1=n.fromOrder===null?from:n.fromOrder,o2=n.toOrder===null?to:n.toOrder;
+   if(n.fromSec===null&&n.toSec===null&&n.fromOrder===null&&n.toOrder===null)continue;
+   const x1=Math.max(left,x(Math.min(a,b))),x2=Math.min(left+plotW,x(Math.max(a,b))),y1=Math.max(plotTop,y(Math.min(o1,o2))-6),y2=Math.min(plotTop+plotH,y(Math.max(o1,o2))+6);
+   if(x2-x1<8||y2-y1<8)continue;
+   const fs=n.fontSize||11,lines=[n.title,...n.text.split('\n')].slice(0,Math.max(1,Math.floor((y2-y1-4)/(fs+3))));
+   svg+=`<g data-dia-note="${escape(n.id)}" tabindex="0" role="button" aria-label="노트 ${escape(n.title)}"><rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="rgba(255,244,160,.82)" stroke="${options_.selectedNote===n.id?'#d6251f':'#b49b1f'}" stroke-width="${options_.selectedNote===n.id?2.4:1}" rx="3"/>${lines.map((t,i)=>`<text x="${x1+5}" y="${y1+fs+2+i*(fs+3)}" font-size="${fs}" ${i?'':'font-weight="700"'} fill="#3b3300" pointer-events="none">${escape(t.slice(0,Math.max(4,Math.floor((x2-x1-10)/(fs*.9)))))}</text>`).join('')}</g>`;
+  }
   const now=x(context.clock());svg+=`<line id="diaNow" data-seconds="${context.clock()}" x1="${now}" y1="${plotTop}" x2="${now}" y2="${plotTop+plotH}" stroke="#d6251f" stroke-width="1.6"/></g>`;
   lastLayout={left,plotW,plotTop,plotH,top,row,from,to,start,span,width,height};
+  for(const fn of renderHooks)fn(lastLayout);
   $('diaSvg').setAttribute('viewBox',`0 0 ${width} ${height}`);$('diaSvg').setAttribute('width',width);$('diaSvg').setAttribute('height',height);$('diaSvg').innerHTML=svg;
   const train=model.trains.find(t=>t.id===selected),pos=T.position(train,context.clock());
   $('graphCancel').textContent=train.cancelled?'운휴 복원':'전체 운휴';
@@ -82,5 +91,5 @@
   $('diaSvg').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-dia-station]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
   $('graphExport').onclick=()=>{const data={schemaVersion:1,kind:'CTC LAB training timetable',sampleSchedule:true,clock:context.clock(),...model};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-dia.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  }
- root.SimDiagram={clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
+ root.SimDiagram={onRender:fn=>{renderHooks.add(fn);return ()=>renderHooks.delete(fn);},setNotes:(list,selected='')=>{options_.notes=list;options_.selectedNote=selected;render();},clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
 })(window);
