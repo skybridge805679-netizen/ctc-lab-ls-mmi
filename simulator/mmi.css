@@ -214,3 +214,13 @@
 .mmi-confirm-row{display:flex;justify-content:center;gap:12px;padding:0 0 12px}
 .drill-steps{margin:0 0 6px;padding-left:20px;font-size:12px;line-height:1.5}
 .drill .rpt-table{height:150px}
+
+/* 관제 실기 시나리오 */
+.sc-problem{margin:6px 0;padding:6px 10px;background:#fff6dc;border:1px solid #c9a227;font-size:12px}
+.sc-steps{list-style:none;margin:0 0 6px;padding:0;max-height:330px;overflow:auto;border:1px solid #9a9a96;background:#fff;font-size:12px}
+.sc-steps li{padding:3px 8px;border-bottom:1px solid #eee;line-height:1.45}
+.sc-steps .sc-do{display:flex;gap:8px;background:#eef3ff}.sc-steps .sc-do.done{background:#e6f4e6;color:#1d5a2c}.sc-steps .sc-do.current{background:#fff2b8;font-weight:700}
+.sc-steps .sc-say label{display:flex;gap:8px;align-items:flex-start;color:#444}.sc-steps .sc-say.done label{color:#888;text-decoration:line-through}
+.sc-hint{display:block;font-weight:400;color:#555}.sc-mark{min-width:16px}
+.sc-notes{margin:6px 0;padding-left:18px;font-size:11px;color:#444}
+#scProgress{margin-left:auto;font-weight:700}

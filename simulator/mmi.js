@@ -93,7 +93,10 @@ function checkDuplicates(stationId){
  }
 }
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
+const eventListeners=new Set();
+const emit=e=>{for(const f of eventListeners)f(e);};
 function sync(stationId,state,action,result){
+ if(action&&result&&action.type!=='tick')emit({...action,station:stationId,ok:result.ok!==false});
  // 제어 확인 (photo 2026-10-22): a control command outside CCM is refused with a modal error box, not an alarm pop-up
  if(action&&result&&result.ok===false&&CONTROL.includes(action.type)&&state.mode!=='CCM'){alertBox('CCM 모드가 아니므로 제어할 수 없습니다.',null,{title:'제어 확인',icon:'error'});return;}
  if(action&&result&&result.ok===false&&action.type!=='tick'){const info=stationInfo(stationId),who=`${info.name}${info.code?`(${info.code})`:''}역`;
@@ -202,7 +205,8 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.querySelector('#mmiScenarioBtn').onclick=()=>open('scenario');
  shell.querySelector('.mmi-ls-link').onclick=()=>$('lsDisplay').scrollIntoView({block:'start'});
  const toMMI=doc.createElement('button');toMMI.className='text-btn';toMMI.textContent='MMI 화면 ↓';toMMI.onclick=()=>shell.scrollIntoView({block:'start'});doc.querySelector('.ls-panel .panel-title').append(toMMI);
  shell.appendChild(buildMenu());
@@ -220,7 +224,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- root.SimNotes.init(host);root.SimDrill.init(host);
+ root.SimNotes.init(host);root.SimDrill.init(host);root.SimScenarioUI.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
@@ -230,7 +234,7 @@ function init(){
  renderLogs();root.addEventListener('resize',()=>{for(const w of Object.values(windows))if(!w.el.hidden)place(w);fitDesktop();});
 }
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
-function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});});}
+function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});emit({type:'schedule',change,ok:true});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);
