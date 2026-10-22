@@ -31,11 +31,14 @@
   $('scheduleStartShow').value=c?T.clock(c[0].departure):'';$('scheduleEndShow').value=c?T.clock(c.at(-1).arrival):'';
  }
  function table(){
-  const readOnly=mode()==='copy';
+  const copyMode=mode()==='copy',now=mode()==='edit'?D.clock():-Infinity;
   $('scheduleCalls').innerHTML=draft?`<table><thead><tr><th>순서</th><th>경유역</th><th>정차구분</th><th>도착시각</th><th>출발시각</th><th>도착진로</th><th>출발진로</th><th>운휴</th></tr></thead><tbody>${draft.calls.map((call,i)=>{
-   const n=stationName(call.station),time=f=>`<input aria-label="${n} ${f==='arrival'?'도착':'출발'}시각" data-call="${i}" data-field="${f}" type="text" inputmode="numeric" maxlength="8" placeholder="HH:MM:SS" value="${T.clock(call[f])}" ${readOnly?'disabled':''}>`;
-   const route=f=>`<input aria-label="${n} ${f==='arrivalRoute'?'도착':'출발'}진로" data-call="${i}" data-field="${f}" maxlength="14" value="${escape(call[f])}" ${readOnly?'disabled':''}>`;
-   return `<tr class="${call.cancelled?'cx':''}"><td>${i+1}</td><td>${escape(n)}</td><td>${escape(call.stopType??'정차')}</td><td>${time('arrival')}</td><td>${time('departure')}</td><td>${route('arrivalRoute')}</td><td>${route('departureRoute')}</td><td>${call.cancelled?'운휴':''}</td></tr>`;}).join('')}</tbody></table>`:'<p style="padding:8px">열차를 선택하고 [온라인 열차스케줄 검색]을 누르거나, [열차운행패턴선택]에서 패턴을 적용하세요.</p>';
+   // 실적이 생긴 부분은 수정할 수 없다 (실기1 p.139): the call already happened on the simulated clock
+   const n=stationName(call.station),done={arrival:call.arrival<=now,departure:call.departure<=now,arrivalRoute:call.arrival<=now,departureRoute:call.departure<=now};
+   const lock=f=>copyMode||done[f]?`disabled ${done[f]?'title="실적이 있어 수정할 수 없습니다"':''}`:'';
+   const time=f=>`<input aria-label="${n} ${f==='arrival'?'도착':'출발'}시각" data-call="${i}" data-field="${f}" type="text" inputmode="numeric" maxlength="8" placeholder="HH:MM:SS" value="${T.clock(call[f])}" ${lock(f)}>`;
+   const route=f=>`<input aria-label="${n} ${f==='arrivalRoute'?'도착':'출발'}진로" data-call="${i}" data-field="${f}" maxlength="14" value="${escape(call[f])}" ${lock(f)}>`;
+   return `<tr class="${call.cancelled?'cx':''}"><td>${i+1}</td><td>${escape(n)}</td><td>${escape(call.stopType??'정차')}</td><td>${time('arrival')}</td><td>${time('departure')}</td><td>${route('arrivalRoute')}</td><td>${route('departureRoute')}</td><td>${call.cancelled?'운휴':''}${now>=call.departure?'<small class="sched-actual">실적</small>':''}</td></tr>`;}).join('')}</tbody></table>`:'<p style="padding:8px">열차를 선택하고 [온라인 열차스케줄 검색]을 누르거나, [열차운행패턴선택]에서 패턴을 적용하세요.</p>';
   summary();stationOptions();
  }
  // 연동: a changed time moves every later time up to 수정구간; 개별: only that cell
@@ -59,13 +62,14 @@
  function load(){
   const m=mode(),source=model.trains.find(t=>t.id===selectedId());
   const create=m==='create';
-  $('scheduleCreateBox').hidden=m==='edit';$('scheduleNumber').readOnly=false;
+  $('scheduleCreateBox').hidden=m==='edit';$('scheduleNumber').readOnly=m==='edit';
   $('schedulePatternOpen').disabled=!create;
   for(const el of document.querySelectorAll('[name="scheduleEditType"],#scheduleEditTo,#scheduleSuspend,#scheduleResume,[name="scheduleCancelType"],#scheduleCancelFrom,#scheduleCancelTo'))el.disabled=create;
   if(create){
    draft=null;$('scheduleNumber').value='A0000';$('scheduleStart').value='09:00:00';
   }else if(source){
    draft=structuredClone(source);
+   if(m==='edit')$('scheduleNumber').value=source.id;
    $('scheduleKind').value=source.kind;$('scheduleCars').value=source.carCount??10;$('scheduleRelated').value=source.relatedTrain??'';$('scheduleService').value=source.service??'정기';
    for(const box of document.querySelectorAll('input[name="scheduleFlag"]'))box.checked=(source.flags??[]).includes(box.value);
    if(m==='copy'){$('scheduleFrom').value=source.calls[0].station;$('scheduleTo').value=source.calls.at(-1).station;$('scheduleNumber').value='C'+source.id.slice(1);$('scheduleStart').value=T.clock(source.calls[0].departure);}

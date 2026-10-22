@@ -81,5 +81,5 @@
   $('diaSvg').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-dia-station]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
   $('graphExport').onclick=()=>{const data={schemaVersion:1,kind:'CTC LAB training timetable',sampleSchedule:true,clock:context.clock(),...model};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-dia.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  }
- root.SimDiagram={layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
+ root.SimDiagram={clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
 })(window);

@@ -80,13 +80,13 @@ function entSignals(){const station=$('entStationList').value;$('entSig').innerH
 function entShow(whole){
  const station=$('entStationList').value,signal=$('entSig').value;
  $('entStationOut').value=mmi().stationInfo(station).name;$('entSignalOut').value=whole?'':'SG_'+signal;
- entRender(notices.filter(n=>n.station===station&&(whole||n.signal===signal)).sort((a,b)=>a.train.localeCompare(b.train)),whole?'등록열차검색':'진입예고열차표시');
+ entRender(notices.filter(n=>n.station===station&&(whole||n.signal===signal)),whole?'등록열차검색':'진입예고열차표시');
 }
 function initEntry(){
  mmi().createWindow('entryNotice',{title:'[CA018_05] 진입예고열차정리',x:120,y:70,width:900,body:`<div class="ent">
 <fieldset class="ent-info"><legend>진입예고열차정보</legend><div class="idm-row"><label>역정보<input id="entStationOut" readonly></label><label>신호기<input id="entSignalOut" readonly></label></div>
 <div class="idm-table ent-table"><table><thead><tr><th></th><th>순번</th><th>열차번호</th><th>출발시간</th><th>종착역</th><th>날짜</th></tr></thead><tbody id="entRows"></tbody></table></div><div class="idm-row"><button type="button" class="sched-btn" id="entDel">선택열차삭제</button><button type="button" class="sched-btn" id="entDelBefore">선택열차이전삭제</button><span id="entCaption" class="idm-hint"></span></div></fieldset>
-<fieldset class="ent-search"><legend>진입예고열차검색</legend><label class="idm-row">신호기<select id="entSig"></select></label><label class="idm-row">구간정보<select><option>경부선</option></select></label><div>역정보</div>
+<fieldset class="ent-search"><legend>진입예고열차검색</legend><label class="idm-row">신호기<select id="entSig"></select></label><div class="idm-row">날짜<label><input type="radio" name="entDay" value="today" checked>오늘</label><label><input type="radio" name="entDay" value="tomorrow">내일</label></div><label class="idm-row">구간정보<select><option>경부선</option></select></label><div>역정보</div>
 <select id="entStationList" size="9" aria-label="역정보">${controlled().map(s=>`<option value="${s.id}">${esc(s.name)} [${s.code}]</option>`).join('')}</select><input id="entStationShow" type="hidden"><button type="button" class="sched-btn" id="entShow">진입예고열차표시</button></fieldset>
 <fieldset class="ent-reg"><legend>진입예고열차등록</legend><div class="idm-row">열차선택<label><input type="radio" name="entDir" value="up" checked>상행</label><label><input type="radio" name="entDir" value="down">하행</label></div><div>열차번호</div>
 <select id="entTrains" size="10" multiple aria-label="열차번호"></select><div class="idm-row"><button type="button" class="sched-btn" id="entAdd">열차등록</button><button type="button" class="sched-btn" id="entFind">등록열차검색</button></div></fieldset>
@@ -98,7 +98,7 @@ function initEntry(){
  $('entAdd').onclick=()=>{
   const station=$('entStationList').value,signal=$('entSig').value,picked=[...$('entTrains').selectedOptions].map(o=>o.value);
   if(!picked.length){mmi().alertBox('등록할 열차번호를 선택하세요.');return;}
-  const date=ymd(model().serviceDate);let added=0;
+  const day=new Date(model().serviceDate+'T00:00:00');if(doc.querySelector('input[name="entDay"]:checked').value==='tomorrow')day.setDate(day.getDate()+1);const date=keyOf(day.getFullYear(),day.getMonth()+1,day.getDate());let added=0;
   for(const train of picked)if(!notices.some(n=>n.station===station&&n.signal===signal&&n.train===train)){notices.push({station,signal,train,date});added++;}
   entShow(false);mmi().log('event',`${mmi().stationInfo(station).name}역 SG_${signal} 진입예고열차 ${added}건 등록`);mmi().alertBox(added?`${added}건의 진입예고열차를 등록했습니다.`:'이미 등록된 열차입니다.');
  };
@@ -107,8 +107,9 @@ function initEntry(){
  $('entDel').onclick=()=>{const i=selected();if(i<0){mmi().alertBox('삭제할 열차를 선택하세요.');return;}const [n]=notices.splice(i,1);entShow(false);mmi().log('event',`진입예고열차 ${n.train} 삭제`);};
  $('entDelBefore').onclick=()=>{
   const i=selected();if(i<0){mmi().alertBox('기준이 되는 열차를 선택하세요.');return;}
-  const n=notices[i],station=n.station,list=notices.filter(x=>x.station===station&&x.signal===n.signal).sort((a,b)=>a.train.localeCompare(b.train)),cut=list.indexOf(n);
-  for(const x of list.slice(0,cut+1))notices.splice(notices.indexOf(x),1);entShow(false);mmi().log('event',`진입예고열차 ${n.train} 이전 ${cut+1}건 삭제`);
+  const n=notices[i],station=n.station,list=notices.filter(x=>x.station===station&&x.signal===n.signal),cut=list.indexOf(n);
+  if(!cut){mmi().alertBox('선택한 열차 앞에 삭제할 열차가 없습니다.');return;}
+  for(const x of list.slice(0,cut))notices.splice(notices.indexOf(x),1);entShow(false);mmi().log('event',`진입예고열차 ${n.train} 이전 ${cut}건 삭제`);
  };
  $('entClose').onclick=()=>close('entryNotice');
 }
@@ -116,24 +117,36 @@ function initEntry(){
 // ---------------------------------------------------------------- [CF003_1] 열차위치추적
 let trackTimer=null,tracking=null;
 const running=dir=>model().trains.filter(t=>(dir==='all'||t.direction===dir)&&T.position(t,clock()));
+// numbers typed by hand on the LS (열차번호제어) are not in the timetable but can still be traced (실기1 p.51)
+function manualStation(number){
+ const lsm=root.SimLSUI?.getModel?.();if(!lsm)return null;
+ for(const st of controlled())for(const rows of Object.values(lsm.stations[st.id]?.windows||{}))if(rows.some(r=>r.number===number))return st.id;
+ return null;
+}
+function badge(text){
+ let el=$('lsTraceBadge');
+ if(!el){el=doc.createElement('div');el.id='lsTraceBadge';el.className='ls-trace-badge';el.setAttribute('role','status');($('lsDisplay')||doc.body).appendChild(el);}
+ el.hidden=!text;el.textContent=text||'';
+}
 function nearestControlled(order){return controlled().reduce((best,s)=>Math.abs(s.order-order)<Math.abs(best.order-order)?s:best);}
 function traceStep(){
  const train=model().trains.find(t=>t.id===tracking),pos=train&&T.position(train,clock());
- if(!pos){$('traceMsg').textContent=`>> ${tracking} 열차가 운행 중이 아니어서 추적을 종료합니다.`;traceStop();return;}
- const station=nearestControlled(pos.order);
- if(host.context().station!==station.id)host.selectStation(station.id);
- $('traceMsg').textContent=`>> ${tracking} 추적 중 · ${mmi().stationInfo(station.id).name} LS 화면`;
+ let stationId=pos?nearestControlled(pos.order).id:manualStation(tracking);
+ if(!stationId){$('traceMsg').textContent=`>> ${tracking} 열차번호를 LS 화면에서 찾을 수 없어 추적을 종료합니다.`;traceStop();return;}
+ if(host.context().station!==stationId)host.selectStation(stationId);
+ badge(`▶ 열차추적중 ${tracking}`);
+ $('traceMsg').textContent=`>> ${tracking} 추적 중 · ${mmi().stationInfo(stationId).name} LS 화면`;
 }
-function traceStop(){clearInterval(trackTimer);trackTimer=null;tracking=null;if($('traceStart')){$('traceStart').disabled=false;$('traceStop').disabled=true;}}
+function traceStop(){clearInterval(trackTimer);trackTimer=null;tracking=null;badge('');if($('traceStart')){$('traceStart').disabled=false;$('traceStop').disabled=true;}}
 function initTrace(){
  const win=mmi().createWindow('trace',{title:'[CF003_1]열차위치추적',x:200,y:90,width:700,body:`<div class="trc"><div class="trc-left"><div>열차번호</div><label class="idm-row">노선<select aria-label="노선"><option>경부선</option></select></label>
 <div class="idm-row"><label><input type="radio" name="traceDir" value="all" checked>전체</label><label><input type="radio" name="traceDir" value="up">상행</label><label><input type="radio" name="traceDir" value="down">하행</label></div>
-<button type="button" class="sched-btn" id="traceLoad">열차번호목록</button><div class="idm-row">열차번호<b id="traceCur"></b></div><select id="traceList" size="12" aria-label="열차번호 목록"></select></div>
+<button type="button" class="sched-btn" id="traceLoad">열차번호목록</button><label class="idm-row">열차번호<input id="traceInput" maxlength="6" autocomplete="off" placeholder="K1131"></label><select id="traceList" size="12" aria-label="열차번호 목록"></select></div>
 <div class="trc-right"><div>LS 화면 선택</div><div class="trc-monitors">${[1,2,3].map(n=>`<button type="button" class="trc-mon" data-mon="${n}" ${n>1?'disabled title="이 실습기에는 LS 화면이 1개뿐입니다"':''} aria-pressed="${n===1}"><span>${n}</span></button>`).join('')}</div></div>
 <div class="trc-msg" id="traceMsg" role="status"></div><div class="idm-buttons"><button type="button" class="sched-btn primary" id="traceStart">추적시작</button><button type="button" class="sched-btn" id="traceStop" disabled>추적종료</button><button type="button" class="sched-btn" id="traceClose">닫기</button></div></div>`});
- const load=()=>{const dir=doc.querySelector('input[name="traceDir"]:checked').value,list=running(dir);$('traceList').innerHTML=list.map(t=>`<option value="${esc(t.id)}">${esc(t.id)}</option>`).join('');if(list.length)$('traceList').selectedIndex=0;$('traceCur').textContent=list[0]?.id??'';$('traceMsg').textContent=`>> 총 [${list.length}]건의 운행열차번호를 수신하였습니다.`;};
- $('traceLoad').onclick=load;$('traceList').onchange=()=>{$('traceCur').textContent=$('traceList').value;};
- $('traceStart').onclick=()=>{const id=$('traceList').value;if(!id){mmi().alertBox('추적할 열차번호를 선택하세요.');return;}tracking=id;$('traceStart').disabled=true;$('traceStop').disabled=false;traceStep();trackTimer=setInterval(traceStep,1000);mmi().log('event',`열차위치추적 시작 · ${id}`);};
+ const load=()=>{const dir=doc.querySelector('input[name="traceDir"]:checked').value,list=running(dir);$('traceList').innerHTML=list.map(t=>`<option value="${esc(t.id)}">${esc(t.id)}</option>`).join('');if(list.length)$('traceList').selectedIndex=0;$('traceInput').value=list[0]?.id??'';$('traceMsg').textContent=`>> 총 [${list.length}]건의 운행열차번호를 수신하였습니다.`;};
+ $('traceLoad').onclick=load;$('traceList').onchange=()=>{$('traceInput').value=$('traceList').value;};
+ $('traceStart').onclick=()=>{const id=$('traceInput').value.trim().toUpperCase();if(!id){mmi().alertBox('추적할 열차번호를 선택하거나 입력하세요.');return;}if(!model().trains.some(t=>t.id===id)&&!manualStation(id)){mmi().alertBox(`${id} 열차번호를 찾을 수 없습니다.`);return;}tracking=id;$('traceStart').disabled=true;$('traceStop').disabled=false;traceStep();trackTimer=setInterval(traceStep,1000);mmi().log('event',`열차위치추적 시작 · ${id}`);};
  $('traceStop').onclick=()=>{if(tracking)mmi().log('event',`열차위치추적 종료 · ${tracking}`);traceStop();$('traceMsg').textContent='>> 추적을 종료했습니다.';};
  $('traceClose').onclick=()=>{traceStop();close('trace');};
  win.el.querySelector('.mmi-close').addEventListener('click',traceStop);
