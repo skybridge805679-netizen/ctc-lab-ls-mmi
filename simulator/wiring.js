@@ -104,6 +104,30 @@ function apply(network){
   ['jonggak',['53-B045T'],'01.선로침수시, 시청역 하선 · 추출문 190–191행'],
   ['underground-seoul',['21-1T'],'01.선로침수시, 시청역 하선 · 추출문 190–191행']
  ])for(const id of ids)Object.assign(network.catalog[station].routes[id],{geometryDerived:false,evidence:'비상시조치 대본의 진로명·PDF 배선 대조',source:[network.catalog[station].sources.display,source]});
+ // Routes confirmed on the real LS but not produced by the geometry walk above (the crossover direction is not in the traced wiring).
+ // 안양역 4B: RT_4B_B984T, RT_4B_B660T (사용자가 LS에서 확인, 2026-10-22). The point layout of 4B-B660T is assumed to be the same
+ // 53번 crossover as 4C-B984T, reversed; it is composed from the traced 4B-B984T (2T), 4C-B660T (3T) and 4C-B984T (diagonal).
+ const manual=[
+  {station:'anyang',id:'4B-B660T',along:'4B-B984T',onto:'4C-B660T',cross:'4C-B984T',points:{'53':'R'}},
+  // 사진(2026-10-22): 안양역 4A 신호기의 [ 진로 제어 ] 목록은 RT_4A_B984T, RT_4A_B660T. 1T→2T(55번)를 거쳐 4B-B660T와 같은 건넘으로 3T에 든다고 추정.
+  {station:'anyang',id:'4A-B660T',along:'4A-B984T',onto:'4B-B660T',cross:'4C-B984T',points:{'53':'R','55':'R'},join:true}];
+ for(const m of manual){
+  const c=network.catalog[m.station],A=c.routes[m.along],B=c.routes[m.onto],X=c.routes[m.cross];if(!A||!B||!X||c.routes[m.id])continue;
+  const pts=r=>r.path.match(/-?\d+(\.\d+)?\s-?\d+(\.\d+)?/g).map(t=>t.split(' ').map(Number));
+  if(m.join){const a=pts(A),b=pts(B),cut=b[1][0];const xs=[...a.filter(p=>p[0]<cut),...b.slice(1)];
+   const locks=[...new Set([...A.pointLocks,...B.pointLocks])];
+   c.routes[m.id]={...B,signal:A.signal,destination:B.destination,pathTracks:[A.signal,B.destination],geometryRails:['1T','2T','3T'],path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources])],pointLocks:locks,pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...B.pointPositions,...m.points},geometryDerived:false,
+    evidence:'LS 사진 확인(안양역 4A: RT_4A_B984T, RT_4A_B660T). 전환기 구성은 추정 — LS 검수 후 확정',source:[c.sources.display,'사용자 LS 사진 2026-10-22']};
+   c.map.paths[m.id]=c.routes[m.id].path;c.traced.routes++;continue;}
+  const a=pts(A),b=pts(B),x=pts(X),diag=x.find((p,i)=>i&&p[1]!==x[i-1][1]);              // the 3T→2T diagonal of 4C-B984T; 2T→3T is its mirror
+  const from=x[x.indexOf(diag)-1],xs=[a[0],[from[0],a[0][1]],[diag[0],b[0][1]],...b.filter(p=>p[0]>diag[0])];
+  const locks=[...new Set([...A.pointLocks,...B.pointLocks])];
+  c.routes[m.id]={...B,signal:A.signal,destination:B.destination,pathTracks:[A.signal,B.destination],geometryRails:['2T','3T'],
+   path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources,X.resources[1]])],pointLocks:locks,
+   pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...m.points},geometryDerived:false,
+   evidence:'LS 직접 확인(안양역 4B: RT_4B_B984T, RT_4B_B660T). 전환기 구성은 4C-B984T와 같은 53번 크로스오버 반위로 추정 — LS 검수 후 확정',source:[c.sources.display,'사용자 LS 확인 2026-10-22']};
+  c.map.paths[m.id]=c.routes[m.id].path;c.traced.routes++;
+ }
  const copies={noryangjin:{page:2,dx:943,dy:120,headerDy:-41},yeongdeungpo:{page:2,dx:958,dy:120,headerDy:-41},guro:{page:3,dx:-768,dy:-156,headerDx:-2,headerDy:-2},geumcheon:{page:3,dx:-765,dy:-157,headerDx:-2,headerDy:0}};
  for(const [id,copy]of Object.entries(copies))network.catalog[id].map.copies=[copy];
  return network;

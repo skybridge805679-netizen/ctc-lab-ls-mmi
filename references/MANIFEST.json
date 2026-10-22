@@ -391,10 +391,11 @@
     {
       "path": "references/mmi/textbook-notes.md",
       "original_name": "textbook-notes.md",
-      "source": "Derived photo and textbook implementation notes, Claude branch 4c105bd; status reconciled during integration",
+      "source": "Derived textbook implementation notes; Claude 90726e2 integration",
       "added_date": "2026-10-22",
-      "bytes": 13830,
-      "sha256": "783e47e34fce1e6818151abc183bfa6d35744b22c1806ccc79cbc82f202a557c"
+      "bytes": 13743,
+      "sha256": "2b6c17b450ddb599737d1639d9a851b39e4a07642ac2e0aab535d7fee16b5e1f",
+      "updated_date": "2026-10-22"
     }
   ],
   "superseded_attachments": [

@@ -42,7 +42,7 @@ function create(catalog){
    if(a.op==='boardEdit'&&!board)return fail('표지판이 없습니다.');
    if(a.op==='boardAdd'){
     if(!Number.isFinite(a.x)||!Number.isFinite(a.y)||a.x<0||a.y<0)return fail('표지판 위치를 확인하세요.');
-    st.boards.push({id:'B'+(++model.serial),kind:a.kind,text,x:a.x,y:a.y,fixed:false});
+    st.boards.push({id:'B'+(++model.serial),kind:a.kind,text,x:a.x,y:a.y,w:a.kind==='서행표시'?130:200,h:a.kind==='서행표시'?46:60,fixed:false});
    }else Object.assign(board,{kind:a.kind,text});
    return ok(a.kind+' 표지판 '+(board?'수정':'추가'));
   }
@@ -52,6 +52,12 @@ function create(catalog){
    if(board.fixed)return fail('고정된 표지판입니다. 고정을 해제하세요.');
    if(!Number.isFinite(a.x)||!Number.isFinite(a.y)||a.x<0||a.y<0)return fail('표지판 위치를 확인하세요.');
    Object.assign(board,{x:a.x,y:a.y});return ok('표지판 위치 이동');
+  }
+  // 표지판은 반투명 창이라 사용자가 진로 위에 겹쳐 놓고 늘리고 줄여 쓴다 (사진·사용자 설명)
+  if(a.op==='boardResize'){
+   if(board.fixed)return fail('고정된 표지판입니다. 고정을 해제하세요.');
+   if(!Number.isFinite(a.w)||!Number.isFinite(a.h)||a.w<60||a.h<30||a.w>1200||a.h>400)return fail('표지판 크기를 확인하세요. (폭 60~1200, 높이 30~400)');
+   Object.assign(board,{w:Math.round(a.w),h:Math.round(a.h)});return ok('표지판 크기 변경');
   }
   if(a.op==='boardDelete'){st.boards.splice(st.boards.indexOf(board),1);return ok('표지판 삭제');}
   return fail('지원하지 않는 표시 명령입니다.');

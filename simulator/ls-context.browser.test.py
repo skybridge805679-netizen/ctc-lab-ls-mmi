@@ -16,7 +16,7 @@ try:
    page=browser.new_page(viewport={'width':width,'height':1100}); errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
    # this test deliberately stacks several numbers in one 열번창; acknowledge the resulting 열차번호 중복 alarm pop-ups as they appear
-   page.add_init_script("window.addEventListener('DOMContentLoaded',()=>setInterval(()=>document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click(),40))")
+   page.add_init_script("window.addEventListener('DOMContentLoaded',()=>setInterval(()=>{document.querySelectorAll('.mmi-alarm:not([hidden]) input[data-alarm-i]').forEach(b=>{if(!b.checked){b.checked=true;b.dispatchEvent(new Event('change',{bubbles:true}));}});document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click()},40))")
    page.on('response',lambda r:errors.append(f'HTTP {r.status} {r.url}') if r.status>=400 else None)
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
    page.select_option('#stationSelect','geumcheon')
@@ -98,8 +98,8 @@ try:
    page.select_option('#stationSelect','jonggak'); background(); action('boards').hover()
    bounds=action('boards').locator('..').locator('.ls-submenu').bounding_box(); assert bounds['x']>=0 and bounds['x']+bounds['width']<=width
    if width==1440:
-    page.screenshot(path=str(ROOT.parent/'docs/preview-v0.16.0-context-background.png'))
-    page.keyboard.press('Escape'); page.select_option('#stationSelect','geumcheon'); win('B967T').click(button='right'); action('train-move').hover(); page.screenshot(path=str(ROOT.parent/'docs/preview-v0.16.0-context-train.png'))
+    page.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.0-context-background.png'))
+    page.keyboard.press('Escape'); page.select_option('#stationSelect','geumcheon'); win('B967T').click(button='right'); action('train-move').hover(); page.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.0-context-train.png'))
    assert not errors,errors
    print(f'PASS LS menus: input/edit/delete/move/swap, signs, scan/restart/print/Overview, {total} windows: {width}px',flush=True)
    page.close()

@@ -42,7 +42,7 @@ def exercise(page, url, width):
 
     # No approaching train: stop releases immediately.
     click_svg('[data-signal="2B"]')
-    expect(page.locator('#dialogTitle')).to_contain_text('신호 정지')
+    expect(page.locator('#dialogTitle')).to_contain_text('제어 확인'); expect(page.locator('#dialogBody')).to_contain_text('해정 하시겠습니까?')
     confirm()
     try:
         expect(page.locator('[data-lock-row]')).to_have_count(0)

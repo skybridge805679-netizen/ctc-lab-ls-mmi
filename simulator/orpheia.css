@@ -182,12 +182,20 @@ dialog::backdrop{background:#133d414f;backdrop-filter:blur(3px)}
 .sc-steps .sc-say.done label{color:#778b80}.sc-hint{font-size:11px;line-height:1.7}
 .rp-ctl{flex-wrap:wrap;gap:8px;padding:8px 0}.rp-ctl button{background:white;border-color:#b4cec0;border-radius:4px;color:var(--teal);padding:6px 10px}
 .rp-ctl button:hover{background:var(--orpheia)}#rpState{color:var(--quiet)}
-.written .wr-body{padding:18px;border-color:var(--line);border-radius:5px;background:white;line-height:1.8}
-.written .wr-meta{color:var(--quiet);font-size:11px;letter-spacing:.2px}.written .wr-q{font-size:14px;color:var(--deep);line-height:1.8;margin:10px 0 16px}
-.written .wr-choices label{border:1px solid var(--line);border-radius:4px;background:#f8fbf7;padding:10px 12px;margin:8px 0;gap:9px}
-.written .wr-choices label:has(input:checked){background:var(--petal);border-color:#78a794;color:var(--deep)}
-.written .wr-opts{gap:10px 14px;padding-bottom:8px}.written .wr-status{color:var(--teal);margin:8px 0}
-.written .trc-msg.ok{background:#e9f4e9;color:#346341;border-color:#9fc5a0}.written .trc-msg.bad{background:#fbefea;color:#8b4639;border-color:#d6afa0}
 .pref .pref-ul{border-color:var(--line);border-radius:4px}.pref .pref-ul li{padding:7px 9px;border-bottom:1px solid #e9f0e9;color:var(--deep)}
 .pref .pref-ul li.sel{background:var(--teal);color:white}.pref .pref-cols{gap:12px}.pref .pref-mid{gap:8px}
 .pref [data-pref-mon][aria-pressed="true"]{background:var(--teal);color:white;border-color:var(--teal)}
+/* The new LS menus retain the photographed structure in the ORPHEIA palette. */
+dialog[data-variant="route"]{max-height:calc(100vh - 8px);overflow:auto;border-color:#9dbeb6;border-radius:4px;background:var(--paper);box-shadow:var(--window-shadow)}
+dialog[data-variant="route"] h2{background:var(--orpheia);color:var(--deep);padding:7px 10px;border-bottom:1px solid #a9cbc3;border-radius:3px 3px 0 0}
+dialog[data-variant="route"] #dialogBody{color:var(--deep);padding:4px 0}
+dialog[data-variant="route"] .route-choice{background:var(--paper);color:var(--deep);padding:7px 14px}
+dialog[data-variant="route"] .route-choice:hover,dialog[data-variant="route"] .route-choice:focus-visible{background:var(--teal);color:white}
+dialog[data-variant="confirm"]{background:var(--paper);color:var(--deep);border-color:#9dbeb6;border-radius:6px;box-shadow:var(--window-shadow)}
+dialog[data-variant="confirm"] h2{background:var(--orpheia);color:var(--deep);border-radius:5px 5px 0 0;border-bottom:1px solid #a9cbc3}
+dialog[data-variant="confirm"] #dialogBody{color:var(--deep)}
+dialog[data-variant="confirm"] .dialog-actions button{background:#f1f7f2;color:var(--deep);border:1px solid #b0cabe;border-radius:4px;padding:6px 14px}
+dialog[data-variant="confirm"] .dialog-actions button.primary{background:var(--teal);color:white;border:1px solid var(--teal)}
+.q-icon{background:var(--teal)}
+
+.sc .rpt-cond>label{white-space:nowrap;min-width:0}.sc .rpt-cond>label select{min-width:0;width:min(420px,100%)}

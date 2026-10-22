@@ -66,11 +66,19 @@ function renderAlarm(){
   alarmEl=doc.createElement('div');alarmEl.className='mmi-alarm';alarmEl.setAttribute('role','alertdialog');alarmEl.setAttribute('aria-label','알람메시지');alarmEl.hidden=true;
   alarmEl.innerHTML=`<div class="mmi-alarm-title"><span>알람메시지</span><button type="button" class="mmi-alarm-x" aria-label="알람메시지 닫기">✕</button></div><div class="mmi-alarm-body"><div class="mmi-alarm-side"></div><div class="mmi-alarm-main"><div class="mmi-alarm-cap" id="alarmCount"></div><div class="mmi-alarm-box" id="alarmText"></div></div></div><div class="mmi-alarm-foot"><button type="button" data-alarm-mute>알람음 소거</button><button type="button" data-alarm-ok id="alarmOk">확인</button></div>`;
   doc.body.appendChild(alarmEl);
-  const ack=()=>{for(const a of alarms)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});alarms.length=0;mute();alarmEl.hidden=true;};
-  alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=ack;alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
+  // 실물 동작(사용자 설명): 체크칸에 체크하고 [확인]을 눌러야 해당 알람이 확인 처리되어 사라지고, 체크 없이 [확인]만 누르면 계속 표시된다.
+  const ack=()=>{
+   const done=alarms.filter(a=>a.checked);if(!done.length)return;
+   for(const a of done)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});
+   for(let i=alarms.length-1;i>=0;i--)if(alarms[i].checked)alarms.splice(i,1);
+   if(!alarms.length)mute();renderAlarm();
+  };
+  alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=()=>{alarmEl.hidden=true;};      // 닫기 X는 확인 처리가 아니다
+  alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
+  alarmEl.querySelector('#alarmText').onchange=e=>{const box=e.target.closest('input[data-alarm-i]');if(box&&alarms[+box.dataset.alarmI])alarms[+box.dataset.alarmI].checked=box.checked;};
  }
  $('alarmCount').textContent=`메시지 내용 (미확인 알람 갯수 : ${alarms.length}개)`;
- $('alarmText').innerHTML=alarms.slice().reverse().map(a=>`<p><label><input type="checkbox" disabled></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
+ $('alarmText').innerHTML=alarms.map((a,i)=>[a,i]).reverse().map(([a,i])=>`<p><label><input type="checkbox" data-alarm-i="${i}" ${a.checked?'checked':''} aria-label="확인 표시"></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
  alarmEl.hidden=!alarms.length;
 }
 function raiseAlarm(text,state='',level='E',station=''){
@@ -221,9 +229,8 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiWrittenBtn">필기 연습</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
  shell.querySelector('#mmiScenarioBtn').onclick=()=>open('scenario');
- shell.querySelector('#mmiWrittenBtn').onclick=()=>open('written');
  shell.querySelector('#mmiEquipBtn').onclick=()=>open('equipment');
  shell.querySelector('#mmiCdrsBtn').onclick=()=>open('cdrs');
  shell.querySelector('#mmiLedgerBtn').onclick=()=>open('ledger');
@@ -244,7 +251,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- root.SimNotes.init(host);root.SimDrill.init(host);root.SimWritten.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
+ root.SimNotes.init(host);root.SimDrill.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
@@ -256,5 +263,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});emit({type:'schedule',change,ok:true});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={markAuto:key=>autoMarks.add(key),replayLog:id=>replayLog[id]||[],replaying:()=>root.SimReplay?.active?.()||false,render:()=>host?.render?.(),run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={checkDuplicates,markAuto:key=>autoMarks.add(key),replayLog:id=>replayLog[id]||[],replaying:()=>root.SimReplay?.active?.()||false,render:()=>host?.render?.(),run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

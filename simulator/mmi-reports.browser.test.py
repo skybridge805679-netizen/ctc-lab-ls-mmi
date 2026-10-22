@@ -107,7 +107,7 @@ def run(page, url):
     expect(page.locator('#alarmLogBody tr').first).to_contain_text('[안내]')
     page.evaluate("SimMMI.raiseAlarm('의왕(010130)역 RT_3D_B685T진로 요구중 대향진로( )','수동진로설정불가')")
     expect(page.locator('#alarmLogBody tr').first).to_contain_text('[오류]')
-    page.locator('#alarmOk').click()
+    page.locator('.mmi-alarm input[data-alarm-i]').check(); page.locator('#alarmOk').click()
     menu(page, '시스템 조회', '알람/이벤트조회')
     page.locator('#alarmEventSearch').click()
     assert rows(page, 'alarmEvent').count() >= 3

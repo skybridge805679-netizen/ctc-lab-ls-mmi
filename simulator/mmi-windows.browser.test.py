@@ -139,6 +139,9 @@ def run(page, url):
     expect(box).to_contain_text('의왕(010130)역 RT_3D_B685T진로 요구중')
     expect(box).to_contain_text('설정상태 [수동진로설정불가]')
     page.locator('[data-alarm-mute]').click(); expect(page.locator('[data-alarm-mute]')).to_be_disabled()
+    # 체크 없이 [확인]만 누르면 계속 표시되고, 체크칸에 체크하고 [확인]을 눌러야 사라진다
+    page.locator('#alarmOk').click(); expect(box).to_be_visible(); expect(box).to_contain_text('미확인 알람 갯수 : 1개')
+    cb = page.locator('.mmi-alarm input[data-alarm-i]'); expect(cb).to_be_enabled(); cb.check(); expect(cb).to_be_checked()
     page.locator('#alarmOk').click(); expect(box).to_be_hidden()
     # 열차번호 중복 알람 (실무5 p.15): two numbers in one 열번창 raise an alarm pop-up
     menu(page, '현장제어', '열차제어', '열차번호제어(B)')
@@ -149,7 +152,11 @@ def run(page, url):
         page.fill('#mmiTrainNumber', number); page.click('#mmiTrainApply'); page.click('#dialogConfirm')
     expect(page.locator('.mmi-alarm')).to_contain_text('K0602 + K0604 열차번호 중복')
     expect(page.locator('#alarmLogBody tr').first).to_contain_text('[오류]')
-    page.locator('#alarmOk').click()
+    # two alarms: only the checked one is acknowledged
+    page.evaluate("SimMMI.raiseAlarm('두 번째 알람')"); expect(box).to_contain_text('미확인 알람 갯수 : 2개')
+    page.locator('.mmi-alarm input[data-alarm-i]').first.check(); page.locator('#alarmOk').click()
+    expect(box).to_contain_text('미확인 알람 갯수 : 1개')
+    page.locator('.mmi-alarm input[data-alarm-i]').first.check(); page.locator('#alarmOk').click(); expect(box).to_be_hidden()
     assert not errors, errors
 
 
