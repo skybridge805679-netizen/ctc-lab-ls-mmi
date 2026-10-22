@@ -44,6 +44,7 @@ function selectStation(id,scroll=true){
 const stationOptions=N.stations.filter(st=>st.controlled).map(st=>`<option value="${st.id}">${st.name}${st.controlled?' ['+st.code+']':' · 비연동'}</option>`).join('');
 $('stationSelect').innerHTML=stationOptions;$('lsStationSelect').innerHTML=stationOptions;
 $('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedStation;
+window.SimPreferred&&window.SimPreferred.apply();
 $('stationSelect').onchange=e=>selectStation(e.target.value);$('lsStationSelect').onchange=e=>selectStation(e.target.value);
 $('stationTabs').innerHTML=N.stations.filter(st=>st.controlled).map(st=>`<button data-station="${st.id}"><i class="tab-dot auto" aria-hidden="true"></i>${st.name}<b class="tab-count"></b></button>`).join('');
 $('stationTabs').onclick=e=>{const button=e.target.closest('[data-station]');if(button)selectStation(button.dataset.station);};
