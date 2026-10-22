@@ -118,6 +118,7 @@ function apply(network){
    path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources,X.resources[1]])],pointLocks:locks,
    pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...m.points},geometryDerived:false,
    evidence:'LS 직접 확인(안양역 4B: RT_4B_B984T, RT_4B_B660T). 전환기 구성은 4C-B984T와 같은 53번 크로스오버 반위로 추정 — LS 검수 후 확정',source:[c.sources.display,'사용자 LS 확인 2026-10-22']};
+  c.map.paths[m.id]=c.routes[m.id].path;c.traced.routes++;
  }
  const copies={noryangjin:{page:2,dx:943,dy:120,headerDy:-41},yeongdeungpo:{page:2,dx:958,dy:120,headerDy:-41},guro:{page:3,dx:-768,dy:-156,headerDx:-2,headerDy:-2},geumcheon:{page:3,dx:-765,dy:-157,headerDx:-2,headerDy:0}};
  for(const [id,copy]of Object.entries(copies))network.catalog[id].map.copies=[copy];
