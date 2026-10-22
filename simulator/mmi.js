@@ -93,6 +93,17 @@ function checkDuplicates(stationId){
  }
 }
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
+// 로그재생: every state change of a station is stored with a snapshot so the LS can be replayed (실기1 p.39-42)
+const replayLog={};
+const SNAP_KEYS=['mode','pending','clock','points','signals','routes','approach','occupied','blockedPoints'];
+function capture(stationId,state,texts){
+ if(!texts.length)return;
+ const ls=root.SimLSUI?.getModel?.()?.stations?.[stationId];
+ const snap={state:structuredClone(Object.fromEntries(SNAP_KEYS.map(k=>[k,state[k]]))),ls:ls?structuredClone(ls):null};
+ const list=replayLog[stationId]??=[];
+ for(const text of texts)list.push({time:stamp(new Date()),clock:state.clock,station:stationId,text,snap});
+ if(list.length>1500)list.splice(0,list.length-1500);
+}
 const eventListeners=new Set();
 const emit=e=>{for(const f of eventListeners)f(e);};
 function sync(stationId,state,action,result){
@@ -103,13 +114,16 @@ function sync(stationId,state,action,result){
   if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가','E',info.name);else if(result.message)raiseAlarm(`${who} ${result.message}`,'','E',info.name);}
  const st=stationLabel(stationId),prev=seen[stationId],now=new Set(Object.keys(state.routes));
  if(!prev||prev.state!==state){seen[stationId]={state,routes:now,mode:state.mode};return;}
- for(const id of now)if(!prev.routes.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로설정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로설정`});}
- for(const id of prev.routes)if(!now.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로해정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로해정`});}
- if(state.mode!==prev.mode){log('event',`${st.name}[${st.code}] ${state.mode} MODE로 전환`);record('mode',{station:st.name,text:`${prev.mode} → ${state.mode}`});}
- if(action?.type==='point'&&result?.ok)record('field',{station:st.name,kind:'선로전환기',text:`${action.id} ${action.value==='R'?'반위':'정위'} 전환`});
- if((action?.type==='stop'||action?.type==='stopAll')&&result?.ok)record('field',{station:st.name,kind:'신호기',text:action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`});
- if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});for(const id of new Set([op.station,op.targetStation]))if(id)checkDuplicates(id);}
+ const changes=[];
+ for(const id of now)if(!prev.routes.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로설정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로설정`});changes.push(`${routeText(id)}진로설정`);}
+ for(const id of prev.routes)if(!now.has(id)){log('alarm',`${st.name}역 ${routeText(id)}진로해정`);record('field',{station:st.name,kind:'진로',text:`${routeText(id)}진로해정`});changes.push(`${routeText(id)}진로해정`);}
+ if(state.mode!==prev.mode){log('event',`${st.name}[${st.code}] ${state.mode} MODE로 전환`);record('mode',{station:st.name,text:`${prev.mode} → ${state.mode}`});changes.push(`${state.mode} MODE로 전환`);}
+ if(action?.type==='point'&&result?.ok){record('field',{station:st.name,kind:'선로전환기',text:`${action.id} ${action.value==='R'?'반위':'정위'} 전환`});changes.push(`전환기 ${action.id} ${action.value==='R'?'반위':'정위'}`);}
+ if((action?.type==='stop'||action?.type==='stopAll')&&result?.ok){record('field',{station:st.name,kind:'신호기',text:action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`});changes.push(action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`);}
+ if(action?.type==='approach'&&result?.ok)changes.push(`${action.signal} 접근 열차 ${action.present===false?'제거':'투입'}`);
+ if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});for(const id of new Set([op.station,op.targetStation]))if(id)checkDuplicates(id);changes.push(`열차번호 ${op.op}${op.number?` · ${op.number}`:''}`);}
  if(action?.type==='scan'&&result?.ok)log('event',action.scope==='all'?'전체 제어역 Basescan 수신':`${st.name}역 Basescan 수신`);
+ capture(stationId,state,changes);
  seen[stationId]={state,routes:now,mode:state.mode};
 }
 function syncAll(states){for(const [id,state] of Object.entries(states))sync(id,state);}
@@ -224,7 +238,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- root.SimNotes.init(host);root.SimDrill.init(host);root.SimScenarioUI.init(host);
+ root.SimNotes.init(host);root.SimDrill.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
@@ -236,5 +250,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});emit({type:'schedule',change,ok:true});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={replayLog:id=>replayLog[id]||[],replaying:()=>root.SimReplay?.active?.()||false,render:()=>host?.render?.(),run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

@@ -224,3 +224,8 @@
 .sc-hint{display:block;font-weight:400;color:#555}.sc-mark{min-width:16px}
 .sc-notes{margin:6px 0;padding-left:18px;font-size:11px;color:#444}
 #scProgress{margin-left:auto;font-weight:700}
+
+/* 로그재생 */
+.ls-replay-badge{background:#ff8a7a;border-color:#8a2214;color:#3b0700}
+.rp-ctl{display:flex;gap:6px;align-items:center;margin:6px 0}.rp-ctl button{min-width:36px;padding:3px 8px;border:1px solid #6d6d6a;background:#e8e8e4;cursor:pointer;font-size:13px}
+.rp-ctl label{margin-left:12px;display:flex;gap:6px;align-items:center}#rpState{margin-left:12px;color:#55607e}
