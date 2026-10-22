@@ -10,7 +10,13 @@ const tasks=window.SimPractice.tasks;
 completed=[...new Set(completed.filter(i=>Number.isInteger(i)&&i>=0&&i<tasks.length))];
 function toast(msg,error=false){$('toast').textContent=msg;$('toast').className='show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').className='',5000);}
 function run(a){let r;if(window.SimMMI?.replaying?.()){toast('로그재생 중에는 조작할 수 없습니다. 재생 창의 ■ 종료를 누르세요.',true);return {ok:false,message:'로그재생 중'};}if(a.type==='tick'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);window.SimAutoUI?.step();r={ok:true};}else if(a.type==='scan'&&a.scope==='all'){for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,a);r={ok:true,message:'전체 15개 취급역 상태 재수신'};}else if(a.type==='lsOperation'){r=window.SimLSUI.dispatch(a.operation);state.logs.unshift({time:state.clock,source:a.source||'LS',action:a.operation.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)state.events.push({...a,time:state.clock});}else r=C.dispatch(state,a);if(window.SimMMI){if(a.type==='tick')window.SimMMI.syncAll(stationStates);else window.SimMMI.sync(selectedStation,state,a,r);}render();if(a.type!=='tick')toast(r.message,!r.ok);return r;}
-function openAction(title,body,action,label='예 · 실행'){$('dialogConfirm').hidden=false;$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;dialogAction=action;$('actionDialog').returnValue='';$('dialogConfirm').textContent=label;$('actionDialog').showModal();}
+// variant: '' = 기본 대화상자, 'route' = 신호기 옆 진로 제어 팝업(사진), 'confirm' = 윈도 스타일 제어 확인 상자(사진: 해정 하시겠습니까?)
+function openAction(title,body,action,label='예 · 실행',variant='',at=null){
+ const d=$('actionDialog');$('dialogConfirm').hidden=false;$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;dialogAction=action;d.returnValue='';
+ $('dialogConfirm').textContent=label;d.querySelector('[value="cancel"]').textContent=variant==='confirm'?'아니요(N)':'아니오 · 취소';d.dataset.variant=variant;
+ if(at){d.style.setProperty('--dx',Math.max(4,Math.min(at.x,innerWidth-200))+'px');d.style.setProperty('--dy',Math.max(4,Math.min(at.y,innerHeight-120))+'px');}
+ d.showModal();
+}
 function routeDetails(id){const r=C.routes[id];return `<div class="route-detail"><b>${escapeHTML(id)}</b><p>${r.pathTracks.join(' → ')}</p><p class="evidence">${r.evidence}</p><p>${r.source.map(escapeHTML).join('<br>')}</p><p class="pending-note">배선 연결 연습 모델 · 경로의 공유 구간·전환기를 쇄정합니다. 실설비 진로표와 세부 연동조건은 별도 검증 대상입니다</p></div>`;}
 const statusLabel={SET:'설정',OCCUPIED:'점유',LOCKED:'쇄정',APPROACH_LOCK:'접근쇄정'};
 function boardTrains(){const ids=[...new Set(Object.values(C.routes).filter(r=>C.lockSeconds(r.signal)).map(r=>r.signal))];return ids.map(id=>{const on=!!state.approach?.[id],sec=C.lockSeconds(id);return `<button class="train-chip ${on?'on':''}" data-approach-toggle="${id}" aria-pressed="${on}" title="${id} 외방 접근구간 열차 ${on?'제거':'투입'}">${id}<small>${on?'접근 열차 있음':'열차 없음'} · ${sec}초</small></button>`;}).join('');}
@@ -76,12 +82,13 @@ function fields(){const type=$('controlSelect').value;$('mmiApply').disabled=!N.
  if(type==='scan')html='<span class="field-label">제어구분</span><div class="radio-row"><label><input type="radio" name="mmiScope" value="current" checked>선택역</label><label><input type="radio" name="mmiScope" value="all">전체 제어역</label></div>';
  $('mmiFields').innerHTML=html;if(type==='route'){routeOptions();$('mmiSignal').onchange=routeOptions;}
 }
-function signalAction(id){
+function signalAction(id,at){
  const active=Object.keys(state.routes).find(key=>C.routes[key].signal===id);
- if(active){openAction(id+' 신호 정지·진로 해정','신호를 정지하고 진로를 해정하시겠습니까?<p>점유 중이면 신호만 정지하고 진로 쇄정을 유지합니다</p>',{type:'stop',id,source:'LS'});return;}
+ if(active){openAction('제어 확인','<span class="q-icon" aria-hidden="true">?</span><span class="q-text">해정 하시겠습니까?</span>',{type:'stop',id,source:'LS'},'예(Y)','confirm');return;}
  const entries=C.lsMenu(id);
  if(!entries.length){toast(id+' 입환신호기의 진로목록은 아직 구현하지 않았습니다.',true);return;}
- openAction('[ 진로 제어 ]','<p>'+(C.menuVerifiedFor(id)?'실제 LS 팝업의 진로 목록입니다.':'교재・대본 대조 경로와 배선 연결로 도출한 연습 경로를 구분합니다. 이 역의 실제 LS 목록은 아직 확인되지 않았습니다.')+'</p>'+entries.map(key=>`<button type="button" class="route-choice" data-route-choice="${key}">RT_${key.replace('-','_')} <small>${C.menuVerifiedFor(id)?'원본 LS 목록':C.routes[key].geometryDerived?'배선 연결 경로':'교재·대본 대조'}</small></button>`).join(''),null);
+ // 실제 LS는 신호기 옆에 "[ 진로 제어 ]" 제목과 RT_<신호기>_<도착> 목록만 보여 준다. 목록의 출처(원본/배선 도출)는 마우스를 올리면 나온다.
+ openAction('[ 진로 제어 ]',entries.map(key=>`<button type="button" class="route-choice" data-route-choice="${key}" title="${C.menuVerifiedFor(id)?'원본 LS 목록':C.routes[key].geometryDerived?'배선 연결으로 도출한 경로 (실제 LS 목록은 확인되지 않음)':'교재·대본·LS 확인 경로'}">RT_${key.replace('-','_')}</button>`).join(''),null,'예 · 실행','route',at);
  $('dialogConfirm').hidden=true;
  document.querySelectorAll('[data-route-choice]').forEach(button=>button.onclick=()=>{$('actionDialog').close();$('dialogConfirm').hidden=false;run({type:'route',id:button.dataset.routeChoice,source:'LS'});});
 }
@@ -95,9 +102,11 @@ $('lsDisplay').onclick=e=>{
   // 표준화 프로토콜(교통관제운영 4권 p.383): LOCAL에서 CTC를 누르면 비상 CTC 대화상자가 뜨고, 선택하면 현장 응답 없이 바로 전환된다
   openAction('역제어모드 설정',N.catalog[selectedStation].name+' LOCAL 상태입니다. CCM(CTC) 모드로 전환하시겠습니까?<label class="nt-check"><input type="checkbox" id="emgCtc"> 비상 CTC (현장 응답 없이 즉시 전환)</label>',()=>({type:'mode',value:'CCM',source:'LS',emergency:$('emgCtc').checked}));
  }else if(mode)openAction('역제어모드 설정',N.catalog[selectedStation].name+' '+mode.dataset.mode+' 모드로 전환하시겠습니까?',{type:'mode',value:mode.dataset.mode,source:'LS'});
- else if(signal)signalAction(signal.dataset.signal);
+ else if(signal)signalAction(signal.dataset.signal,{x:e.clientX,y:e.clientY});
  else if(stop)openAction('신호기 일괄정지',N.catalog[selectedStation].name+'의 설정 신호기를 모두 정지합니다. 점유 중인 진로는 쇄정을 유지합니다.',{type:'stopAll',source:'LS'});
 };
+$('actionDialog').addEventListener('click',e=>{const d=$('actionDialog');if(d.dataset.variant==='route'&&e.target===d)d.close();});      // 팝업 밖을 누르면 닫힘
+$('actionDialog').addEventListener('keydown',e=>{const d=$('actionDialog');if(d.dataset.variant!=='confirm')return;if(/^y$/i.test(e.key)){e.preventDefault();$('dialogConfirm').click();}else if(/^n$/i.test(e.key)){e.preventDefault();d.querySelector('[value="cancel"]').click();}});
 $('lsStage').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
 
 $('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});

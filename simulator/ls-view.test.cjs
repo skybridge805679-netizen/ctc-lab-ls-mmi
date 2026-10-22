@@ -52,13 +52,13 @@ test('route lines, approach trains and overlap rings are drawn from the same sta
  const svg=LS.render(st,W.data.geumcheon,C,s).svg;
  assert(/data-route-state="locked"/.test(svg));assert(/data-approach-train="2B"/.test(svg));assert(/data-overlap-point="26"/.test(svg));
 });
-test('all 655 routes update track-section state and preserve state through occupancy',()=>{
+test('all 656 routes update track-section state and preserve state through occupancy',()=>{
  let count=0;
  for(const st of controlled){const C=Core.forStation(st.id);for(const id of Object.keys(C.routes)){
   const s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});assert(C.dispatch(s,{type:'route',id}).ok);
   assert(LS.render(st,W.data[st.id],C,s).svg.includes('data-track-state="set"'),st.id+' '+id);
   C.dispatch(s,{type:'occupy',id});assert(LS.render(st,W.data[st.id],C,s).svg.includes('data-track-state="occupied"'),st.id+' '+id+' occupied');count++;
- }}assert.equal(count,655);
+ }}assert.equal(count,656);
 });
 test('source station tracks, platforms, circuit identifiers and SP/SS symbols are vector objects',()=>{
  const details=require('./schematic-details');

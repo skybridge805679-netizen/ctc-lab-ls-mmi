@@ -50,7 +50,7 @@ def run(page, url):
     # out-of-order action does not count (route before CCM / release): refused, nothing ticks
     do({'type': 'route', 'id': '2A-5T', 'source': 'LS'})
     page.locator('#mmiAlertOk').click() if page.locator('#mmiAlertOk').count() else None
-    page.locator('.mmi-alarm [data-alarm-ok]').click() if page.locator('.mmi-alarm:not([hidden])').count() else None
+    page.evaluate("()=>{document.querySelectorAll('.mmi-alarm:not([hidden]) input[data-alarm-i]').forEach(b=>{if(!b.checked){b.checked=true;b.dispatchEvent(new Event('change',{bubbles:true}));}});document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click()}")
     assert page.locator('#scSteps li.done').count() == 0
     do({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(1)

@@ -34,3 +34,12 @@ test('boards retain text/location; fixing blocks dragging, edits validate before
  assert(C.dispatch(s,{station:base.station,op:'boardDelete',id:b.id}).ok);assert.equal(s.stations.geumcheon.boards.length,0);
 });
 console.log(tests+' LS operation tests passed');
+// 표지판 크기 조절 (반투명 창을 진로 위에서 늘리고 줄임)
+{const LSO=require('./ls-operations.js'),C=LSO.create({seoul:['1T']}),s=C.initial();
+ assert(C.dispatch(s,{station:'seoul',op:'boardAdd',kind:'열간작업',text:'작업중',x:10,y:10}).ok);
+ const b=s.stations.seoul.boards[0];assert.strictEqual(b.w,200);assert.strictEqual(b.h,60);
+ assert(C.dispatch(s,{station:'seoul',op:'boardResize',id:b.id,w:420,h:90}).ok);assert.strictEqual(b.w,420);
+ assert(!C.dispatch(s,{station:'seoul',op:'boardResize',id:b.id,w:10,h:90}).ok);assert(!C.dispatch(s,{station:'seoul',op:'boardResize',id:b.id,w:300,h:900}).ok);assert.strictEqual(b.w,420);
+ C.dispatch(s,{station:'seoul',op:'boardFix',id:b.id,fixed:true});assert(!C.dispatch(s,{station:'seoul',op:'boardResize',id:b.id,w:300,h:90}).ok);
+ assert(C.dispatch(s,{station:'seoul',op:'boardAdd',kind:'서행표시',text:'25',x:10,y:80}).ok);assert.strictEqual(s.stations.seoul.boards[1].w,130);}
+console.log('board resize: ok');

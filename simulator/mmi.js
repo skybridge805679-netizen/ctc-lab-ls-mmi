@@ -66,11 +66,19 @@ function renderAlarm(){
   alarmEl=doc.createElement('div');alarmEl.className='mmi-alarm';alarmEl.setAttribute('role','alertdialog');alarmEl.setAttribute('aria-label','알람메시지');alarmEl.hidden=true;
   alarmEl.innerHTML=`<div class="mmi-alarm-title"><span>알람메시지</span><button type="button" class="mmi-alarm-x" aria-label="알람메시지 닫기">✕</button></div><div class="mmi-alarm-body"><div class="mmi-alarm-side"></div><div class="mmi-alarm-main"><div class="mmi-alarm-cap" id="alarmCount"></div><div class="mmi-alarm-box" id="alarmText"></div></div></div><div class="mmi-alarm-foot"><button type="button" data-alarm-mute>알람음 소거</button><button type="button" data-alarm-ok id="alarmOk">확인</button></div>`;
   doc.body.appendChild(alarmEl);
-  const ack=()=>{for(const a of alarms)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});alarms.length=0;mute();alarmEl.hidden=true;};
-  alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=ack;alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
+  // 실물 동작(사용자 설명): 체크칸에 체크하고 [확인]을 눌러야 해당 알람이 확인 처리되어 사라지고, 체크 없이 [확인]만 누르면 계속 표시된다.
+  const ack=()=>{
+   const done=alarms.filter(a=>a.checked);if(!done.length)return;
+   for(const a of done)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});
+   for(let i=alarms.length-1;i>=0;i--)if(alarms[i].checked)alarms.splice(i,1);
+   if(!alarms.length)mute();renderAlarm();
+  };
+  alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=()=>{alarmEl.hidden=true;};      // 닫기 X는 확인 처리가 아니다
+  alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
+  alarmEl.querySelector('#alarmText').onchange=e=>{const box=e.target.closest('input[data-alarm-i]');if(box&&alarms[+box.dataset.alarmI])alarms[+box.dataset.alarmI].checked=box.checked;};
  }
  $('alarmCount').textContent=`메시지 내용 (미확인 알람 갯수 : ${alarms.length}개)`;
- $('alarmText').innerHTML=alarms.slice().reverse().map(a=>`<p><label><input type="checkbox" disabled></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
+ $('alarmText').innerHTML=alarms.map((a,i)=>[a,i]).reverse().map(([a,i])=>`<p><label><input type="checkbox" data-alarm-i="${i}" ${a.checked?'checked':''} aria-label="확인 표시"></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
  alarmEl.hidden=!alarms.length;
 }
 function raiseAlarm(text,state='',level='E',station=''){
