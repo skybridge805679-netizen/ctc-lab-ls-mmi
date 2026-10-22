@@ -6,6 +6,36 @@ const doc=document,$=id=>doc.getElementById(id),SC=()=>root.SimScenarios;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mmi=()=>root.SimMMI;
 let host=null,run=null,timer=null,passed=false;
+// ---- the trains of the scenario on the LS 열번창 (direction + number), moved as the script advances
+const lsm=()=>root.SimLSUI.getModel();
+function findRow(number){
+ for(const [station,st] of Object.entries(lsm().stations))for(const [slot,rows] of Object.entries(st.windows))for(const r of rows)if(r.number===number)return {station,slot,uid:r.uid};
+ return null;
+}
+function clearNumbers(numbers){for(const n of numbers){let f;while((f=findRow(n)))root.SimLSUI.dispatch({op:'delete',...f});}}
+function placeCast(){
+ const sc=run.sc;clearNumbers(run.cast.map(c=>c.id));
+ for(const c of run.cast){const r=root.SimLSUI.dispatch({op:'insert',station:sc.station,slot:c.slot,number:c.id,direction:c.dir});if(!r.ok)mmi().log('event',`열차번호 표시 실패 · ${c.id} · ${r.message}`);}
+}
+function moveCast(key,slot){
+ const c=run.cast.find(x=>x.key===key);if(!c)return;
+ const f=findRow(c.id);if(!f)return;
+ if(slot===null)root.SimLSUI.dispatch({op:'delete',...f});
+ else if(f.slot!==slot)root.SimLSUI.dispatch({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:run.sc.station,targetSlot:slot});
+}
+// when a tagged step is newly done, queue its moves (each `after` sim-seconds after the previous one); the queue runs on the station clock
+function fireBeats(){
+ run.sc.steps.forEach((s,i)=>{
+  if(!s.tag||!run.done[i]||run.fired.has(s.tag))return;
+  run.fired.add(s.tag);let due=station().clock;
+  for(const m of SC().movesFor(run.sc,s.tag)){due+=m.after;run.queue.push({due,key:m.key,slot:m.slot});}
+ });
+}
+function runQueue(){
+ let moved=false;const now=station().clock;
+ while(run.queue.length&&run.queue[0].due<=now){const m=run.queue.shift();moveCast(m.key,m.slot);moved=true;}
+ if(moved)mmi().render();
+}
 const station=()=>host.context().stationStates[run.sc.station];
 const ctx=()=>({state:station(),model:root.SimDiagram.getModel()});
 function render(){
@@ -21,7 +51,7 @@ function render(){
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
-function evaluate(){if(!run)return;if(SC().advance(run,ctx()))render();}
+function evaluate(){if(!run)return;if(SC().advance(run,ctx()))render();fireBeats();runQueue();}
 const current=()=>SC().list.find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
@@ -36,8 +66,8 @@ function start(){
  host.selectStation(sc.station);
  SC().seed(sc,host.context().stationStates[sc.station]);
  mmi().rebase(sc.station);
- run=SC().newRun(sc,train);passed=false;
- $('scProblem').innerHTML=`<b>문제</b> ${esc(SC().fill(sc.problem,run))}<br><small>고장열차: ${esc(train||'지정 안 함')} · 출처: ${esc(sc.source)}</small>`;
+ run=SC().newRun(sc,train);passed=false;run.fired=new Set();run.queue=[];run.cast=SC().pickCast(sc,root.SimDiagram.getModel(),train);placeCast();
+ $('scProblem').innerHTML=`<b>문제</b> ${esc(SC().fill(sc.problem,run))}<br><small>고장열차: ${esc(train||'지정 안 함')} · 출처: ${esc(sc.source)}</small><br><small>LS 열번창 등장 열차: ${run.cast.map(c=>`${esc(c.id)}(${c.dir==='up'?'상':'하'}${c.role==='fault'?' · 고장':c.role==='follow'?' · 후속':' · '+esc(c.label||'타 열차')})`).join(' / ')}</small>`;
  $('scNotes').innerHTML=sc.notes.map(n=>`<li>${esc(n)}</li>`).join('');
  host.run({type:'tick',seconds:0});   // redraw the LS with the seeded station
  mmi().log('event',`실기 시나리오 시작 · ${sc.title}`);

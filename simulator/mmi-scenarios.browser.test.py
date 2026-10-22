@@ -36,6 +36,15 @@ def run(page, url):
     expect(page.locator('#scProblem')).to_contain_text(train)
     expect(page.locator('#stationSelect')).to_have_value('yongsan')
     assert page.evaluate("SimMMI.history().mode.length") == 0       # the seeding is silent
+    # the trains of the script stand on the LS 열번창 with direction and number
+    where = lambda n: page.evaluate("n=>{for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number===n)return st+'/'+slot+'/'+r.direction;return null;}", n)
+    assert where(train) == 'yongsan/B607T/up', where(train)
+    cast = page.evaluate("[...document.querySelectorAll('#scProblem small')].map(e=>e.textContent).join(' ')")
+    assert '등장 열차' in cast and train in cast, cast
+    followers = [c for c in page.evaluate("SimLSUI.getModel().stations.yongsan.windows.B607T").__iter__()]
+    assert len(followers) == 3, followers                                   # fault train + two following up trains behind it
+    assert page.evaluate("SimLSUI.getModel().stations.yongsan.windows.B606T[0].direction") == 'down'     # the 하2선 train
+    expect(page.locator('#lsStage')).to_contain_text(train)
     expect(page.locator('#scSteps li.current')).to_contain_text('CCM 전환')
     expect(page.locator('#scSteps li.current .sc-hint')).to_contain_text('힌트')
     # out-of-order action does not count (route before CCM / release): refused, nothing ticks
@@ -53,11 +62,14 @@ def run(page, url):
     do({'type': 'route', 'id': '2A-5T', 'source': 'LS'})
     do({'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(5)
+    page.wait_for_function("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['5T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # the broken train pulled into 5번 부본선
+    assert where(train) == 'yongsan/5T/up'
     expect(page.locator('#scSteps li.current')).to_contain_text('스케줄 수정')
     expect(page.locator('#scStatus')).not_to_contain_text('합격')
     page.evaluate("""id=>{const m=SimDiagram.getModel(),t=m.trains.find(x=>x.id===id),d=structuredClone(t);
       d.calls.find(c=>c.station==='yongsan').departureRoute='3C_B605T';SimTimetable.update(m,id,d);}""", train)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(6)
+    page.wait_for_function("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['B605T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # edited departure route -> out to B605T
     expect(page.locator('#scStatus')).to_contain_text('구술')
     for box in page.locator('#scSteps input[data-say]').all():
         box.check()
