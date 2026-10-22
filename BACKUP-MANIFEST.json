@@ -1,5 +1,5 @@
 {
-  "version": "0.18.2",
+  "version": "0.18.3",
   "backupDate": "2026-10-22",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 26812,
-      "sha256": "6ed6931e6baa6b8011ea3d0dab591655bad22878e6926ad935be4ec599be04d9"
+      "bytes": 27512,
+      "sha256": "93d7445a67d46a9c87888ff00d783e7961bcd4576daa2b6e5fd519be2e4ac41f"
     },
     {
       "path": "README.md",
-      "bytes": 9675,
-      "sha256": "9be1f2daca32e006683b15ecf5e26ee8892d821830c3fbd4ef54a02df60057d2"
+      "bytes": 10005,
+      "sha256": "83f916095461606f2d04e159a2ebb586ca0c2e285bff6f77c39ac12eee2bc4e7"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -87,6 +87,11 @@
       "path": "archive/CTC-LAB-v0.18.2.zip",
       "bytes": 9866060,
       "sha256": "a3962edf929834a4d16cb4948cb82d40431092a302e33572fbc59f019b0b6d48"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.18.3.zip",
+      "bytes": 9871138,
+      "sha256": "8b91678871ceb4c38b2290d21351e465cdf073cdd208ac71caceb9333838777b"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -1419,6 +1424,16 @@
       "sha256": "dd04ac9fe5655ba2ebac2fc4625a604749d7ffb21958a4aa8e9a39f939ed4ea1"
     },
     {
+      "path": "docs/preview-v0.18.3-occupancy.png",
+      "bytes": 100699,
+      "sha256": "4f26ee670fdca2bb88d78537ff4dc914bd8fb897cd1059735265cc9a12591e33"
+    },
+    {
+      "path": "docs/preview-v0.18.3-train-run.png",
+      "bytes": 103273,
+      "sha256": "42867da85bc1e2d7d95cad599ce453d8d3395845b90e7c8651873169097187b1"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -1639,6 +1654,11 @@
       "sha256": "b4a92d0e98529979bd37703d537be283ac78a7592e5d8a71fb8e6d6164f0001d"
     },
     {
+      "path": "docs/v0.18.3-Claude통합.md",
+      "bytes": 2613,
+      "sha256": "cad93d96c9a352e50ff72bd01af79bc4990126806b2fde721bfccd146a352b8e"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -1650,8 +1670,8 @@
     },
     {
       "path": "docs/구현현황.md",
-      "bytes": 8393,
-      "sha256": "3a0b4a2aa544604d251cb99b69d7f67fbf203b4e0ef3ecf9b1cefe538942514a"
+      "bytes": 8556,
+      "sha256": "ef97699bd6ad57e676786899b039ac5267b14e1cad40152f9db00db74913c33e"
     },
     {
       "path": "docs/데스크톱배선정리.md",
@@ -1720,8 +1740,8 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 6087,
-      "sha256": "63d9e14b3db1730ddbc976952c6c3a99b5ffc1d72350863f69b6bae6bdae8ace"
+      "bytes": 6283,
+      "sha256": "01bef8274fa3f1599b40dc922f71ba3bfe2b60e8ddd98dd3ae472b17295daad8"
     },
     {
       "path": "simulator/anyang-routes.test.cjs",
@@ -1730,8 +1750,8 @@
     },
     {
       "path": "simulator/app.js",
-      "bytes": 26987,
-      "sha256": "8546e5e5d61281b5fede956a7199f78c9fa6b62cb9f8fabeae124793edf454b4"
+      "bytes": 27615,
+      "sha256": "b2b9adfb4f4b51091fa5ff3222893c4b30d9e9cabc2c5f8fdae06a92ccdd770f"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -1935,8 +1955,8 @@
     },
     {
       "path": "simulator/core.js",
-      "bytes": 13731,
-      "sha256": "d5862e6255621fd6fdd4a9a223f58231d2e906dacfea9abe4c8c326a3a273de2"
+      "bytes": 13993,
+      "sha256": "d8e3d65765bc6d5f3b7aa11f5cf8d480dfdcef4e4b4628daf086998b4c8eec37"
     },
     {
       "path": "simulator/core.test.cjs",
@@ -2016,7 +2036,7 @@
     {
       "path": "simulator/index.html",
       "bytes": 21184,
-      "sha256": "b6c2f5d940c2735f9e745501a866c5489046ed30dca43f0256856fc2105d9ae3"
+      "sha256": "3eee297a3e9e2f01e87c2351f9c7a76babbb1b4161ce4c4509c38fdd1861af06"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -2050,8 +2070,8 @@
     },
     {
       "path": "simulator/ls-boards.browser.test.py",
-      "bytes": 4948,
-      "sha256": "3009d4b5b0a4d73eee88dc29f3f46b3af68befea3aeda399dedcde2ba5ecd4ff"
+      "bytes": 7431,
+      "sha256": "09f0e69002169b2f93578b73054debde7afe35482c9871e4eed3b917e5483788"
     },
     {
       "path": "simulator/ls-context.browser.test.py",
@@ -2060,8 +2080,8 @@
     },
     {
       "path": "simulator/ls-context.js",
-      "bytes": 18546,
-      "sha256": "2cbaeeb6544385d2ef37c13630c16ad78b6ad4479eb5d4154797b76eb2c99a3e"
+      "bytes": 18704,
+      "sha256": "4aa0df812796a628a1e537b4b658a94bf700a1ad121070bb8f4369d18cd6144b"
     },
     {
       "path": "simulator/ls-header.browser.test.py",
@@ -2100,8 +2120,8 @@
     },
     {
       "path": "simulator/ls-view.js",
-      "bytes": 28726,
-      "sha256": "4e54f9f5bb188164df574c38c34611a68f617339420c79e48024ba4dbaa7cace"
+      "bytes": 32201,
+      "sha256": "cd40bff67ad4fc86903cd04a3c4f32941ca190481ca6fb807aab59394e00c8ee"
     },
     {
       "path": "simulator/ls-view.test.cjs",
@@ -2115,8 +2135,8 @@
     },
     {
       "path": "simulator/lsdialogs.css",
-      "bytes": 3789,
-      "sha256": "27c2d7abb44324808347c70c604e0f2db258594abb28d2cb705faccd0261f54e"
+      "bytes": 3842,
+      "sha256": "0f37c0b5f7962dac3f8e7ad06c6058797db8c203aeb04c3df025811d79c25055"
     },
     {
       "path": "simulator/mmi-cdrs.js",
@@ -2359,6 +2379,16 @@
       "sha256": "d0072733a3c7b341d8453a72b93e0a675b7566fbd97357466dd02de08bc64a5a"
     },
     {
+      "path": "simulator/train-occupancy.browser.test.py",
+      "bytes": 3061,
+      "sha256": "f98e5e6e622e71aa2443139eec5becee63d6a2d60ba89ee6cb64934151b427a7"
+    },
+    {
+      "path": "simulator/train-occupancy.test.cjs",
+      "bytes": 1744,
+      "sha256": "9850dd87379ad89562d2cb39acb7051b4142b878b40c749422a856d67d264d0b"
+    },
+    {
       "path": "simulator/train-windows.js",
       "bytes": 29569,
       "sha256": "815ea498eef8105f0f7d79a89de7d7e10a0d9a2cdc07606cd6e9a9b2acac49de"
@@ -2390,8 +2420,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 20977,
-      "sha256": "90e4e697de9886bdc57d77e265dd0698d4f4ebd22033835dcda6a13f44372717"
+      "bytes": 21623,
+      "sha256": "69879fdefa67e807c0246e5d2f8265c9618d78c7aff27009ccbc6170f6b8bb08"
     },
     {
       "path": "simulator/고증대조표.json",

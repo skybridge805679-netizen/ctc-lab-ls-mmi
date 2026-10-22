@@ -126,14 +126,14 @@
    if(active.occupied)return log(false,'이미 점유된 진로입니다.');
    if(active.lock)return log(false,'접근쇄정 중에는 정지신호입니다. 남은 '+remaining(s,active)+'초');
    delete s.approach[r.signal];active.occupied=true;active.status='OCCUPIED';s.signals[r.signal]='STOP';
-   active.train={from:s.clock,to:s.clock+(a.seconds||20)};       // 열차가 진로를 지나는 구간(LS의 붉은 점유 표시가 따라 움직임)
+   const travelSeconds=Number(a.seconds);active.train={from:s.clock,to:s.clock+(Number.isFinite(travelSeconds)&&travelSeconds>0?travelSeconds:20)};       // 열차가 진로를 지나는 구간(LS의 붉은 점유 표시가 따라 움직임)
    for(const t of r.resources)s.occupied[t]=a.id;
    return log(true,a.id+' 모의 열차 진입 · 신호 정지 · 진로 쇄정');
   }
   if(a.type==='clear'){
    const r=routes[a.id],active=s.routes[a.id];if(!r||!active?.occupied)return log(false,'점유된 진로를 선택하세요.');
    for(const t of r.resources)delete s.occupied[t];
-   if(active.control==='continuous'&&s.mode==='CCM'&&!s.pending&&!r.pointLocks.some(id=>s.blockedPoints.includes(id))){active.occupied=false;active.status='SET';s.signals[r.signal]='GO';}
+   if(active.control==='continuous'&&s.mode==='CCM'&&!s.pending&&!r.pointLocks.some(id=>s.blockedPoints.includes(id))){active.occupied=false;delete active.train;active.status='SET';s.signals[r.signal]='GO';}
    else delete s.routes[a.id];
    return log(true,a.id+' 모의 열차 통과 · '+(s.routes[a.id]?'연속진로 재설정':'진로 해정'));
   }
