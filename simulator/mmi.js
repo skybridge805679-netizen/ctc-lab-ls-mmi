@@ -8,7 +8,10 @@ const PENDING='원본 화면을 아직 확인하지 못해 구현하지 않았�
 // Menu structure copied from the photos. Items without `open` are known names whose windows are not implemented yet;
 // menus whose entries were never photographed are marked as unknown.
 const MENUS=[
- {label:'프로그램',items:[{label:'(원본 메뉴 항목 미확인)',disabled:true}]},
+ {label:'프로그램',items:[
+  {label:'로그재생(R)',open:'logReplay'},
+  {label:'도구모음설정',items:[{label:'메뉴바',disabled:true},{label:'상태표시줄',disabled:true},{sep:true},{label:'이벤트로그창',act:'logEvent'},{label:'알람로그창',act:'logAlarm'}]},
+  {label:'프로그램 환경설정',open:'settings'}]},
  {label:'현장제어',items:[
   {label:'현장설비제어(A)',open:'field'},
   {label:'열차제어',items:[{label:'열차번호제어(B)',open:'trainNumber'},{label:'열차추적(T)',open:'trace'}]}]},
@@ -18,8 +21,16 @@ const MENUS=[
   {label:'온라인 열차그래프(O)',open:'graph'},
   {label:'오프라인 열차그래프(F)',open:'offlineGraph'},
   {label:'오프라인 열차스케줄',items:[{label:'(원본 메뉴 항목 미확인)',disabled:true}]}]},
- {label:'시스템 조회',items:[{label:'(원본 메뉴 항목 미확인)',disabled:true}]},
- {label:'시스템 관리',items:[{label:'(원본 메뉴 항목 미확인)',disabled:true}]}
+ {label:'시스템 조회',items:[
+  {label:'경광등상태',open:'beacon'},{label:'알람메시지 확인이력 조회',open:'alarmAck'},
+  {label:'수동제어 이력 조회',items:[{label:'열차번호 수동조작 이력',open:'manualTrain'},{label:'역제어모드 수동조작 이력',open:'manualMode'},{label:'현장설비 수동조작 이력',open:'manualField'}]},
+  {sep:true},{label:'열차위치목록 조회',open:'trainPositions'},{sep:true},
+  {label:'열차스케줄 이력조회',items:[{label:'온라인 스케줄 이력',open:'scheduleHistory'}]},
+  {label:'알람/이벤트조회',open:'alarmEvent'},{sep:true},
+  {label:'실적조회',items:[{label:'역실적 조회',open:'stationActual'},{label:'열차실적 조회',open:'trainActual'},{sep:true},{label:'운휴열차조회',open:'cancelledList'},{label:'임시열차 조회',open:'createdList'},{label:'지연열차조회',open:'delayList'}]}]},
+ {label:'시스템 관리',items:[
+  {label:'제어화면 관리',items:[{label:'운영자선호화면 설정',open:'preferredScreen'},{sep:true},{label:'모니터 위치 설정',open:'monitorPos'},{label:'RAIL Track ROUTE',open:'railRoute'},{label:'FTS 스케줄편집',open:'ftsEdit'}]},
+  {label:'(이 메뉴의 다른 항목은 미확인)',disabled:true}]}
 ];
 const windows={};let host=null,zTop=20,desktop,logRows={alarm:[],event:[]};
 const stamp=d=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(d).replaceAll('-','/');
@@ -91,7 +102,7 @@ function open(id){
  const w=windows[id];if(!w){return null;}
  // an already open window is only brought to the front (re-running the opener would reload its draft)
  if(w.host&&w.host.hidden){w.host.hidden=false;w.opener?.();w.el.querySelector('.mmi-win-body').scrollTop=0;}
- w.el.hidden=false;focus(w);place(w);dock(id,!!w.docked);fitDesktop();return w;
+ const wasHidden=w.el.hidden;w.el.hidden=false;if(!w.host&&wasHidden)w.opener?.();focus(w);place(w);dock(id,!!w.docked);fitDesktop();return w;
 }
 function close(id){const w=windows[id];if(!w)return;if(w.host){const btn=w.closer?$(w.closer):null;if(btn)btn.click();w.host.hidden=true;}w.el.hidden=true;desktop.classList.toggle('has-docked',Object.values(windows).some(x=>x.docked&&!x.el.hidden));fitDesktop();}
 const isOpen=id=>!!windows[id]&&!windows[id].el.hidden;
@@ -112,14 +123,15 @@ function buildMenu(){
  const bar=doc.createElement('div');bar.className='mmi-menubar';bar.setAttribute('role','menubar');
  let openTop=null;
  const closeAll=()=>{bar.querySelectorAll('.open').forEach(e=>e.classList.remove('open'));openTop=null;};
- const list=(items,depth)=>`<ul class="mmi-menu-list" role="menu">${items.map(it=>it.items?`<li class="has-sub" role="none"><button type="button" role="menuitem" aria-haspopup="true">${esc(it.label)}<i>▸</i></button>${list(it.items,depth+1)}</li>`
-  :`<li role="none"><button type="button" role="menuitem" ${it.disabled?'disabled':''} ${it.open?`data-mmi-open="${it.open}"`:''}>${esc(it.label)}</button></li>`).join('')}</ul>`;
+ const list=(items,depth)=>`<ul class="mmi-menu-list" role="menu">${items.map(it=>it.sep?`<li class="mmi-sep" role="separator"></li>`:it.items?`<li class="has-sub" role="none"><button type="button" role="menuitem" aria-haspopup="true">${esc(it.label)}<i>▸</i></button>${list(it.items,depth+1)}</li>`
+  :`<li role="none"><button type="button" role="menuitem" ${it.disabled?'disabled':''} ${it.open?`data-mmi-open="${it.open}"`:''} ${it.act?`data-mmi-act="${it.act}" role="menuitemcheckbox" aria-checked="true"`:''}>${esc(it.label)}</button></li>`).join('')}</ul>`;
  bar.innerHTML=MENUS.map(m=>`<div class="mmi-menu-top"><button type="button" class="mmi-top-btn" aria-haspopup="true">${esc(m.label)}</button>${list(m.items,1)}</div>`).join('');
  bar.addEventListener('click',e=>{
   const top=e.target.closest('.mmi-top-btn');
   if(top){const wrap=top.parentElement,was=wrap.classList.contains('open');closeAll();if(!was){wrap.classList.add('open');openTop=wrap;}return;}
   const sub=e.target.closest('.has-sub>button');if(sub){const li=sub.parentElement;const was=li.classList.contains('open');li.parentElement.querySelectorAll(':scope>.open').forEach(x=>x.classList.remove('open'));if(!was)li.classList.add('open');return;}
-  const item=e.target.closest('[data-mmi-open]');if(item){closeAll();open(item.dataset.mmiOpen);}
+  const item=e.target.closest('[data-mmi-open]');if(item){closeAll();open(item.dataset.mmiOpen);return;}
+  const act=e.target.closest('[data-mmi-act]');if(act){closeAll();root.SimMMIWindows?.act(act.dataset.mmiAct,act);}
  });
  bar.addEventListener('mouseover',e=>{const top=e.target.closest('.mmi-menu-top');if(top&&openTop&&top!==openTop){closeAll();top.classList.add('open');openTop=top;}});
  doc.addEventListener('pointerdown',e=>{if(!e.target.closest('.mmi-menubar'))closeAll();});
@@ -153,11 +165,10 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- placeholder('trace','열차추적(T)');
- placeholder('pattern','열차운행패턴 관리(P)');
- placeholder('scheduleId','[CA028_01] 온라인열차스케줄ID관리','온라인열차스케줄ID관리 화면(운행일 달력, 스케줄 ID 목록)은 사진으로 확인했으며 아직 구현하지 않았습니다.');
- placeholder('entryNotice','진입예고열차관리(E)');
- placeholder('offlineGraph','오프라인 열차그래프(F)');
+ root.SimMMIWindows.init(host);
+ // every other menu entry known from the photos gets an honest "not implemented" window
+ const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
+ for(const it of leaves(MENUS.flatMap(m=>m.items)))placeholder(it.open,it.label);
  // the old tab strip is replaced by the menu bar; its elements stay in the DOM (hidden) because other code binds to them
  old.hidden=true;
  renderLogs();root.addEventListener('resize',()=>{for(const w of Object.values(windows))if(!w.el.hidden)place(w);fitDesktop();});
@@ -165,5 +176,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);
