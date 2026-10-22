@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // 경합해소 실습: the "경합 시나리오" exam (references/scenarios/경합 시나리오.hwpx) on top of the 실기3 경합 detection (4장).
-// A temporary train B0000 is copied from the first down train and sped up over a stretch so that it closes in on its leader.
+// A temporary train B0000 is copied from a down train of the current timetable and sped up over a stretch so that it closes in on its leader.
 // The operator finds the conflict on the T/G and resolves it at the nearest upstream 해소역 by moving the time (+2분) and the
 // arrival/departure routes of B0000 there. Grading is not part of the real system; it only checks what the scenario text asks for.
 const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
@@ -12,21 +12,37 @@ const name=id=>mmi().stationInfo(id).name;
 let baseline=null,start=null;
 
 function problemTrain(){return model().trains.find(t=>t.id===ID);}
-function generate(){
- if(problemTrain()){say('이미 출제된 문제가 있습니다. 채점하거나 [초기화] 후 다시 출제하세요.');return;}
- // the last down train, so that nothing runs behind B0000 and a +2분 shift cannot create a 3rd conflict by itself
- const leader=model().trains.filter(t=>t.direction==='down'&&!t.cancelled).at(-1);
- if(!leader){say('기준이 되는 하행 열차가 없습니다.');return;}
- const made=T.copy(model(),leader.id,ID,leader.calls[0].departure+OFFSET,{});
- if(!made.ok){say(made.message);return;}
- const train=problemTrain(),a=N.stations.findIndex(s=>s.id==='yeongdeungpo')+1;
- SHIFTS.forEach((shift,k)=>{const c=train.calls[a+k];if(!c)return;c.arrival-=shift;c.departure-=shift;});
- // everything after the sped-up stretch is as copied; legs only ever get shorter by <=50 s, so the order stays valid
+// The timetable is user data (typed in, changed by scenarios), so nothing here assumes particular train numbers or spacing:
+// every down train is tried as the leader on a scratch copy of the CURRENT timetable until B0000 behind it makes a conflict
+// that involves only B0000 and that a +2분 shift at the nearest 해소역 really resolves.
+const involves=c=>c.trains.includes(ID);
+function build(m,leader){
+ const made=T.copy(m,leader.id,ID,leader.calls[0].departure+OFFSET,{});if(!made.ok)return null;
+ const train=m.trains.find(t=>t.id===ID),a=N.stations.findIndex(s=>s.id==='yeongdeungpo')+1;
+ SHIFTS.forEach((shift,k)=>{const st=N.stations[a+k]?.id,c=train.calls.find(x=>x.station===st);if(!c)return;c.arrival-=shift;c.departure-=shift;});
  train.plan=train.calls.map(c=>({...c}));
- if(!T.valid(train)){T.remove(model(),ID);say('문제 열차를 만들지 못했습니다. 시각표를 확인하세요.');return;}
- const found=T.conflicts(model());
- if(!found.length){T.remove(model(),ID);say('경합이 만들어지지 않았습니다.');return;}
- baseline=structuredClone(train.calls);start={station:found[0].station,leader:leader.id};
+ return T.valid(train)?train:null;
+}
+function viable(leader){
+ const m=structuredClone(model()),train=build(m,leader);if(!train)return null;
+ const found=T.conflicts(m);
+ if(!found.some(involves)||found.some(c=>involves(c)&&!c.trains.includes(leader.id)))return null;      // only B0000 vs its leader
+ const first=found.filter(involves)[0],nearest=T.nearestResolveStation(first.station,'down'),i=train.calls.findIndex(c=>c.station===nearest);
+ if(i<0)return null;
+ for(let k=i;k<train.calls.length;k++){train.calls[k].departure+=120;if(k>i)train.calls[k].arrival+=120;}      // the +2분 the scenario asks for
+ return T.conflicts(m).filter(involves).length===0?first:null;
+}
+function generate(){
+ if(problemTrain()){say(baseline?'이미 출제된 문제가 있습니다. 채점하거나 [초기화] 후 다시 출제하세요.':`현재 시간표에 ${ID} 열차가 이미 있습니다. 다른 번호로 바꾸거나 삭제한 뒤 출제하세요.`);return;}
+ const downs=model().trains.filter(t=>t.direction==='down'&&!t.cancelled).sort((x,y)=>y.calls[0].departure-x.calls[0].departure);
+ if(!downs.length){say('현재 시간표에 운행 중인 하행 열차가 없습니다. 하행 열차를 만든 뒤 출제하세요.');return;}
+ let leader=null,first=null;
+ for(const t of downs){const f=viable(t);if(f){leader=t;first=f;break;}}
+ if(!leader){say('현재 시간표에서는 해소 가능한 경합 문제를 만들 수 없습니다. 하행 열차 사이 간격이 좁거나 영등포~수원 구간을 지나는 열차가 없습니다. 열차 간격을 넓히거나 하행 열차를 추가한 뒤 다시 출제하세요.');return;}
+ const made=build(model(),leader);
+ if(!made){say('문제 열차를 만들지 못했습니다. 시각표를 확인하세요.');return;}
+ const m2=model();m2.trains.find(t=>t.id===ID).plan=made.plan;
+ baseline=structuredClone(problemTrain().calls);start={station:first.station,leader:leader.id};
  D().selectTrain(ID);D().render();
  mmi().log('event','경합해소 실습 출제');
  say(`문제가 출제되었습니다. 온라인 열차그래프에서 ${leader.id}과 ${ID}의 경합을 찾아 해소하세요. (경합 발생 위치와 해소역은 직접 판단합니다)`);
@@ -41,7 +57,7 @@ function list(){
 function grade(){
  const train=problemTrain();
  if(!train||!baseline){say('출제된 문제가 없습니다. [문제 출제]를 누르세요.');return;}
- const remaining=T.conflicts(model());
+ const remaining=T.conflicts(model()).filter(involves);
  if(remaining.length){list();say(`경합이 ${remaining.length}건 남아 있습니다. 경합 구간은 ${name(remaining[0].station)}부터입니다 — 다시 확인하세요.`);return;}
  const changed=train.calls.findIndex((c,i)=>c.arrival!==baseline[i].arrival||c.departure!==baseline[i].departure||c.arrivalRoute!==baseline[i].arrivalRoute||c.departureRoute!==baseline[i].departureRoute);
  if(changed<0){say('B0000을 수정하지 않았는데 경합이 없습니다. 상태를 확인하세요.');return;}

@@ -21,7 +21,19 @@ def run(page, url):
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')
     assert page.locator('#scSelect option').count() == 5
     do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
-    page.locator('#scSelect').select_option('yongsan-5'); page.locator('#scStart').click()
+    # the timetable is user data: rename every train and drop the first up train -> the choices follow the current timetable
+    page.evaluate("""()=>{const m=SimDiagram.getModel();for(const t of m.trains)t.id=(t.direction==='up'?'U':'D')+t.id.slice(1);
+      m.trains.splice(m.trains.findIndex(t=>t.direction==='up'),1);SimDiagram.render();}""")
+    page.locator('#scSelect').select_option('yongsan-5')
+    page.locator('#scSelect').dispatch_event('change')
+    options = page.locator('#scTrainList option').evaluate_all('o=>o.map(x=>x.value)')
+    assert options and all(o.startswith('U') for o in options) and 'U1002' not in options, options
+    train = options[0]
+    expect(page.locator('#scTrain')).to_have_value(train)
+    page.locator('#scTrain').fill('Q9999'); page.locator('#scStart').click()
+    expect(page.locator('.mmi-alert')).to_contain_text('시간표 열차'); page.locator('#mmiAlertOk').click()
+    page.locator('#scTrain').fill(train); page.locator('#scStart').click()
+    expect(page.locator('#scProblem')).to_contain_text(train)
     expect(page.locator('#stationSelect')).to_have_value('yongsan')
     assert page.evaluate("SimMMI.history().mode.length") == 0       # the seeding is silent
     expect(page.locator('#scSteps li.current')).to_contain_text('CCM 전환')
@@ -43,8 +55,8 @@ def run(page, url):
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(5)
     expect(page.locator('#scSteps li.current')).to_contain_text('스케줄 수정')
     expect(page.locator('#scStatus')).not_to_contain_text('합격')
-    page.evaluate("""()=>{const m=SimDiagram.getModel(),t=m.trains.find(x=>x.id==='K1002'),d=structuredClone(t);
-      d.calls.find(c=>c.station==='yongsan').departureRoute='3C_B605T';SimTimetable.update(m,'K1002',d);}""")
+    page.evaluate("""id=>{const m=SimDiagram.getModel(),t=m.trains.find(x=>x.id===id),d=structuredClone(t);
+      d.calls.find(c=>c.station==='yongsan').departureRoute='3C_B605T';SimTimetable.update(m,id,d);}""", train)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(6)
     expect(page.locator('#scStatus')).to_contain_text('구술')
     for box in page.locator('#scSteps input[data-say]').all():
