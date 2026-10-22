@@ -243,15 +243,62 @@
       "sha256": "b193700a9dd4cf1db1a07a33c43b68e01976ec51b91df23f1988c6a4db4d516d",
       "added_date": "2026-10-22",
       "pages": 250
-    }
-  ],
-  "pending_attachments": [
+    },
     {
-      "original_name": "(학과2)관제운영.pdf",
-      "file_id": "file_00000000db98821196f65373566d8a1a",
-      "status": "not_downloaded",
-      "reason": "Attachment exceeds executor transfer limit of 32 MiB",
-      "recorded_date": "2026-10-22"
+      "path": "references/textbooks/교통관제운영_01_001-114.pdf",
+      "original_name": "교통관제운영_01_001-114.pdf",
+      "bytes": 18150886,
+      "sha256": "a114667d09013aa1d5ff42a0d72ff1ca724d321d3ad0faef346b45194fda2671",
+      "added_date": "2026-10-22",
+      "pages": 114,
+      "source_document": "(학과2)관제운영.pdf",
+      "source_page_range": [
+        1,
+        114
+      ],
+      "source_note": "User-provided split PDF; the original unsplit attachment was not downloaded"
+    },
+    {
+      "path": "references/textbooks/교통관제운영_02_115-228.pdf",
+      "original_name": "교통관제운영_02_115-228.pdf",
+      "bytes": 8413415,
+      "sha256": "73fc4e293bfab34d15a2c5847aa9fe50566ef0c46ddf7507e425c9e6156bb567",
+      "added_date": "2026-10-22",
+      "pages": 114,
+      "source_document": "(학과2)관제운영.pdf",
+      "source_page_range": [
+        115,
+        228
+      ],
+      "source_note": "User-provided split PDF; the original unsplit attachment was not downloaded"
+    },
+    {
+      "path": "references/textbooks/교통관제운영_03_229-342.pdf",
+      "original_name": "교통관제운영_03_229-342.pdf",
+      "bytes": 17335845,
+      "sha256": "a37a9e7aaaf5604ef09203462ec083ff07d70d7bc884d8b66924991e65055971",
+      "added_date": "2026-10-22",
+      "pages": 114,
+      "source_document": "(학과2)관제운영.pdf",
+      "source_page_range": [
+        229,
+        342
+      ],
+      "source_note": "User-provided split PDF; the original unsplit attachment was not downloaded"
+    },
+    {
+      "path": "references/textbooks/교통관제운영_04_343-454.pdf",
+      "original_name": "교통관제운영_04_343-454.pdf",
+      "bytes": 19838774,
+      "sha256": "e38c1c1c122e7649749eee559434f37e9266cffa03d268a79ee3d0838103e72a",
+      "added_date": "2026-10-22",
+      "pages": 112,
+      "source_document": "(학과2)관제운영.pdf",
+      "source_page_range": [
+        343,
+        454
+      ],
+      "source_note": "User-provided split PDF; the original unsplit attachment was not downloaded"
     }
   ],
   "superseded_attachments": [
@@ -274,6 +321,22 @@
       "name": "4.노량진-금천구청.png",
       "replacement": "references/diagrams/1.전체노선.pdf",
       "page": 4
+    }
+  ],
+  "resolved_attachments": [
+    {
+      "original_name": "(학과2)관제운영.pdf",
+      "original_file_id": "file_00000000db98821196f65373566d8a1a",
+      "status": "replaced_by_user_provided_split_pdfs",
+      "resolved_date": "2026-10-22",
+      "replacement_files": [
+        "references/textbooks/교통관제운영_01_001-114.pdf",
+        "references/textbooks/교통관제운영_02_115-228.pdf",
+        "references/textbooks/교통관제운영_03_229-342.pdf",
+        "references/textbooks/교통관제운영_04_343-454.pdf"
+      ],
+      "pages": 454,
+      "note": "Original single PDF exceeded the 32 MiB transfer limit; split-file integrity and page-count continuity verified, not byte equivalence to the unavailable single PDF"
     }
   ]
 }
