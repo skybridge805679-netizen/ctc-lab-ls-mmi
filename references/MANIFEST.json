@@ -227,9 +227,33 @@
       "source": "Derived transcription of user-provided MMI photos; Claude branch ed81a24",
       "bytes": 950,
       "sha256": "0bda0bc244600f548039c6fdd48ddef06ee20a093d9bb8cde8706482e8f35403"
+    },
+    {
+      "path": "references/textbooks/(학과1)관제관련규정.pdf",
+      "original_name": "(학과1)관제관련규정.pdf",
+      "bytes": 3889452,
+      "sha256": "bf58d2dd6bd9f8ace60f93477bffdd37d7cd3db143f8a159a4ece5fc1c80c911",
+      "added_date": "2026-10-22",
+      "pages": 230
+    },
+    {
+      "path": "references/textbooks/(학과3)비상시조치등(20240430).pdf",
+      "original_name": "(학과3)비상시조치등(20240430).pdf",
+      "bytes": 12351019,
+      "sha256": "b193700a9dd4cf1db1a07a33c43b68e01976ec51b91df23f1988c6a4db4d516d",
+      "added_date": "2026-10-22",
+      "pages": 250
     }
   ],
-  "pending_attachments": [],
+  "pending_attachments": [
+    {
+      "original_name": "(학과2)관제운영.pdf",
+      "file_id": "file_00000000db98821196f65373566d8a1a",
+      "status": "not_downloaded",
+      "reason": "Attachment exceeds executor transfer limit of 32 MiB",
+      "recorded_date": "2026-10-22"
+    }
+  ],
   "superseded_attachments": [
     {
       "name": "1.전체노선.png",
