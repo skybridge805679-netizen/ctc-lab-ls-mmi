@@ -103,61 +103,141 @@
       "path": "references/scenarios/emergency/03.열차충돌시, 석수역 상선(구원지시, 운행선변경, 회송).hwp",
       "original_name": "03.열차충돌시, 석수역 상선(구원지시, 운행선변경, 회송).hwp",
       "bytes": 104448,
-      "sha256": "bc197db7e42d681221744b49f266716331e6df80d7a757202a0ae93cd646fe3a"
+      "sha256": "bc197db7e42d681221744b49f266716331e6df80d7a757202a0ae93cd646fe3a",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_000000005d5c8209ab13cf57cc03a28b",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/02.열차충돌시, 동묘앞역 상선(회송, 구원연결,  단선지령식 지시)_.hwp",
       "original_name": "02.열차충돌시, 동묘앞역 상선(회송, 구원연결,  단선지령식 지시)_.hwp",
       "bytes": 111104,
-      "sha256": "f3e30bbb223e048ac627a0b7cded9f6c742c43d3faeacb51f84130743ae22c92"
+      "sha256": "f3e30bbb223e048ac627a0b7cded9f6c742c43d3faeacb51f84130743ae22c92",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_000000000abc8209b3bb912717e01eba",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/01.선로침수시, 시청역 하선(상선 열차 진입 중).hwp",
       "original_name": "01.선로침수시, 시청역 하선(상선 열차 진입 중).hwp",
       "bytes": 94208,
-      "sha256": "cbe87302537ad98344fc4d405bd745674ef1aa7b35fd410b856f95368fa593f5"
+      "sha256": "cbe87302537ad98344fc4d405bd745674ef1aa7b35fd410b856f95368fa593f5",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_00000000c7f48209aa3c47256bfbfe52",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/04.사상사고시 (금정 하선, 사상자 차량하부) .운행선 변경, 회송운행.hwp",
       "original_name": "04.사상사고시 (금정 하선, 사상자 차량하부) .운행선 변경, 회송운행.hwp",
       "bytes": 103936,
-      "sha256": "aaff0a8378a36d7d6ac2990fac6f8c2e9e5602c9bdbeec6fe42a24863f16bd1a"
+      "sha256": "aaff0a8378a36d7d6ac2990fac6f8c2e9e5602c9bdbeec6fe42a24863f16bd1a",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_0000000037f88209b83a55f6a0db5f55",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/05.차량고장 시(가, 디역 상선) 구원, 운행선변경.hwp",
       "original_name": "05.차량고장 시(가, 디역 상선) 구원, 운행선변경.hwp",
       "bytes": 101888,
-      "sha256": "b80db13c9ad33d5fe11b4e14076fbc0c121d6fd667cc3516392568513c97b505"
+      "sha256": "b80db13c9ad33d5fe11b4e14076fbc0c121d6fd667cc3516392568513c97b505",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_0000000003b08209a6af63637ea8b5d8",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/06-2.열차화재(자력회송, 운행선변경 지시).hwp",
       "original_name": "06-2.열차화재(자력회송, 운행선변경 지시).hwp",
       "bytes": 114688,
-      "sha256": "53662e080e5a10ba4525b2769701f35394b2c4e39a06e3d35f1229e8289a0ef9"
+      "sha256": "53662e080e5a10ba4525b2769701f35394b2c4e39a06e3d35f1229e8289a0ef9",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_00000000153482119b25b09ad589783e",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/05-1.차량고장 시(가, 디역 상선) 운행선변경,구원없음.hwp",
       "original_name": "05-1.차량고장 시(가, 디역 상선) 운행선변경,구원없음.hwp",
       "bytes": 104448,
-      "sha256": "4403d9f31fc1bbfab6258e0caaed5cca5e7f3e25fb8e499f0ed5ee3e9f492587"
+      "sha256": "4403d9f31fc1bbfab6258e0caaed5cca5e7f3e25fb8e499f0ed5ee3e9f492587",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_000000002cf482099e82ed35d493a8f6",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/06-1.열차화재(역간정차,운행선변경 지시).hwp",
       "original_name": "06-1.열차화재(역간정차,운행선변경 지시).hwp",
       "bytes": 122880,
-      "sha256": "f21f3648af7e6c7fa91d572a03c71f7afdf09f1b8e037fc63298b67130906c1d"
+      "sha256": "f21f3648af7e6c7fa91d572a03c71f7afdf09f1b8e037fc63298b67130906c1d",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_00000000e33c8209851a26f7b114d889",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/06.열차화재(구원연결, 운행선변경 지시).hwp",
       "original_name": "06.열차화재(구원연결, 운행선변경 지시).hwp",
       "bytes": 103424,
-      "sha256": "5fe13aa45f3b4384e09814ca2822c9860d5dcc4d3ca50ee7aab19f8564b18e6f"
+      "sha256": "5fe13aa45f3b4384e09814ca2822c9860d5dcc4d3ca50ee7aab19f8564b18e6f",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_00000000afc88209919804cb38cc4e79",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/scenarios/emergency/비상시조치(상황변경시대응).hwp",
       "original_name": "비상시조치(상황변경시대응).hwp",
       "bytes": 102912,
-      "sha256": "8087894dc9ad8c0fca5409f9c3d164002d4c2915163b07049aa77d410a778928"
+      "sha256": "8087894dc9ad8c0fca5409f9c3d164002d4c2915163b07049aa77d410a778928",
+      "last_verified_date": "2026-10-22",
+      "verified_reattachments": [
+        {
+          "file_id": "file_000000006a7881f89028d6e393a7a004",
+          "verified_date": "2026-10-22",
+          "result": "byte_identical_to_stored_original"
+        }
+      ]
     },
     {
       "path": "references/diagrams/1.전체노선.pdf",
