@@ -60,7 +60,8 @@
    if(!['current','all'].includes(a.scope))return log(false,'범위를 선택하세요.');
    s.scans[a.scope]++;s.scanUntil=s.clock+3;return log(true,(a.scope==='all'?'전체 제어역':'현재역')+' 베이스스캔 · 가상 상태 재수신');
   }
-  if(['route','withdraw','stop','stopAll','point','pointLock'].includes(a.type)&& (s.mode!=='CCM'||s.pending))return log(false,'CCM 모드와 제어권을 확인하세요.');
+  // 열차자동제어(실기3 3.4): in AUTO the schedule software requests routes (a.auto); a person still needs CCM
+  if(['route','withdraw','stop','stopAll','point','pointLock'].includes(a.type)&&!(a.auto&&a.type==='route'&&s.mode==='AUTO'&&!s.pending)&&(s.mode!=='CCM'||s.pending))return log(false,'CCM 모드와 제어권을 확인하세요.');
   if(a.type==='route'){
    const r=routes[a.id];if(!r)return log(false,'등록되지 않은 진로입니다.');
    if(s.routes[a.id])return log(false,s.routes[a.id].lock?a.id+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[a.id])+'초 후 해정됩니다.':'이미 설정된 진로입니다.');
