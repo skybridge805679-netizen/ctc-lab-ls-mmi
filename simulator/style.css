@@ -151,3 +151,4 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 .ls-properties{display:grid;grid-template-columns:100px 1fr;gap:10px}.ls-properties dt{color:#657282}.ls-properties dd{margin:0}
 @media print{body{min-width:0!important;background:white}body>*{display:none!important}body>main{display:block!important;margin:0;padding:0}main>*{display:none!important}.workgrid,.ls-panel,#lsDisplay{display:block!important;width:100%;margin:0;padding:0;border:0}.workgrid>*:not(.ls-panel),.ls-panel>*:not(#lsDisplay),.ls-context-menu,.ls-overview{display:none!important}.ls-svg{width:100%!important;print-color-adjust:exact}.ls-display,.ls-stage{print-color-adjust:exact}}
 .ls-submenu{max-height:calc(100vh - 12px);overflow-y:auto}.ls-context-menu{max-height:calc(100vh - 12px)}
+.ls-equipment span.fault{background:#7a1f1f;border-color:#e05a5a;color:#fff}
