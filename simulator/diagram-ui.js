@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;const options_={tooltips:true};let lastLayout=null,context=null,selected=model.trains[0].id;
+ const model=T.initial(),subscribers=new Set();let notified=0;const options_={tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
@@ -41,19 +41,20 @@
   const direction=$('graphDirection').value;
   for(const train of model.trains){
    if(direction!=='all'&&train.direction!==direction)continue;
+   if(options_.kinds&&!options_.kinds.has(train.kind))continue;
    const points=calls=>calls.flatMap(c=>[[c.arrival,N.catalog[c.station].order],[c.departure,N.catalog[c.station].order]]).map(([time,order])=>[x(time),y(order)]);
    const path=pts=>pts.map(([px,py],i)=>`${i?'L':'M'}${px.toFixed(2)} ${py.toFixed(2)}`).join(' ');
-   const ink=train.cancelled?'#94a3a0':'#1b2a78',pts=points(train.calls);
-   svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
+   const style=options_.styles[train.kind]||{},ink=train.cancelled?'#94a3a0':(style.color||'#1b2a78'),pts=points(train.calls);
+   if(options_.plan)svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
    let currentPath=path(pts);if(!train.cancelled&&train.calls.some(c=>c.cancelled)){currentPath='';for(let i=0;i<train.calls.length;i++){const c=train.calls[i],n=train.calls[i+1];if(!c.cancelled)currentPath+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(n&&!c.cancelled&&!n.cancelled)currentPath+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(n.arrival),y(N.catalog[n.station].order)]]);}}
-   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':'2 3'}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${T.clock(train.calls[0].departure)}–${T.clock(train.calls.at(-1).arrival)}</title>`:''}</path>`;
+   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':(DASH[style.dash]??'2 3')}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${T.clock(train.calls[0].departure)}–${T.clock(train.calls.at(-1).arrival)}</title>`:''}</path>`;
    // Cancelled calls and their connecting legs are shown separately on the same online model.
    if(!train.cancelled)for(let i=0;i<train.calls.length;i++){const c=train.calls[i],next=train.calls[i+1];let p='';if(c.cancelled)p+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(next&&(c.cancelled||next.cancelled))p+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(next.arrival),y(N.catalog[next.station].order)]]);if(p)svg+=`<path data-dia-cancelled-segment="${train.id}" data-dia-select="${train.id}" d="${p}" stroke="#8b969c" stroke-width="3" stroke-dasharray="7 4" fill="none"/>`;}
    // train number rotated along the longest visible segment
    let best=null;for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1);if(len>12&&Math.max(x1,x2)>left&&Math.min(x1,x2)<left+plotW&&(!best||len>best.len))best={len,x1,y1,x2,y2};}
-   if(best){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
+   if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
-   const pos=T.position(train,context.clock());if(pos)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
+   const pos=T.position(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
   }
   const now=x(context.clock());svg+=`<line id="diaNow" data-seconds="${context.clock()}" x1="${now}" y1="${plotTop}" x2="${now}" y2="${plotTop+plotH}" stroke="#d6251f" stroke-width="1.6"/></g>`;
   lastLayout={left,plotW,plotTop,plotH,top,row,from,to,start,span,width,height};
@@ -81,5 +82,5 @@
   $('diaSvg').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-dia-station]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
   $('graphExport').onclick=()=>{const data={schemaVersion:1,kind:'CTC LAB training timetable',sampleSchedule:true,clock:context.clock(),...model};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-dia.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  }
- root.SimDiagram={clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
+ root.SimDiagram={clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
 })(window);
