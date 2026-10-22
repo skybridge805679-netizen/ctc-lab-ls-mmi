@@ -1,0 +1,5 @@
+(function(root){'use strict';
+// Generated from references/transcriptions/fixed-symbols.json by tools/build-fixed-symbols.py.
+const data={"guro":{"brackets":[{"id":"52BT-52B","bounds":[760.89,355.407,23.066,30.086]},{"id":"52AT-52A","bounds":[760.89,404.332,23.066,30.086]},{"id":"53A-53AT","bounds":[819.961,710.252,23.066,30.086]},{"id":"53B-53BT","bounds":[819.961,761.426,23.066,30.086]}],"captions":[{"id":"depot-lead","at":[1071.716,750.741],"lines":["차량기지","입출고선"]}]},"noryangjin":{"brackets":[{"id":"parallel-boundary-left","bounds":[814.071,473.501,23.066,82.104]},{"id":"parallel-boundary-right","bounds":[853.172,474.345,21.941,82.104]}],"captions":[]},"dongmyo":{"brackets":[],"captions":[{"id":"gunja-out","at":[601.924,303.646],"lines":["군자기지 출고선"]},{"id":"gunja-in","at":[601.924,559.496],"lines":["군자기지 입고선"]}]},"uiwang":{"brackets":[],"captions":[{"id":"freight-a","at":[447.188,272.852],"lines":["남부화물기지 A선"]},{"id":"freight-b","at":[447.188,652.594],"lines":["남부화물기지 B선"]}]}};
+if(typeof module!=='undefined')module.exports=data;else root.SimFixedSymbols=data;
+})(typeof window!=='undefined'?window:globalThis);

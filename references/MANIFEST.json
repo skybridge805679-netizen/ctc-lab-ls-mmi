@@ -277,8 +277,8 @@
       "path": "references/transcriptions/README.md",
       "original_name": "README.md",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 1877,
-      "sha256": "e4c20b9ba4aa0eba035e3afbbf26d93d23cd275899716a4d001eaab4e56c8290"
+      "bytes": 2463,
+      "sha256": "eb2547b70fe41715ee6ebe1534e4351ed26846a69fe972499121b4181bed6117"
     },
     {
       "path": "references/transcriptions/intermediate-circuits.json",
@@ -397,6 +397,13 @@
       "bytes": 13743,
       "sha256": "2b6c17b450ddb599737d1639d9a851b39e4a07642ac2e0aab535d7fee16b5e1f",
       "updated_date": "2026-10-22"
+    },
+    {
+      "path": "references/transcriptions/fixed-symbols.json",
+      "original_name": "fixed-symbols.json",
+      "source": "Derived fixed-symbol and yard-caption transcription reviewed against user-provided 전체노선 PDF and Guro photograph; originals preserved",
+      "bytes": 1687,
+      "sha256": "7b2d29dfdf521ea3b13d729c0a8382b7436fc04c01368f4f57f5e519a5db7e1c"
     }
   ],
   "superseded_attachments": [

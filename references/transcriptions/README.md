@@ -11,3 +11,7 @@ v0.13.0에서는 용산·동묘앞의 경계 칸을 보완해 67개 선로 열·
 `train-windows.json`은 PPT 슬라이드 2~19의 흰 열번창 276개를 기록한다. 선로 위에 겹친 흰 블록 71개도 포함한다. 원본 이미지의 사각형 좌표와 OCR 후보를 보존하며, `train-window-review.json`에는 원본을 대조한 코드·행 교정값이 있다. `slot`은 창의 고유 식별자, `code`는 원본의 연결 구간, `side`는 선로 위/위쪽/아래쪽 배치다. PDF와 PPT의 경계 코드가 다른 곳은 `anchorCode`로 현재 그림의 좌표 기준을 따로 기록한다. 이는 새 진로나 연동 조건을 추가하는 데이터가 아니다.
 
 `python3 tools/build-train-windows.py --compile-only`로 대조 결과를 실행용 `train-windows.js`에 반영할 수 있다. `--compile-only`를 빼면 원본 PPT 미디어에서 창과 OCR 후보를 다시 추출하고 교정 기록을 적용한다.
+
+## 고정 괄호 표식·기지 문구 (v0.18.1)
+
+[fixed-symbols.json](fixed-symbols.json)은 전체노선 PDF 2–4쪽과 구로 사진을 대조한 파생 전사다. 구로 4쌍·노량진 2쌍의 대향 괄호와 기지 설명 5블록의 원본 좌표를 보관한다. 원본 PDF의 반복 구간은 실제 역 화면에서 한 번만 사용한다. 표식의 운영 의미·상태 전이는 미확정이며 고정 표시로 복원했다. `python tools/build-fixed-symbols.py`로 런타임 SVG 좌표 데이터를 다시 생성한다. 원본 첨부 파일은 수정하지 않았다.
