@@ -105,8 +105,31 @@ function render(st,def,core,model,neighbours={}){
   const [X,Y]=T([x,y]);return {index,source,x:X,y:Y,width:T([x+w,y])[0]-X,label};
  });
  // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
- const bracketBoxes=wing.fixed.brackets.map(b=>{const [x,y,w,h]=b.bounds,a=T([x,y]),z=T([x+w,y+h]);return {...b,box:[...a,...z]};});
- const captionBoxes=wing.fixed.captions.map(c=>{const [x,y]=T(c.at),w=Math.max(...c.lines.map(t=>t.length))*14+12,h=c.lines.length*22;return {...c,x,y,box:[x-w/2,y-h/2,x+w/2,y+h/2]};});
+ const bracketBoxes=wing.fixed.brackets.map(b=>{
+  const [x,y,w,h]=b.bounds,cx=T([x+w/2,y])[0];
+  const crossed=[...new Set(rows.filter(row=>row>=y-5&&row<=y+h+5))];
+  const top=crossed.length?T([x,Math.min(...crossed)])[1]-17:T([x,y])[1];
+  const bottom=crossed.length?T([x,Math.max(...crossed)])[1]+17:T([x,y+h])[1];
+  return {...b,box:[cx-14,top,cx+14,bottom]};
+ });
+ // Presentation follows the yard tracks, rather than treating raster text centres as a layout grid.
+ // Matching above/below bays share a centreline and a 90px centre-to-rail offset.
+ const captionAnchors={
+  'gunja-out':{rail:'CT',side:-1},'gunja-in':{rail:'DT',side:1},
+  'freight-a':{rail:'1T',side:-1,end:716},'freight-b':{rail:'6T',side:1,start:201,end:716}
+ };
+ const captionBoxes=wing.fixed.captions.map(c=>{
+  const w=Math.max(...c.lines.map(t=>t.length))*15+32,h=c.lines.length*22+20;
+  let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
+  if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*90;}
+  if(c.id==='depot-lead'){
+   const a=def.rails.find(r=>r[0]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
+   const right=T([Math.max(a[0],b[0]),a[1]])[0];y=(T(a)[1]+T(b)[1])/2;x=right+32+w/2;
+  }
+  return {...c,x,y,box:[x-w/2,y-h/2,x+w/2,y+h/2]};
+ });
+ // Keep bottom captions within the same comfortable canvas inset as the upper bays.
+ L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
  const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
  const switches=switchView.build(st,def,core,model,T);
  const projectRoute=(points,destination)=>{
@@ -242,7 +265,7 @@ function render(st,def,core,model,neighbours={}){
   symbols+=`<g class="source-bracket-pair" data-source-symbol="bracket-pair" data-source-bracket="${esc(b.id)}" pointer-events="none"><path d="${shape(x,1)}"/><path d="${shape(right,-1)}"/><title>원본 대향 괄호 표식 · ${esc(b.id)}</title></g>`;
  }
  for(const c of captionBoxes){
-  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none">${c.lines.map((line,i)=>`<text x="${c.x}" y="${c.y+(i-(c.lines.length-1)/2)*22}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`).join('')}</g>`;
+  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none"><rect class="caption-surface" x="${c.box[0]}" y="${c.box[1]}" width="${c.box[2]-c.box[0]}" height="${c.box[3]-c.box[1]}" rx="6"/><path class="caption-accent" d="M${c.box[0]+1} ${c.box[1]+11}V${c.box[3]-11}"/>${c.lines.map((line,i)=>`<text x="${c.x}" y="${c.y+(i-(c.lines.length-1)/2)*22}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`).join('')}</g>`;
  }
  for(const [X,Y]of capsulePositions)symbols+=`<g data-source-symbol="capsule"><path class="capsule" d="M${X-7} ${Y}h14"/><path class="capsule-stop" d="M${X+10} ${Y-4}v8"/><title>원본 캡슐 표시</title></g>`;
  const segments=[...paths.flatMap(poly=>poly.slice(1).map((p,i)=>[poly[i],p])),...def.links.map(([,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])])];
