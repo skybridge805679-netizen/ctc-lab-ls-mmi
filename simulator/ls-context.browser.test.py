@@ -98,8 +98,8 @@ try:
    page.select_option('#stationSelect','jonggak'); background(); action('boards').hover()
    bounds=action('boards').locator('..').locator('.ls-submenu').bounding_box(); assert bounds['x']>=0 and bounds['x']+bounds['width']<=width
    if width==1440:
-    page.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-context-background.png'))
-    page.keyboard.press('Escape'); page.select_option('#stationSelect','geumcheon'); win('B967T').click(button='right'); action('train-move').hover(); page.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-context-train.png'))
+    page.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-context-background.png'))
+    page.keyboard.press('Escape'); page.select_option('#stationSelect','geumcheon'); win('B967T').click(button='right'); action('train-move').hover(); page.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-context-train.png'))
    assert not errors,errors
    print(f'PASS LS menus: input/edit/delete/move/swap, signs, scan/restart/print/Overview, {total} windows: {width}px',flush=True)
    page.close()

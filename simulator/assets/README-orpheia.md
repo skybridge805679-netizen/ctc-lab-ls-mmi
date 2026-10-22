@@ -1,5 +1,5 @@
-# ORPHEIA 배경
+# ORPHEIA 디자인 에셋
 
-기본 배경은 코드로 그린 벡터 리라 로고다. 기본 실행 시 존재하지 않는 이미지 파일을 요청하지 않는다.
+기본 실행은 [orpheia/](orpheia/README.md)의 생성 PNG 3종을 로컬에서 사용한다. 원형 엠블럼은 브랜드·창·favicon, 투명 캐릭터는 MMI 대기 배경·가이드, 배너는 헤더에 적용한다. 네트워크나 외부 폰트/CDN이 필요 없다.
 
-사용자 지정 이미지를 사용하려면 파일을 추가하고 `mmi.js`를 읽기 전에 `window.SimMMITheme = {mascotUrl: 'assets/orpheia-mascot.png'}`를 지정한다. 투명 배경을 권장한다. 학교 로고는 사용하지 않는다.
+MMI 대기 캐릭터만 사용자 이미지로 바꾸려면 `mmi.js` 전에 `window.SimMMITheme = {mascotUrl: 'assets/custom-guide.png'}`를 지정한다. 파일을 함께 배포해야 한다. 기본 에셋은 전부 실행 ZIP에 포함한다. 생성 출처와 원본 PNG 해시는 `orpheia/MANIFEST.json`을 따른다.

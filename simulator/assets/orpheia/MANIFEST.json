@@ -1,0 +1,55 @@
+{
+  "palette": {
+    "main": "#BEE3E3",
+    "deep": "#193F43",
+    "teal": "#28656A",
+    "gold": "#9A7940"
+  },
+  "files": [
+    {
+      "path": "guide.png",
+      "title": "Transparent full-character guide",
+      "usage": "MMI idle background and operator guide",
+      "generator": "OpenAI image_gen",
+      "reference": "User-provided Orpheia character image in chat (2026-10-22)",
+      "generated_date": "2026-10-22",
+      "prompt_summary": "Same silver-haired green-eyed maid identity, tablet and presenting hand, clean transparent silhouette; mint/deep teal/ivory/gold palette.",
+      "width": 1069,
+      "height": 1472,
+      "mode": "RGBA",
+      "transparent": true,
+      "bytes": 1593565,
+      "sha256": "ed99336f68058130458f5e5512f64b991d5e97e85aebb1e17b9c59d269d97745"
+    },
+    {
+      "path": "emblem.png",
+      "title": "Transparent circular emblem",
+      "usage": "Navigation, window identity, favicon and empty log",
+      "generator": "OpenAI image_gen",
+      "reference": "User-provided Orpheia character image in chat (2026-10-22)",
+      "generated_date": "2026-10-22",
+      "prompt_summary": "Circular dark teal portrait medallion, mint rim, restrained gold accents, simplified chibi portrait readable at small size.",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "transparent": true,
+      "bytes": 1892514,
+      "sha256": "b0270200a8d5c8dbd384f991483953f102098ecd58685c062555dc8cd1c97f48"
+    },
+    {
+      "path": "banner.png",
+      "title": "Wide mint dispatch illustration",
+      "usage": "Workspace hero background",
+      "generator": "OpenAI image_gen",
+      "reference": "User-provided Orpheia character image in chat (2026-10-22)",
+      "generated_date": "2026-10-22",
+      "prompt_summary": "Wide airy pale mint/ivory composition, quiet negative space on left and Orpheia at dispatch desk on right, no typography.",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGB",
+      "transparent": false,
+      "bytes": 1895681,
+      "sha256": "4a08432849589958256e1e48c544158798b631bc1ec9473a0aa5ceb7292f56bb"
+    }
+  ]
+}

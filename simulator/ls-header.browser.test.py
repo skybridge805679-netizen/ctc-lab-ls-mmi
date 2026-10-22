@@ -26,7 +26,7 @@ try:
    page.locator('[data-mode="CCM"]').click();d=page.locator('#actionDialog');expect(d).to_have_class('mode-confirm')
    expect(page.locator('#dialogTitle')).to_have_text('제어확인');expect(d).to_contain_text('역 운행모드를 CCM 모드로 전환하시겠습니까?')
    expect(page.locator('#dialogConfirm')).to_have_text('예(Y)');expect(d.locator('[value="cancel"]')).to_have_text('아니요(N)')
-   if width==1440:d.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-ccm-confirm.png'))
+   if width==1440:d.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-ccm-confirm.png'))
    page.keyboard.press('n');expect(d).not_to_be_visible();page.wait_for_function('dialogAction===null');assert page.evaluate("SimField.state('suwon').mode")=='AUTO'
    page.locator('[data-mode="CCM"]').click();page.keyboard.press('y');page.wait_for_function("SimField.state('suwon').mode==='CCM'")
    for names,col in [(['N1','C','REC','UPS','ShP','EIS1','DTS1'],'rgb(24, 223, 0)'),(['N2','RC'],'rgb(242, 242, 240)'),(['EIS2','DTS2'],'rgb(244, 236, 0)')]:
@@ -39,13 +39,13 @@ try:
    for index in [0,1,0,1]:
     rows.nth(index).hover()
     assert [r.evaluate('e=>getComputedStyle(e).backgroundColor')==active for r in rows.all()]==[index==0,index==1]
-   if width==1440:d.screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-route-hover.png'))
+   if width==1440:d.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-route-hover.png'))
    page.locator('#dialogTitle').hover();assert all(r.evaluate('e=>getComputedStyle(e).backgroundColor')!=active for r in rows.all())
    page.keyboard.press('Tab');assert page.locator('[data-route-choice]:focus-visible').count()==1
    page.keyboard.press('Escape');expect(d).not_to_be_visible()
-   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-underground-header.png'))
+   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-underground-header.png'))
    page.select_option('#lsStationSelect','suwon')
-   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.17.1-suwon-header.png'))
+   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-suwon-header.png'))
    assert not errors,errors;print('PASS LS photo colours, 15 station names, CCM Y/N, equipment faults, exclusive hover and keyboard:',width,flush=True);page.close()
   b.close()
 finally:s.shutdown()

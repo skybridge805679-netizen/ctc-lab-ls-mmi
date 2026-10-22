@@ -47,12 +47,14 @@ def run(page, url):
     expect(board).to_be_visible()
     assert float(board.locator('.bd-body').evaluate("e=>getComputedStyle(e).fillOpacity")) < 1          # 반투명
     w0 = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0].w")
+    board.locator('[data-board-resize]').scroll_into_view_if_needed()
     grip = board.locator('[data-board-resize]').bounding_box()
     page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down()
     page.mouse.move(grip['x'] + 160, grip['y'] + 70, steps=6); page.mouse.up()
     b = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
     assert b['w'] > w0 + 50 and b['h'] > 80, b
     page.mouse.move(grip['x'] + 160 - 2, grip['y'] + 70 - 2)
+    page.locator('#lsStage [data-ls-board] [data-board-resize]').scroll_into_view_if_needed()
     grip = page.locator('#lsStage [data-ls-board] [data-board-resize]').bounding_box()
     page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down(); page.mouse.move(grip['x'] - 300, grip['y'] - 150, steps=6); page.mouse.up()
     s = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
