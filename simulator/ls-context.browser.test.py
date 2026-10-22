@@ -15,6 +15,8 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1100}); errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
+   # this test deliberately stacks several numbers in one 열번창; acknowledge the resulting 열차번호 중복 alarm pop-ups as they appear
+   page.add_init_script("window.addEventListener('DOMContentLoaded',()=>setInterval(()=>document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click(),40))")
    page.on('response',lambda r:errors.append(f'HTTP {r.status} {r.url}') if r.status>=400 else None)
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
    page.select_option('#stationSelect','geumcheon')

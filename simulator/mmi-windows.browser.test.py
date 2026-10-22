@@ -140,6 +140,16 @@ def run(page, url):
     expect(box).to_contain_text('설정상태 [수동진로설정불가]')
     page.locator('[data-alarm-mute]').click(); expect(page.locator('[data-alarm-mute]')).to_be_disabled()
     page.locator('#alarmOk').click(); expect(box).to_be_hidden()
+    # 열차번호 중복 알람 (실무5 p.15): two numbers in one 열번창 raise an alarm pop-up
+    menu(page, '현장제어', '열차제어', '열차번호제어(B)')
+    page.locator('#mmiTrainStation').select_option('underground-seoul')
+    slot = page.locator('#mmiTrainSlot option').first.get_attribute('value')
+    for number in ['K0602', 'K0604']:
+        page.select_option('#mmiTrainOp', 'insert'); page.select_option('#mmiTrainSlot', slot)
+        page.fill('#mmiTrainNumber', number); page.click('#mmiTrainApply'); page.click('#dialogConfirm')
+    expect(page.locator('.mmi-alarm')).to_contain_text('K0602 + K0604 열차번호 중복')
+    expect(page.locator('#alarmLogBody tr').first).to_contain_text('[오류]')
+    page.locator('#alarmOk').click()
     assert not errors, errors
 
 

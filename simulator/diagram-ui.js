@@ -1,13 +1,14 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
+ const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
  function selectTrain(id){selected=id;$('graphTrain').value=id;render();}
  function render(){
   if(!context)return;
+  if(!model.trains.some(t=>t.id===selected))selected=model.trains[0].id; // the selected train may have been removed (경합해소 실습 초기화)
   while(notified<model.changes.length){const change=model.changes[notified++];for(const listener of subscribers)listener(change);}
   $('graphTrain').innerHTML=model.trains.map(t=>`<option>${escape(t.id)}</option>`).join('');$('graphTrain').value=selected;
   if($('graphPanel').hidden)return;
@@ -55,6 +56,10 @@
    if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
    const pos=T.position(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
+  }
+  if(options_.conflicts)for(const c of T.conflicts(model)){
+   const cx=x(c.time),cy=y(N.catalog[c.station].order);if(cx<left||cx>left+plotW||cy<plotTop||cy>plotTop+plotH)continue;
+   svg+=`<g data-dia-conflict="${escape(c.type)}"><ellipse cx="${cx}" cy="${cy}" rx="11" ry="8" fill="none" stroke="#d6251f" stroke-width="2"/><title>${escape(c.type)} · ${escape(c.trains.join(' + '))} · ${escape(N.catalog[c.station].name)}</title></g>`;
   }
   for(const n of options_.notes){
    const a=n.fromSec===null?start:n.fromSec,b=n.toSec===null?start+span:n.toSec,o1=n.fromOrder===null?from:n.fromOrder,o2=n.toOrder===null?to:n.toOrder;

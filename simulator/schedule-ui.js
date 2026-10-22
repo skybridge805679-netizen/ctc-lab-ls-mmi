@@ -76,8 +76,18 @@
   }else draft=null;
   draftRevision=model.changes.length;table();message('');
  }
+ // a hand-typed route must exist at that controlled station (arrival = 장내, departure = 출발 signal)
+ function badRoute(){
+  const R=root.SimScheduleRoutes;if(!R||!draft)return null;
+  for(const c of draft.calls){
+   if(!R.validate(c.station,c.arrivalRoute,'arrival'))return `${stationName(c.station)}역에 없는 도착진로입니다: ${c.arrivalRoute}`;
+   if(!R.validate(c.station,c.departureRoute,'departure'))return `${stationName(c.station)}역에 없는 출발진로입니다: ${c.departureRoute}`;
+  }
+  return null;
+ }
  function apply(){
   const m=mode(),id=selectedId(),newId=$('scheduleNumber').value.trim().toUpperCase();
+  const bad=m==='copy'?null:badRoute();if(bad){notify(bad);return;}
   if(draftRevision!==model.changes.length){notify('다이아에서 스케줄이 변경되었습니다. 다시 조회한 뒤 편집하세요.');return;}
   let result;
   if(m==='copy')result=T.copy(model,id,newId,seconds($('scheduleStart').value),{...attributes(),from:$('scheduleFrom').value,to:$('scheduleTo').value});

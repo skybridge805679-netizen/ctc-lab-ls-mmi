@@ -164,7 +164,10 @@ def check(page, url, screenshot=False):
     original_row = page.locator('#graphDetails tbody tr').nth(3).text_content()
     page.locator('input[name="scheduleEditType"][value="single"]').check()
     page.locator('#scheduleCalls [data-call="3"][data-field="departure"]').fill('09:07:40')
-    page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]').fill('1b_2t')
+    valid_route = page.evaluate("SimScheduleRoutes.options('dongmyo','arrival')[1]")
+    page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]').fill('9z_9t')
+    page.locator('#scheduleApply').click(); expect(page.locator('.mmi-alert')).to_contain_text('없는 도착진로'); page.locator('#mmiAlertOk').click()
+    page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]').fill(valid_route.lower())
     page.locator('#scheduleKind').select_option('회송열차')
     page.locator('#scheduleCars').fill('8')
     page.locator('#scheduleRelated').fill('K1002')
@@ -237,7 +240,7 @@ def check(page, url, screenshot=False):
     assert len(final['trains']) == 14
     edited = next(t for t in final['trains'] if t['id'] == 'K2001')
     assert edited['carCount'] == 8 and edited['relatedTrain'] == 'K1002'
-    assert edited['calls'][3]['arrivalRoute'] == '1B_2T' and edited['cancelled'], (edited['calls'][3], edited['cancelled'])
+    assert edited['calls'][3]['arrivalRoute'] == valid_route and edited['cancelled'], (edited['calls'][3], edited['cancelled'])
     page.locator('#graphTrain').select_option('K1131')
     page.locator('#graphSearch').fill('K1131')
     page.locator('#graphSpan').select_option('120')

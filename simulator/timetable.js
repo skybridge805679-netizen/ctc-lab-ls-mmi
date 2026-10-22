@@ -75,6 +75,8 @@
   if(!draft||!valid(draft)||model.trains.some(t=>t.id===draft.id))return {ok:false,message:'열차번호 중복, 역 순서, 시각(동일 운행일), 차량수 및 속성을 확인하세요.'};
   const train=structuredClone(draft);train.plan=train.calls.map(c=>({...c}));model.trains.push(train);model.changes.push({type:'create',id:train.id});return {ok:true,message:train.id+' 스케줄 생성 완료'};
  }
+ // used by the 경합해소 실습 to take the exercise train away again
+ function remove(model,id){const i=model.trains.findIndex(t=>t.id===id);if(i<0)return {ok:false,message:'열차를 찾을 수 없습니다.'};model.trains.splice(i,1);model.changes.push({type:'delete',id});return {ok:true,message:id+' 스케줄 삭제'};}
  function update(model,id,draft){
   const train=model.trains.find(t=>t.id===id);
   if(!train||!draft||draft.id!==id||!valid(draft)||draft.calls.length!==train.calls.length||draft.calls.some((c,i)=>c.station!==train.calls[i].station))return {ok:false,message:'역별 시각·차량수·속성을 확인하세요. 기존 열차번호는 복사로 변경하세요.'};
@@ -92,5 +94,35 @@
   for(const key of ['kind','carCount','relatedTrain','service','flags'])if(attributes[key]!==undefined)draft[key]=attributes[key];
   const result=create(model,draft);if(result.ok){model.changes.at(-1).type='copy';model.changes.at(-1).sourceId=sourceId;result.message=id+' 스케줄 복사 완료';}return result;
  }
- const api={initial,delay,cancel,setCancelled,position,clock,valid,pattern,create,update,copy,KINDS,FLAGS,STOPS};if(typeof module!=='undefined')module.exports=api;else root.SimTimetable=api;
+ // 경합 검지 (실기3 4장, p.64-70): 같은 방향 열차끼리의 추월경합, 도착/출발 운전시격 경합, 같은 도착선 동시 점유(플랫폼 할당 경합).
+// 교행경합은 단선 구간 전용이라 복선인 이 선로에는 없습니다. 최소 운전시격 120초는 교재의 "2~3분 고밀도" 설명에 맞춘 교육용 값입니다.
+const MIN_HEADWAY=120;
+const RESOLVE_STATIONS=['yongsan','yeongdeungpo','geumcheon','anyang','gunpo','uiwang'];
+function conflicts(model,minHeadway=MIN_HEADWAY){
+ const out=[],trains=model.trains.filter(t=>!t.cancelled);
+ for(let i=0;i<trains.length;i++)for(let j=i+1;j<trains.length;j++){
+  const a=trains[i],b=trains[j];if(a.direction!==b.direction)continue;
+  const common=a.calls.filter(c=>!c.cancelled&&b.calls.some(d=>d.station===c.station&&!d.cancelled)).map(c=>({a:c,b:b.calls.find(d=>d.station===c.station)}));
+  common.sort((x,y)=>(N.catalog[x.a.station].order-N.catalog[y.a.station].order)*(a.direction==='down'?1:-1));
+  const found=[];let lastSign=0,lastStation=null;
+  for(const {a:ca,b:cb} of common){
+   const aFirst=ca.arrival+ca.departure<=cb.arrival+cb.departure,lead=aFirst?ca:cb,follow=aFirst?cb:ca,leader=aFirst?a:b,follower=aFirst?b:a,sign=aFirst?1:-1;
+   if(lastSign&&sign!==lastSign)found.push({type:'추월경합',station:ca.station,from:lastStation,trains:[a.id,b.id],time:Math.min(ca.arrival,cb.arrival)});
+   lastSign=sign;lastStation=ca.station;
+   const arr=follow.arrival-lead.arrival,dep=follow.departure-lead.departure;
+   if(arr>=0&&arr<minHeadway)found.push({type:'도착 운전시격 경합',station:ca.station,trains:[leader.id,follower.id],time:follow.arrival,gap:arr});
+   if(dep>0&&dep<minHeadway)found.push({type:'출발 운전시격 경합',station:ca.station,trains:[leader.id,follower.id],time:follow.departure,gap:dep});
+   if(lead.arrivalRoute&&lead.arrivalRoute===follow.arrivalRoute&&follow.arrival<lead.departure)found.push({type:'플랫폼 할당 경합',station:ca.station,trains:[leader.id,follower.id],time:follow.arrival,route:lead.arrivalRoute});
+  }
+  out.push(...found);
+ }
+ return out.sort((x,y)=>N.catalog[x.station].order-N.catalog[y.station].order||x.time-y.time);
+}
+// 경합 해소는 경합지에서 가장 가까운 앞쪽(상류) 해소역에서 한다 (경합 시나리오 ※)
+function nearestResolveStation(station,direction){
+ const order=N.catalog[station].order,sign=direction==='down'?1:-1;
+ const candidates=RESOLVE_STATIONS.map(id=>N.catalog[id]).filter(s=>(s.order-order)*sign<=0).sort((x,y)=>(y.order-x.order)*sign);
+ return candidates[0]?.id??null;
+}
+const api={initial,delay,cancel,setCancelled,position,clock,valid,pattern,create,update,remove,copy,conflicts,nearestResolveStation,MIN_HEADWAY,RESOLVE_STATIONS,KINDS,FLAGS,STOPS};if(typeof module!=='undefined')module.exports=api;else root.SimTimetable=api;
 })(typeof window!=='undefined'?window:globalThis);

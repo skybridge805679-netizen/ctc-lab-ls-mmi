@@ -28,7 +28,7 @@ const TOOLS=[
 const MENUS=[
  {label:'파일(F)',items:[{label:'열기(O)',run:'open'},{label:'인쇄(P)',run:'print'}]},
  {label:'편집(E)',items:[{label:'열차복사(C)',key:'Ctrl+C',run:'copy'},{label:'붙여놓기(V)',key:'Ctrl+V',run:'paste'},{label:'열차생성(A)',key:'Ctrl+A',run:'create'},{label:'열차정보수정(F5)',key:'F5',run:'edit'},{label:'노트편집(N)',key:'Ctrl+N',run:'note'}]},
- {label:'보기(V)',items:[{label:'현재시각으로(F9)',key:'F9',run:'jumpNow'}]},
+ {label:'보기(V)',items:[{label:'현재시각으로(F9)',key:'F9',run:'jumpNow'},{label:'경합 표시 (교육용)',run:'t:conflicts',check:'conflicts',off:true},{label:'경합해소 실습 (교육용)',run:'drill'}]},
  {label:'Dia 보기(V)',items:[
   {label:'확대/축소',items:[{label:'시간축 확대',key:'+',run:'timeIn'},{label:'시간축 축소',key:'-',run:'timeOut'},{label:'역축 확대',key:'*',run:'stationIn'},{label:'역축 축소',key:'/',run:'stationOut'}]},
   {label:'다이얼로그',items:[{label:'역축/시간축 설정',run:'axisDialog'},{label:'열차정보보기옵션',run:'viewDialog'}]},
@@ -124,7 +124,7 @@ const ACTIONS={
   });$('fdList').innerHTML=D().getModel().trains.map(t=>`<option value="${esc(t.id)}">`).join('');},
  favSet(){store.set({from:$('graphFrom').value,to:$('graphTo').value,start:$('graphStart').value,span:$('graphSpan').value,row:$('graphRow').value});status('즐겨찾기를 설정했습니다. 다음 실행 때도 이 화면으로 열립니다.');},
  favGo(){const f=store.get();if(!f){status('저장된 즐겨찾기가 없습니다.');return;}applyFav(f);status('즐겨찾기로 이동했습니다.');},
- 't:plan'(b){toggle('plan',b);},'t:numbers'(b){toggle('numbers',b);},'t:position'(b){toggle('position',b);}
+ drill(){root.SimMMI.open('conflictDrill');},'t:conflicts'(b){toggle('conflicts',b);},'t:plan'(b){toggle('plan',b);},'t:numbers'(b){toggle('numbers',b);},'t:position'(b){toggle('position',b);}
 };
 function toggle(key,btn){const on=!D().getOption(key);D().setOption(key,on);btn?.setAttribute('aria-checked',String(on));}
 function applyFav(f){$('graphFrom').value=f.from;$('graphTo').value=f.to;$('graphStart').value=f.start;ensureOption($('graphSpan'),f.span,`${f.span}분`);$('graphSpan').value=f.span;ensureOption($('graphRow'),f.row,f.row);$('graphRow').value=f.row;fire('graphFrom');}
@@ -187,7 +187,7 @@ function bindPlot(){
 }
 
 // ---------------------------------------------------------------- menu + toolbar
-function menuHtml(items){return `<ul class="tg-list">${items.map(it=>it.items?`<li class="tg-has-sub"><button type="button" aria-haspopup="true"><span>${it.label}</span><i>▸</i></button>${menuHtml(it.items)}</li>`:`<li><button type="button" data-tg-run="${it.run}" ${it.mode?`data-tg-mode="${it.mode}" role="menuitemcheckbox" aria-checked="${mode===it.mode}"`:''} ${it.check?`data-tg-check="${it.check}" role="menuitemcheckbox" aria-checked="true"`:''}><span>${it.label}</span>${it.key?`<kbd>${it.key}</kbd>`:''}</button></li>`).join('')}</ul>`;}
+function menuHtml(items){return `<ul class="tg-list">${items.map(it=>it.items?`<li class="tg-has-sub"><button type="button" aria-haspopup="true"><span>${it.label}</span><i>▸</i></button>${menuHtml(it.items)}</li>`:`<li><button type="button" data-tg-run="${it.run}" ${it.mode?`data-tg-mode="${it.mode}" role="menuitemcheckbox" aria-checked="${mode===it.mode}"`:''} ${it.check?`data-tg-check="${it.check}" role="menuitemcheckbox" aria-checked="${it.off?'false':'true'}"`:''}><span>${it.label}</span>${it.key?`<kbd>${it.key}</kbd>`:''}</button></li>`).join('')}</ul>`;}
 function init(panel){
  graph=panel;
  for(const v of SPANS)ensureOption($('graphSpan'),v,`${v}분`);

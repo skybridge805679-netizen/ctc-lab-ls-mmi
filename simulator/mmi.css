@@ -212,3 +212,5 @@
 .nt-edit label>span{min-width:70px}
 .mmi-alert p span{white-space:pre-line}
 .mmi-confirm-row{display:flex;justify-content:center;gap:12px;padding:0 0 12px}
+.drill-steps{margin:0 0 6px;padding-left:20px;font-size:12px;line-height:1.5}
+.drill .rpt-table{height:150px}

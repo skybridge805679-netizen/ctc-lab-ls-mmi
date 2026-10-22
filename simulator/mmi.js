@@ -78,6 +78,20 @@ function raiseAlarm(text,state='',level='E',station=''){
  alarms.push({time:stamp(new Date()),text,state,level,station});if(alarms.length>50)alarms.shift();renderAlarm();
  alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
 }
+// 열차번호 중복 알람 (실무5 p.15: 충돌·구원연결로 한 열번창에 번호가 겹치면 "K0602 + K0604 열차번호 중복 알람")
+const dupSeen=new Set();
+function checkDuplicates(stationId){
+ const m=root.SimLSUI?.getModel?.(),st=m?.stations?.[stationId];if(!st)return;
+ for(const [slot,rows] of Object.entries(st.windows||{})){
+  const key=`${stationId}|${slot}`,numbers=rows.map(r=>r.number);
+  if(numbers.length<2){for(const k of [...dupSeen])if(k.startsWith(key+'|'))dupSeen.delete(k);continue;}
+  const sig=`${key}|${numbers.join('+')}`;
+  if(dupSeen.has(sig))continue;
+  for(const k of [...dupSeen])if(k.startsWith(key+'|'))dupSeen.delete(k);
+  dupSeen.add(sig);const info=stationInfo(stationId);
+  raiseAlarm(`${info.name}${info.code?`(${info.code})`:''}역 ${numbers.join(' + ')} 열차번호 중복`,'','E',info.name);
+ }
+}
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
 function sync(stationId,state,action,result){
  // 제어 확인 (photo 2026-10-22): a control command outside CCM is refused with a modal error box, not an alarm pop-up
@@ -91,7 +105,7 @@ function sync(stationId,state,action,result){
  if(state.mode!==prev.mode){log('event',`${st.name}[${st.code}] ${state.mode} MODE로 전환`);record('mode',{station:st.name,text:`${prev.mode} → ${state.mode}`});}
  if(action?.type==='point'&&result?.ok)record('field',{station:st.name,kind:'선로전환기',text:`${action.id} ${action.value==='R'?'반위':'정위'} 전환`});
  if((action?.type==='stop'||action?.type==='stopAll')&&result?.ok)record('field',{station:st.name,kind:'신호기',text:action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`});
- if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});}
+ if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});for(const id of new Set([op.station,op.targetStation]))if(id)checkDuplicates(id);}
  if(action?.type==='scan'&&result?.ok)log('event',action.scope==='all'?'전체 제어역 Basescan 수신':`${st.name}역 Basescan 수신`);
  seen[stationId]={state,routes:now,mode:state.mode};
 }
@@ -206,7 +220,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- root.SimNotes.init(host);
+ root.SimNotes.init(host);root.SimDrill.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
