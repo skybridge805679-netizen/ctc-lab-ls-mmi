@@ -26,6 +26,12 @@ try:
      const captions=[...svg.querySelectorAll('[data-source-caption]')];
      const hit=(a,b)=>Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x)>1&&Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y)>1;
      const clips=[],overlaps=[];
+     const alignedPairs=[['gunja-out','gunja-in'],['freight-a','freight-b']];
+     for(const [first,second] of alignedPairs){
+      const a=svg.querySelector(`[data-source-caption="${first}"]`),b=svg.querySelector(`[data-source-caption="${second}"]`);
+      if(a&&b){const x=a.getBBox(),y=b.getBBox();if(Math.abs(x.x-y.x)>.1||Math.abs(x.width-y.width)>.1)overlaps.push(['caption-alignment',first,second]);}
+     }
+     for(const el of brackets)if(Math.abs(el.getBBox().width-28)>.1)overlaps.push(['bracket-width',el.dataset.sourceBracket]);
      for(const el of [...brackets,...captions]){
       const a=el.getBBox();if(a.x<0||a.y<0||a.x+a.width>vb.width||a.y+a.height>vb.height)clips.push(el.dataset);
       for(const other of svg.querySelectorAll('text,.ls-train-slot'))if(!el.contains(other)&&hit(a,other.getBBox()))overlaps.push([el.dataset,other.textContent||other.dataset.windowCode]);
@@ -33,7 +39,7 @@ try:
      return {clips,overlaps,bracketsNative:brackets.every(e=>e.querySelectorAll('path').length===2&&getComputedStyle(e).pointerEvents==='none')};
     }''')
     assert result=={'clips':[],'overlaps':[],'bracketsNative':True},(width,sid,result)
-    if sid in ['guro','noryangjin','dongmyo','uiwang'] and width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.18.1-{sid}.png'))
+    if sid in ['guro','noryangjin','dongmyo','uiwang'] and width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.18.2-{sid}.png'))
    page.select_option('#stationSelect','guro')
    expect(page.locator('[data-source-caption="depot-lead"]')).to_have_text('차량기지입출고선')
    before=page.locator('[data-source-bracket="52BT-52B"]').evaluate('(el)=>el.outerHTML')

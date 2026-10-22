@@ -154,5 +154,7 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 .ls-equipment span.fault{background:#7a1f1f;border-color:#e05a5a;color:#fff}
 
 /* Source bracket glyphs and yard captions are native scene objects, not controls. */
-.ls-svg .source-bracket-pair path{fill:#91c7ad;stroke:#182c26;stroke-width:1.25;stroke-linejoin:miter}
-.ls-svg .source-caption text{fill:#e4edeb;font:500 14px "Noto Sans KR",sans-serif;stroke:#263639;stroke-width:3px;paint-order:stroke fill}
+.ls-svg .source-bracket-pair path{fill:#BEE3E3;stroke:#233e39;stroke-width:1.25;stroke-linejoin:miter}
+.ls-svg .source-caption .caption-surface{fill:#283d3e;stroke:#a8c5bf;stroke-opacity:.28;stroke-width:1}
+.ls-svg .source-caption .caption-accent{fill:none;stroke:#BEE3E3;stroke-width:3;stroke-linecap:round}
+.ls-svg .source-caption text{fill:#e7f1ee;font:500 15px "Noto Sans KR",sans-serif;letter-spacing:.15px;stroke:none}
