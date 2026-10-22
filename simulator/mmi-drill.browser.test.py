@@ -37,11 +37,14 @@ def run(page, url):
     assert page.locator('#drillRows tr:not(.empty)').count() >= 3
     page.locator('#drillNew').click(); expect(page.locator('#drillMsg')).to_contain_text('이미 출제')
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('경합이')
+    # Close the floating drill before reaching the graph menu underneath it.
+    page.locator('[data-mmi-window="conflictDrill"] .mmi-close').click()
     # 경합 표시 toggles the red markers on the T/G
     tg(page, '보기(V)', '경합 표시')
     assert page.locator('[data-dia-conflict]').count() >= 1
     tg(page, '보기(V)', '경합 표시')
     assert page.locator('[data-dia-conflict]').count() == 0
+    page.evaluate("SimMMI.open('conflictDrill')")
     # edit B0000 at 용산 (a 해소역, but not the nearest one) -> conflict gone, principle violated
     def edit_at(station_id, delta, change_routes):
         page.evaluate("SimScheduleUI.open('edit','B0000')")

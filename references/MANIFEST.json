@@ -299,6 +299,22 @@
         454
       ],
       "source_note": "User-provided split PDF; the original unsplit attachment was not downloaded"
+    },
+    {
+      "path": "references/mmi/photos-2026-10-22.md",
+      "original_name": "photos-2026-10-22.md",
+      "source": "Derived photo and textbook implementation notes, Claude branch 4c105bd; status reconciled during integration",
+      "added_date": "2026-10-22",
+      "bytes": 7358,
+      "sha256": "9f819efa703a2c5fb58aad6f0510fef2bb5f3946565017ed880e89bffd445e87"
+    },
+    {
+      "path": "references/mmi/textbook-notes.md",
+      "original_name": "textbook-notes.md",
+      "source": "Derived photo and textbook implementation notes, Claude branch 4c105bd; status reconciled during integration",
+      "added_date": "2026-10-22",
+      "bytes": 13830,
+      "sha256": "783e47e34fce1e6818151abc183bfa6d35744b22c1806ccc79cbc82f202a557c"
     }
   ],
   "superseded_attachments": [
