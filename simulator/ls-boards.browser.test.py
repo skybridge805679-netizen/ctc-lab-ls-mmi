@@ -59,6 +59,17 @@ def run(page, url):
     assert s['w'] >= 60 and s['h'] >= 30 and s['w'] < b['w'], s                                          # shrinks, never below the minimum
     run_({'type': 'lsOperation', 'operation': {'op': 'boardFix', 'station': 'anyang', 'id': s['id'], 'fixed': True}, 'source': 'LS'})
     expect(page.locator('#lsStage [data-ls-board] [data-board-resize]')).to_have_count(0)
+    # ---- 열차 점유 표시 (FTS): 열번창에 번호가 서 있는 궤도회로는 붉게, 번호가 움직이면 따라 움직임
+    occ = lambda: page.evaluate("[...document.querySelectorAll('#lsStage .train-occ')].map(e=>e.dataset.trainOccupied)")
+    ls = lambda o: page.evaluate("o=>SimMMI.run({type:'lsOperation',operation:o,source:'LS'})", o)
+    assert occ() == []
+    ls({'op': 'insert', 'station': 'anyang', 'slot': '5T', 'number': 'K1004', 'direction': 'up'})
+    assert occ() == ['5T'], occ()
+    uid = page.evaluate("SimLSUI.getModel().stations.anyang.windows['5T'][0].uid")
+    ls({'op': 'move', 'station': 'anyang', 'slot': '5T', 'uid': uid, 'targetStation': 'anyang', 'targetSlot': 'B981T'})
+    assert occ() == ['B981T'], occ()
+    page.evaluate("SimMMI.run({type:'lsOperation',operation:{op:'delete',station:'anyang',slot:'B981T',uid:SimLSUI.getModel().stations.anyang.windows['B981T'][0].uid},source:'LS'})")
+    assert occ() == []
     assert not errors, errors
     print('ls boards and dialogs: ok')
 

@@ -214,6 +214,12 @@ function render(st,def,core,model,neighbours={}){
   for(const name of [left,right])if(name&&cells.some(c=>c.label.replaceAll(' · ','')===name))labels+=`<g data-circuit-alias="${esc(name)}"><title>${esc(name)}</title></g>`;
  }
  for(const route of active)routes+=`<path class="route-line ${route.state}" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="${route.state}" stroke="${COLORS[route.state]}" d="${dpath(route.points)}" ${route.state==='locked'?'stroke-dasharray="14 8"':''}/>`;
+ // FTS: a circuit holding a train (its number stands in that 열번창) is shown red and follows the train as the number moves
+ const occupiedNow=neighbours.occupied||new Set(),hitCells=new Map();
+ for(const c of cells){const names=[c.label.replaceAll(' · ',''),...c.label.split(' · ').filter(Boolean)],hit=names.find(t=>occupiedNow.has(t));if(hit)hitCells.set(c,hit);}
+ // a platform window stands on an unnamed circuit: use the cell under the window
+ for(const b of windowBoxes)if(b.inline&&occupiedNow.has(b.item.slot)){const mid=b.x+b.width/2,c=cells.find(c=>Math.abs(c.y-b.cy)<5&&mid>=c.x-1&&mid<=c.x+c.width+1);if(c&&!hitCells.has(c))hitCells.set(c,b.item.slot);}
+ for(const [c,hit] of hitCells)routes+=`<rect class="train-occ" data-train-occupied="${esc(hit)}" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/>`;
  for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){

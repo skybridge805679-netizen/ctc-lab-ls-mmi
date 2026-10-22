@@ -31,8 +31,10 @@ function drawBoard(){
   +`<div class="route-run-controls"><button data-sim-enter="${r.id}" ${a.occupied||a.lock?'disabled':''}>모의 열차 진입</button><button data-sim-clear="${r.id}" ${a.occupied?'':'disabled'}>모의 열차 통과</button></div>${routeDetails(r.id)}</article>`;}).join(''):'<p class="evidence-empty">설정된 진로가 없습니다. 취급역의 CCM → 신호기 → 진로를 선택하세요.</p>';
  $('routeEvidence').innerHTML=head+trains+`<div class="lock-list">${list}</div>`;
 }
+// 열번창에 열차번호가 서 있는 궤도회로 = 열차 점유 (FTS는 이 구간을 붉게 표시)
+function trainOccupied(id){const st=window.SimLSUI?.getModel?.().stations?.[id],set=new Set();if(st)for(const [slot,rows] of Object.entries(st.windows))if(rows.length)set.add(slot);return set;}
 function drawTracks(){
- const st=N.catalog[selectedStation],ctl=N.stations.filter(s=>s.controlled),at=ctl.findIndex(s=>s.id===selectedStation),view=window.SimLS.render(st,window.SimWiring.data[selectedStation],C,state,{left:ctl[at-1]?.name,right:ctl[at+1]?.name});
+ const st=N.catalog[selectedStation],ctl=N.stations.filter(s=>s.controlled),at=ctl.findIndex(s=>s.id===selectedStation),view=window.SimLS.render(st,window.SimWiring.data[selectedStation],C,state,{left:ctl[at-1]?.name,right:ctl[at+1]?.name,occupied:trainOccupied(selectedStation)});
  const head=`<div class="ls-head"><div class="ls-modes" role="group" aria-label="${st.name} 역제어모드">${['AUTO','CCM','LOCAL'].map(m=>`<button type="button" class="mode-btn ${m.toLowerCase()} ${state.mode===m?'on':''}" data-mode="${m}" aria-pressed="${state.mode===m}">${m}</button>`).join('')}</div><button type="button" class="stop-all" data-stop-all="true">신호기 일괄정지</button><div class="ls-name"><b>${escapeHTML(st.name)}</b><span>${st.code}</span></div><div class="ls-equipment" aria-label="원본 장치 표시">${['N1','N2','C','REC','UPS','ShP','EIS1','EIS2','DTS1','DTS2','RC'].map(name=>`<span data-equipment="${name}" title="${name} · 장치 통신 상태 미연결">${name}</span>`).join('')}</div></div>`;
  $('lsStage').dataset.controlStation=selectedStation;
  $('lsStage').innerHTML=head+`<svg id="trackSvg" class="ls-svg" viewBox="0 0 ${view.width} ${view.height}" role="img" aria-label="${escapeHTML(st.name)} LS 선로 배선">${view.svg}</svg>`;
