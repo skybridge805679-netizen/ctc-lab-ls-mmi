@@ -221,7 +221,27 @@ function render(st,def,core,model,neighbours={}){
   addRailName(left,poly[0],poly,42);addRailName(right,poly.at(-1),poly,-42);
   for(const name of [left,right])if(name&&cells.some(c=>c.label.replaceAll(' · ','')===name))labels+=`<g data-circuit-alias="${esc(name)}"><title>${esc(name)}</title></g>`;
  }
- for(const route of active)routes+=`<path class="route-line ${route.state}" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="${route.state}" stroke="${COLORS[route.state]}" d="${dpath(route.points)}" ${route.state==='locked'?'stroke-dasharray="14 8"':''}/>`;
+ // FTS: a train running over a route reddens only the circuits it is on, from the tail to the head, and moves on with the clock
+ const lenOf=pts=>pts.slice(1).reduce((t,p,i)=>t+Math.hypot(p[0]-pts[i][0],p[1]-pts[i][1]),0);
+ const slicePath=(pts,d0,d1)=>{const out=[];let acc=0;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],seg=Math.hypot(b[0]-a[0],b[1]-a[1]);if(!seg)continue;const s0=acc,s1=acc+seg;if(s1>d0&&s0<d1){const t0=Math.max(0,(d0-s0)/seg),t1=Math.min(1,(d1-s0)/seg);if(!out.length)out.push([a[0]+(b[0]-a[0])*t0,a[1]+(b[1]-a[1])*t0]);out.push([a[0]+(b[0]-a[0])*t1,a[1]+(b[1]-a[1])*t1]);}acc=s1;}return out;};
+ const TRAIN_PX=150;
+ for(const route of active){
+  const t=model.routes[route.id]?.train;
+  if(route.state==='occupied'&&t&&t.to>t.from){
+   const L=lenOf(route.points),f=Math.max(0,Math.min(1,((model.clock??0)-t.from)/(t.to-t.from))),head=L*f,tail=Math.max(0,head-Math.min(TRAIN_PX,L*.55)),part=slicePath(route.points,tail,Math.max(head,tail+1));
+   routes+=`<path class="route-line set" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="set" stroke="${COLORS.set}" d="${dpath(route.points)}"/>`;
+   if(part.length>1)routes+=`<path class="route-line occupied train-run" data-train-run="${esc(route.id)}" data-route-state="occupied" stroke="${COLORS.occupied}" d="${dpath(part)}"/>`;
+   continue;
+  }
+  routes+=`<path class="route-line ${route.state}" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="${route.state}" stroke="${COLORS[route.state]}" d="${dpath(route.points)}" ${route.state==='locked'?'stroke-dasharray="14 8"':''}/>`;
+ }
+ // an approaching train (접근 열차) reddens the circuit just outside its signal
+ for(const [sig,on] of Object.entries(model.approach||{})){
+  if(!on)continue;const sg=core.signals[sig],rid=Object.keys(core.routes).find(id=>core.routes[id].signal===sig);if(!sg||!rid)continue;
+  const p0=projectRoute(routePoints(core.routes[rid].path),core.routes[rid].destination)[0],dir=sg.dir,row=cells.filter(c=>Math.abs(c.y-p0[1])<6&&(dir>0?c.x<p0[0]-2:c.x+c.width>p0[0]+2));      // the circuit holding the signal's outer side (or just outside it)
+  const c=dir>0?row.sort((a,b)=>b.x+b.width-(a.x+a.width))[0]:row.sort((a,b)=>a.x-b.x)[0];
+  if(c)routes+=`<rect class="train-occ" data-train-occupied="접근 ${esc(sig)}" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/>`;
+ }
  // FTS: a circuit holding a train (its number stands in that 열번창) is shown red and follows the train as the number moves
  const occupiedNow=neighbours.occupied||new Set(),hitCells=new Map();
  for(const c of cells){const names=[c.label.replaceAll(' · ',''),...c.label.split(' · ').filter(Boolean)],hit=names.find(t=>occupiedNow.has(t));if(hit)hitCells.set(c,hit);}

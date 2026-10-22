@@ -72,6 +72,22 @@ def run(page, url):
     assert occ() == ['B981T'], occ()
     page.evaluate("SimMMI.run({type:'lsOperation',operation:{op:'delete',station:'anyang',slot:'B981T',uid:SimLSUI.getModel().stations.anyang.windows['B981T'][0].uid},source:'LS'})")
     assert occ() == []
+    # ---- 열차 진행에 따른 점유: 접근 → 진입(진로를 따라 붉은 구간이 이동) → 해정
+    page.evaluate("document.querySelector('#stationSelect').value='yongsan';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
+    run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
+    run_({'type': 'approach', 'signal': '2A', 'present': True, 'source': 'LS'})
+    assert page.evaluate("[...document.querySelectorAll('#lsStage .train-occ')].map(e=>e.dataset.trainOccupied)") == ['접근 2A']
+    run_({'type': 'route', 'id': '2A-5T', 'source': 'LS'}); run_({'type': 'tick', 'seconds': 95})      # 접근쇄정은 신호를 정지한 경우에만 걸림: here the route is simply entered
+    run_({'type': 'occupy', 'id': '2A-5T', 'source': 'LS', 'seconds': 20})
+    run_({'type': 'tick', 'seconds': 3})
+    seg = lambda: page.evaluate("document.querySelector('#lsStage [data-train-run=\"2A-5T\"]')?.getAttribute('d')||''")
+    d1 = seg(); assert d1.startswith('M'), d1                                  # a red piece of the route, the rest stays green
+    assert page.evaluate("document.querySelectorAll('#lsStage [data-active-route=\"2A-5T\"]').length") == 1
+    run_({'type': 'tick', 'seconds': 8}); d2 = seg()
+    assert d2 and d2 != d1, (d1, d2)                                            # it moved with the clock
+    run_({'type': 'tick', 'seconds': 15}); d3 = seg(); assert d3 and d3 != d2
+    run_({'type': 'clear', 'id': '2A-5T', 'source': 'LS'})
+    assert seg() == ''
     assert not errors, errors
     print('ls boards and dialogs: ok')
 
