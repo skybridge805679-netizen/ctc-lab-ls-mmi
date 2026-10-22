@@ -60,6 +60,7 @@
    if(s.pending)return log(false,'현장 인계 응답을 먼저 처리하세요.');
    if(s.mode===a.value)return log(false,'이미 '+a.value+' 모드입니다.');
    if(a.value==='AUTO'&&s.mode!=='CCM')return log(false,'AUTO는 CCM에서만 전환할 수 있습니다.');
+   if(a.emergency&&s.mode==='LOCAL'&&a.value==='CCM'){s.mode='CCM';s.pending=null;return log(true,'비상 CTC 전환 · 현장 응답 없이 CCM 모드 전환 완료');}
    if(a.value==='LOCAL'||s.mode==='LOCAL'){s.pending=a.value;return log(true,a.value+' 전환 요청 · 현장 응답 대기');}
    s.mode=a.value;return log(true,a.value+' 모드 전환 완료');
   }

@@ -80,7 +80,14 @@
  function update(model,id,draft){
   const train=model.trains.find(t=>t.id===id);
   if(!train||!draft||draft.id!==id||!valid(draft)||draft.calls.length!==train.calls.length||draft.calls.some((c,i)=>c.station!==train.calls[i].station))return {ok:false,message:'역별 시각·차량수·속성을 확인하세요. 기존 열차번호는 복사로 변경하세요.'};
-  const plan=train.plan;Object.assign(train,structuredClone(draft));train.plan=plan;train.direction=N.catalog[train.calls[0].station].order<N.catalog[train.calls.at(-1).station].order?'down':'up';if(train.cancelled)train.calls.forEach(c=>{c.cancelled=true;});model.changes.push({type:'update',id});return {ok:true,message:id+' 편집 적용 완료'};
+  // what the edit touched, for the 운전정리 대장 (운전명령 / 관제승인 / 단순 운전정리)
+  const flags=[];
+  if(draft.calls.some((c,i)=>c.arrival!==train.calls[i].arrival||c.departure!==train.calls[i].departure))flags.push('time');
+  if(draft.calls.some((c,i)=>(c.arrivalRoute??'')!==(train.calls[i].arrivalRoute??'')||(c.departureRoute??'')!==(train.calls[i].departureRoute??'')||(c.track??'')!==(train.calls[i].track??'')))flags.push('route');
+  if(draft.kind!==train.kind)flags.push('kind');
+  if((draft.relatedTrain??'')!==(train.relatedTrain??''))flags.push('related');
+  if(draft.calls.some((c,i)=>(c.cancelled??false)!==(train.calls[i].cancelled??false)))flags.push('cancel');
+  const plan=train.plan;Object.assign(train,structuredClone(draft));train.plan=plan;train.direction=N.catalog[train.calls[0].station].order<N.catalog[train.calls.at(-1).station].order?'down':'up';if(train.cancelled)train.calls.forEach(c=>{c.cancelled=true;});model.changes.push({type:'update',id,flags});return {ok:true,message:id+' 편집 적용 완료'};
  }
  function copy(model,sourceId,id,start,attributes={}){
   const source=model.trains.find(t=>t.id===sourceId);

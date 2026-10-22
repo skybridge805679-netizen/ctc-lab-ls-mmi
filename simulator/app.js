@@ -91,7 +91,10 @@ $('taskSelect').innerHTML=tasks.map((t,i)=>`<option value="${i}">${String(i+1).p
 document.querySelectorAll('[data-practice]').forEach(b=>b.onclick=()=>{practice=b.dataset.practice;document.querySelectorAll('[data-practice]').forEach(x=>x.classList.toggle('selected',x===b));taskView();});
 $('lsDisplay').onclick=e=>{
  const mode=e.target.closest('[data-mode]'),signal=e.target.closest('[data-signal]'),stop=e.target.closest('[data-stop-all]');
- if(mode)openAction('역제어모드 설정',N.catalog[selectedStation].name+' '+mode.dataset.mode+' 모드로 전환하시겠습니까?',{type:'mode',value:mode.dataset.mode,source:'LS'});
+ if(mode&&state.mode==='LOCAL'&&mode.dataset.mode==='CCM'&&!state.pending){
+  // 표준화 프로토콜(교통관제운영 4권 p.383): LOCAL에서 CTC를 누르면 비상 CTC 대화상자가 뜨고, 선택하면 현장 응답 없이 바로 전환된다
+  openAction('역제어모드 설정',N.catalog[selectedStation].name+' LOCAL 상태입니다. CCM(CTC) 모드로 전환하시겠습니까?<label class="nt-check"><input type="checkbox" id="emgCtc"> 비상 CTC (현장 응답 없이 즉시 전환)</label>',()=>({type:'mode',value:'CCM',source:'LS',emergency:$('emgCtc').checked}));
+ }else if(mode)openAction('역제어모드 설정',N.catalog[selectedStation].name+' '+mode.dataset.mode+' 모드로 전환하시겠습니까?',{type:'mode',value:mode.dataset.mode,source:'LS'});
  else if(signal)signalAction(signal.dataset.signal);
  else if(stop)openAction('신호기 일괄정지',N.catalog[selectedStation].name+'의 설정 신호기를 모두 정지합니다. 점유 중인 진로는 쇄정을 유지합니다.',{type:'stopAll',source:'LS'});
 };
