@@ -175,3 +175,11 @@
 .mmi-alarm-foot{display:flex;justify-content:space-between;padding:6px 8px 8px}
 .mmi-alarm-foot button{min-width:84px;padding:3px 12px;border:1px solid #6d6d6a;background:#ecebe6;cursor:pointer}
 .mmi-alarm-foot button:disabled{color:#888;cursor:default}
+
+/* 제어 확인 error box (photo 2026-10-22): pale dialog, red round error icon, blue-outlined 확인 */
+.mmi-alert.error{min-width:380px;background:#f4f4f2;border:1px solid #8a8a86}
+.mmi-alert.error .mmi-title{background:#f4f4f2;color:#333;border-bottom:0;font-weight:400}
+.mmi-alert.error p{display:flex;align-items:center;gap:16px;padding:22px 24px 26px}
+.mmi-err{flex:0 0 38px;width:38px;height:38px;border-radius:50%;background:#d9261c;color:#fff;font-style:normal;font-size:24px;line-height:38px;text-align:center}
+.mmi-alert.error button{margin:0;float:right;margin:8px 10px 10px 0;min-width:92px;padding:4px 14px;background:#e6e6e6;color:#111;border:2px solid #2a6fd6;border-radius:0}
+.mmi-alert.error::after{content:'';display:block;clear:both}

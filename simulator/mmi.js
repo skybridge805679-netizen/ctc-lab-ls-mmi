@@ -71,7 +71,10 @@ function raiseAlarm(text,state=''){
  alarms.push({time:stamp(new Date()),text,state});if(alarms.length>50)alarms.shift();renderAlarm();
  alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
 }
+const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
 function sync(stationId,state,action,result){
+ // 제어 확인 (photo 2026-10-22): a control command outside CCM is refused with a modal error box, not an alarm pop-up
+ if(action&&result&&result.ok===false&&CONTROL.includes(action.type)&&state.mode!=='CCM'){alertBox('CCM 모드가 아니므로 제어할 수 없습니다.',null,{title:'제어 확인',icon:'error'});return;}
  if(action&&result&&result.ok===false&&action.type!=='tick'){const info=stationInfo(stationId),who=`${info.name}${info.code?`(${info.code})`:''}역`;
   if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가');else if(result.message)raiseAlarm(`${who} ${result.message}`);}
  const st=stationLabel(stationId),prev=seen[stationId],now=new Set(Object.keys(state.routes));
@@ -107,10 +110,11 @@ function createWindow(id,{title,x=24,y=24,width,body,host=null,onClose=null}){
  return w;
 }
 // modal message box (원본의 "확인" 대화상자): a shield blocks the desktop until it is acknowledged
-function alertBox(text,done){
+function alertBox(text,done,opts={}){
  const shield=doc.createElement('dialog');shield.className='mmi-shield';
  const box=doc.createElement('div');box.className='mmi-alert';box.setAttribute('role','alertdialog');
- box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">확인</span></div><p>${esc(text)}</p><button type="button" id="mmiAlertOk">확인</button>`;
+ box.classList.toggle('error',opts.icon==='error');
+ box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">${esc(opts.title||'확인')}</span></div><p>${opts.icon==='error'?'<i class="mmi-err" aria-hidden="true">✕</i>':''}<span>${esc(text)}</span></p><button type="button" id="mmiAlertOk">확인</button>`;
  shield.appendChild(box);doc.body.appendChild(shield);shield.showModal();
  const ok=box.querySelector('button');ok.focus();ok.onclick=()=>{shield.close();shield.remove();done?.();};shield.addEventListener('cancel',e=>{e.preventDefault();ok.click();});
 }

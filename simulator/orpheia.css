@@ -133,3 +133,6 @@ dialog::backdrop{background:#133d414f;backdrop-filter:blur(3px)}
 .mmi-train-form input,.mmi-train-form select{border-color:#bfd6cc;padding:7px}.mmi-pending{color:var(--quiet)}
 @media (prefers-reduced-motion:reduce){button{transition:none}}
 @media print{body{background:white}.sidebar{display:none!important}}
+.mmi-alert.error{background:#f4f4f2;border-radius:2px;border-color:#8a8a86}
+.mmi-alert.error .mmi-title{background:#f4f4f2;color:#333}.mmi-alert.error p{color:#111}
+.mmi-alert.error button{background:#e6e6e6;color:#111;border:2px solid #2a6fd6;border-radius:0;padding:4px 14px}
