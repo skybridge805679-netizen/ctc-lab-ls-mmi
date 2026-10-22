@@ -141,3 +141,23 @@
 .trc-mon[aria-pressed="true"]{border-color:#316ac5;color:#316ac5}.trc-mon:disabled{opacity:.5;cursor:not-allowed}
 .trc-msg,.trc .idm-buttons{grid-column:1/-1}.trc-msg{min-height:18px;padding:2px 6px;background:#f6f6f4;border:1px solid #b9b9b4}
 .rpt-table{height:260px}
+
+/* T/G window chrome after the real photos: dark label column, icon toolbar, "준비" status bar */
+.mmi-win .graph-panel>.tg-body{order:1}.mmi-win .graph-panel>.tg-status{order:2}
+.mmi-win .graph-panel>#graphMessage{order:3}.mmi-win .graph-panel>.graph-toolbar{order:4}
+.mmi-win .graph-panel>.graph-notice{order:5}.mmi-win .graph-panel>#graphDetails{order:6}
+.tg-body{display:flex;align-items:flex-start;background:#1e1e1e}
+.tg-tools{display:flex;flex-direction:column;flex:0 0 54px;background:#ddd9d0;border-right:1px solid #8a8a86}
+.tg-tool{height:44px;border:1px solid #f4f2ec;border-right-color:#8a8a86;border-bottom-color:#8a8a86;background:#e6e3da;padding:0;font-size:11px;font-weight:700;color:#22345e;cursor:default;overflow:hidden}
+.tg-tool span{display:block;line-height:1.1;font-size:15px}
+.tg-tool:disabled{color:#8a8a86;background:#dedbd2}
+.tg-tool:hover:not(:disabled){background:#d9e2f6}
+.tg-tool[aria-pressed="true"]{background:#c4d4f2;border-color:#316ac5}
+.tg-body .graph-scroll{flex:1;min-width:0;background:#1e1e1e}
+.tg-status{padding:2px 8px;background:#e9e7e0;border-top:1px solid #a6a6a2;font-size:12px;color:#111}
+#diaSvg.tg-selecting{cursor:crosshair}
+.tg-top{position:relative}
+.tg-list{display:none;position:absolute;left:0;top:100%;min-width:230px;margin:0;padding:2px;list-style:none;background:#f6f6f4;border:1px solid #6d6d6a;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:400}
+.tg-top.open>.tg-list{display:block}
+.tg-list button{display:flex;justify-content:space-between;gap:24px;width:100%;padding:5px 12px;border:0;background:transparent;font-size:12px;color:#111;cursor:default;text-align:left}
+.tg-list button:hover{background:#316ac5;color:#fff}.tg-list kbd{font:inherit;color:inherit;opacity:.75}

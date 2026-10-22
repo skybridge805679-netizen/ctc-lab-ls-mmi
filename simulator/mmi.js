@@ -158,10 +158,7 @@ function init(){
  createWindow('field',{title:'현장설비제어',x:18,y:14,width:560,host:field});
  windows.field.el.hidden=false;dock('field',true);
  if(graph){
-  const bar=doc.createElement('div');bar.className='tg-menubar';
-  bar.innerHTML=['파일(F)','편집(E)','보기(V)','Dia 보기(V)','화면설정(D)','즐겨찾기','도움말(H)'].map(n=>`<button type="button" class="tg-menu" title="원본 메뉴 항목을 아직 확인하지 못했습니다">${n}</button>`).join('');
-  graph.insertBefore(bar,graph.firstChild);
-  bar.addEventListener('click',e=>{if(e.target.closest('.tg-menu'))$('graphMessage').textContent='이 메뉴의 원본 항목은 아직 확인하지 못했습니다. 아래 교육용 도구로 시간 범위·검색·지연·운휴를 조작하세요.';});
+  root.SimTG.init(graph);
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);

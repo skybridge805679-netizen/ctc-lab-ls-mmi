@@ -133,4 +133,5 @@
  $('schedulePatternOpen').onclick=openPattern;
  $('scheduleApply').onclick=apply;
  $('scheduleSuspend').onclick=()=>cancelRange(true);$('scheduleResume').onclick=()=>cancelRange(false);
+ root.SimScheduleUI={open(m,id){const M=root.SimMMI;M.open('schedule');document.querySelector(`input[name="scheduleMode"][value="${m}"]`).checked=true;$('scheduleSearch').value='';list(id||selectedId());load();}};
 })(window);
