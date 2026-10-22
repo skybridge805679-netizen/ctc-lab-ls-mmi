@@ -4,6 +4,7 @@ const details=typeof module!=='undefined'?require('./schematic-details.js'):root
 const switchView=typeof module!=='undefined'?require('./ls-switches.js'):root.SimLSSwitches;
 const inventory=typeof module!=='undefined'?require('./wings.js'):root.SimWings;
 const trainWindows=typeof module!=='undefined'?require('./train-windows.js'):root.SimTrainWindows;
+const fixedSymbols=typeof module!=='undefined'?require('./fixed-symbols.js'):root.SimFixedSymbols;
 const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
@@ -51,6 +52,7 @@ function wingOf(st,def){
  const inside=(x,y)=>{const px=ox+x*rw/iw,py=oy+y*rh/ih;return px>=bx&&px<=bx+bw&&py>=by&&py<=by+bh;};
  const plates=[...source.plates].sort((a,b)=>a[0]-b[0]);
  return {
+  fixed:fixedSymbols[st.id]||{brackets:[],captions:[]},
   markers:data.markers,
   cells:data.cells.filter(c=>outside(c[0]+c[2]/2)),
   diags:source.diags.filter(p=>inside(mean(p,0),mean(p,1))&&band(mean(p,1))&&(Math.max(...p.map(q=>q[0]))>hi+1||Math.min(...p.map(q=>q[0]))<lo-1)),
@@ -70,6 +72,8 @@ function layout(def,wing){
  for(const p of wing.plates)xs.push(p.box[0],p.box[2]);
  for(const s of wing.signals){xs.push(s[0]);ys.push(s[1]);}
  for(const [x,y]of wing.markers||[]){xs.push(x-14,x+14);}
+ for(const b of wing.fixed?.brackets||[]){const [x,y,w,h]=b.bounds;xs.push(x,x+w);ys.push(y,y+h);}
+ for(const c of wing.fixed?.captions||[]){xs.push(c.at[0]-55,c.at[0]+55);ys.push(c.at[1]-10,c.at[1]+10);}
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
  // Use vertical desktop space for readable rail and signal lanes; preserve every connection.
  const railRows=[...new Set(def.rails.flatMap(r=>r[1].slice(1).filter((p,i)=>Math.abs(p[1]-r[1][i][1])<2).map(p=>p[1])))].sort((a,b)=>a-b);
@@ -100,6 +104,10 @@ function render(st,def,core,model,neighbours={}){
   if(nearby.length)y=nearby[0];
   const [X,Y]=T([x,y]);return {index,source,x:X,y:Y,width:T([x+w,y])[0]-X,label};
  });
+ // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
+ const bracketBoxes=wing.fixed.brackets.map(b=>{const [x,y,w,h]=b.bounds,a=T([x,y]),z=T([x+w,y+h]);return {...b,box:[...a,...z]};});
+ const captionBoxes=wing.fixed.captions.map(c=>{const [x,y]=T(c.at),w=Math.max(...c.lines.map(t=>t.length))*14+12,h=c.lines.length*22;return {...c,x,y,box:[x-w/2,y-h/2,x+w/2,y+h/2]};});
+ const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
  const switches=switchView.build(st,def,core,model,T);
  const projectRoute=(points,destination)=>{
   const out=[points[0]],near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<.1;
@@ -136,12 +144,12 @@ function render(st,def,core,model,neighbours={}){
   paths.push([[start,row.y],[end,row.y]]);
  }
  let platforms='',rails='',sections='',labels='',routes='',symbols='',plates='',pointSymbols='',signalSymbols='',trains='',leaders='',annotations='';
- const occupiedBoxes=[];
+ const occupiedBoxes=fixedObstacles.map(b=>[...b]);
  let trainShapes='';
  let cached=windowLayouts.get(def)?.get(st.id);
  if(!cached){
  const windowBoxes=[];
- const obstacles=[...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...wing.platforms.map(p=>{const a=T([p[0],p[1]]),b=T([p[2],p[3]]);return [a[0],a[1],b[0],a[1]+Math.max(8,b[1]-a[1])];}),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
+ const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...wing.platforms.map(p=>{const a=T([p[0],p[1]]),b=T([p[2],p[3]]);return [a[0],a[1],b[0],a[1]+Math.max(8,b[1]-a[1])];}),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
  const capsulePositions=[];
  for(const [x,y]of data.capsules){
   if(!data.cells.some(c=>Math.abs(c[1]-y)<30&&x>=c[0]-8&&x<=c[0]+c[2]+8)||def.signals.some(s=>Math.abs(s[2]-x)<22&&Math.abs(s[3]-y)<14))continue;
@@ -233,6 +241,14 @@ function render(st,def,core,model,neighbours={}){
   const [X]=T([x,y]),Y=Math.max(44,topRow-44,T([x,y])[1]);
   symbols+=`<g data-source-symbol="${label}">${label==='SP'?`<path d="M${X-13} ${Y-23}H${X+13}L${X} ${Y}Z" class="sp-board"/><text x="${X}" y="${Y-10}" class="board-label" text-anchor="middle">SP</text>`:`<rect x="${X-9}" y="${Y-23}" width="18" height="28" class="ss-board"/><path d="M${X-8} ${Y+3}L${X+8} ${Y-21}" class="ss-stripe"/><text x="${X}" y="${Y-29}" class="board-label" text-anchor="middle">SS</text>`}<title>원본 ${label} 표지</title></g>`;
   occupiedBoxes.push([X-16,Y-38,X+16,Y+6]);
+ }
+ for(const b of bracketBoxes){
+  const [x,y,right,bottom]=b.box,w=(right-x)*.30,t=Math.min(2.5,w*.45);
+  const shape=(a,dir)=>dpath([[a,y],[a+dir*w,y],[a+dir*w,bottom],[a,bottom],[a,bottom-t],[a+dir*(w-t),bottom-t],[a+dir*(w-t),y+t],[a,y+t]])+'Z';
+  symbols+=`<g class="source-bracket-pair" data-source-symbol="bracket-pair" data-source-bracket="${esc(b.id)}" pointer-events="none"><path d="${shape(x,1)}"/><path d="${shape(right,-1)}"/><title>원본 대향 괄호 표식 · ${esc(b.id)}</title></g>`;
+ }
+ for(const c of captionBoxes){
+  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none">${c.lines.map((line,i)=>`<text x="${c.x}" y="${c.y+(i-(c.lines.length-1)/2)*22}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`).join('')}</g>`;
  }
  for(const [X,Y]of capsulePositions)symbols+=`<g data-source-symbol="capsule"><path class="capsule" d="M${X-7} ${Y}h14"/><path class="capsule-stop" d="M${X+10} ${Y-4}v8"/><title>원본 캡슐 표시</title></g>`;
  const segments=[...paths.flatMap(poly=>poly.slice(1).map((p,i)=>[poly[i],p])),...def.links.map(([,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])])];

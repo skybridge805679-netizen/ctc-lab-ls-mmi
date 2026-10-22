@@ -198,12 +198,12 @@ function placeholder(id,title,note){
 }
 
 // ---------------------------------------------------------------- menu bar
-// Wallpaper parody of the school logo: the Orpheia mascot (assets/orpheia-mascot.png, optional) or a vector lyre + ORPHEIA.
-const LYRE='<svg viewBox="0 0 64 72" width="54" height="60" aria-hidden="true"><path d="M14 8c-8 8-8 26 2 34 4 3 8 5 12 5V12c0-3-3-5-6-4-3 1-5 3-8 0z" fill="none"/><path d="M12 10c-6 14-2 30 12 36 3 1 5 2 8 2s5-1 8-2c14-6 18-22 12-36" fill="none" stroke="#c9a227" stroke-width="4" stroke-linecap="round"/><path d="M20 12v34M28 10v38M36 10v38M44 12v34" stroke="#e3c25a" stroke-width="2.4" stroke-linecap="round"/><path d="M10 10h44" stroke="#c9a227" stroke-width="5" stroke-linecap="round"/><path d="M24 58h16l4 8H20z" fill="#c9a227"/></svg>';
+// Locally bundled image-generated ORPHEIA assets; custom mascot remains optional.
 function brand(){
- const one=`<div class="mmi-brand"><span class="mmi-mascot">${LYRE}${root.SimMMITheme?.mascotUrl?`<img src="${esc(root.SimMMITheme.mascotUrl)}" alt="" onerror="this.remove()" onload="this.parentElement.querySelector('svg')?.remove()">`:''}</span><span class="mmi-brand-text"><b>ORPHEIA</b><em>MMI</em><small>RAIL CONTROL SYSTEM</small></span></div>`;
- return `<div class="mmi-wallpaper" aria-hidden="true">${one}${one}</div>`;
+ const portrait=root.SimMMITheme?.mascotUrl||'assets/orpheia/guide.png';
+ return `<div class="mmi-wallpaper" aria-hidden="true"><div class="mmi-brand"><span class="mmi-mascot"><img src="assets/orpheia/emblem.png" alt="" width="92" height="92"></span><span class="mmi-brand-text"><b>ORPHEIA</b><em>FTS WORKSPACE</em><small>RAIL CONTROL SYSTEM</small></span></div><img class="mmi-guide" src="${esc(portrait)}" alt="" width="240" height="340" loading="lazy"></div>`;
 }
+
 function buildMenu(){
  const bar=doc.createElement('div');bar.className='mmi-menubar';bar.setAttribute('role','menubar');
  let openTop=null;

@@ -2,7 +2,7 @@
 'use strict';
 // 비상시 조치 시나리오 (references/scenarios/emergency/*.hwp 9종): 원문 대본(emergency-data.js)의 번호별 단계를 체크리스트로 보여 주고,
 // 대본에 적힌 MMI/LS 조작(CCM 전환, 신호기 정지, 진로 설정, 열차번호 수정·이동·삭제, AUTO 전환)을 순서대로 인식한다.
-// 열차는 대본의 번호를 그대로 쓰고, 연동역(LS 열번창이 있는 역)에 서 있는 열차만 LS에 놓는다. 비연동역(시청·석수·가산디지털 등)은 대본 구술로만 다룬다.
+// 대본 열차를 취급역 또는 이웃 취급역 LS의 관할 중간역 열번창에 놓고 단계에 따라 표시를 갱신한다.
 const isNode=typeof module!=='undefined';
 const D=isNode?require('./emergency-data.js'):root.SimEmergencyData;
 const N=isNode?require('./network.js'):root.SimNetwork;

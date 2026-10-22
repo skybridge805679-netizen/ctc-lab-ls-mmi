@@ -152,3 +152,7 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 @media print{body{min-width:0!important;background:white}body>*{display:none!important}body>main{display:block!important;margin:0;padding:0}main>*{display:none!important}.workgrid,.ls-panel,#lsDisplay{display:block!important;width:100%;margin:0;padding:0;border:0}.workgrid>*:not(.ls-panel),.ls-panel>*:not(#lsDisplay),.ls-context-menu,.ls-overview{display:none!important}.ls-svg{width:100%!important;print-color-adjust:exact}.ls-display,.ls-stage{print-color-adjust:exact}}
 .ls-submenu{max-height:calc(100vh - 12px);overflow-y:auto}.ls-context-menu{max-height:calc(100vh - 12px)}
 .ls-equipment span.fault{background:#7a1f1f;border-color:#e05a5a;color:#fff}
+
+/* Source bracket glyphs and yard captions are native scene objects, not controls. */
+.ls-svg .source-bracket-pair path{fill:#91c7ad;stroke:#182c26;stroke-width:1.25;stroke-linejoin:miter}
+.ls-svg .source-caption text{fill:#e4edeb;font:500 14px "Noto Sans KR",sans-serif;stroke:#263639;stroke-width:3px;paint-order:stroke fill}

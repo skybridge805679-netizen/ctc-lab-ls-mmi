@@ -85,5 +85,8 @@ with sync_playwright() as p:
     server = ThreadingHTTPServer(('127.0.0.1', 0), partial(Quiet, directory=str(ROOT)))
     Thread(target=server.serve_forever, daemon=True).start()
     browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
-    run(browser.new_page(viewport={'width': 1440, 'height': 1000}), f'http://127.0.0.1:{server.server_port}/')
+    for width, height in [(1440, 1000), (1920, 1080)]:
+        page=browser.new_page(viewport={'width': width, 'height': height})
+        run(page, f'http://127.0.0.1:{server.server_port}/')
+        page.close()
     browser.close(); server.shutdown()

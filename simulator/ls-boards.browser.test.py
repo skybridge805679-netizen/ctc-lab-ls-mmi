@@ -47,12 +47,14 @@ def run(page, url):
     expect(board).to_be_visible()
     assert float(board.locator('.bd-body').evaluate("e=>getComputedStyle(e).fillOpacity")) < 1          # 반투명
     w0 = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0].w")
+    board.locator('[data-board-resize]').scroll_into_view_if_needed()
     grip = board.locator('[data-board-resize]').bounding_box()
     page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down()
     page.mouse.move(grip['x'] + 160, grip['y'] + 70, steps=6); page.mouse.up()
     b = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
     assert b['w'] > w0 + 50 and b['h'] > 80, b
     page.mouse.move(grip['x'] + 160 - 2, grip['y'] + 70 - 2)
+    page.locator('#lsStage [data-ls-board] [data-board-resize]').scroll_into_view_if_needed()
     grip = page.locator('#lsStage [data-ls-board] [data-board-resize]').bounding_box()
     page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down(); page.mouse.move(grip['x'] - 300, grip['y'] - 150, steps=6); page.mouse.up()
     s = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
@@ -78,5 +80,8 @@ with sync_playwright() as p:
     server = ThreadingHTTPServer(('127.0.0.1', 0), partial(Quiet, directory=str(ROOT)))
     Thread(target=server.serve_forever, daemon=True).start()
     browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
-    run(browser.new_page(viewport={'width': 1700, 'height': 1100}), f'http://127.0.0.1:{server.server_port}/')
+    for width, height in [(1440, 1000), (1920, 1080)]:
+        page=browser.new_page(viewport={'width': width, 'height': height})
+        run(page, f'http://127.0.0.1:{server.server_port}/')
+        page.close()
     browser.close(); server.shutdown()

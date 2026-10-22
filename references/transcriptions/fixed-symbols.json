@@ -1,0 +1,41 @@
+{
+  "source": "references/diagrams/1.전체노선.pdf",
+  "coordinateSystem": "PDF page raster normalised to 2048px width; bracket bounds include both opposing glyphs; caption at is text-block centre",
+  "review": "Compared enlarged PDF pages 2–4 and the supplied Guro photograph. Page 3 repeats Guro; page 2 repeats Noryangjin. Use each station's displayed source page once. Narrow cyan platform edges are not brackets. Bracket operating meaning and state transitions remain unverified; these are fixed source symbols, not new controls.",
+  "stations": {
+    "guro": {
+      "page": 4,
+      "brackets": [
+        {"id":"52BT-52B","bounds":[1170.5,321.4,8.2,10.7]},
+        {"id":"52AT-52A","bounds":[1170.5,338.8,8.2,10.7]},
+        {"id":"53A-53AT","bounds":[1191.5,447.6,8.2,10.7]},
+        {"id":"53B-53BT","bounds":[1191.5,465.8,8.2,10.7]}
+      ],
+      "captions":[{"id":"depot-lead","at":[1281,462],"lines":["차량기지","입출고선"]}]
+    },
+    "noryangjin": {
+      "page":4,
+      "brackets":[
+        {"id":"parallel-boundary-left","bounds":[289.4,368.4,8.2,29.2]},
+        {"id":"parallel-boundary-right","bounds":[303.3,368.7,7.8,29.2]}
+      ],
+      "captions":[]
+    },
+    "dongmyo": {
+      "page":2,
+      "brackets":[],
+      "captions":[
+        {"id":"gunja-out","at":[724,108],"lines":["군자기지 출고선"]},
+        {"id":"gunja-in","at":[724,199],"lines":["군자기지 입고선"]}
+      ]
+    },
+    "uiwang": {
+      "page":3,
+      "brackets":[],
+      "captions":[
+        {"id":"freight-a","at":[609,487],"lines":["남부화물기지 A선"]},
+        {"id":"freight-b","at":[609,622],"lines":["남부화물기지 B선"]}
+      ]
+    }
+  }
+}
