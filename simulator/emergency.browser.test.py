@@ -24,7 +24,7 @@ def run(page, url):
     page.locator('#scStart').click()
     expect(page.locator('#scProblem')).to_contain_text('K0602')
     steps = page.locator('#scSteps li').count()
-    assert steps == 40, steps                                         # 27 spoken steps + 13 operations
+    assert steps == 41, steps                                         # 27 spoken steps + 14 operations
     expect(page.locator('#scSteps li.sc-say').first).to_contain_text('상황수보')
     row = lambda n: page.evaluate("n=>{for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number===n)return st+'/'+slot+'/'+r.direction;return null;}", n)
     assert row('K0602') == 'dongmyo/2T/up', row('K0602')
@@ -43,7 +43,8 @@ def run(page, url):
     done = lambda: page.locator('#scSteps li.sc-do.done').count()
     rename('K0602', 'G0602')
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(1)
-    page.wait_for_function("()=>JSON.stringify(SimLSUI.getModel().stations.dongmyo.windows).includes('K0606')")      # rescue train arrives, G0602 leaves
+    page.wait_for_function("()=>(SimLSUI.getModel().stations.dongmyo.windows.B017T||[]).some(r=>r.number==='K0606')")      # rescue train comes in from 동대문 (B021T), G0602 leaves
+    assert row('K0607') == 'dongmyo/B012T/down' and row('K0608') == 'jonggak/B055T/up'
     assert row('G0602') is None
     at('dongmyo', {'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
     for sig in ('3A', '1B', '4A'):
@@ -54,6 +55,8 @@ def run(page, url):
     at('jonggak', {'type': 'route', 'id': '51-1T', 'source': 'LS'})
     at('dongmyo', {'type': 'route', 'id': '24-B015T', 'source': 'LS'})
     page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length===7")
+    mv = lambda n, st, slot: ls({'op': 'move', **page.evaluate("n=>{for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number===n)return {station:st,slot,uid:r.uid};}", n), 'targetStation': st, 'targetSlot': slot})
+    assert mv('K0608', 'dongmyo', 'B011T')['ok']                                       # 시청 → 신설동 (수동 열번 이동)
     rename('K0606', 'G0606')
     f = page.evaluate("()=>{for(const [slot,rows] of Object.entries(SimLSUI.getModel().stations.dongmyo.windows))for(const r of rows)if(r.number==='G0606')return {station:'dongmyo',slot,uid:r.uid};}")
     assert ls({'op': 'move', **f, 'targetStation': 'dongmyo', 'targetSlot': '2T'})['ok']
@@ -63,11 +66,11 @@ def run(page, url):
     rename('K0604', 'G0604')
     at('dongmyo', {'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
     at('jonggak', {'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
-    page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length===13")
+    page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length===14")
     expect(page.locator('#scStatus')).to_contain_text('조작은 모두 끝났습니다')
     # restart: numbers of the previous run are cleared and the cast is back
     page.locator('#scStart').click()
-    assert row('K0602') == 'dongmyo/2T/up' and row('G0604') is None and row('K0606') is None
+    assert row('K0602') == 'dongmyo/2T/up' and row('G0604') is None and row('K0606') == 'dongmyo/B021T/up'
     # every scenario starts and shows its script
     for sid in ['em-01', 'em-03', 'em-04', 'em-05', 'em-05-1', 'em-06', 'em-06-1', 'em-06-2']:
         page.locator('#scSelect').select_option(sid); page.locator('#scSelect').dispatch_event('change'); page.locator('#scStart').click()

@@ -17,7 +17,7 @@ for(const sc of E.list){
  for(const [st,sigs] of Object.entries(sc.seeds))assert.strictEqual(b.states[st].mode,'AUTO',sc.id+' '+st+' back in AUTO');
  // cast: every train stands on a real 열번창 of its station
  for(const c of E.castFor(sc)){assert.ok(c.slot&&catalog[c.station].includes(c.slot),`${sc.id}: ${c.number} slot ${c.slot} at ${c.station}`);place(b,c.number,c.station,c.slot);}
- for(const [tag,list] of Object.entries(sc.autos))for(const a of list)if(a.op==='insert')assert.ok(catalog[a.station].includes(a.slot||E.platform(a.station,a.dir)),sc.id+' auto slot');
+ for(const [tag,list] of Object.entries(sc.autos))for(const a of list)if(a.op==='insert'||a.op==='move')assert.ok(catalog[a.station].includes(a.slot||E.platform(a.station,a.dir)),sc.id+' auto slot');
  // a perfect operator: do the do-steps in order; each is recognised exactly when done, never before
  const run=S.newRun(sc,'');run.fired=new Set();const autos=()=>E.applyAutos(sc,run,a=>ops.dispatch(b.ls,{...a,}),()=>b.ls);
  const ctx=()=>({states:b.states,ls:b.ls});
@@ -32,12 +32,27 @@ for(const sc of E.list){
   else if(a.type==='stop'){for(const id of a.ids){const r=c.dispatch(b.states[a.station],{type:'stop',id,source:'x'});rec({type:'stop',id},r);}}
   else if(a.type==='route'){const r=c.dispatch(b.states[a.station],{type:'route',id:a.id,source:'x'});assert.ok(r.ok,`${sc.id}: ${a.station} ${a.id}: ${r.message}`);rec({type:'route',id:a.id},r);}
   else if(a.type==='rename'){const f=find(b,a.from);assert.ok(f,`${sc.id}: ${a.from} stands on the LS`);assert.ok(ops.dispatch(b.ls,{op:'rename',station:f.station,slot:f.slot,uid:f.r.uid,number:a.to,direction:f.r.direction}).ok);}
-  else if(a.type==='move'){const f=find(b,a.number)||(()=>{place(b,a.number,'dongmyo','B017T');return find(b,a.number);})();const slot=a.slot||catalog[a.station][0];assert.ok(ops.dispatch(b.ls,{op:'move',station:f.station,slot:f.slot,uid:f.r.uid,targetStation:a.station,targetSlot:slot}).ok);}
+  else if(a.type==='move'){const f=find(b,a.number);assert.ok(f,`${sc.id}: ${a.number} stands on the LS before it is moved`);const slot=a.slot||catalog[a.station][0];assert.ok(ops.dispatch(b.ls,{op:'move',station:f.station,slot:f.slot,uid:f.r.uid,targetStation:a.station,targetSlot:slot}).ok);}
   else if(a.type==='delete'){const f=find(b,a.number);assert.ok(f,sc.id+' delete target');ops.dispatch(b.ls,{op:'delete',station:f.station,slot:f.slot,uid:f.r.uid});}
   S.advance(run,ctx());autos();
   assert.ok(run.done[idx],`${sc.id}: "${step.text}" recognised`);
  }
  assert.ok(sc.steps.filter(s=>s.kind==='do').every(s=>run.done[sc.steps.indexOf(s)]),sc.id+' all operations done');
+}
+// every operation block sits next to the script lines it comes from (step N-1 .. N), checked against the original text
+const D=require('./emergency-data.js');
+for(const sc of E.list){
+ const text=n=>{const st=D.scenarios[sc.key].steps.find(x=>x.no===n);return st?st.title+' '+st.body.join(' '):'';};
+ for(const [k,ops] of Object.entries(E.OVERLAY[sc.key].before)){
+  const hay=(text(+k-1)+' '+text(+k)).replace(/\s+/g,' ');
+  for(const op of ops){const a=op.act,need=[];
+   if(a.type==='rename'){need.push(a.from,a.to);}
+   else if(a.type==='move'||a.type==='delete')need.push(a.number);
+   else if(a.type==='mode'){need.push(a.value==='CCM'?/CCM/i:/AUTO|Auto/);}
+   else if(a.type==='stop')for(const id of a.ids)need.push(id);
+   else if(a.type==='route')need.push(a.id.split('-')[0]);
+   for(const n of need)assert.ok(n instanceof RegExp?n.test(hay):hay.includes(n),`${sc.id}: op "${op.text}" is not near its script lines (step ${k}); missing ${n}`);}
+ }
 }
 assert.ok(E.variants.lines.length>100);
 console.log('emergency scenarios: ok',E.list.length,E.list.reduce((n,s)=>n+s.steps.length,0),'steps');

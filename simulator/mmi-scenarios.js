@@ -61,7 +61,7 @@ function render(){
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
-function evaluate(){if(!run)return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(redraw)render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of run.sc.stations)mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
+function evaluate(){if(!run)return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(redraw)render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of new Set([...run.sc.stations,...(run.sc.castStations||[])]))mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
 const current=()=>all().find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
