@@ -32,6 +32,13 @@ function routesFor(stationId,direction,first,last){
  const seen=OBSERVED[direction]?.[stationId],est=seen?null:estimate(stationId,direction),v=seen||est||{};
  return {arrivalRoute:first?'':(v.arr||''),departureRoute:last?'':(v.dep||''),stopType:first?'시발':last?'종착':'정차',routeSource:seen?'photo':(v.arr||v.dep)?'estimate':'none'};
 }
-const api={OBSERVED,routesFor,estimate};
+// Routes a station really has, in the schedule table's notation ("1A_1T"); used to validate hand-edited 도착/출발진로.
+function options(stationId,kind){
+ let C;try{C=core().forStation(stationId);}catch{return null;}
+ const want=kind==='arrival'?'장내':'출발';
+ return Object.keys(C.routes).filter(id=>C.signals[C.routes[id].signal].kind===want).sort((a,b)=>a.localeCompare(b,'en',{numeric:true})).map(name);
+}
+function validate(stationId,route,kind){const list=options(stationId,kind);return !route||list===null||list.includes(route);}
+const api={OBSERVED,routesFor,estimate,options,validate};
 if(typeof module!=='undefined')module.exports=api;else root.SimScheduleRoutes=api;
 })(typeof window!=='undefined'?window:globalThis);

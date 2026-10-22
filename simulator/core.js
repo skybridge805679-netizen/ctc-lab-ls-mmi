@@ -28,10 +28,22 @@
   }
   return null;
  }
- function initial(){return {mode:'AUTO',pending:null,clock:0,points:Object.fromEntries(Object.keys(points).map(id=>[id,'N'])),signals:Object.fromEntries(Object.keys(signals).map(id=>[id,'STOP'])),routes:{},approach:{},occupied:{},blockedPoints:[],logs:[],events:[],scans:{current:0,all:0},scanUntil:0,inspected:[]};}
+ function initial(){return {mode:'AUTO',pending:null,clock:0,points:Object.fromEntries(Object.keys(points).map(id=>[id,'N'])),signals:Object.fromEntries(Object.keys(signals).map(id=>[id,'STOP'])),routes:{},approach:{},occupied:{},blockedPoints:[],faults:{signals:[],points:[]},ttb:[],logs:[],events:[],scans:{current:0,all:0},scanUntil:0,inspected:[]};}
  function dispatch(s,a){
   const log=(ok,message)=>{s.logs.unshift({time:s.clock,source:a.source||'안내',action:a.type,result:ok?'완료':'보류',message});if(ok)s.events.push({...a,time:s.clock});return{ok,message};};
   if(config?.controlled===false&&['mode','route','withdraw','stop','point'].includes(a.type))return log(false,'비연동역입니다. 연결 연동역에서 진로를 제어하세요.');
+  // 설비 고장·TTB 설정은 교육용 상황 설정이라 제어권이 필요 없다 (실기3 3.4 자동제어 조건 ④⑤⑥)
+  if(a.type==='fault'){
+   const list=a.kind==='signal'?signals:points;if(!list[a.id])return log(false,'신호기 또는 전환기를 확인하세요.');
+   const arr=(s.faults??={signals:[],points:[]})[a.kind==='signal'?'signals':'points'],at=arr.indexOf(a.id);
+   if(a.on&&at<0)arr.push(a.id);if(!a.on&&at>=0)arr.splice(at,1);
+   return log(true,a.id+(a.kind==='signal'?' 신호기 ':' 전환기 ')+(a.on?'고장':'고장 복구'));
+  }
+  if(a.type==='ttb'){
+   if(!routes[a.id])return log(false,'등록되지 않은 진로입니다.');
+   const arr=(s.ttb??=[]),at=arr.indexOf(a.id);if(a.on&&at<0)arr.push(a.id);if(!a.on&&at>=0)arr.splice(at,1);
+   return log(true,a.id+' 연속통과진로(TTB) '+(a.on?'설정':'해제'));
+  }
   if(a.type==='tick'){s.clock+=a.seconds||1;for(const [id,r] of Object.entries(s.routes))if(r.lock&&s.clock>=r.lock.until){delete s.routes[id];s.signals[routes[id].signal]='STOP';s.logs.unshift({time:s.clock,source:'연동장치',action:'approachRelease',result:'완료',message:id+' 접근쇄정 '+r.lock.seconds+'초 경과 · 진로 해정'});s.events.push({type:'approachRelease',id,time:s.clock});}return{ok:true};}
   if(a.type==='approach'){
    const sig=signals[a.signal];if(!sig||!lockSeconds(a.signal))return log(false,'접근쇄정은 장내·출발신호기에만 적용됩니다.');
@@ -48,6 +60,7 @@
    if(s.pending)return log(false,'현장 인계 응답을 먼저 처리하세요.');
    if(s.mode===a.value)return log(false,'이미 '+a.value+' 모드입니다.');
    if(a.value==='AUTO'&&s.mode!=='CCM')return log(false,'AUTO는 CCM에서만 전환할 수 있습니다.');
+   if(a.emergency&&s.mode==='LOCAL'&&a.value==='CCM'){s.mode='CCM';s.pending=null;return log(true,'비상 CTC 전환 · 현장 응답 없이 CCM 모드 전환 완료');}
    if(a.value==='LOCAL'||s.mode==='LOCAL'){s.pending=a.value;return log(true,a.value+' 전환 요청 · 현장 응답 대기');}
    s.mode=a.value;return log(true,a.value+' 모드 전환 완료');
   }
@@ -60,11 +73,15 @@
    if(!['current','all'].includes(a.scope))return log(false,'범위를 선택하세요.');
    s.scans[a.scope]++;s.scanUntil=s.clock+3;return log(true,(a.scope==='all'?'전체 제어역':'현재역')+' 베이스스캔 · 가상 상태 재수신');
   }
-  if(['route','withdraw','stop','stopAll','point','pointLock'].includes(a.type)&& (s.mode!=='CCM'||s.pending))return log(false,'CCM 모드와 제어권을 확인하세요.');
+  // 열차자동제어(실기3 3.4): in AUTO the schedule software requests routes (a.auto); a person still needs CCM
+  if(['route','withdraw','stop','stopAll','point','pointLock'].includes(a.type)&&!(a.auto&&a.type==='route'&&s.mode==='AUTO'&&!s.pending)&&(s.mode!=='CCM'||s.pending))return log(false,'CCM 모드와 제어권을 확인하세요.');
   if(a.type==='route'){
    const r=routes[a.id];if(!r)return log(false,'등록되지 않은 진로입니다.');
    if(s.routes[a.id])return log(false,s.routes[a.id].lock?a.id+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[a.id])+'초 후 해정됩니다.':'이미 설정된 진로입니다.');
    if((r.resources||[]).some(t=>s.occupied[t]))return log(false,'진로 안에 점유된 구간이 있습니다.');
+   if((s.faults?.signals||[]).includes(r.signal))return log(false,r.signal+' 신호기가 고장입니다.');
+   const badPoint=[...new Set([...(r.pointLocks||[]),...Object.keys(r.pointPositions||{})])].find(id=>(s.faults?.points||[]).includes(id));
+   if(badPoint)return log(false,'진로 내 전환기 '+badPoint+'가 고장입니다.');
    if((r.pointLocks||[]).some(id=>s.blockedPoints.includes(id)))return log(false,'진로 내 전환기가 쇄정되어 있습니다.');
    const conflict=Object.keys(s.routes).find(id=>routes[id].signal===r.signal||(routes[id].resources||[]).some(t=>(r.resources||[]).includes(t))||(routes[id].pointLocks||[]).some(t=>(r.pointLocks||[]).includes(t)));
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');

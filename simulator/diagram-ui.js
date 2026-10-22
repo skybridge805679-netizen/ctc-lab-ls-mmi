@@ -1,13 +1,14 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;let context=null,selected=model.trains[0].id;
+ const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
  function selectTrain(id){selected=id;$('graphTrain').value=id;render();}
  function render(){
   if(!context)return;
+  if(!model.trains.some(t=>t.id===selected))selected=model.trains[0].id; // the selected train may have been removed (경합해소 실습 초기화)
   while(notified<model.changes.length){const change=model.changes[notified++];for(const listener of subscribers)listener(change);}
   $('graphTrain').innerHTML=model.trains.map(t=>`<option>${escape(t.id)}</option>`).join('');$('graphTrain').value=selected;
   if($('graphPanel').hidden)return;
@@ -21,42 +22,56 @@
   const x=t=>left+(t-start)/span*plotW,y=order=>top+(order-from)*row,plotTop=top-14,plotH=(to-from)*row+28;
   const info=id=>window.SimMMI?.stationInfo?.(id)||{name:N.catalog[id].name,code:N.catalog[id].code};
   const sod=t=>8*3600+t,day=T.clock(0)&&model.serviceDate?new Date(model.serviceDate+'T00:00:00'):new Date();
-  let svg=`<defs><clipPath id="diaClip"><rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}"/></clipPath></defs><rect width="${width}" height="${height}" fill="#fff"/>`;
-  svg+=`<text x="10" y="20" font-size="13" fill="#111">${day.getFullYear()}년 ${day.getMonth()+1}월 ${day.getDate()}일 (${'일월화수목금토'[day.getDay()]}요일)</text><text x="${left+plotW/2}" y="24" text-anchor="middle" font-size="19" font-weight="700" fill="#d6251f" letter-spacing="8">경 부 선</text><text x="${left+plotW+8}" y="24" font-size="10" fill="#1f9d4a">역 순서</text>`;
+  let svg=`<defs><clipPath id="diaClip"><rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}"/></clipPath></defs><rect width="${width}" height="${height}" fill="#1e1e1e"/><rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}" fill="#f5f7fb"/>`;
+  svg+=`<text x="10" y="20" font-size="13" font-weight="700" fill="#fff">${day.getFullYear()}년 ${day.getMonth()+1}월 ${day.getDate()}일 (${'일월화수목금토'[day.getDay()]}요일)</text><text x="${left+plotW/2}" y="24" text-anchor="middle" font-size="19" font-weight="700" fill="#ff6a1f" letter-spacing="8">경 부 선</text><text x="${left+plotW+8}" y="24" font-size="10" fill="#7ed39a">역 순서</text>`;
   const minor=span<=3600?60:span<=21600?300:600;
   for(let t=Math.ceil(start/minor)*minor;t<=start+span;t+=minor){
    const s=sod(t),hour=s%3600===0,half=s%1800===0,px=x(t).toFixed(1),mm=String(Math.floor((s%3600)/60)).padStart(2,'0');
-   svg+=`<line x1="${px}" y1="${plotTop}" x2="${px}" y2="${plotTop+plotH}" stroke="${hour?'#6f9a7b':half?'#b3c8b9':'#d2d2d2'}" stroke-width="${hour?1.3:1}" ${hour||half?'':'stroke-dasharray="1 3"'}/>`;
-   svg+=hour?`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="11" font-weight="700" fill="#111">${T.clock(t).slice(0,5)}</text>`:`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="9" fill="${half?'#e08a00':'#333'}">${mm}</text>`;
+   svg+=`<line x1="${px}" y1="${plotTop}" x2="${px}" y2="${plotTop+plotH}" stroke="${hour?'#1b1b1b':half?'#555':'#cfd3dc'}" stroke-width="${hour?1.4:1}" ${hour||half?'':'stroke-dasharray="1 3"'}/>`;
+   svg+=hour?`<text x="${px}" y="${plotTop-(span>10800?17:5)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffd400">${Number(T.clock(t).slice(0,2))}:00</text>`:`<text x="${px}" y="${plotTop-5}" text-anchor="middle" font-size="8.5" fill="${half?'#ffd400':'#fff'}">${mm}</text>`;
   }
   for(const st of N.stations.slice(from,to+1)){
    const i=info(st.id),ry=y(st.order);
-   svg+=`<line x1="${left}" y1="${ry}" x2="${left+plotW}" y2="${ry}" stroke="${st.controlled?'#b9b9b9':'#d6d6d6'}" ${st.controlled?'':'stroke-dasharray="1 3"'}/>`;
-   svg+=`<text x="10" y="${ry+4}" font-size="11" fill="#111" pointer-events="none">${escape(i.code&&i.code!=='—'?i.code:'')}</text>`;
-   svg+=`<text ${st.controlled?`data-dia-station="${st.id}" tabindex="0" role="button" aria-label="${escape(i.name)} LS 열기"`:`data-dia-stop="${st.id}"`} x="${left-8}" y="${ry+4}" text-anchor="end" fill="#d6251f" font-size="12" font-weight="${st.controlled?700:500}">${escape(i.name)}</text>`;
-   svg+=`<text x="${left+plotW+8}" y="${ry+4}" font-size="10.5" fill="#1f9d4a" pointer-events="none">${st.order+1}</text>`;
+   svg+=`<line x1="${left}" y1="${ry}" x2="${left+plotW}" y2="${ry}" stroke="${st.controlled?'#c3c7d0':'#e0e2e8'}" ${st.controlled?'':'stroke-dasharray="1 3"'}/>`;
+   svg+=`<text x="10" y="${ry+4}" font-size="11" fill="#fff" pointer-events="none">${escape(i.code&&i.code!=='—'?i.code:'')}</text>`;
+   svg+=`<text ${st.controlled?`data-dia-station="${st.id}" tabindex="0" role="button" aria-label="${escape(i.name)} LS 열기"`:`data-dia-stop="${st.id}"`} x="${left-8}" y="${ry+4}" text-anchor="end" fill="#ff6a1f" font-size="12" font-weight="${st.controlled?700:500}">${escape(i.name)}</text>`;
+   svg+=`<text x="${left+plotW+8}" y="${ry+4}" font-size="10.5" fill="#7ed39a" pointer-events="none">${st.order+1}</text>`;
   }
   svg+=`<rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}" fill="none" stroke="#b8541f" stroke-width="2"/>`;
   svg+='<g clip-path="url(#diaClip)">';
   const direction=$('graphDirection').value;
   for(const train of model.trains){
    if(direction!=='all'&&train.direction!==direction)continue;
+   if(options_.kinds&&!options_.kinds.has(train.kind))continue;
    const points=calls=>calls.flatMap(c=>[[c.arrival,N.catalog[c.station].order],[c.departure,N.catalog[c.station].order]]).map(([time,order])=>[x(time),y(order)]);
    const path=pts=>pts.map(([px,py],i)=>`${i?'L':'M'}${px.toFixed(2)} ${py.toFixed(2)}`).join(' ');
-   const ink=train.cancelled?'#94a3a0':'#1b2a78',pts=points(train.calls);
-   svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
+   const style=options_.styles[train.kind]||{},ink=train.cancelled?'#94a3a0':(style.color||'#1b2a78'),pts=points(train.calls);
+   if(options_.plan)svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
    let currentPath=path(pts);if(!train.cancelled&&train.calls.some(c=>c.cancelled)){currentPath='';for(let i=0;i<train.calls.length;i++){const c=train.calls[i],n=train.calls[i+1];if(!c.cancelled)currentPath+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(n&&!c.cancelled&&!n.cancelled)currentPath+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(n.arrival),y(N.catalog[n.station].order)]]);}}
-   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':'2 3'}" fill="none"><title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${T.clock(train.calls[0].departure)}–${T.clock(train.calls.at(-1).arrival)}</title></path>`;
+   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':(DASH[style.dash]??'2 3')}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${T.clock(train.calls[0].departure)}–${T.clock(train.calls.at(-1).arrival)}</title>`:''}</path>`;
    // Cancelled calls and their connecting legs are shown separately on the same online model.
    if(!train.cancelled)for(let i=0;i<train.calls.length;i++){const c=train.calls[i],next=train.calls[i+1];let p='';if(c.cancelled)p+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(next&&(c.cancelled||next.cancelled))p+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(next.arrival),y(N.catalog[next.station].order)]]);if(p)svg+=`<path data-dia-cancelled-segment="${train.id}" data-dia-select="${train.id}" d="${p}" stroke="#8b969c" stroke-width="3" stroke-dasharray="7 4" fill="none"/>`;}
    // train number rotated along the longest visible segment
    let best=null;for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1);if(len>12&&Math.max(x1,x2)>left&&Math.min(x1,x2)<left+plotW&&(!best||len>best.len))best={len,x1,y1,x2,y2};}
-   if(best){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
+   if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
-   const pos=T.position(train,context.clock());if(pos)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
+   const pos=T.position(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
+  }
+  if(options_.conflicts)for(const c of T.conflicts(model)){
+   const cx=x(c.time),cy=y(N.catalog[c.station].order);if(cx<left||cx>left+plotW||cy<plotTop||cy>plotTop+plotH)continue;
+   svg+=`<g data-dia-conflict="${escape(c.type)}"><ellipse cx="${cx}" cy="${cy}" rx="11" ry="8" fill="none" stroke="#d6251f" stroke-width="2"/><title>${escape(c.type)} · ${escape(c.trains.join(' + '))} · ${escape(N.catalog[c.station].name)}</title></g>`;
+  }
+  for(const n of options_.notes){
+   const a=n.fromSec===null?start:n.fromSec,b=n.toSec===null?start+span:n.toSec,o1=n.fromOrder===null?from:n.fromOrder,o2=n.toOrder===null?to:n.toOrder;
+   if(n.fromSec===null&&n.toSec===null&&n.fromOrder===null&&n.toOrder===null)continue;
+   const x1=Math.max(left,x(Math.min(a,b))),x2=Math.min(left+plotW,x(Math.max(a,b))),y1=Math.max(plotTop,y(Math.min(o1,o2))-6),y2=Math.min(plotTop+plotH,y(Math.max(o1,o2))+6);
+   if(x2-x1<8||y2-y1<8)continue;
+   const fs=n.fontSize||11,lines=[n.title,...n.text.split('\n')].slice(0,Math.max(1,Math.floor((y2-y1-4)/(fs+3))));
+   svg+=`<g data-dia-note="${escape(n.id)}" tabindex="0" role="button" aria-label="노트 ${escape(n.title)}"><rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="rgba(255,244,160,.82)" stroke="${options_.selectedNote===n.id?'#d6251f':'#b49b1f'}" stroke-width="${options_.selectedNote===n.id?2.4:1}" rx="3"/>${lines.map((t,i)=>`<text x="${x1+5}" y="${y1+fs+2+i*(fs+3)}" font-size="${fs}" ${i?'':'font-weight="700"'} fill="#3b3300" pointer-events="none">${escape(t.slice(0,Math.max(4,Math.floor((x2-x1-10)/(fs*.9)))))}</text>`).join('')}</g>`;
   }
   const now=x(context.clock());svg+=`<line id="diaNow" data-seconds="${context.clock()}" x1="${now}" y1="${plotTop}" x2="${now}" y2="${plotTop+plotH}" stroke="#d6251f" stroke-width="1.6"/></g>`;
-  svg+=`<text x="10" y="${height-8}" font-size="11" fill="#555">준비</text>`;
+  lastLayout={left,plotW,plotTop,plotH,top,row,from,to,start,span,width,height};
+  for(const fn of renderHooks)fn(lastLayout);
   $('diaSvg').setAttribute('viewBox',`0 0 ${width} ${height}`);$('diaSvg').setAttribute('width',width);$('diaSvg').setAttribute('height',height);$('diaSvg').innerHTML=svg;
   const train=model.trains.find(t=>t.id===selected),pos=T.position(train,context.clock());
   $('graphCancel').textContent=train.cancelled?'운휴 복원':'전체 운휴';
@@ -81,5 +96,5 @@
   $('diaSvg').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-dia-station]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
   $('graphExport').onclick=()=>{const data={schemaVersion:1,kind:'CTC LAB training timetable',sampleSchedule:true,clock:context.clock(),...model};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-dia.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  }
- root.SimDiagram={init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
+ root.SimDiagram={onRender:fn=>{renderHooks.add(fn);return ()=>renderHooks.delete(fn);},setNotes:(list,selected='')=>{options_.notes=list;options_.selectedNote=selected;render();},clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
 })(window);
