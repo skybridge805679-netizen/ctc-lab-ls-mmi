@@ -4,9 +4,9 @@
 // state / operator events match (in order); the spoken 'say' lines are ticked by the operator. Grading is this simulator's own.
 const doc=document,$=id=>doc.getElementById(id),SC=()=>root.SimScenarios;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const mmi=()=>root.SimMMI,EM=()=>root.SimEmergency;
-const all=()=>SC().list.concat(EM().list);
-const isEm=sc=>sc?.group==='emergency';
+const mmi=()=>root.SimMMI,EM=()=>root.SimEmergency,SS=()=>root.SimScheduleScenarios;
+const all=()=>SC().list.concat(EM().list,SS().list);
+const isEm=sc=>sc?.group==='emergency',isSch=sc=>sc?.group==='schedule';
 let host=null,run=null,timer=null,passed=false;
 // ---- the trains of the scenario on the LS 열번창 (direction + number), moved as the script advances
 const lsm=()=>root.SimLSUI.getModel();
@@ -39,12 +39,20 @@ function runQueue(){
  if(moved)mmi().render();
 }
 const station=()=>host.context().stationStates[run.sc.station];
-const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:root.SimLSUI.getModel()});
+// what the operator has open on the MMI / T/G (for the 경합·스케줄생성 시나리오)
+function uiState(){
+ const open=id=>{const p=$(id);return !!p&&!p.hidden&&p.closest('[data-mmi-window]')?.hidden!==true;};
+ return {graphOpen:open('graphPanel'),graphTrain:$('graphTrain')?.value||'',
+  tgMode:doc.querySelector('.tg-tool[data-mode][aria-pressed="true"]')?.dataset.mode||doc.querySelector('[data-tg-mode][aria-checked="true"]')?.dataset.tgMode||'',
+  station:$('stationSelect')?.value||'',scheduleOpen:open('schedulePanel'),scheduleMode:doc.querySelector('input[name="scheduleMode"]:checked')?.value||'',
+  scheduleSelected:$('scheduleSelected')?.value||'',patternOpen:!!doc.querySelector('[data-mmi-window="patternSelect"]:not([hidden])')};
+}
+const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:root.SimLSUI.getModel(),ui:uiState()});
 function render(){
  const box=$('scSteps');if(!run){box.innerHTML='';return;}
  const fill=t=>SC().fill(t,run),firstOpen=run.sc.steps.findIndex((s,i)=>s.kind==='do'&&!run.done[i]);
  box.innerHTML=run.sc.steps.map((s,i)=>s.kind==='do'
-  ?`<li class="sc-do ${run.done[i]?'done':''} ${i===firstOpen?'current':''}"><span class="sc-mark">${run.done[i]?'✔':i===firstOpen?'▶':'○'}</span><span>${esc(fill(s.text))}${i===firstOpen&&s.hint?`<small class="sc-hint">힌트: ${esc(s.hint)}</small>`:''}</span></li>`
+  ?`<li class="sc-do ${run.done[i]?'done':''} ${i===firstOpen?'current':''}"><span class="sc-mark">${run.done[i]?'✔':i===firstOpen?'▶':'○'}</span><span>${esc(fill(s.text))}${i===firstOpen&&s.hint?`<small class="sc-hint">힌트: ${esc(s.hint)}</small>`:''}${i===firstOpen&&run.explain?`<small class="sc-hint sc-explain">${esc(run.explain)}</small>`:''}</span></li>`
   :`<li class="sc-say ${run.done[i]?'done':''}"><label><input type="checkbox" data-say="${i}" ${run.done[i]?'checked':''}>${s.lines?`<span class="sc-lines"><b>${s.no}. ${esc(s.heading||'')}</b>${s.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</span>`:`<span>${esc(fill(s.text))}</span>`}</label></li>`).join('');
  const total=run.sc.steps.length,doneCount=run.done.filter(Boolean).length;
  $('scProgress').textContent=`진행 ${doneCount}/${total}`;
@@ -53,11 +61,11 @@ function render(){
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
-function evaluate(){if(!run)return;if(SC().advance(run,ctx()))render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of run.sc.stations)mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
+function evaluate(){if(!run)return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(redraw)render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of run.sc.stations)mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
 const current=()=>all().find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
- const sc=current();$('scTrainRow').hidden=isEm(sc);if(isEm(sc)){$('scTrainNote').textContent='';return;}
+ const sc=current();$('scTrainRow').hidden=isEm(sc)||isSch(sc);if(isEm(sc)||isSch(sc)){$('scTrainNote').textContent='';return;}
  const ids=SC().candidates(sc,root.SimDiagram.getModel());
  $('scTrainList').innerHTML=ids.map(id=>`<option value="${esc(id)}">`).join('');
  if(!ids.includes($('scTrain').value))$('scTrain').value=ids[0]||'';
@@ -75,7 +83,22 @@ function startEmergency(sc){
  mmi().log('event',`실기 시나리오 시작 · ${sc.title}`);
  render();
 }
+function startSchedule(meta){
+ const m=root.SimDiagram.getModel(),D=root.SimDrill;let sc;
+ if(meta.id==='sch-conflict'){
+  if(m.trains.some(t=>t.id===D.ID)){D.reset();}
+  const r=D.createProblem({select:false});if(!r.ok){mmi().alertBox(r.message);return;}
+  const other=m.trains.find(t=>t.id!==D.ID&&t.id!==r.leader)||m.trains.find(t=>t.id!==D.ID);if(other)root.SimDiagram.selectTrain(other.id);
+  sc=SS().conflictScenario({id:D.ID,leader:r.leader,nearest:r.nearest,baseline:r.baseline});
+ }else sc=SS().createScenario(SS().planCreate(m));
+ run=SC().newRun(sc,'');passed=false;run.fired=new Set();run.queue=[];run.cast=[];run.explain='';
+ $('scProblem').innerHTML=`<b>문제</b> ${esc(sc.problem)}<br><small>출처: ${esc(sc.source)} · 시간표는 지금 불러온 것을 씁니다</small>`;
+ $('scNotes').innerHTML=sc.notes.map(n=>`<li>${esc(n)}</li>`).join('');
+ mmi().log('event',`실기 시나리오 시작 · ${sc.title}`);
+ render();
+}
 function start(){
+ if(isSch(current()))return startSchedule(current());
  if(isEm(current()))return startEmergency(current());
  const sc=current(),train=$('scTrain').value.trim().toUpperCase();
  if(sc.steps.some(s=>s.kind==='do'&&/스케줄 수정/.test(s.text))&&!root.SimDiagram.getModel().trains.some(t=>t.id===train&&t.calls.some(c=>c.station===sc.station))){mmi().alertBox(`스케줄 수정 단계가 있어 ${train||'고장열차'}가 이 역에 서는 시간표 열차여야 합니다. 열차를 선택하세요.`);return;}
@@ -91,7 +114,7 @@ function start(){
 }
 function init(api){
  host=api;
- const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5종 · 비상시 조치 9종)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect"><optgroup label="부본선 대피">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="비상시 조치">${EM().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup></select></label><span id="scTrainRow"><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small></span><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
+ const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5종 · 비상시 조치 9종)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect"><optgroup label="부본선 대피">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="비상시 조치">${EM().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="스케줄 연습 (MMI·그래프)">${SS().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup></select></label><span id="scTrainRow"><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small></span><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
 <div id="scProblem" class="sc-problem">시나리오를 고르고 [시작]을 누르세요.</div>
 <ol id="scSteps" class="sc-steps"></ol>
 <div id="scStatus" class="trc-msg" role="status"></div>

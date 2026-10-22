@@ -32,20 +32,25 @@ function viable(leader){
  for(let k=i;k<train.calls.length;k++){train.calls[k].departure+=120;if(k>i)train.calls[k].arrival+=120;}      // the +2분 the scenario asks for
  return T.conflicts(m).filter(involves).length===0?first:null;
 }
-function generate(){
- if(problemTrain()){say(baseline?'이미 출제된 문제가 있습니다. 채점하거나 [초기화] 후 다시 출제하세요.':`현재 시간표에 ${ID} 열차가 이미 있습니다. 다른 번호로 바꾸거나 삭제한 뒤 출제하세요.`);return;}
+// builds the exercise on the current timetable; shared by the drill window and the 경합 시나리오 (which lets the operator find the train by search)
+function createProblem({select=true}={}){
+ if(problemTrain())return {ok:false,message:baseline?'이미 출제된 문제가 있습니다. 채점하거나 [초기화] 후 다시 출제하세요.':`현재 시간표에 ${ID} 열차가 이미 있습니다. 다른 번호로 바꾸거나 삭제한 뒤 출제하세요.`};
  const downs=model().trains.filter(t=>t.direction==='down'&&!t.cancelled).sort((x,y)=>y.calls[0].departure-x.calls[0].departure);
- if(!downs.length){say('현재 시간표에 운행 중인 하행 열차가 없습니다. 하행 열차를 만든 뒤 출제하세요.');return;}
+ if(!downs.length)return {ok:false,message:'현재 시간표에 운행 중인 하행 열차가 없습니다. 하행 열차를 만든 뒤 출제하세요.'};
  let leader=null,first=null;
  for(const t of downs){const f=viable(t);if(f){leader=t;first=f;break;}}
- if(!leader){say('현재 시간표에서는 해소 가능한 경합 문제를 만들 수 없습니다. 하행 열차 사이 간격이 좁거나 영등포~수원 구간을 지나는 열차가 없습니다. 열차 간격을 넓히거나 하행 열차를 추가한 뒤 다시 출제하세요.');return;}
+ if(!leader)return {ok:false,message:'현재 시간표에서는 해소 가능한 경합 문제를 만들 수 없습니다. 하행 열차 사이 간격이 좁거나 영등포~수원 구간을 지나는 열차가 없습니다. 열차 간격을 넓히거나 하행 열차를 추가한 뒤 다시 출제하세요.'};
  const made=build(model(),leader);
- if(!made){say('문제 열차를 만들지 못했습니다. 시각표를 확인하세요.');return;}
+ if(!made)return {ok:false,message:'문제 열차를 만들지 못했습니다. 시각표를 확인하세요.'};
  const m2=model();m2.trains.find(t=>t.id===ID).plan=made.plan;
  baseline=structuredClone(problemTrain().calls);start={station:first.station,leader:leader.id};
- D().selectTrain(ID);D().render();
+ if(select)D().selectTrain(ID);D().render();
  mmi().log('event','경합해소 실습 출제');
- say(`문제가 출제되었습니다. 온라인 열차그래프에서 ${leader.id}과 ${ID}의 경합을 찾아 해소하세요. (경합 발생 위치와 해소역은 직접 판단합니다)`);
+ return {ok:true,leader:leader.id,first,nearest:T.nearestResolveStation(first.station,'down'),baseline};
+}
+function generate(){
+ const r=createProblem();if(!r.ok){say(r.message);return;}
+ say(`문제가 출제되었습니다. 온라인 열차그래프에서 ${r.leader}과 ${ID}의 경합을 찾아 해소하세요. (경합 발생 위치와 해소역은 직접 판단합니다)`);
  list();
 }
 function say(text){$('drillMsg').textContent=text;}
@@ -82,5 +87,5 @@ function init(){
  $('drillNew').onclick=generate;$('drillList').onclick=list;$('drillGrade').onclick=grade;$('drillReset').onclick=reset;$('drillClose').onclick=()=>mmi().close('conflictDrill');
  win.opener=list;list();
 }
-root.SimDrill={init,generate,grade,reset};
+root.SimDrill={init,generate,grade,reset,createProblem,ID,baseline:()=>baseline&&structuredClone(baseline),started:()=>start};
 })(window);
