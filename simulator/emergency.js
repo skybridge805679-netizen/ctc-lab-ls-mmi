@@ -76,7 +76,7 @@ const OVERLAY={
   seeds:{anyang:['4B','4C','1B'],gunpo:['1A','1B']},
   before:{
    16:[mode('anyang','CCM'),stop('anyang',['4B'],' (필요시 4C 출발·1B 장내도 정지)'),mode('gunpo','CCM'),stop('gunpo',['1A','1B'])],
-   17:[route('anyang','4C-B660T','출발 진행 (교재 표기 4B-B660T — 이 시뮬레이터의 안양역 진로는 4C-B660T)'),mode('anyang','AUTO'),route('gunpo','1B-1T','장내 진행'),mode('gunpo','AUTO')],
+   17:[route('anyang','4B-B660T','출발 진행'),mode('anyang','AUTO'),route('gunpo','1B-1T','장내 진행'),mode('gunpo','AUTO')],
    20:[rename('K0809','G0809','geumjeong')]}},
  '05':{station:'geumcheon',stations:['geumcheon','guro'],
   cast:[['K1208','guro',GASAN_UP2],['K1210','guro',DOKSAN_UP2],['K1212','geumcheon'],['K1214','geumcheon',SEOKSU_UP2],['A0168','guro','5T']],
