@@ -18,15 +18,17 @@ def run(page, url):
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(url, wait_until='networkidle')
     mode = lambda m: page.locator(f'#lsStage [data-mode="{m}"]')
-    st = lambda: page.evaluate("SimField.state(document.querySelector('#lsStage').dataset.controlStation).mode")
+    cur = "SimField.state(document.querySelector('#lsStage').dataset.controlStation)"
+    st = lambda: page.evaluate(cur + '.mode')
+    wait = lambda mode: page.wait_for_function(cur + f".mode==='{mode}'")      # the dialog closes asynchronously
     mode('LOCAL').click(); page.locator('#dialogConfirm').click()
-    page.locator('[data-handover="yes"]').click(); assert st() == 'LOCAL'
+    page.locator('[data-handover="yes"]').click(); wait('LOCAL')
     # normal request: waits for the field
     mode('CCM').click(); expect(page.locator('#emgCtc')).to_be_visible(); page.locator('#dialogConfirm').click()
-    assert st() == 'LOCAL'; page.locator('[data-handover="no"]').click()
+    page.wait_for_function(cur + ".pending==='CCM'"); assert st() == 'LOCAL'; page.locator('[data-handover="no"]').click(); page.wait_for_function(cur + '.pending===null')
     # 비상 CTC: immediate
     mode('CCM').click(); page.locator('#emgCtc').check(); page.locator('#dialogConfirm').click()
-    assert st() == 'CCM'
+    wait('CCM')
     assert page.locator('[data-handover]').count() == 0 or not page.locator('#handoverBar').is_visible()
     assert not errors, errors
     print('emergency ctc: ok')
