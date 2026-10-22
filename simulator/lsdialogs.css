@@ -27,4 +27,3 @@ dialog[data-variant="confirm"] .dialog-actions button.primary{border:2px solid #
 .ls-svg .ls-info-board .bd-x{fill:#bdbdbd;fill-opacity:.9;stroke:#3d3d3d;stroke-width:1}.ls-svg .ls-info-board [data-board-close] text{fill:#111;font-size:14px}
 .ls-svg .ls-info-board .bd-grip{fill:#222;fill-opacity:.65;cursor:nwse-resize;pointer-events:all}
 .ls-svg .train-occ{fill:#ff3b30;fill-opacity:.95;pointer-events:none}
-.ls-svg .ls-train-slot.inline.has-train rect{fill:#ff6f64;stroke:#b3261e}.ls-svg .ls-train-slot.inline.has-train text{fill:#fff}

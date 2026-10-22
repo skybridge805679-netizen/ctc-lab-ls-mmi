@@ -226,8 +226,12 @@ function render(st,def,core,model,neighbours={}){
  const occupiedNow=neighbours.occupied||new Set(),hitCells=new Map();
  for(const c of cells){const names=[c.label.replaceAll(' · ',''),...c.label.split(' · ').filter(Boolean)],hit=names.find(t=>occupiedNow.has(t));if(hit)hitCells.set(c,hit);}
  // a platform window stands on an unnamed circuit: use the cell under the window
- for(const b of windowBoxes)if(b.inline&&occupiedNow.has(b.item.slot)){const mid=b.x+b.width/2,c=cells.find(c=>Math.abs(c.y-b.cy)<5&&mid>=c.x-1&&mid<=c.x+c.width+1);if(c&&!hitCells.has(c))hitCells.set(c,b.item.slot);}
- for(const [c,hit] of hitCells)routes+=`<rect class="train-occ" data-train-occupied="${esc(hit)}" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/>`;
+ const stubs=[];
+ for(const b of windowBoxes)if(b.inline&&occupiedNow.has(b.item.slot)){const mid=b.x+b.width/2,c=cells.find(c=>Math.abs(c.y-b.cy)<5&&mid>=c.x-1&&mid<=c.x+c.width+1);
+  if(c&&!hitCells.has(c))hitCells.set(c,{name:b.item.slot,x:Math.max(c.x,b.x-9),width:Math.min(c.x+c.width,b.x+b.width+9)-Math.max(c.x,b.x-9)});
+  else if(!c)stubs.push({name:b.item.slot,x:b.x-9,y:b.cy,width:b.width+18});}       // rail drawn as a plain path: red either side of the window
+ for(const t of stubs)routes+=`<rect class="train-occ" data-train-occupied="${esc(t.name)}" x="${t.x}" y="${t.y-BAR/2}" width="${t.width}" height="${BAR}"/>`;
+ for(const [c,hit] of hitCells){const named=typeof hit==='string';routes+=`<rect class="train-occ" data-train-occupied="${esc(named?hit:hit.name)}" x="${named?c.x:hit.x}" y="${c.y-BAR/2}" width="${named?c.width:hit.width}" height="${BAR}"/>`;}
  for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
