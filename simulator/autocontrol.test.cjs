@@ -63,4 +63,43 @@ const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',
 // 6) +10초/+90초 jumps catch up in one go
 {const model=T.initial(),states=fresh(),a=make();tick(states,600);a.run({states,model});
  assert.ok(Object.values(states).every(s=>!Object.values(s.routes).some(r=>r.occupied)||true));}
+
+// 7) 자동제어 조건 ④~⑦ (실기3 3.4 마.): a failed signal / point, a TTB route and an ANTI route keep the request back as a trouble until it clears
+{const st='cheongnyangni',route='4A-B002T',c=Core.forStation(st);
+ const attempt=(setup,undo,word)=>{
+  const model=T.initial(),states=fresh(),a=make();setup(states[st]);
+  const ev=a.run({states,model});
+  assert.ok(!states[st].routes[route],word+': route not set');
+  const tr=ev.find(e=>e.type==='trouble'&&e.station===st);assert.ok(tr&&tr.reason.includes(word),word+' trouble '+JSON.stringify(tr));
+  assert.strictEqual(a.troubles().filter(x=>x.station===st).length,1);
+  undo(states[st]);
+  const ev2=a.run({states,model});
+  assert.ok(ev2.some(e=>e.type==='route'&&e.station===st&&e.route===route),word+': set after the condition clears');
+  assert.strictEqual(a.troubles().filter(x=>x.station===st).length,0,word+': trouble resolved');};
+ const r=c.routes[route];
+ attempt(s=>assert.ok(c.dispatch(s,{type:'fault',kind:'signal',id:r.signal,on:true}).ok),s=>c.dispatch(s,{type:'fault',kind:'signal',id:r.signal,on:false}),'고장');
+ attempt(s=>c.dispatch(s,{type:'fault',kind:'point',id:r.pointLocks[0],on:true}),s=>c.dispatch(s,{type:'fault',kind:'point',id:r.pointLocks[0],on:false}),'고장');
+ attempt(s=>c.dispatch(s,{type:'ttb',id:route,on:true}),s=>c.dispatch(s,{type:'ttb',id:route,on:false}),'TTB');
+ attempt(s=>{c.dispatch(s,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(s,{type:'route',id:'2A-1T',source:'x'}).ok);c.dispatch(s,{type:'mode',value:'AUTO',source:'x'});},
+         s=>{c.dispatch(s,{type:'mode',value:'CCM',source:'x'});c.dispatch(s,{type:'stop',id:'2A',source:'x'});c.dispatch(s,{type:'mode',value:'AUTO',source:'x'});},'ANTI');
+ // a faulted signal also stops a manual request
+ const s0=c.initial();c.dispatch(s0,{type:'mode',value:'CCM',source:'x'});c.dispatch(s0,{type:'fault',kind:'signal',id:r.signal,on:true});
+ assert.ok(!c.dispatch(s0,{type:'route',id:route,source:'x'}).ok);}
+
+// 8) 신호 대기 지연: a blocked arrival route delays the train; the delay is recorded, and only pushed into the timetable when asked
+for(const reflect of [false,true]){
+ const model=T.initial(),states=fresh(),a=make(),st='seoul',c=Core.forStation(st);
+ const train=model.trains.find(t=>t.id==='K1131'),i=train.calls.findIndex(x=>x.station===st),planned=structuredClone(train.calls);
+ const route=(train.calls[i].arrivalRoute||'').replace('_','-');
+ c.dispatch(states[st],{type:'fault',kind:'signal',id:c.routes[route].signal,on:true});
+ let released=false;
+ for(let t=0;t<4000;t+=5){tick(states,5);
+  if(!released&&states[st].clock>=train.calls[i].arrival+90){c.dispatch(states[st],{type:'fault',kind:'signal',id:c.routes[route].signal,on:false});released=true;}
+  a.run({states,model,numbers,reflect});}
+ const rec=a.actuals().find(x=>x.train==='K1131'&&x.station===st);
+ assert.ok(rec&&rec.arrDelay>=80,'arrival delay recorded '+JSON.stringify(rec));
+ const next=train.calls[i+1],was=planned[i+1];
+ if(reflect){assert.ok(next.arrival>was.arrival,'later calls pushed back');assert.ok(model.changes.some(c=>c.type==='delay'&&c.auto&&c.id==='K1131'));}
+ else{assert.deepStrictEqual(train.calls,planned,'timetable untouched');}
+}
 console.log('auto control: ok');

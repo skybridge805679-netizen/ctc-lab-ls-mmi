@@ -40,8 +40,18 @@ def run(page, url):
     page.evaluate("SimEquipment.tick(10790);SimEquipment.tick(10805)")
     assert page.evaluate("SimEquipment.sentTimes().length") == n + 1
     assert page.evaluate("SimEquipment.sentTimes().slice(-1)[0]") == '매일 03:00:00'
+    # signal / point fault and TTB end up in the station state and block a route request
+    page.evaluate("document.querySelector('#stationSelect').value='cheongnyangni';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
+    page.locator('#eqRt').select_option('4A-B002T')
+    sig = page.evaluate("SimField.core('cheongnyangni').routes['4A-B002T'].signal")
+    page.locator('#eqSig').select_option(sig); page.locator('#eqSigFault').check()
+    assert sig in page.evaluate("SimField.state('cheongnyangni').faults.signals")
+    page.locator('#eqTtb').check(); assert '4A-B002T' in page.evaluate("SimField.state('cheongnyangni').ttb")
+    expect(page.locator('#eventLogBody')).to_contain_text('연속통과진로')
     page.locator('#eqClear').click()
-    assert page.evaluate("SimEquipment.faultList().length") == 0
+    assert page.evaluate("SimField.state('cheongnyangni').faults.signals.length+SimField.state('cheongnyangni').ttb.length") == 0
+    page.locator('#eqClear').click()
+    assert page.evaluate("SimEquipment.faultList().filter(k=>k.startsWith('cheongnyangni')).length") == 0
     assert not errors, errors
     print('equipment: ok')
 

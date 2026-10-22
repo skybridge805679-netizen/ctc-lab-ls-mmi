@@ -118,6 +118,10 @@ setInterval(()=>{if(!paused&&!window.SimMMI?.replaying?.()&&!window.SimLSUI.isIn
 window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates}),run,render,openAction,toast,selectStation});
 fields();render();taskView();
 
+window.SimField={ // 교육용 설비 상태 설정(고장·TTB)이 역 상태에 접근하는 통로
+ dispatch:(id,a)=>{const r=BaseCore.forStation(id).dispatch(stationStates[id],{...a,source:'설비'});render();return r;},
+ core:id=>BaseCore.forStation(id),state:id=>stationStates[id]
+};
 window.SimDiagram.init({clock:()=>state.clock,selectStation:id=>{selectStation(id);$('lsDisplay').scrollIntoView({block:'start'});}});
 window.SimMMI?.connect({context:()=>({station:selectedStation,C,state,stationStates}),run,render,selectStation,openAction,toast});
 window.SimMMI?.syncAll(stationStates);
