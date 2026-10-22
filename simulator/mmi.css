@@ -230,3 +230,9 @@
 .rp-ctl{display:flex;gap:6px;align-items:center;margin:6px 0}.rp-ctl button{min-width:36px;padding:3px 8px;border:1px solid #6d6d6a;background:#e8e8e4;cursor:pointer;font-size:13px}
 .rp-ctl label{margin-left:12px;display:flex;gap:6px;align-items:center}#rpState{margin-left:12px;color:#55607e}
 #mmiAutoBtn[aria-pressed="true"]{background:#2e8b57;color:#fff;border-color:#1f6b41}
+
+.written .wr-opts{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-bottom:6px}.written .wr-opts select{max-width:220px;font-size:12px}.written .wr-opts input[type=number]{width:52px}
+.written .wr-status{font-weight:bold;margin:4px 0}.written .wr-body{min-height:170px;border:1px solid #9a9a96;background:#fff;padding:8px;margin-bottom:6px;max-height:340px;overflow:auto}
+.written .wr-meta{color:#555;font-size:11px;margin-bottom:4px}.written .wr-q{font-size:13px;font-weight:bold;margin-bottom:8px;line-height:1.5}
+.written .wr-choices label{display:flex;gap:6px;align-items:flex-start;margin:4px 0;cursor:pointer}.written .wr-text{width:100%;box-sizing:border-box}
+.written .trc-msg.ok{border-color:#2f7d32}.written .trc-msg.bad{border-color:#b3261e}.written .wr-summary{font-size:13px;line-height:1.7}
