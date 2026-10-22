@@ -51,7 +51,29 @@ const stationLabel=stationInfo;
 const routeText=id=>'RT_'+id.replace('-','_');
 // Alarm log: route set / release. Event log: mode change and base scan. A new state object (reset) is a silent baseline.
 const seen={};
+// ---------------------------------------------------------------- 알람메시지 (photo 2026-10-22): refused operations are announced in a salmon pop-up
+const alarms=[];let alarmEl=null,beepTimer=null,audio=null;
+function beep(){try{audio??=new(root.AudioContext||root.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=880;g.gain.value=.03;o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+.16);}catch{}}
+function mute(){clearInterval(beepTimer);beepTimer=null;if(alarmEl)alarmEl.querySelector('[data-alarm-mute]').disabled=true;}
+function renderAlarm(){
+ if(!alarmEl){
+  alarmEl=doc.createElement('div');alarmEl.className='mmi-alarm';alarmEl.setAttribute('role','alertdialog');alarmEl.setAttribute('aria-label','알람메시지');alarmEl.hidden=true;
+  alarmEl.innerHTML=`<div class="mmi-alarm-title"><span>알람메시지</span><button type="button" class="mmi-alarm-x" aria-label="알람메시지 닫기">✕</button></div><div class="mmi-alarm-body"><div class="mmi-alarm-side"></div><div class="mmi-alarm-main"><div class="mmi-alarm-cap" id="alarmCount"></div><div class="mmi-alarm-box" id="alarmText"></div></div></div><div class="mmi-alarm-foot"><button type="button" data-alarm-mute>알람음 소거</button><button type="button" data-alarm-ok id="alarmOk">확인</button></div>`;
+  doc.body.appendChild(alarmEl);
+  const ack=()=>{alarms.length=0;mute();alarmEl.hidden=true;};
+  alarmEl.querySelector('[data-alarm-ok]').onclick=ack;alarmEl.querySelector('.mmi-alarm-x').onclick=ack;alarmEl.querySelector('[data-alarm-mute]').onclick=mute;
+ }
+ $('alarmCount').textContent=`메시지 내용 (미확인 알람 갯수 : ${alarms.length}개)`;
+ $('alarmText').innerHTML=alarms.slice().reverse().map(a=>`<p><label><input type="checkbox" disabled></label>발생시간 : ${esc(a.time)}<br>${esc(a.text)}${a.state?`<br>설정상태 [${esc(a.state)}]`:''}</p>`).join('');
+ alarmEl.hidden=!alarms.length;
+}
+function raiseAlarm(text,state=''){
+ alarms.push({time:stamp(new Date()),text,state});if(alarms.length>50)alarms.shift();renderAlarm();
+ alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
+}
 function sync(stationId,state,action,result){
+ if(action&&result&&result.ok===false&&action.type!=='tick'){const info=stationInfo(stationId),who=`${info.name}${info.code?`(${info.code})`:''}역`;
+  if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가');else if(result.message)raiseAlarm(`${who} ${result.message}`);}
  const st=stationLabel(stationId),prev=seen[stationId],now=new Set(Object.keys(state.routes));
  if(!prev||prev.state!==state){seen[stationId]={state,routes:now,mode:state.mode};return;}
  for(const id of now)if(!prev.routes.has(id))log('alarm',`${st.name}역 ${routeText(id)}진로설정`);
@@ -173,5 +195,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

@@ -161,3 +161,17 @@
 .tg-top.open>.tg-list{display:block}
 .tg-list button{display:flex;justify-content:space-between;gap:24px;width:100%;padding:5px 12px;border:0;background:transparent;font-size:12px;color:#111;cursor:default;text-align:left}
 .tg-list button:hover{background:#316ac5;color:#fff}.tg-list kbd{font:inherit;color:inherit;opacity:.75}
+
+/* 알람메시지 pop-up (photo 2026-10-22): fixed so it is visible wherever the page is scrolled */
+.mmi-alarm{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:6000;width:min(640px,92vw);background:#d8d8d6;border:1px solid #6f6f6c;box-shadow:5px 5px 14px rgba(0,0,0,.4);font-size:13px;color:#111}
+.mmi-alarm[hidden]{display:none}
+.mmi-alarm-title{display:flex;justify-content:space-between;align-items:center;padding:2px 6px;background:#eceae6;border-bottom:1px solid #9a9a96;color:#666}
+.mmi-alarm-x{border:0;background:transparent;font-size:14px;color:#555;cursor:pointer}
+.mmi-alarm-body{display:grid;grid-template-columns:28% minmax(0,1fr);gap:6px;padding:6px 8px 0}
+.mmi-alarm-side{border:1px dashed #8a8a86;background:#e4e4e2;min-height:220px}
+.mmi-alarm-cap{padding:2px 0}
+.mmi-alarm-box{min-height:200px;max-height:300px;overflow:auto;padding:8px 10px;background:#e8735a;border:2px solid #fff;line-height:1.5}
+.mmi-alarm-box p{margin:0 0 10px}.mmi-alarm-box label{display:inline-block;width:16px;margin-right:8px}
+.mmi-alarm-foot{display:flex;justify-content:space-between;padding:6px 8px 8px}
+.mmi-alarm-foot button{min-width:84px;padding:3px 12px;border:1px solid #6d6d6a;background:#ecebe6;cursor:pointer}
+.mmi-alarm-foot button:disabled{color:#888;cursor:default}

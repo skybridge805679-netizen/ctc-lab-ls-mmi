@@ -107,6 +107,17 @@ def run(page, url):
     expect(page.locator('[aria-label="알람 로그"]')).to_be_hidden()
     menu(page, '프로그램', '도구모음설정', '알람로그창')
     expect(page.locator('[aria-label="알람 로그"]')).to_be_visible()
+    # 알람메시지 pop-up for a refused operation (route request while not in CCM)
+    page.locator('#stationSelect').select_option('uiwang')
+    page.locator('#controlSelect').select_option('route')
+    page.locator('#mmiApply').click()
+    box = page.locator('.mmi-alarm')
+    expect(box).to_be_visible()
+    expect(box).to_contain_text('미확인 알람 갯수 : 1개')
+    expect(box).to_contain_text('의왕(010130)역 RT_')
+    expect(box).to_contain_text('설정상태 [수동진로설정불가]')
+    page.locator('[data-alarm-mute]').click(); expect(page.locator('[data-alarm-mute]')).to_be_disabled()
+    page.locator('#alarmOk').click(); expect(box).to_be_hidden()
     assert not errors, errors
 
 
