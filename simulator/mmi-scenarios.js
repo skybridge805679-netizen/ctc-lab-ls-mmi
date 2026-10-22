@@ -7,7 +7,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const mmi=()=>root.SimMMI,EM=()=>root.SimEmergency,SS=()=>root.SimScheduleScenarios;
 const all=()=>SC().list.concat(EM().list,SS().list);
 const isEm=sc=>sc?.group==='emergency',isSch=sc=>sc?.group==='schedule';
-let host=null,run=null,timer=null,passed=false;
+let host=null,run=null,timer=null,passed=false,motion=null,motionStamp='';
 // ---- the trains of the scenario on the LS 열번창 (direction + number), moved as the script advances
 const lsm=()=>root.SimLSUI.getModel();
 function findRow(number){
@@ -22,15 +22,15 @@ function placeCast(){
 function moveCast(key,slot){
  const c=run.cast.find(x=>x.key===key);if(!c)return;
  const f=findRow(c.id);if(!f)return;
- if(slot===null)root.SimLSUI.dispatch({op:'delete',...f});
- else if(f.slot!==slot)root.SimLSUI.dispatch({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:run.sc.station,targetSlot:slot});
+ if(slot===null)motion.request({op:'delete',...f});
+ else if(f.slot!==slot)motion.request({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:run.sc.station,targetSlot:slot});
 }
 // when a tagged step is newly done, queue its moves (each `after` sim-seconds after the previous one); the queue runs on the station clock
 function fireBeats(){
  run.sc.steps.forEach((s,i)=>{
   if(!s.tag||!run.done[i]||run.fired.has(s.tag))return;
   run.fired.add(s.tag);let due=station().clock;
-  for(const m of SC().movesFor(run.sc,s.tag)){due+=m.after;run.queue.push({due,key:m.key,slot:m.slot});}
+  for(const m of SC().movesFor(run.sc,s.tag)){due+=m.after;run.queue.push({due,key:m.key,slot:m.slot});run.queue.sort((a,b)=>a.due-b.due);}
  });
 }
 function runQueue(){
@@ -57,11 +57,12 @@ function render(){
  const total=run.sc.steps.length,doneCount=run.done.filter(Boolean).length;
  $('scProgress').textContent=`진행 ${doneCount}/${total}`;
  const doOpen=run.sc.steps.some((s,i)=>s.kind==='do'&&!run.done[i]),sayOpen=run.sc.steps.some((s,i)=>s.kind==='say'&&!run.done[i]);
- if(!doOpen&&!sayOpen){$('scStatus').textContent='합격: 조작과 구술 항목을 모두 마쳤습니다. 이상입니다!';if(!passed){passed=true;mmi().log('event',`실기 시나리오 합격 · ${run.sc.title}`);}}
+ if(!doOpen&&!sayOpen&&(motion.busy()||run.queue.length))$('scStatus').textContent='조작·구술 완료 — 열차 이동과 도착을 기다리고 있습니다.';
+ else if(!doOpen&&!sayOpen){$('scStatus').textContent='합격: 조작과 구술 항목을 모두 마쳤습니다. 이상입니다!';if(!passed){passed=true;mmi().log('event',`실기 시나리오 합격 · ${run.sc.title}`);}}
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
-function evaluate(){if(!run)return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(redraw)render();if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of new Set([...run.sc.stations,...(run.sc.castStations||[])]))mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}}
+function evaluate(){if(!run||mmi().replaying())return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of new Set([...run.sc.stations,...(run.sc.castStations||[])]))mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}if(motion.step()){mmi().syncAll(host.context().stationStates);mmi().render();render();}renderMotion();const stamp=motion.list().map(j=>j.id+j.phase+j.reason).join('|');if(redraw||stamp!==motionStamp){motionStamp=stamp;render();}}
 const current=()=>all().find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
@@ -98,6 +99,7 @@ function startSchedule(meta){
  render();
 }
 function start(){
+ motion.reset();if(run)clearNumbers(isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id));
  if(isSch(current()))return startSchedule(current());
  if(isEm(current()))return startEmergency(current());
  const sc=current(),train=$('scTrain').value.trim().toUpperCase();
@@ -114,19 +116,33 @@ function start(){
 }
 function init(api){
  host=api;
+ motion=root.SimScenarioMotion.create({states:()=>host.context().stationStates,model:lsm,validate:a=>root.SimLSUI.validate(a),commit:a=>{const result=root.SimLSUI.dispatchDirect(a);if(result.ok){for(const id of new Set([a.station,a.targetStation]))if(id)mmi().checkDuplicates(id);mmi().log('event','시나리오 열차 이동 완료 · '+a.station+' '+a.slot+' → '+(a.targetSlot||'관제구간 밖'));if(run){SC().advance(run,ctx());render();}}return result;}});
  const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5 · 비상 9 · 스케줄 2)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect"><optgroup label="부본선 대피">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="비상시 조치">${EM().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="스케줄 연습 (MMI·그래프)">${SS().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup></select></label><span id="scTrainRow"><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small></span><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
 <div id="scProblem" class="sc-problem">시나리오를 고르고 [시작]을 누르세요.</div>
-<ol id="scSteps" class="sc-steps"></ol>
+<p class="idm-note">열차 이동은 가상시계를 따릅니다. 일시정지 시 멈추며, 진로 대기 이유와 도착 상태를 아래에서 확인할 수 있습니다.</p><div id="scMotionStatus" class="sc-motion-status" role="status"></div><ol id="scSteps" class="sc-steps"></ol>
 <div id="scStatus" class="trc-msg" role="status"></div>
 <ul id="scNotes" class="sc-notes"></ul>
 <details class="sc-variants"><summary>상황변경 시 대응 요령 (비상시조치 평가 참고 원문)</summary><pre id="scVariants"></pre></details>
 <div class="idm-note">교육용 구성 — 대본은 references/scenarios의 실기 대본이며, 열차번호는 지금 시간표의 열차를 고르거나 직접 입력합니다(시간표는 수시로 바뀌는 자료라 고정하지 않았습니다). 조작 인식과 채점은 이 시뮬레이터의 기능입니다. 시작하면 해당 역의 상태가 AUTO + 시나리오 초기 진로로 바뀝니다.</div>
-<div class="idm-buttons"><button type="button" class="sched-btn" id="scClose">닫기</button></div></div>`});
+<div class="idm-buttons"><button type="button" class="sched-btn" id="scStop">시나리오 중지</button><button type="button" class="sched-btn" id="scClose">닫기</button></div></div>`});
  $('scVariants').textContent=EM().variants.lines.join('\n');
+ $('scStop').onclick=()=>{motion.reset();run=null;passed=false;$('scSteps').innerHTML='';$('scProgress').textContent='';$('scStatus').textContent='시나리오 중지 · 이동 대기와 시나리오 점유를 정리했습니다.';renderMotion();mmi().render();};
  $('scStart').onclick=start;$('scSelect').onchange=fillTrains;win.opener=fillTrains;$('scClose').onclick=()=>mmi().close('scenario');
- $('scSteps').onchange=e=>{const i=e.target.dataset?.say;if(i===undefined||!run)return;run.done[Number(i)]=e.target.checked;render();};
+ $('scSteps').onchange=e=>{const i=e.target.dataset?.say;if(i===undefined||!run)return;run.done[Number(i)]=e.target.checked;evaluate();render();};
  mmi().onEvent(e=>{if(!run)return;run.events.push(e);evaluate();});
  timer=setInterval(evaluate,500);
 }
-root.SimScenarioUI={init};
+function renderMotion(){
+ const el=$('scMotionStatus');if(!el)return;
+ const jobs=motion?.list().filter(j=>!['done','cancelled'].includes(j.phase))||[];
+ el.hidden=!jobs.length;
+ el.innerHTML=jobs.map(j=>`<div><b>${esc(j.number)}</b><span>${esc(mmi().stationInfo(j.fromStation||j.station).name)} · ${esc(j.from)} → ${j.action.targetStation?esc(mmi().stationInfo(j.action.targetStation).name)+' · ':''}${esc(j.to)}</span><small>${esc(j.reason)}</small></div>`).join('');
+}
+function intercept(a){
+ if(!run||isSch(run.sc)||a.op!=='move')return null;
+ const row=lsm().stations[a.station]?.windows[a.slot]?.find(t=>t.uid===a.uid);if(!row)return null;
+ const numbers=isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id);
+ return numbers.includes(row.number)?motion.request(a,true):null;
+}
+root.SimScenarioUI={init,intercept,snapshot:()=>run?{id:run.sc.id,done:[...run.done],queue:[...run.queue],motions:motion.list()}:null,motionJobs:()=>motion?.list()||[],reservedNumbers:()=>!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id),stepMotion:()=>{if(!motion||!run||mmi().replaying())return false;const before=motion.list().map(j=>j.id+j.phase+j.reason).join('|');evaluate();return before!==motion.list().map(j=>j.id+j.phase+j.reason).join('|');}};
 })(window);

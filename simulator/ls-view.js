@@ -258,6 +258,12 @@ function render(st,def,core,model,neighbours={}){
   }
   routes+=`<path class="route-line ${route.state}" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="${route.state}" stroke="${COLORS[route.state]}" d="${dpath(route.points)}" ${route.state==='locked'?'stroke-dasharray="14 8"':''}/>`;
  }
+ // Scenario block travel follows surveyed local rows; manual handovers remain separate on each screen.
+ for(const m of model.scenarioMotions||[]){
+  if(model.clock<m.from||model.clock>m.to)continue;
+  const pts=m.points.map(T),len=lenOf(pts),fraction=Math.max(0,Math.min(1,(model.clock-m.from)/(m.to-m.from))),head=Math.max(1,len*fraction),part=slicePath(pts,Math.max(0,head-90),head);
+  if(part.length>1)routes+=`<path class="route-line occupied scenario-run" data-scenario-run="${esc(m.id)}" data-scenario-train="${esc(m.number)}" data-manual-handover="${!!m.manual}" stroke="${COLORS.occupied}" d="${dpath(part)}"/>`;
+ }
  // an approaching train (접근 열차) reddens the circuit just outside its signal
  for(const [sig,on] of Object.entries(model.approach||{})){
   if(!on)continue;const sg=core.signals[sig],rid=Object.keys(core.routes).find(id=>core.routes[id].signal===sig);if(!sg||!rid)continue;
@@ -363,6 +369,6 @@ function render(st,def,core,model,neighbours={}){
  if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
  return {width:WIDTH,height:L.H,svg:`${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
-const api={render,layout,wingOf,sceneOf};
+const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;
 })(typeof window!=='undefined'?window:globalThis);

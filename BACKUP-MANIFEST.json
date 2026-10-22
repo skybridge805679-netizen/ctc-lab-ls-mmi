@@ -1,5 +1,5 @@
 {
-  "version": "0.18.3",
+  "version": "0.19.0",
   "backupDate": "2026-10-22",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 27512,
-      "sha256": "93d7445a67d46a9c87888ff00d783e7961bcd4576daa2b6e5fd519be2e4ac41f"
+      "bytes": 28413,
+      "sha256": "e85f8252e234bb27f3d9d226ab240247dc297c553db2e724c4c8231afaf0962b"
     },
     {
       "path": "README.md",
-      "bytes": 10005,
-      "sha256": "83f916095461606f2d04e159a2ebb586ca0c2e285bff6f77c39ac12eee2bc4e7"
+      "bytes": 10455,
+      "sha256": "e7159d85b830527f8ab3b67305eef33a5f418b6bde37f114939f6620839839af"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -92,6 +92,11 @@
       "path": "archive/CTC-LAB-v0.18.3.zip",
       "bytes": 9871138,
       "sha256": "8b91678871ceb4c38b2290d21351e465cdf073cdd208ac71caceb9333838777b"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.19.0.zip",
+      "bytes": 9882555,
+      "sha256": "e5758258b2d1a5ae06595327805f558f7f8073c2d74258e6a60708de9cad7747"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -1434,6 +1439,16 @@
       "sha256": "42867da85bc1e2d7d95cad599ce453d8d3395845b90e7c8651873169097187b1"
     },
     {
+      "path": "docs/preview-v0.19.0-scenario-moving.png",
+      "bytes": 98416,
+      "sha256": "e715d9c6eb248d1f555434e6cdb85189650158b104143a2173b95b00449c27e0"
+    },
+    {
+      "path": "docs/preview-v0.19.0-scenario-status.png",
+      "bytes": 15602,
+      "sha256": "0e3d1bbb856e0b1b8ea622d81f68c4c7f79f504eabd39dae7349c9a62d306383"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -1659,6 +1674,11 @@
       "sha256": "cad93d96c9a352e50ff72bd01af79bc4990126806b2fde721bfccd146a352b8e"
     },
     {
+      "path": "docs/v0.19.0-시나리오운행연계.md",
+      "bytes": 4494,
+      "sha256": "968b83c2bfcdd3ebf613cf2efdc9d352dad12bab3654bcd29a378571d1ec6e7b"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -1670,8 +1690,8 @@
     },
     {
       "path": "docs/구현현황.md",
-      "bytes": 8556,
-      "sha256": "ef97699bd6ad57e676786899b039ac5267b14e1cad40152f9db00db74913c33e"
+      "bytes": 8768,
+      "sha256": "3abdf5933cfed24a5d65394b2c965fa9bd21a9ca885411a04cb0bf0b143e3b65"
     },
     {
       "path": "docs/데스크톱배선정리.md",
@@ -1740,8 +1760,8 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 6283,
-      "sha256": "01bef8274fa3f1599b40dc922f71ba3bfe2b60e8ddd98dd3ae472b17295daad8"
+      "bytes": 6531,
+      "sha256": "d5387fec776147b114a14e9d8dba17d54798c98946b0d23a6a64b67cdfebe1ef"
     },
     {
       "path": "simulator/anyang-routes.test.cjs",
@@ -1750,8 +1770,8 @@
     },
     {
       "path": "simulator/app.js",
-      "bytes": 27615,
-      "sha256": "b2b9adfb4f4b51091fa5ff3222893c4b30d9e9cabc2c5f8fdae06a92ccdd770f"
+      "bytes": 27916,
+      "sha256": "505e88917107b1ae383f7693a7bfb8f5c4c34dc883aabd5b3bb4d02b7035244e"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -1910,8 +1930,8 @@
     },
     {
       "path": "simulator/autocontrol-ui.js",
-      "bytes": 6092,
-      "sha256": "2576608b77b1ffca99039563e147866c7fe63e761e0fc1af7789c55326be2ec9"
+      "bytes": 6230,
+      "sha256": "36266a0220b7cc2f2cec3253f30447ad2b138623682fb76b6c7ed63ac55f1d49"
     },
     {
       "path": "simulator/autocontrol.browser.test.py",
@@ -1995,13 +2015,13 @@
     },
     {
       "path": "simulator/emergency.browser.test.py",
-      "bytes": 6840,
-      "sha256": "86c3d012b021a9d095c14788f961be85168346f368eebc0f47cf882b52444674"
+      "bytes": 7103,
+      "sha256": "ec2ecf77a915488235a14fa200d0e5e018379ae5de7116a652599b6ff94940d5"
     },
     {
       "path": "simulator/emergency.js",
-      "bytes": 16158,
-      "sha256": "3fe9814d1a63a561398f41307568a032fe29ef06a9df685df3cb236daf78d747"
+      "bytes": 17954,
+      "sha256": "ad5041e674fb378f79efd499c407ba035e7d3a96e82c0a046f1dd21e94dea5a3"
     },
     {
       "path": "simulator/emergency.test.cjs",
@@ -2035,8 +2055,8 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 21184,
-      "sha256": "3eee297a3e9e2f01e87c2351f9c7a76babbb1b4161ce4c4509c38fdd1861af06"
+      "bytes": 21232,
+      "sha256": "ceaf972d3d1b18253321e46176f90f524a3aa66f75e1c217f44844bbb5516474"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -2080,8 +2100,8 @@
     },
     {
       "path": "simulator/ls-context.js",
-      "bytes": 18704,
-      "sha256": "4aa0df812796a628a1e537b4b658a94bf700a1ad121070bb8f4369d18cd6144b"
+      "bytes": 18959,
+      "sha256": "9206834ca825a208beff7f10fc5b20173d23a6667c6fb379360c56c449ba5968"
     },
     {
       "path": "simulator/ls-header.browser.test.py",
@@ -2120,8 +2140,8 @@
     },
     {
       "path": "simulator/ls-view.js",
-      "bytes": 32201,
-      "sha256": "cd40bff67ad4fc86903cd04a3c4f32941ca190481ca6fb807aab59394e00c8ee"
+      "bytes": 32832,
+      "sha256": "240714228398b3e17981a23453c5c088801c979ef5015a03936fb2b07aed95a3"
     },
     {
       "path": "simulator/ls-view.test.cjs",
@@ -2200,8 +2220,8 @@
     },
     {
       "path": "simulator/mmi-scenario-cast.browser.test.py",
-      "bytes": 4271,
-      "sha256": "09b2a0f962c6e04854e3b8801337e5d6f9f82975ec3bd08fd1b6ea1cc807de7d"
+      "bytes": 4618,
+      "sha256": "b57e7a8397747b38de9d122e41492b81d2c2311c74ea49406e8a867947ea78a8"
     },
     {
       "path": "simulator/mmi-scenarios.browser.test.py",
@@ -2210,8 +2230,8 @@
     },
     {
       "path": "simulator/mmi-scenarios.js",
-      "bytes": 12304,
-      "sha256": "c8a89b5a8dd7f2cd85d3d90c74d459d35bba9577e0737e4f5d788c0d57fae6ec"
+      "bytes": 15217,
+      "sha256": "15efcf836cbdf70e1ef77bf3e69de1d7c76574f1233620f4cba1507af2f49a18"
     },
     {
       "path": "simulator/mmi-trains.js",
@@ -2240,8 +2260,8 @@
     },
     {
       "path": "simulator/mmi.js",
-      "bytes": 27346,
-      "sha256": "289c4f52e9695bef2751d9bff05b4680d78377df12cd81fe44227ac137b8492d"
+      "bytes": 27386,
+      "sha256": "3ab5c5bea486cb3be44bbe30bb9503e044dbbe6876196074f444d7b0e27dc2f3"
     },
     {
       "path": "simulator/network.browser.test.py",
@@ -2287,6 +2307,21 @@
       "path": "simulator/scenario-cast.test.cjs",
       "bytes": 1713,
       "sha256": "beed00e89590f2adcb421eb84a6bed9ab92b4d1b32afc78c6fd773551d74a366"
+    },
+    {
+      "path": "simulator/scenario-motion.browser.test.py",
+      "bytes": 3930,
+      "sha256": "376d23ffed6e5a77460dd8bb09862b6da01d96f40ec46bd381b4df6a25e9e193"
+    },
+    {
+      "path": "simulator/scenario-motion.js",
+      "bytes": 10948,
+      "sha256": "81469a765936fb3804e9fa896fcd22c1baa7c2734cf90980346cc0d726a7d3ea"
+    },
+    {
+      "path": "simulator/scenario-motion.test.cjs",
+      "bytes": 8990,
+      "sha256": "dfc6d230220c18ba46fc2b2d558409ebc8e7fb228230c34b515ef76a2d016ac9"
     },
     {
       "path": "simulator/scenarios.js",
@@ -2360,8 +2395,8 @@
     },
     {
       "path": "simulator/style.css",
-      "bytes": 33365,
-      "sha256": "e95c873854912e5047a536a690a50ec98ef9fc8f6f77b630432f0ad982a641ad"
+      "bytes": 34017,
+      "sha256": "72b7d824e2f7c506b1d057e11597d60b68e2826e008f37bdc7a3f356b3b23ad6"
     },
     {
       "path": "simulator/tg-tools.browser.test.py",
@@ -2420,8 +2455,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 21623,
-      "sha256": "69879fdefa67e807c0246e5d2f8265c9618d78c7aff27009ccbc6170f6b8bb08"
+      "bytes": 22564,
+      "sha256": "9a79c1eea37089f272298110d28bc94f139632bb5e9df59c76860b1ac139c39a"
     },
     {
       "path": "simulator/고증대조표.json",

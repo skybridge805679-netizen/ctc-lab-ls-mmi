@@ -131,7 +131,7 @@ function sync(stationId,state,action,result){
  if(action?.type==='point'&&result?.ok){record('field',{station:st.name,kind:'선로전환기',text:`${action.id} ${action.value==='R'?'반위':'정위'} 전환`});changes.push(`전환기 ${action.id} ${action.value==='R'?'반위':'정위'}`);}
  if((action?.type==='stop'||action?.type==='stopAll')&&result?.ok){record('field',{station:st.name,kind:'신호기',text:action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`});changes.push(action.type==='stopAll'?'신호기 일괄정지':`${action.id} 신호 정지`);}
  if(action?.type==='approach'&&result?.ok)changes.push(`${action.signal} 접근 열차 ${action.present===false?'제거':'투입'}`);
- if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});for(const id of new Set([op.station,op.targetStation]))if(id)checkDuplicates(id);changes.push(`열차번호 ${op.op}${op.number?` · ${op.number}`:''}`);}
+ if(action?.type==='lsOperation'&&result?.ok){const op=action.operation,who=stationLabel(op.station).name;log('event',`${who} 열차표시 · ${op.op}${result.pending?' · 이동 접수':''}`);record('train',{station:who,text:`${op.op}${op.number?` · ${op.number}`:''}`});for(const id of new Set([op.station,op.targetStation]))if(id)checkDuplicates(id);changes.push(`열차번호 ${op.op}${op.number?` · ${op.number}`:''}`);}
  if(action?.type==='scan'&&result?.ok)log('event',action.scope==='all'?'전체 제어역 Basescan 수신':`${st.name}역 Basescan 수신`);
  capture(stationId,state,changes);
  seen[stationId]={state,routes:now,mode:state.mode};
