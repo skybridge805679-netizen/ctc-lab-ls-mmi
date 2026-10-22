@@ -88,7 +88,7 @@ try:
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:
                     page.select_option('#lsStationSelect', station)
-                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.17.0-{station}.png'))
+                    page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.17.1-{station}.png'))
             assert not errors, errors
             context.close()
             print(f'PASS vector LS: {tested} signals, navigation, continuous/occupancy, removed controls: {width}px', flush=True)

@@ -190,7 +190,9 @@ dialog[data-variant="route"]{max-height:calc(100vh - 8px);overflow:auto;border-c
 dialog[data-variant="route"] h2{background:var(--orpheia);color:var(--deep);padding:7px 10px;border-bottom:1px solid #a9cbc3;border-radius:3px 3px 0 0}
 dialog[data-variant="route"] #dialogBody{color:var(--deep);padding:4px 0}
 dialog[data-variant="route"] .route-choice{background:var(--paper);color:var(--deep);padding:7px 14px}
-dialog[data-variant="route"] .route-choice:hover,dialog[data-variant="route"] .route-choice:focus-visible{background:var(--teal);color:white}
+dialog[data-variant="route"] .route-choice{transition:none}
+dialog[data-variant="route"] .route-choice:focus-visible{background:var(--paper);color:var(--deep);outline:2px solid var(--teal);outline-offset:-2px}
+dialog[data-variant="route"] .route-choice:hover{background:var(--teal);color:white}
 dialog[data-variant="confirm"]{background:var(--paper);color:var(--deep);border-color:#9dbeb6;border-radius:6px;box-shadow:var(--window-shadow)}
 dialog[data-variant="confirm"] h2{background:var(--orpheia);color:var(--deep);border-radius:5px 5px 0 0;border-bottom:1px solid #a9cbc3}
 dialog[data-variant="confirm"] #dialogBody{color:var(--deep)}
@@ -199,3 +201,28 @@ dialog[data-variant="confirm"] .dialog-actions button.primary{background:var(--t
 .q-icon{background:var(--teal)}
 
 .sc .rpt-cond>label{white-space:nowrap;min-width:0}.sc .rpt-cond>label select{min-width:0;width:min(420px,100%)}
+
+/* LS operational colours follow the equipment photos; the surrounding workspace stays mint. */
+.ls-modes{gap:8px}.mode-btn{min-width:88px;border-radius:0;background:#f2f2f0;color:#111;border:1px solid #b7b9b4;box-shadow:none}
+.mode-btn:hover{background:#fff;border-color:#e0e2dc}.mode-btn.on.auto{background:#18df00;border-color:#149e00;color:#101510}.mode-btn.on.ccm{background:#f4ec00;border-color:#b6ae00;color:#111}
+.stop-all{background:#f2f2f0;color:#111;border:1px solid #b7b9b4;border-radius:0;min-height:64px;min-width:132px;font-size:16px;font-weight:500;padding:8px 18px;line-height:1.35;letter-spacing:.05em}
+.stop-all span{display:block}.stop-all:hover{background:white;border-color:#e0e2dc}
+.ls-name{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:210px;min-height:68px;padding:6px 24px;background:#080b08;border:1px solid #afb5a9;border-radius:0;color:white;line-height:1.3}
+.ls-name b{font-size:23px;font-weight:500;letter-spacing:6px}.ls-name span{color:white;font-size:16px;letter-spacing:1px}
+.ls-equipment{grid-template-columns:repeat(6,auto);gap:4px;font-family:Arial,sans-serif;font-size:10px;color:#10220e}
+.ls-equipment span{border:1px solid #508244;border-radius:0;background:#18df00;color:#10220e;padding:3px 7px;min-width:36px;line-height:1.1}
+.ls-equipment [data-equipment="N2"],.ls-equipment [data-equipment="RC"]{background:#f2f2f0;border-color:#b7b9b4;color:#111}
+.ls-equipment [data-equipment="EIS2"],.ls-equipment [data-equipment="DTS2"]{background:#f4ec00;border-color:#b6ae00;color:#111}
+.ls-equipment span.fault{background:#bc3027;border-color:#ee8f81;color:white}
+#actionDialog.mode-confirm{background:#f5f5f3;border:1px solid #a3a5a0;border-radius:2px;color:#20211f}
+#actionDialog.mode-confirm h2{background:#fafaf8;border:0;border-radius:0;color:#333;font-weight:400}
+#actionDialog.mode-confirm .q-icon{background:radial-gradient(circle at 35% 30%,#3388d4,#075ba2)}
+#actionDialog.mode-confirm #dialogBody{color:#20211f;gap:14px;padding:24px 22px}
+#actionDialog.mode-confirm .dialog-actions{justify-content:flex-start;padding:10px 14px 14px;background:#ececea;gap:8px}
+#actionDialog.mode-confirm .dialog-actions button{background:#f3f3f0;color:#222;border:1px solid #b2b4af;border-radius:0;min-width:92px;padding:4px 12px}
+#actionDialog.mode-confirm .dialog-actions button.primary{background:#f4f8fb;color:#222;border:2px solid #3883bd}
+#actionDialog.mode-confirm .nt-check{display:flex;align-items:flex-start;gap:6px;margin-top:12px;font-size:11px;line-height:1.6}
+
+/* User-confirmed district colours: underground Cheongnyangni through underground Seoul. */
+.ls-name.metro{background:#2068e6;border-color:#acc8f7}
+#lsStage:is([data-control-station="cheongnyangni"],[data-control-station="dongmyo"],[data-control-station="jonggak"],[data-control-station="underground-seoul"]) .inter-station .plate{fill:#2068e6}
