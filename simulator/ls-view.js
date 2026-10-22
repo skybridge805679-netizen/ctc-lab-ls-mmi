@@ -229,7 +229,7 @@ function render(st,def,core,model,neighbours={}){
   const t=model.routes[route.id]?.train;
   if(route.state==='occupied'&&t&&t.to>t.from){
    const L=lenOf(route.points),f=Math.max(0,Math.min(1,((model.clock??0)-t.from)/(t.to-t.from))),head=L*f,tail=Math.max(0,head-Math.min(TRAIN_PX,L*.55)),part=slicePath(route.points,tail,Math.max(head,tail+1));
-   routes+=`<path class="route-line set" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="set" stroke="${COLORS.set}" d="${dpath(route.points)}"/>`;
+   routes+=`<path class="route-line occupied-base" data-active-route="${esc(route.id)}" data-route-station="${st.id}" data-route-state="occupied" stroke="${COLORS.set}" d="${dpath(route.points)}"/>`;
    if(part.length>1)routes+=`<path class="route-line occupied train-run" data-train-run="${esc(route.id)}" data-route-state="occupied" stroke="${COLORS.occupied}" d="${dpath(part)}"/>`;
    continue;
   }
