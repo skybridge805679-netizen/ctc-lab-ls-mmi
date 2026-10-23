@@ -11,7 +11,11 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-ls-windows-'));let a
  await app.evaluate(({BrowserWindow})=>{const windows=BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('lsStation='));windows.forEach((w,i)=>w.setBounds({x:i*960,y:0,width:960,height:720}));});
  await expect.poll(()=>west.evaluate(()=>innerWidth)).toBeLessThan(961);await expect.poll(()=>east.evaluate(()=>innerWidth)).toBeLessThan(961);
  const positions=async(page,side)=>page.locator('#trackSvg').evaluate((svg,side)=>{const m=svg.getScreenCTM();return Object.fromEntries([...svg.querySelectorAll(`[data-seam-side="${side}"]`)].map(g=>{const p=g.querySelector('.seam-rail'),end=p.getPointAtLength(p.getTotalLength()).matrixTransform(m);return [g.dataset.seamTrunk,{x:end.x,y:end.y}]}));},side);
- for(const [page,side]of [[west,'right'],[east,'left']]){const p=await positions(page,side);assert.equal(Object.keys(p).length,4);const edge=side==='left'?0:await page.evaluate(()=>innerWidth);for(const port of Object.values(p))assert.ok(Math.abs(port.x-edge)<1,'rail reaches its own window edge');}
+ // 창 크기 변경 직후에는 화면 맞춤(zoom)이 한 박자 늦게 적용되므로, 끝점이 가장자리에 닿을 때까지 기다린 뒤 판정한다.
+ for(const [page,side]of [[west,'right'],[east,'left']]){
+  assert.equal(Object.keys(await positions(page,side)).length,4);
+  await expect.poll(async()=>{const p=await positions(page,side),edge=side==='left'?0:await page.evaluate(()=>innerWidth);return Math.max(...Object.values(p).map(port=>Math.abs(port.x-edge)));},{message:'rail reaches its own window edge'}).toBeLessThan(1);
+ }
 
  const pid=await primary.evaluate(()=>SimRemote.snapshot.pid);assert.equal(await west.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await east.evaluate(()=>SimRemote.snapshot.pid),pid);
  await east.locator('[data-mode="CCM"]').click();await east.click('#dialogConfirm');await east.waitForFunction(()=>SimField.state('geumcheon').mode==='CCM');await east.locator('[data-point-control="51A"]').click();await east.click('#dialogConfirm');await east.waitForFunction(()=>SimField.state('geumcheon').points['52']==='R');await primary.evaluate(()=>SimRemote.poll());assert.equal(await primary.evaluate(()=>SimField.state('geumcheon').points['52']),'R');
