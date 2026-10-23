@@ -102,4 +102,12 @@ for(const reflect of [false,true]){
  if(reflect){assert.ok(next.arrival>was.arrival,'later calls pushed back');assert.ok(model.changes.some(c=>c.type==='delay'&&c.auto&&c.id==='K1131'));}
  else{assert.deepStrictEqual(train.calls,planned,'timetable untouched');}
 }
+
+// 9) 선로망: a train leaving a station is handed to the next station on its trunk (the exit circuit is the departure route's destination)
+{const model=T.initial(),states=fresh(),a=make(),L=require('./line.js'),W=require('./train-windows.js'),hand=[];
+ const nums={place(){},depart(){},remove(){},handoff:(st,tr,dest)=>{const h=dest&&L.handoff(st,dest,id=>(W.data||W)[id].map(x=>x.slot));if(h)hand.push([st,tr.id,h.station,h.slot]);}};
+ for(let t=0;t<7200;t+=5){tick(states,5);a.run({states,model,numbers:nums});}
+ assert.ok(hand.length>20,'hand-offs happened '+hand.length);
+ const down=hand.filter(h=>h[1]==='K1131');assert.ok(down.length>3&&down.every(h=>L.line.stations[h[2]].order>L.line.stations[h[0]].order),'a down train is handed to stations further down the line');
+ const up=hand.filter(h=>h[1]==='K1002');assert.ok(up.length>3&&up.every(h=>L.line.stations[h[2]].order<L.line.stations[h[0]].order),'an up train goes the other way');}
 console.log('auto control: ok');

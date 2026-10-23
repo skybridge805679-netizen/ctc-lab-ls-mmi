@@ -16,7 +16,12 @@ function removeEverywhere(number){
 const numbers={
  place(station,slot,train){removeEverywhere(train.id);if(slot)root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});},
  depart(station,slot,train){removeEverywhere(train.id);if(slot)root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});},
- remove(station,train){removeEverywhere(train.id);}
+ remove(station,train){removeEverywhere(train.id);},
+ // 선로망: 역을 빠져나간 열차번호는 같은 본선의 다음 연동역 진입 열번창(경계 회로)으로 넘어간다 — 그 역의 자동제어가 승강장에 놓을 때까지 그곳에 서 있다
+ handoff(station,train,dest){
+  const h=dest&&root.SimLine.handoff(station,dest,id=>(root.SimTrainWindows.data[id]||[]).map(w=>w.slot));
+  if(h)root.SimLSUI.dispatch({op:'insert',station:h.station,slot:h.slot,number:train.id,direction:train.direction});
+ }
 };
 
 function label(){const b=$('mmiAutoBtn');if(b){b.textContent=`자동제어 ${enabled?'ON':'OFF'}`;b.setAttribute('aria-pressed',String(enabled));}const c=$('acEnabled');if(c)c.checked=enabled;}

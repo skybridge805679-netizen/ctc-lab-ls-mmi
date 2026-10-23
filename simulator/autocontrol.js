@@ -108,7 +108,7 @@ function create({core,stations}){
     }
     if(m.stage===6&&t>=m.leftAt+EXIT_LEAD){
      if(s.routes[p.depRoute]?.occupied)c.dispatch(s,{type:'clear',id:p.depRoute,source:'AUTO'});
-     m.stage=7;numbers?.remove(station,train);emit({type:'left',station,train:train.id,route:p.depRoute});
+     m.stage=7;numbers?.remove(station,train);numbers?.handoff?.(station,train,R[p.depRoute]?.destination);emit({type:'left',station,train:train.id,route:p.depRoute});
      // 신호 대기로 늦은 시분을 실적으로 남긴다 (스케줄의 계획 시각은 그대로; reflect일 때만 뒤 역의 시각을 같이 민다)
      const depDelay=Math.max(0,m.leftAt-p.tDep),arrDelay=m.arrDelay||0;
      if(depDelay||arrDelay){
