@@ -21,7 +21,7 @@ def run(page, url):
     page.evaluate("document.querySelector('#stationSelect').value='anyang';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
     run_ = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
     run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
-    run_({'type': 'lsOperation', 'operation': {'op': 'insert', 'station': 'anyang', 'slot': 'B988T', 'number': 'K0001', 'direction': 'down'}, 'source': 'LS'})
+    run_({'type': 'lsOperation', 'operation': {'op': 'insert', 'station': 'anyang', 'slot': 'B984T', 'number': 'K0001', 'direction': 'down'}, 'source': 'LS'})
     ack()
     r = run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})
     assert not r['ok'] and '전방 폐색' in r['message'] and 'K0001' in r['message'], r
@@ -36,8 +36,8 @@ def run(page, url):
     run_({'type': 'withdraw', 'id': '4A-B984T', 'source': 'LS'})
     page.locator('#lnEnforce').check()
     assert not run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})['ok']; ack()
-    uid = page.evaluate("SimLSUI.getModel().stations.anyang.windows.B988T[0].uid")
-    run_({'type': 'lsOperation', 'operation': {'op': 'delete', 'station': 'anyang', 'slot': 'B988T', 'uid': uid}, 'source': 'LS'})
+    uid = page.evaluate("SimLSUI.getModel().stations.anyang.windows.B984T[0].uid")
+    run_({'type': 'lsOperation', 'operation': {'op': 'delete', 'station': 'anyang', 'slot': 'B984T', 'uid': uid}, 'source': 'LS'})
     assert run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})['ok']
     # 단선지령식 on/off is logged and listed
     page.locator('#lnPair').select_option(index=0); page.locator('#lnSingleOn').click()

@@ -15,7 +15,7 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
-   candidates=json.loads((ROOT.parent/'docs/route-conflict-audit-v0.19.2.json').read_text())['newlyAllowed']
+   candidates=json.loads((ROOT.parent/'docs/route-conflict-audit-v0.19.4.json').read_text())['newlyAllowed']
    menus=page.evaluate('SimRouteMenus');plans={}
    for pair in candidates:
     st=pair['station']

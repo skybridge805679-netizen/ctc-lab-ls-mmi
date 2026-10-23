@@ -36,14 +36,14 @@ assert.strictEqual(L.handoff('geumcheon','B968T',slots).signal,'1A');assert.stri
  const mk=id=>{const c=Core.forStation(id),s=c.initial();c.dispatch(s,{type:'mode',value:'CCM',source:'x'});return {c,s};};
  const A=mk('anyang'),G=mk('geumjeong'),states={anyang:A.s,geumjeong:G.s};
  assert.deepStrictEqual(L.blockedExits(ls),{},'empty line: nothing blocked');
- ops.dispatch(ls,{op:'insert',station:'geumjeong',slot:'B992T',number:'K0001',direction:'up'});       // 하2선 구간 안양>금정 의 금정 쪽 끝에 열차
+ ops.dispatch(ls,{op:'insert',station:'anyang',slot:'B984T',number:'K0001',direction:'up'});       // 하2선 구간 안양>금정 의 금정 쪽 끝에 열차
  L.refresh(states,ls);assert.strictEqual(A.s.exitBlocked?.B984T,'K0001');
  assert.ok(!A.c.dispatch(A.s,{type:'route',id:'4A-B984T',source:'x'}).ok,'exit into an occupied block is refused');
  assert.ok(A.c.dispatch(A.s,{type:'route',id:'4C-B660T',source:'x'}).ok,'the other trunk is free');
- const uid=ls.stations.geumjeong.windows.B992T[0].uid;ops.dispatch(ls,{op:'delete',station:'geumjeong',slot:'B992T',uid});L.refresh(states,ls);
+ const uid=ls.stations.anyang.windows.B984T[0].uid;ops.dispatch(ls,{op:'delete',station:'anyang',slot:'B984T',uid});L.refresh(states,ls);
  assert.strictEqual(A.s.exitBlocked,undefined);assert.ok(A.c.dispatch(A.s,{type:'withdraw',id:'4C-B660T',source:'x'}).ok);assert.ok(A.c.dispatch(A.s,{type:'route',id:'4A-B984T',source:'x'}).ok,'free again');
  // 상행 본선은 동쪽 역에서 나가는 진로가 막힌다
- ops.dispatch(ls,{op:'insert',station:'anyang',slot:'B975T',number:'K0002',direction:'up'});L.refresh(states,ls);
+ ops.dispatch(ls,{op:'insert',station:'anyang',slot:'B981T',number:'K0002',direction:'up'});L.refresh(states,ls);
  assert.ok(L.blockedExits(ls).anyang&&Object.keys(L.blockedExits(ls).anyang).every(n=>L.trunkOf(n)==='EU'||L.trunkOf(n)==='ED'));
  // enforcement can be switched off (scripted scenarios)
  L.state.enforce=false;L.refresh(states,ls);assert.strictEqual(A.s.exitBlocked,undefined);L.state.enforce=true;

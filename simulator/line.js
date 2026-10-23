@@ -40,6 +40,17 @@ function build(){
  return {order,stations,sections,NAMES};
 }
 const line=build();
+const Track=isNode?require('./track-network'):root.SimTrackNetwork;
+const graph=Track.build(line.sections);
+const journeys=new Map();
+function setJourney(number,code){if(code&&graph.circuits[Track.codeOf(code)])journeys.set(number,Track.codeOf(code));else journeys.delete(number);}
+function circuitOccupancy(ls,states={},slotsOf=slotsOfDefault){
+ const occupied={};const put=(code,who)=>{code=Track.codeOf(code);if(code&&graph.circuits[code]){const rows=occupied[code]??=[];if(!rows.includes(who))rows.push(who);}};
+ for(const [st,s]of Object.entries(ls?.stations||{}))for(const slot of slotsOf(st))for(const row of s.windows?.[slot]||[])if(!journeys.has(row.number))put(slot,row.number);
+ for(const [who,code]of journeys)put(code,who);
+ for(const [st,s]of Object.entries(states))for(const [res,route]of Object.entries(s.occupied||{}))put(graph.resourceToCode[res],s.routes?.[route]?.train?.number||st+' '+route);
+ return occupied;
+}
 // 본선마다 그 본선으로 들어오는 장내신호기(예: 금천구청 하2선 1A, 하1선 1B, 상1선 2B, 상2선 2A)
 function arrivalSignal(station,trunk,direction){
  const t=line.stations[station]?.trunks[trunk];if(!t)return null;const dir=direction?(direction==='down'?1:-1):(trunk.endsWith('D')?1:-1);
@@ -94,7 +105,7 @@ function viaStations(a,b,trunk){
  const list=N.stations.filter(x=>!x.controlled&&x.order>lo&&x.order<hi&&INTERMEDIATE[x.id]?.slots[trunk]).map(x=>({station:x.id,host:INTERMEDIATE[x.id].host,slot:INTERMEDIATE[x.id].slots[trunk]}));
  return N.catalog[a].order<N.catalog[b].order?list:list.reverse();
 }
-// ---- 폐색(구간) 점유: 구간 안(양쪽 역의 경계 열번창 포함)에 열차번호가 있으면 그 구간으로 나가는 출발 진로를 막는다 (한 폐색에 한 열차)
+// ---- 회로 단위 점유: 바로 앞 회로를 검사한다. 단선지령식의 대향 보호는 구간 전체를 유지한다.
 const state={enforce:true,single:new Set()};            // single: "서쪽>동쪽:M|G|E" 단선지령식 시행 중인 구간
 const TW=isNode?require('./train-windows.js'):root.SimTrainWindows;
 const slotsOfDefault=id=>((TW.data||TW)[id]||[]).map(x=>x.slot);
@@ -104,12 +115,14 @@ function sectionNumbers(sec,ls,slotsOf=slotsOfDefault){
 }
 const key=(sec)=>`${sec.west}>${sec.east}:${sec.trunk[0]}`;
 // exits that are closed right now: {station:{destination circuit: train number}}
-function blockedExits(ls,slotsOf){
+function blockedExits(ls,slotsOf,states={}){
  const out={},put=(st,name,who)=>{if(name)(out[st]??={})[name]??=who;};
- const occ=new Map(line.sections.map(sec=>[sec.id,sectionNumbers(sec,ls,slotsOf)]));
+ const occupied=circuitOccupancy(ls,states,slotsOf);
+ const occ=new Map(line.sections.map(sec=>[sec.id,[...new Set(graph.chains[sec.id].flatMap(c=>occupied[c]||[]))]]));
  for(const sec of line.sections){
   const nums=occ.get(sec.id);if(!nums.length)continue;
-  if(sec.trunk.endsWith('D'))put(sec.west,sec.westSide,nums[0]);else put(sec.east,sec.eastSide,nums[0]);
+  const first=sec.trunk.endsWith('D')?graph.chains[sec.id][0]:graph.chains[sec.id].at(-1),front=occupied[first];
+  if(front?.length){if(sec.trunk.endsWith('D'))put(sec.west,sec.westSide,front[0]);else put(sec.east,sec.eastSide,front[0]);}
   if(state.single.has(key(sec))){       // 단선지령식: 한 선로를 양방향이 쓰므로 어느 쪽 열차가 있어도 양쪽 끝에서 나가는 진로를 막는다
    for(const mate of line.sections.filter(x=>x.west===sec.west&&x.east===sec.east&&x.trunk[0]===sec.trunk[0])){
     const t=line.stations;for(const st of [sec.west,sec.east])for(const d of ['D','U']){const tr=t[st].trunks[sec.trunk[0]+d];if(tr){put(st,sec.west===st?tr.right:tr.left,nums[0]);}}
@@ -119,7 +132,8 @@ function blockedExits(ls,slotsOf){
  return out;
 }
 function refresh(states,ls,slotsOf){
- const blocked=state.enforce?blockedExits(ls,slotsOf):{};
+ const occupied=circuitOccupancy(ls,states,slotsOf),blocked=state.enforce?blockedExits(ls,slotsOf,states):{};
+ for(const [id,s]of Object.entries(states))s.circuitOccupied=Object.fromEntries(Object.entries(occupied).filter(([code])=>graph.circuits[code].sources.some(src=>src.station===id)));
  // Reserve a single-line section as soon as an outbound route is set, before the number enters.
  // An empty section must never permit opposing departure routes at the same time.
  if(state.enforce)for(const sec of line.sections){
@@ -137,6 +151,6 @@ function refresh(states,ls,slotsOf){
  for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
  return blocked;
 }
-const api={INTERMEDIATE,viaStations,state,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
+const api={graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

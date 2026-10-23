@@ -1,5 +1,5 @@
 {
-  "version": "0.19.3",
+  "version": "0.19.4",
   "backupDate": "2026-10-23",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 35151,
-      "sha256": "63c9c3bdb09b3f31512e48f17d2feb7efdad0e36e3d14474ca94e86633b4391b"
+      "bytes": 35795,
+      "sha256": "be417f55ce4bb1dfea7b515b42d2b9ccbe47890828d2df5d95eb7f88a50f061a"
     },
     {
       "path": "README.md",
-      "bytes": 11722,
-      "sha256": "48553a431645518767e81940648ac763c12825281271711df829f781da7c90e2"
+      "bytes": 12181,
+      "sha256": "3754bf3cdec3130148c76c1553255991f97ebb5fc651d7004b39ce66f0cd2cb1"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -112,6 +112,11 @@
       "path": "archive/CTC-LAB-v0.19.3.zip",
       "bytes": 9912274,
       "sha256": "bc7ffe94dfc10738a65be5bb0590e265ab7e398376bad98e524a6c96b8c87714"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.19.4.zip",
+      "bytes": 9919446,
+      "sha256": "387ea095417efc155b994bde64a140026654840e55771cd05daf10d82ee123d9"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -212,6 +217,11 @@
       "path": "docs/network-audit-v0.19.3.json",
       "bytes": 29009,
       "sha256": "60380c38247a26211525d115118c4d6b12bc851a517b2935a4051c4d73cd4b99"
+    },
+    {
+      "path": "docs/network-audit-v0.19.4.json",
+      "bytes": 105632,
+      "sha256": "afc574712259e60f05f59bfb3dea1925c790ce476e97a502b1a58d1bd58bd453"
     },
     {
       "path": "docs/preview-v0.10.0-anyang.png",
@@ -1484,6 +1494,16 @@
       "sha256": "38ba3b604f712052808a4b3cf04d3525810180e8d4b1ba771f5fa410693d42e0"
     },
     {
+      "path": "docs/preview-v0.19.4-anyang.png",
+      "bytes": 95471,
+      "sha256": "1658d2cfa2fcd330883c6cc8f9524dd8ca35589f90b01bee40d41b63702dc674"
+    },
+    {
+      "path": "docs/preview-v0.19.4-circuits.png",
+      "bytes": 78961,
+      "sha256": "00d6e75ab1c57513a9f7b66a9335220a66f61216958817841ca1a3b1733c4a73"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -1674,6 +1694,11 @@
       "sha256": "784b062b6dc93994fd39e1545b9620492920ecb0307b87c7c5f9d8b0f706d1a1"
     },
     {
+      "path": "docs/route-conflict-audit-v0.19.4.json",
+      "bytes": 246498,
+      "sha256": "42f61a4ec1d11c3476f1aaa2343cea310ebe7936e37f71364bd7f8b6541c737f"
+    },
+    {
       "path": "docs/station-control-coverage.json",
       "bytes": 27334,
       "sha256": "010f025e578dd6e7c795caaa074829ecffa226afc8a08b968337c97b447be429"
@@ -1739,6 +1764,11 @@
       "sha256": "3ad6885d5f9553f32ff7d82ddca5c6533f5c1c5b5447900ae111c7a903739a31"
     },
     {
+      "path": "docs/v0.19.4-회로단위연결.md",
+      "bytes": 6564,
+      "sha256": "e33f8838bd5890f0cd816a41a75966f5317f51963b4f377cf89d796ff970ea1d"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -1750,8 +1780,8 @@
     },
     {
       "path": "docs/구현현황.md",
-      "bytes": 9427,
-      "sha256": "365eb091dc4f72ad71b33ffaab2a5bb29b8b64273856f4ff825cb2763f6f9943"
+      "bytes": 9769,
+      "sha256": "7395cfec60d178fddcc37c902ef8f74fa365b4d5f3a0996ed336217521d2d78e"
     },
     {
       "path": "docs/데스크톱배선정리.md",
@@ -1760,8 +1790,8 @@
     },
     {
       "path": "docs/선로망-큰가지와-작은가지.md",
-      "bytes": 2811,
-      "sha256": "b960655db646e1a3e4242dcc4fd4df304ae06628c64a8b4b439a16c27e8cc257"
+      "bytes": 3006,
+      "sha256": "aee073a5e894bc5c480295641c4eb5010c91a9ab648fa1f695d0a66a58ab6279"
     },
     {
       "path": "docs/선형전환과화면정리.md",
@@ -1825,8 +1855,8 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 6976,
-      "sha256": "615744b996578072675fc5f5dd44330db227470d5d36c6ff59d7fcc8784f603c"
+      "bytes": 7167,
+      "sha256": "7529622c1d40669d61362caa2924d9510d3a8917bd7d7208488fcf333f3ed8a2"
     },
     {
       "path": "simulator/anyang-parallel.browser.test.py",
@@ -1835,13 +1865,13 @@
     },
     {
       "path": "simulator/anyang-routes.test.cjs",
-      "bytes": 6005,
-      "sha256": "70a8288ecaf87effd299a8aac8d2cb25f4464166af32c91bd887df6892a4bb39"
+      "bytes": 6252,
+      "sha256": "d226e2f807c2daee7c3444a4f181aaed13784eaea93c23f50f0c6eba9802e503"
     },
     {
       "path": "simulator/app.js",
-      "bytes": 28196,
-      "sha256": "dd0ea0288f817fa3b5ddb72f17039a3e4ee8c58d1f722cbe18be94661629f74b"
+      "bytes": 28307,
+      "sha256": "176c12e390f1f7356bfae5ac93d6132ecac60d00c25deb89be2cc486fe7c73d5"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2000,18 +2030,18 @@
     },
     {
       "path": "simulator/autocontrol-ui.js",
-      "bytes": 8373,
-      "sha256": "d66388004fd77138b9f16ec2d004b070ea5ddf6651bfb7163cc400e6e9040bb8"
+      "bytes": 11038,
+      "sha256": "05f67a54a8b50cb77a35db395b7b47ac3a7ef2a9c12ee69277e179073ce231e1"
     },
     {
       "path": "simulator/autocontrol.browser.test.py",
-      "bytes": 4605,
-      "sha256": "701cd8e9c565fdc1abf76a6fdfb70802d58fb2fcd030855609203c8efafc9f8e"
+      "bytes": 4623,
+      "sha256": "fbeb98c3ca7b60179dce8abbff76d23ef55ab721ba75437fb3809b27471c1c80"
     },
     {
       "path": "simulator/autocontrol.js",
-      "bytes": 11763,
-      "sha256": "1ed3e356ae545324d0cd7c7e5e4f21681fcd42cb8ca3908a8f5e00c8568fd7fb"
+      "bytes": 12529,
+      "sha256": "26c7e2857adedd382066da3345035ce8690747f868841fed1165473b17bbe7b2"
     },
     {
       "path": "simulator/autocontrol.test.cjs",
@@ -2045,8 +2075,8 @@
     },
     {
       "path": "simulator/core.js",
-      "bytes": 14543,
-      "sha256": "88f5f37ee12ad46bc6b829c0aa270abded1c0ddf09945645bbab67a4391b9180"
+      "bytes": 14768,
+      "sha256": "d776b60f04c175c902e970cb9d1a9393c1a57ea22088651367af968188f85b79"
     },
     {
       "path": "simulator/core.test.cjs",
@@ -2125,8 +2155,8 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 21359,
-      "sha256": "b9879cde01cc760c38d25efe1db4d4478f48da693897c31d5cb5600b66da16a7"
+      "bytes": 21405,
+      "sha256": "763198e503c69ef3468889a20c43124cf256ef085811b4fd9637e43d04324ac4"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -2161,7 +2191,7 @@
     {
       "path": "simulator/line-block.browser.test.py",
       "bytes": 3348,
-      "sha256": "2e04068e355cda40e40809f633b475d82a879deba319be815322c92153d05342"
+      "sha256": "64f180ee1cdc72f81c56b89704cccec1e2fedd3dec927f3a95dbcc1a862d599b"
     },
     {
       "path": "simulator/line.browser.test.py",
@@ -2170,13 +2200,13 @@
     },
     {
       "path": "simulator/line.js",
-      "bytes": 10334,
-      "sha256": "3b9597f49ce33487e927663280d4bd97cdbed4d4ffc3f877e363967f44356a71"
+      "bytes": 11715,
+      "sha256": "a2aef1b39493d3387c7382513bb045988f18d3bcc4faa162c803038c97d9c0ea"
     },
     {
       "path": "simulator/line.test.cjs",
-      "bytes": 5975,
-      "sha256": "206be3d8047376efa7329ee98f8260e8087221c4660d2ca66e1e61b51e31cafd"
+      "bytes": 5966,
+      "sha256": "69056708bfedd4e60e550f6020b537db713fb2f2e39bc7b2b957869a9c3738bb"
     },
     {
       "path": "simulator/ls-boards.browser.test.py",
@@ -2236,7 +2266,7 @@
     {
       "path": "simulator/ls-view.test.cjs",
       "bytes": 6449,
-      "sha256": "ad1f96012edc14caf43b9ed86d870f6fcd5384a39cfe421589b644bba95946f1"
+      "sha256": "e2ab65db7fdee49bcdbf3fa0c0c1f5d7fab5f55db63995b8b806a830a40f7c14"
     },
     {
       "path": "simulator/ls.browser.test.py",
@@ -2270,8 +2300,8 @@
     },
     {
       "path": "simulator/mmi-line.js",
-      "bytes": 3836,
-      "sha256": "634da13a1d7b7efdc15003e21fadeabb4ce2fc8d5a4ab38f888088670ea295af"
+      "bytes": 4519,
+      "sha256": "da919248c9f8b2b61a60d80f2913dc8c83ee208611206f2d33c1eaadc78b4e70"
     },
     {
       "path": "simulator/mmi-notes.browser.test.py",
@@ -2360,8 +2390,8 @@
     },
     {
       "path": "simulator/network-topology.js",
-      "bytes": 3286,
-      "sha256": "07f0431db9200ef79be652fe423912295812aeeb756b2dd833b185811b3ab1d3"
+      "bytes": 3675,
+      "sha256": "f2cada52e82aca026c7f8be45c7a779f69ccdf0f9bcc2577da38bfdf9b7dd36e"
     },
     {
       "path": "simulator/network-unified.browser.test.py",
@@ -2370,8 +2400,8 @@
     },
     {
       "path": "simulator/network-unified.test.cjs",
-      "bytes": 6042,
-      "sha256": "19fc22c6a89421fa0d8347c31479befed3d5d6353819a52bec924183b541e509"
+      "bytes": 6021,
+      "sha256": "888477c07da2420871af92ec576407f21d0bba83bf430881c148d7bc26010a2f"
     },
     {
       "path": "simulator/network.browser.test.py",
@@ -2394,6 +2424,16 @@
       "sha256": "c53f2e16d063dfa236ae897549cc05e84e355b201c8d01425b7a74232f027a20"
     },
     {
+      "path": "simulator/physical-network.browser.test.py",
+      "bytes": 4470,
+      "sha256": "b99d087b48c54eb5f61e0cdf1b9aac226924634b1344fe8da63ade8340fb5977"
+    },
+    {
+      "path": "simulator/physical-network.test.cjs",
+      "bytes": 4170,
+      "sha256": "f5444651f3e06dbbc97e77f9e5203f0cbc7256e30d03c747542a2d49a582eaab"
+    },
+    {
       "path": "simulator/practice.js",
       "bytes": 5368,
       "sha256": "bbd121bd5fd8d24d97399cdc7596ba8fdbaa4865aaa79d59e8ef9c18711a919e"
@@ -2406,17 +2446,17 @@
     {
       "path": "simulator/route-conflict-audit.cjs",
       "bytes": 4052,
-      "sha256": "a79116df931622505012c321c95c5210c2e274447448d98423d41bebe9fbd87d"
+      "sha256": "dea741a03e423c8a1996453ef5525aa8236a4b354e4020de718135c38b6c7ca1"
     },
     {
       "path": "simulator/route-conflicts.browser.test.py",
       "bytes": 3149,
-      "sha256": "20bf2c76a7406cf86b4440ec5d0d3ccee7b403c0c712fcb83a132516b4e67c92"
+      "sha256": "c9b9dbb0417aad7c8ca7d069cb2f30f506faa104cfa1c8936841fb23405934f0"
     },
     {
       "path": "simulator/route-conflicts.test.cjs",
       "bytes": 665,
-      "sha256": "356011c197a4f5d2a4e66a688bfc941d0c18b7dfc526969bdc50d8ca4c70ebfe"
+      "sha256": "a6575840bfb08595705df5ca4427280b52ade98635e71a9f7593b541ed0ff8a3"
     },
     {
       "path": "simulator/route-menus.js",
@@ -2440,8 +2480,8 @@
     },
     {
       "path": "simulator/scenario-motion.js",
-      "bytes": 11170,
-      "sha256": "df83bdf4883686a01eecc7581f63eeb22fb4135d604cc67f74b68981e7ad1d19"
+      "bytes": 11186,
+      "sha256": "a322b233d11b06118d6e03a8a6d4d674b885f2d8cec7db6fa459157a54b1fa9d"
     },
     {
       "path": "simulator/scenario-motion.test.cjs",
@@ -2460,8 +2500,8 @@
     },
     {
       "path": "simulator/schedule-routes.js",
-      "bytes": 3075,
-      "sha256": "8f84a8c9cd962feea4eb1ba88150e938e55b6bcf2f710796756734780180f437"
+      "bytes": 3586,
+      "sha256": "7dcafeef3db0ec49a34203e9b312a887addff7f121be45f19f7a4ae2adfae9f7"
     },
     {
       "path": "simulator/schedule-routes.test.cjs",
@@ -2539,6 +2579,11 @@
       "sha256": "d0072733a3c7b341d8453a72b93e0a675b7566fbd97357466dd02de08bc64a5a"
     },
     {
+      "path": "simulator/track-network.js",
+      "bytes": 3488,
+      "sha256": "019955e1db26b0873d113d2006adfa91628c6cf5fbe022d35f3e54693183aa75"
+    },
+    {
       "path": "simulator/train-occupancy.browser.test.py",
       "bytes": 3061,
       "sha256": "f98e5e6e622e71aa2443139eec5becee63d6a2d60ba89ee6cb64934151b427a7"
@@ -2570,8 +2615,8 @@
     },
     {
       "path": "simulator/wiring.js",
-      "bytes": 25900,
-      "sha256": "1f512ce41b5a17abb084e68794c2f651125bb5ed0d0de1ef38653d0b6a3286e6"
+      "bytes": 23109,
+      "sha256": "07e25ef678db74f5740917d5ca2e44b99427ce1075f87c8aae12b8fbf6de251b"
     },
     {
       "path": "simulator/wiring.test.cjs",
@@ -2580,8 +2625,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 25499,
-      "sha256": "4162e458edeff74f33fa6fdf96c34372e3a217ae943ea52bdbc2c37cdf1e80fb"
+      "bytes": 26617,
+      "sha256": "8ee4fde0faf7d12ac201faf0be2aec6a325350b7a819f9515771e4671bfcf47f"
     },
     {
       "path": "simulator/고증대조표.json",
@@ -2590,8 +2635,8 @@
     },
     {
       "path": "tools/audit-network.cjs",
-      "bytes": 1596,
-      "sha256": "b1e95c3736e99abffd8a2233885ddec58b564496f331fd2a1e0fa199d356106f"
+      "bytes": 1823,
+      "sha256": "f288d83bd164ef6e66b4346c2feb6c93b2f4842a3ac1822c87a87bd7ddfbf7a6"
     },
     {
       "path": "tools/audit-route-conflicts.cjs",

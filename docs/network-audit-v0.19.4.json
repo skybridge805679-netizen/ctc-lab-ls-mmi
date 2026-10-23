@@ -1,0 +1,5548 @@
+{
+  "version": "0.19.4",
+  "baseBranch": {
+    "ref": "claude/practical-dirac-68tgp6",
+    "commit": "cae0a0afa3b44f8b0dc6fbaa0c3e6212983786a4"
+  },
+  "scope": "원본 추적 구내 그래프·본선 계열별 연결·역간 실제 운행 순서의 정합 검사. 실설비 연동표 또는 실제 폐색 회로표의 완전 복원 아님.",
+  "circuits": {
+    "B004T": {
+      "id": "B004T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    "B006T": {
+      "id": "B006T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    "B008T": {
+      "id": "B008T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        },
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B003T": {
+      "id": "B003T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    "B005T": {
+      "id": "B005T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    "B007T": {
+      "id": "B007T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "reviewed-strip",
+          "slide": [
+            2,
+            3
+          ]
+        },
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B002T": {
+      "id": "B002T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B001T": {
+      "id": "B001T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "cheongnyangni",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B010T": {
+      "id": "B010T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B012T": {
+      "id": "B012T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B018T": {
+      "id": "B018T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B020T": {
+      "id": "B020T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B022T": {
+      "id": "B022T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B024T": {
+      "id": "B024T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B026T": {
+      "id": "B026T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B028T": {
+      "id": "B028T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B030T": {
+      "id": "B030T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B032T": {
+      "id": "B032T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B034T": {
+      "id": "B034T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "B036T": {
+      "id": "B036T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": [
+            3,
+            4
+          ]
+        },
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B009T": {
+      "id": "B009T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B011T": {
+      "id": "B011T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B013T": {
+      "id": "B013T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B019T": {
+      "id": "B019T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B021T": {
+      "id": "B021T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B023T": {
+      "id": "B023T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B025T": {
+      "id": "B025T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B027T": {
+      "id": "B027T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B029T": {
+      "id": "B029T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B031T": {
+      "id": "B031T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B033T": {
+      "id": "B033T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "reviewed-strip",
+          "slide": 3
+        }
+      ]
+    },
+    "B014T": {
+      "id": "B014T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B016T": {
+      "id": "B016T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B015T": {
+      "id": "B015T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B017T": {
+      "id": "B017T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "dongmyo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B038T": {
+      "id": "B038T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B040T": {
+      "id": "B040T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B042T": {
+      "id": "B042T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B048T": {
+      "id": "B048T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B050T": {
+      "id": "B050T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B052T": {
+      "id": "B052T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B054T": {
+      "id": "B054T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B056T": {
+      "id": "B056T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B058T": {
+      "id": "B058T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B060T": {
+      "id": "B060T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B062T": {
+      "id": "B062T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B035T": {
+      "id": "B035T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B037T": {
+      "id": "B037T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B039T": {
+      "id": "B039T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B041T": {
+      "id": "B041T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B047T": {
+      "id": "B047T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B049T": {
+      "id": "B049T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B051T": {
+      "id": "B051T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B053T": {
+      "id": "B053T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B055T": {
+      "id": "B055T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B057T": {
+      "id": "B057T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "reviewed-strip",
+          "slide": 4
+        }
+      ]
+    },
+    "B044T": {
+      "id": "B044T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B046T": {
+      "id": "B046T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B043T": {
+      "id": "B043T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B045T": {
+      "id": "B045T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "jonggak",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B064T": {
+      "id": "B064T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B066T": {
+      "id": "B066T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B068T": {
+      "id": "B068T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B059T": {
+      "id": "B059T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B061T": {
+      "id": "B061T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B063T": {
+      "id": "B063T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "reviewed-strip",
+          "slide": 5
+        }
+      ]
+    },
+    "B070T": {
+      "id": "B070T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B072T": {
+      "id": "B072T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B065T": {
+      "id": "B065T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B067T": {
+      "id": "B067T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "underground-seoul",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B904T": {
+      "id": "B904T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B906T": {
+      "id": "B906T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B908T": {
+      "id": "B908T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B910T": {
+      "id": "B910T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B903T": {
+      "id": "B903T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B905T": {
+      "id": "B905T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B907T": {
+      "id": "B907T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B909T": {
+      "id": "B909T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B911T": {
+      "id": "B911T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B604T": {
+      "id": "B604T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B603T": {
+      "id": "B603T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "reviewed-strip",
+          "slide": 6
+        }
+      ]
+    },
+    "B074T": {
+      "id": "B074T",
+      "trunk": "MD",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B902T": {
+      "id": "B902T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B069T": {
+      "id": "B069T",
+      "trunk": "MU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B901T": {
+      "id": "B901T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B602T": {
+      "id": "B602T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B601T": {
+      "id": "B601T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "seoul",
+          "kind": "native-port",
+          "rail": "7T",
+          "side": "right"
+        }
+      ]
+    },
+    "B916T": {
+      "id": "B916T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        },
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B918T": {
+      "id": "B918T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B920T": {
+      "id": "B920T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B922T": {
+      "id": "B922T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B924T": {
+      "id": "B924T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B917T": {
+      "id": "B917T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        },
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B919T": {
+      "id": "B919T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B921T": {
+      "id": "B921T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B913T": {
+      "id": "B913T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B606T": {
+      "id": "B606T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B912T": {
+      "id": "B912T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "reviewed-strip",
+          "slide": null
+        }
+      ]
+    },
+    "B914T": {
+      "id": "B914T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B915T": {
+      "id": "B915T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B608T": {
+      "id": "B608T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B610T": {
+      "id": "B610T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B605T": {
+      "id": "B605T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B607T": {
+      "id": "B607T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "yongsan",
+          "kind": "native-port",
+          "rail": "YT",
+          "side": "right"
+        }
+      ]
+    },
+    "B930T": {
+      "id": "B930T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B618T": {
+      "id": "B618T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        },
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B616T": {
+      "id": "B616T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        },
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B615T": {
+      "id": "B615T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        },
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B617T": {
+      "id": "B617T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        },
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B619T": {
+      "id": "B619T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        },
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B932T": {
+      "id": "B932T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B934T": {
+      "id": "B934T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B936T": {
+      "id": "B936T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B938T": {
+      "id": "B938T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B931T": {
+      "id": "B931T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B933T": {
+      "id": "B933T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B935T": {
+      "id": "B935T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B937T": {
+      "id": "B937T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B939T": {
+      "id": "B939T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B923T": {
+      "id": "B923T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B925T": {
+      "id": "B925T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B609T": {
+      "id": "B609T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B611T": {
+      "id": "B611T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "reviewed-strip",
+          "slide": 8
+        }
+      ]
+    },
+    "B926T": {
+      "id": "B926T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B928T": {
+      "id": "B928T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B927T": {
+      "id": "B927T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B929T": {
+      "id": "B929T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B612T": {
+      "id": "B612T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B614T": {
+      "id": "B614T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B613T": {
+      "id": "B613T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "noryangjin",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B624T": {
+      "id": "B624T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        },
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": [
+            9,
+            10
+          ]
+        }
+      ]
+    },
+    "B623T": {
+      "id": "B623T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        },
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": [
+            9,
+            10
+          ]
+        }
+      ]
+    },
+    "B944T": {
+      "id": "B944T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        }
+      ]
+    },
+    "B946T": {
+      "id": "B946T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        }
+      ]
+    },
+    "B945T": {
+      "id": "B945T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        }
+      ]
+    },
+    "B947T": {
+      "id": "B947T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "reviewed-strip",
+          "slide": 9
+        }
+      ]
+    },
+    "B620T": {
+      "id": "B620T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B622T": {
+      "id": "B622T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B621T": {
+      "id": "B621T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B940T": {
+      "id": "B940T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "6T",
+          "side": "left"
+        }
+      ]
+    },
+    "B942T": {
+      "id": "B942T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "6T",
+          "side": "right"
+        }
+      ]
+    },
+    "B941T": {
+      "id": "B941T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "7T",
+          "side": "left"
+        }
+      ]
+    },
+    "B943T": {
+      "id": "B943T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "yeongdeungpo",
+          "kind": "native-port",
+          "rail": "7T",
+          "side": "right"
+        }
+      ]
+    },
+    "B952T": {
+      "id": "B952T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B954T": {
+      "id": "B954T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B956T": {
+      "id": "B956T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B958T": {
+      "id": "B958T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B960T": {
+      "id": "B960T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B962T": {
+      "id": "B962T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B964T": {
+      "id": "B964T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B632T": {
+      "id": "B632T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B634T": {
+      "id": "B634T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B636T": {
+      "id": "B636T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B638T": {
+      "id": "B638T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B640T": {
+      "id": "B640T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B631T": {
+      "id": "B631T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B633T": {
+      "id": "B633T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B635T": {
+      "id": "B635T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B637T": {
+      "id": "B637T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B953T": {
+      "id": "B953T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B955T": {
+      "id": "B955T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B957T": {
+      "id": "B957T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B959T": {
+      "id": "B959T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B961T": {
+      "id": "B961T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B626T": {
+      "id": "B626T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B625T": {
+      "id": "B625T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "reviewed-strip",
+          "slide": 10
+        }
+      ]
+    },
+    "B628T": {
+      "id": "B628T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B630T": {
+      "id": "B630T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B627T": {
+      "id": "B627T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B629T": {
+      "id": "B629T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B948T": {
+      "id": "B948T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B950T": {
+      "id": "B950T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B949T": {
+      "id": "B949T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B951T": {
+      "id": "B951T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "guro",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "right"
+        }
+      ]
+    },
+    "B970T": {
+      "id": "B970T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B972T": {
+      "id": "B972T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B974T": {
+      "id": "B974T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B646T": {
+      "id": "B646T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B648T": {
+      "id": "B648T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B650T": {
+      "id": "B650T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B643T": {
+      "id": "B643T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": [
+            11,
+            12
+          ]
+        }
+      ]
+    },
+    "B645T": {
+      "id": "B645T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": [
+            11,
+            12
+          ]
+        }
+      ]
+    },
+    "B647T": {
+      "id": "B647T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": [
+            11,
+            12
+          ]
+        },
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B967T": {
+      "id": "B967T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B969T": {
+      "id": "B969T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B971T": {
+      "id": "B971T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "reviewed-strip",
+          "slide": 11
+        }
+      ]
+    },
+    "B966T": {
+      "id": "B966T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B968T": {
+      "id": "B968T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B642T": {
+      "id": "B642T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B644T": {
+      "id": "B644T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B639T": {
+      "id": "B639T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B641T": {
+      "id": "B641T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B963T": {
+      "id": "B963T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "left"
+        }
+      ]
+    },
+    "B965T": {
+      "id": "B965T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumcheon",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "right"
+        }
+      ]
+    },
+    "B976T": {
+      "id": "B976T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B978T": {
+      "id": "B978T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B980T": {
+      "id": "B980T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B652T": {
+      "id": "B652T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B654T": {
+      "id": "B654T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B656T": {
+      "id": "B656T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B649T": {
+      "id": "B649T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B651T": {
+      "id": "B651T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B653T": {
+      "id": "B653T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B973T": {
+      "id": "B973T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B975T": {
+      "id": "B975T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B977T": {
+      "id": "B977T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B979T": {
+      "id": "B979T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 12
+        }
+      ]
+    },
+    "B986T": {
+      "id": "B986T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B988T": {
+      "id": "B988T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B990T": {
+      "id": "B990T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B662T": {
+      "id": "B662T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B664T": {
+      "id": "B664T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B666T": {
+      "id": "B666T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B668T": {
+      "id": "B668T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B659T": {
+      "id": "B659T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B661T": {
+      "id": "B661T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B663T": {
+      "id": "B663T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B985T": {
+      "id": "B985T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B987T": {
+      "id": "B987T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B989T": {
+      "id": "B989T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "reviewed-strip",
+          "slide": 13
+        }
+      ]
+    },
+    "B982T": {
+      "id": "B982T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B984T": {
+      "id": "B984T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B658T": {
+      "id": "B658T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B660T": {
+      "id": "B660T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B655T": {
+      "id": "B655T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B657T": {
+      "id": "B657T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B981T": {
+      "id": "B981T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "left"
+        }
+      ]
+    },
+    "B983T": {
+      "id": "B983T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "anyang",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "right"
+        }
+      ]
+    },
+    "B670T": {
+      "id": "B670T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B672T": {
+      "id": "B672T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B674T": {
+      "id": "B674T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B676T": {
+      "id": "B676T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B665T": {
+      "id": "B665T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B667T": {
+      "id": "B667T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B669T": {
+      "id": "B669T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B671T": {
+      "id": "B671T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B992T": {
+      "id": "B992T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B991T": {
+      "id": "B991T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "reviewed-strip",
+          "slide": 14
+        }
+      ]
+    },
+    "B994T": {
+      "id": "B994T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B996T": {
+      "id": "B996T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B993T": {
+      "id": "B993T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B995T": {
+      "id": "B995T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "geumjeong",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B1004T": {
+      "id": "B1004T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1006T": {
+      "id": "B1006T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1008T": {
+      "id": "B1008T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1010T": {
+      "id": "B1010T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B682T": {
+      "id": "B682T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B684T": {
+      "id": "B684T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B686T": {
+      "id": "B686T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B688T": {
+      "id": "B688T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B677T": {
+      "id": "B677T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B679T": {
+      "id": "B679T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B681T": {
+      "id": "B681T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B683T": {
+      "id": "B683T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1003T": {
+      "id": "B1003T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1005T": {
+      "id": "B1005T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1007T": {
+      "id": "B1007T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1009T": {
+      "id": "B1009T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "reviewed-strip",
+          "slide": 16
+        }
+      ]
+    },
+    "B1000T": {
+      "id": "B1000T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "left"
+        }
+      ]
+    },
+    "B1002T": {
+      "id": "B1002T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "1T",
+          "side": "right"
+        }
+      ]
+    },
+    "B678T": {
+      "id": "B678T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B680T": {
+      "id": "B680T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B673T": {
+      "id": "B673T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B675T": {
+      "id": "B675T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B999T": {
+      "id": "B999T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B1001T": {
+      "id": "B1001T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "gunpo",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B1016T": {
+      "id": "B1016T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1018T": {
+      "id": "B1018T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1020T": {
+      "id": "B1020T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1022T": {
+      "id": "B1022T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1024T": {
+      "id": "B1024T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1026T": {
+      "id": "B1026T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1028T": {
+      "id": "B1028T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1030T": {
+      "id": "B1030T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1032T": {
+      "id": "B1032T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1034T": {
+      "id": "B1034T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B694T": {
+      "id": "B694T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B696T": {
+      "id": "B696T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B698T": {
+      "id": "B698T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B700T": {
+      "id": "B700T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B702T": {
+      "id": "B702T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B704T": {
+      "id": "B704T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B706T": {
+      "id": "B706T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B708T": {
+      "id": "B708T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B710T": {
+      "id": "B710T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B712T": {
+      "id": "B712T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B689T": {
+      "id": "B689T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B691T": {
+      "id": "B691T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B693T": {
+      "id": "B693T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B695T": {
+      "id": "B695T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B697T": {
+      "id": "B697T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B699T": {
+      "id": "B699T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B701T": {
+      "id": "B701T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B703T": {
+      "id": "B703T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B705T": {
+      "id": "B705T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B707T": {
+      "id": "B707T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1015T": {
+      "id": "B1015T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1017T": {
+      "id": "B1017T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1019T": {
+      "id": "B1019T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1021T": {
+      "id": "B1021T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1023T": {
+      "id": "B1023T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1025T": {
+      "id": "B1025T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1027T": {
+      "id": "B1027T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1029T": {
+      "id": "B1029T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1031T": {
+      "id": "B1031T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "reviewed-strip",
+          "slide": 18
+        }
+      ]
+    },
+    "B1012T": {
+      "id": "B1012T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "left"
+        }
+      ]
+    },
+    "B1014T": {
+      "id": "B1014T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "2T",
+          "side": "right"
+        }
+      ]
+    },
+    "B690T": {
+      "id": "B690T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B692T": {
+      "id": "B692T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "right"
+        }
+      ]
+    },
+    "B685T": {
+      "id": "B685T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B687T": {
+      "id": "B687T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "right"
+        }
+      ]
+    },
+    "B1011T": {
+      "id": "B1011T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "left"
+        }
+      ]
+    },
+    "B1013T": {
+      "id": "B1013T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "uiwang",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "right"
+        }
+      ]
+    },
+    "B1036T": {
+      "id": "B1036T",
+      "trunk": "ED",
+      "sources": [
+        {
+          "station": "suwon",
+          "kind": "native-port",
+          "rail": "3T",
+          "side": "left"
+        }
+      ]
+    },
+    "B714T": {
+      "id": "B714T",
+      "trunk": "GD",
+      "sources": [
+        {
+          "station": "suwon",
+          "kind": "native-port",
+          "rail": "4T",
+          "side": "left"
+        }
+      ]
+    },
+    "B709T": {
+      "id": "B709T",
+      "trunk": "GU",
+      "sources": [
+        {
+          "station": "suwon",
+          "kind": "native-port",
+          "rail": "BT",
+          "side": "left"
+        }
+      ]
+    },
+    "B1035T": {
+      "id": "B1035T",
+      "trunk": "EU",
+      "sources": [
+        {
+          "station": "suwon",
+          "kind": "native-port",
+          "rail": "5T",
+          "side": "left"
+        }
+      ]
+    }
+  },
+  "globalNodes": 1333,
+  "globalEdges": 1421,
+  "externalBoundaries": 7,
+  "numberGaps": [
+    {
+      "section": "ED:geumjeong>gunpo",
+      "from": "B996T",
+      "to": "B1000T"
+    },
+    {
+      "section": "EU:geumjeong>gunpo",
+      "from": "B995T",
+      "to": "B999T"
+    },
+    {
+      "section": "EU:uiwang>suwon",
+      "from": "B1031T",
+      "to": "B1035T"
+    }
+  ],
+  "stations": 33,
+  "controlled": 15,
+  "segments": 32,
+  "nodes": 692,
+  "edges": 734,
+  "routes": 658,
+  "branchBoundaries": 17,
+  "inferredCompositeRoutes": [],
+  "issues": [],
+  "sourceCorrection": {
+    "station": "anyang",
+    "point": "53",
+    "from": "2T",
+    "to": "3T",
+    "sources": [
+      "배선도(관제교육장).pptx slide 12",
+      "1.전체노선.pdf page 3"
+    ]
+  },
+  "circuitChains": {
+    "MD:cheongnyangni>dongmyo": [
+      "B002T",
+      "B004T",
+      "B006T",
+      "B008T",
+      "B010T",
+      "B012T",
+      "B014T"
+    ],
+    "MD:dongmyo>jonggak": [
+      "B016T",
+      "B018T",
+      "B020T",
+      "B022T",
+      "B024T",
+      "B026T",
+      "B028T",
+      "B030T",
+      "B032T",
+      "B034T",
+      "B036T",
+      "B038T",
+      "B040T",
+      "B042T",
+      "B044T"
+    ],
+    "MD:jonggak>underground-seoul": [
+      "B046T",
+      "B048T",
+      "B050T",
+      "B052T",
+      "B054T",
+      "B056T",
+      "B058T",
+      "B060T",
+      "B062T",
+      "B064T",
+      "B066T",
+      "B068T",
+      "B070T"
+    ],
+    "MD:underground-seoul>seoul": [
+      "B072T",
+      "B074T"
+    ],
+    "MU:cheongnyangni>dongmyo": [
+      "B001T",
+      "B003T",
+      "B005T",
+      "B007T",
+      "B009T",
+      "B011T",
+      "B013T",
+      "B015T"
+    ],
+    "MU:dongmyo>jonggak": [
+      "B017T",
+      "B019T",
+      "B021T",
+      "B023T",
+      "B025T",
+      "B027T",
+      "B029T",
+      "B031T",
+      "B033T",
+      "B035T",
+      "B037T",
+      "B039T",
+      "B041T",
+      "B043T"
+    ],
+    "MU:jonggak>underground-seoul": [
+      "B045T",
+      "B047T",
+      "B049T",
+      "B051T",
+      "B053T",
+      "B055T",
+      "B057T",
+      "B059T",
+      "B061T",
+      "B063T",
+      "B065T"
+    ],
+    "MU:underground-seoul>seoul": [
+      "B067T",
+      "B069T"
+    ],
+    "GD:seoul>yongsan": [
+      "B602T",
+      "B604T",
+      "B606T",
+      "B608T"
+    ],
+    "GD:yongsan>noryangjin": [
+      "B610T",
+      "B612T"
+    ],
+    "GD:noryangjin>yeongdeungpo": [
+      "B614T",
+      "B616T",
+      "B618T",
+      "B620T"
+    ],
+    "GD:yeongdeungpo>guro": [
+      "B622T",
+      "B624T",
+      "B626T",
+      "B628T"
+    ],
+    "GD:guro>geumcheon": [
+      "B630T",
+      "B632T",
+      "B634T",
+      "B636T",
+      "B638T",
+      "B640T",
+      "B642T"
+    ],
+    "GD:geumcheon>anyang": [
+      "B644T",
+      "B646T",
+      "B648T",
+      "B650T",
+      "B652T",
+      "B654T",
+      "B656T",
+      "B658T"
+    ],
+    "GD:anyang>gunpo": [
+      "B660T",
+      "B662T",
+      "B664T",
+      "B666T",
+      "B668T",
+      "B670T",
+      "B672T",
+      "B674T",
+      "B676T",
+      "B678T"
+    ],
+    "GD:gunpo>uiwang": [
+      "B680T",
+      "B682T",
+      "B684T",
+      "B686T",
+      "B688T",
+      "B690T"
+    ],
+    "GD:uiwang>suwon": [
+      "B692T",
+      "B694T",
+      "B696T",
+      "B698T",
+      "B700T",
+      "B702T",
+      "B704T",
+      "B706T",
+      "B708T",
+      "B710T",
+      "B712T",
+      "B714T"
+    ],
+    "GU:seoul>yongsan": [
+      "B601T",
+      "B603T",
+      "B605T"
+    ],
+    "GU:yongsan>noryangjin": [
+      "B607T",
+      "B609T",
+      "B611T",
+      "B613T"
+    ],
+    "GU:noryangjin>yeongdeungpo": [
+      "B615T",
+      "B617T",
+      "B619T"
+    ],
+    "GU:yeongdeungpo>guro": [
+      "B621T",
+      "B623T",
+      "B625T",
+      "B627T"
+    ],
+    "GU:guro>geumcheon": [
+      "B629T",
+      "B631T",
+      "B633T",
+      "B635T",
+      "B637T",
+      "B639T"
+    ],
+    "GU:geumcheon>anyang": [
+      "B641T",
+      "B643T",
+      "B645T",
+      "B647T",
+      "B649T",
+      "B651T",
+      "B653T",
+      "B655T"
+    ],
+    "GU:anyang>gunpo": [
+      "B657T",
+      "B659T",
+      "B661T",
+      "B663T",
+      "B665T",
+      "B667T",
+      "B669T",
+      "B671T",
+      "B673T"
+    ],
+    "GU:gunpo>uiwang": [
+      "B675T",
+      "B677T",
+      "B679T",
+      "B681T",
+      "B683T",
+      "B685T"
+    ],
+    "GU:uiwang>suwon": [
+      "B687T",
+      "B689T",
+      "B691T",
+      "B693T",
+      "B695T",
+      "B697T",
+      "B699T",
+      "B701T",
+      "B703T",
+      "B705T",
+      "B707T",
+      "B709T"
+    ],
+    "ED:seoul>yongsan": [
+      "B902T",
+      "B904T",
+      "B906T",
+      "B908T",
+      "B910T",
+      "B912T",
+      "B914T"
+    ],
+    "ED:yongsan>noryangjin": [
+      "B916T",
+      "B918T",
+      "B920T",
+      "B922T",
+      "B924T",
+      "B926T"
+    ],
+    "ED:noryangjin>yeongdeungpo": [
+      "B928T",
+      "B930T",
+      "B932T",
+      "B934T",
+      "B936T",
+      "B938T",
+      "B940T"
+    ],
+    "ED:yeongdeungpo>guro": [
+      "B942T",
+      "B944T",
+      "B946T",
+      "B948T"
+    ],
+    "ED:guro>geumcheon": [
+      "B950T",
+      "B952T",
+      "B954T",
+      "B956T",
+      "B958T",
+      "B960T",
+      "B962T",
+      "B964T",
+      "B966T"
+    ],
+    "ED:geumcheon>anyang": [
+      "B968T",
+      "B970T",
+      "B972T",
+      "B974T",
+      "B976T",
+      "B978T",
+      "B980T",
+      "B982T"
+    ],
+    "ED:anyang>geumjeong": [
+      "B984T",
+      "B986T",
+      "B988T",
+      "B990T",
+      "B992T",
+      "B994T"
+    ],
+    "ED:geumjeong>gunpo": [
+      "B996T",
+      "B1000T"
+    ],
+    "ED:gunpo>uiwang": [
+      "B1002T",
+      "B1004T",
+      "B1006T",
+      "B1008T",
+      "B1010T",
+      "B1012T"
+    ],
+    "ED:uiwang>suwon": [
+      "B1014T",
+      "B1016T",
+      "B1018T",
+      "B1020T",
+      "B1022T",
+      "B1024T",
+      "B1026T",
+      "B1028T",
+      "B1030T",
+      "B1032T",
+      "B1034T",
+      "B1036T"
+    ],
+    "EU:seoul>yongsan": [
+      "B901T",
+      "B903T",
+      "B905T",
+      "B907T",
+      "B909T",
+      "B911T",
+      "B913T",
+      "B915T"
+    ],
+    "EU:yongsan>noryangjin": [
+      "B917T",
+      "B919T",
+      "B921T",
+      "B923T",
+      "B925T",
+      "B927T"
+    ],
+    "EU:noryangjin>yeongdeungpo": [
+      "B929T",
+      "B931T",
+      "B933T",
+      "B935T",
+      "B937T",
+      "B939T",
+      "B941T"
+    ],
+    "EU:yeongdeungpo>guro": [
+      "B943T",
+      "B945T",
+      "B947T",
+      "B949T"
+    ],
+    "EU:guro>geumcheon": [
+      "B951T",
+      "B953T",
+      "B955T",
+      "B957T",
+      "B959T",
+      "B961T",
+      "B963T"
+    ],
+    "EU:geumcheon>anyang": [
+      "B965T",
+      "B967T",
+      "B969T",
+      "B971T",
+      "B973T",
+      "B975T",
+      "B977T",
+      "B979T",
+      "B981T"
+    ],
+    "EU:anyang>geumjeong": [
+      "B983T",
+      "B985T",
+      "B987T",
+      "B989T",
+      "B991T",
+      "B993T"
+    ],
+    "EU:geumjeong>gunpo": [
+      "B995T",
+      "B999T"
+    ],
+    "EU:gunpo>uiwang": [
+      "B1001T",
+      "B1003T",
+      "B1005T",
+      "B1007T",
+      "B1009T",
+      "B1011T"
+    ],
+    "EU:uiwang>suwon": [
+      "B1013T",
+      "B1015T",
+      "B1017T",
+      "B1019T",
+      "B1021T",
+      "B1023T",
+      "B1025T",
+      "B1027T",
+      "B1029T",
+      "B1031T",
+      "B1035T"
+    ]
+  },
+  "boundaries": [
+    {
+      "station": "dongmyo",
+      "code": "CT",
+      "name": "군자기지 출고선",
+      "id": "external:dongmyo:CT",
+      "rail": "CT",
+      "node": "dongmyo:CT:383.000,328.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "dongmyo",
+      "code": "DT",
+      "name": "군자기지 입고선",
+      "id": "external:dongmyo:DT",
+      "rail": "DT",
+      "node": "dongmyo:DT:383.000,532.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "guro",
+      "code": "F1T",
+      "name": "구로 차량기지 입출고선",
+      "id": "external:guro:F1T",
+      "rail": "F1T",
+      "node": "guro:F1T:1009.000,729.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "guro",
+      "code": "F2T",
+      "name": "구로 차량기지 입출고선",
+      "id": "external:guro:F2T",
+      "rail": "4T",
+      "node": "guro:4T:1009.000,778.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "GT",
+      "name": "남부화물기지 A선",
+      "id": "external:uiwang:GT",
+      "rail": "1T",
+      "node": "uiwang:1T:201.000,339.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "FT",
+      "name": "남부화물기지 A선",
+      "id": "external:uiwang:FT",
+      "rail": "1T",
+      "node": "uiwang:1T:1195.000,339.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "ET",
+      "name": "남부화물기지 B선",
+      "id": "external:uiwang:ET",
+      "rail": "6T",
+      "node": "uiwang:6T:190.000,597.000",
+      "outsideSurvey": true
+    }
+  ],
+  "sections": [
+    {
+      "id": "MD:cheongnyangni>dongmyo",
+      "trunk": "MD",
+      "west": "cheongnyangni",
+      "east": "dongmyo",
+      "westSide": "B002T",
+      "eastSide": "B014T",
+      "skipped": []
+    },
+    {
+      "id": "MD:dongmyo>jonggak",
+      "trunk": "MD",
+      "west": "dongmyo",
+      "east": "jonggak",
+      "westSide": "B016T",
+      "eastSide": "B044T",
+      "skipped": []
+    },
+    {
+      "id": "MD:jonggak>underground-seoul",
+      "trunk": "MD",
+      "west": "jonggak",
+      "east": "underground-seoul",
+      "westSide": "B046T",
+      "eastSide": "B070T",
+      "skipped": []
+    },
+    {
+      "id": "MD:underground-seoul>seoul",
+      "trunk": "MD",
+      "west": "underground-seoul",
+      "east": "seoul",
+      "westSide": "B072T",
+      "eastSide": "B074T",
+      "skipped": []
+    },
+    {
+      "id": "MU:cheongnyangni>dongmyo",
+      "trunk": "MU",
+      "west": "cheongnyangni",
+      "east": "dongmyo",
+      "westSide": "B001T",
+      "eastSide": "B015T",
+      "skipped": []
+    },
+    {
+      "id": "MU:dongmyo>jonggak",
+      "trunk": "MU",
+      "west": "dongmyo",
+      "east": "jonggak",
+      "westSide": "B017T",
+      "eastSide": "B043T",
+      "skipped": []
+    },
+    {
+      "id": "MU:jonggak>underground-seoul",
+      "trunk": "MU",
+      "west": "jonggak",
+      "east": "underground-seoul",
+      "westSide": "B045T",
+      "eastSide": "B065T",
+      "skipped": []
+    },
+    {
+      "id": "MU:underground-seoul>seoul",
+      "trunk": "MU",
+      "west": "underground-seoul",
+      "east": "seoul",
+      "westSide": "B067T",
+      "eastSide": "B069T",
+      "skipped": []
+    },
+    {
+      "id": "GD:seoul>yongsan",
+      "trunk": "GD",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B602T",
+      "eastSide": "B608T",
+      "skipped": []
+    },
+    {
+      "id": "GD:yongsan>noryangjin",
+      "trunk": "GD",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B610T",
+      "eastSide": "B612T",
+      "skipped": []
+    },
+    {
+      "id": "GD:noryangjin>yeongdeungpo",
+      "trunk": "GD",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B614T",
+      "eastSide": "B620T",
+      "skipped": []
+    },
+    {
+      "id": "GD:yeongdeungpo>guro",
+      "trunk": "GD",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B622T",
+      "eastSide": "B628T",
+      "skipped": []
+    },
+    {
+      "id": "GD:guro>geumcheon",
+      "trunk": "GD",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B630T",
+      "eastSide": "B642T",
+      "skipped": []
+    },
+    {
+      "id": "GD:geumcheon>anyang",
+      "trunk": "GD",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B644T",
+      "eastSide": "B658T",
+      "skipped": []
+    },
+    {
+      "id": "GD:anyang>gunpo",
+      "trunk": "GD",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B660T",
+      "eastSide": "B678T",
+      "skipped": [
+        "geumjeong"
+      ]
+    },
+    {
+      "id": "GD:gunpo>uiwang",
+      "trunk": "GD",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B680T",
+      "eastSide": "B690T",
+      "skipped": []
+    },
+    {
+      "id": "GD:uiwang>suwon",
+      "trunk": "GD",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B692T",
+      "eastSide": "B714T",
+      "skipped": []
+    },
+    {
+      "id": "GU:seoul>yongsan",
+      "trunk": "GU",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B601T",
+      "eastSide": "B605T",
+      "skipped": []
+    },
+    {
+      "id": "GU:yongsan>noryangjin",
+      "trunk": "GU",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B607T",
+      "eastSide": "B613T",
+      "skipped": []
+    },
+    {
+      "id": "GU:noryangjin>yeongdeungpo",
+      "trunk": "GU",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B615T1T",
+      "eastSide": "B619T2T",
+      "skipped": []
+    },
+    {
+      "id": "GU:yeongdeungpo>guro",
+      "trunk": "GU",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B621T",
+      "eastSide": "B627T",
+      "skipped": []
+    },
+    {
+      "id": "GU:guro>geumcheon",
+      "trunk": "GU",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B629T",
+      "eastSide": "B639T",
+      "skipped": []
+    },
+    {
+      "id": "GU:geumcheon>anyang",
+      "trunk": "GU",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B641T",
+      "eastSide": "B655T",
+      "skipped": []
+    },
+    {
+      "id": "GU:anyang>gunpo",
+      "trunk": "GU",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B657T",
+      "eastSide": "B673T",
+      "skipped": [
+        "geumjeong"
+      ]
+    },
+    {
+      "id": "GU:gunpo>uiwang",
+      "trunk": "GU",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B675T",
+      "eastSide": "B685T",
+      "skipped": []
+    },
+    {
+      "id": "GU:uiwang>suwon",
+      "trunk": "GU",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B687T",
+      "eastSide": "B709T",
+      "skipped": []
+    },
+    {
+      "id": "ED:seoul>yongsan",
+      "trunk": "ED",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B902T",
+      "eastSide": "B914T",
+      "skipped": []
+    },
+    {
+      "id": "ED:yongsan>noryangjin",
+      "trunk": "ED",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B916T",
+      "eastSide": "B926T",
+      "skipped": []
+    },
+    {
+      "id": "ED:noryangjin>yeongdeungpo",
+      "trunk": "ED",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B928T",
+      "eastSide": "B940T",
+      "skipped": []
+    },
+    {
+      "id": "ED:yeongdeungpo>guro",
+      "trunk": "ED",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B942T",
+      "eastSide": "B948T",
+      "skipped": []
+    },
+    {
+      "id": "ED:guro>geumcheon",
+      "trunk": "ED",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B950T",
+      "eastSide": "B966T",
+      "skipped": []
+    },
+    {
+      "id": "ED:geumcheon>anyang",
+      "trunk": "ED",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B968T",
+      "eastSide": "B982T",
+      "skipped": []
+    },
+    {
+      "id": "ED:anyang>geumjeong",
+      "trunk": "ED",
+      "west": "anyang",
+      "east": "geumjeong",
+      "westSide": "B984T",
+      "eastSide": "B994T",
+      "skipped": []
+    },
+    {
+      "id": "ED:geumjeong>gunpo",
+      "trunk": "ED",
+      "west": "geumjeong",
+      "east": "gunpo",
+      "westSide": "B996T",
+      "eastSide": "B1000T",
+      "skipped": []
+    },
+    {
+      "id": "ED:gunpo>uiwang",
+      "trunk": "ED",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B1002T",
+      "eastSide": "B1012T",
+      "skipped": []
+    },
+    {
+      "id": "ED:uiwang>suwon",
+      "trunk": "ED",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B1014T",
+      "eastSide": "B1036T",
+      "skipped": []
+    },
+    {
+      "id": "EU:seoul>yongsan",
+      "trunk": "EU",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B901T",
+      "eastSide": "B915T",
+      "skipped": []
+    },
+    {
+      "id": "EU:yongsan>noryangjin",
+      "trunk": "EU",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B917T",
+      "eastSide": "B927T",
+      "skipped": []
+    },
+    {
+      "id": "EU:noryangjin>yeongdeungpo",
+      "trunk": "EU",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B929T",
+      "eastSide": "B941T",
+      "skipped": []
+    },
+    {
+      "id": "EU:yeongdeungpo>guro",
+      "trunk": "EU",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B943T",
+      "eastSide": "B949T",
+      "skipped": []
+    },
+    {
+      "id": "EU:guro>geumcheon",
+      "trunk": "EU",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B951T",
+      "eastSide": "B963T",
+      "skipped": []
+    },
+    {
+      "id": "EU:geumcheon>anyang",
+      "trunk": "EU",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B965T",
+      "eastSide": "B981T",
+      "skipped": []
+    },
+    {
+      "id": "EU:anyang>geumjeong",
+      "trunk": "EU",
+      "west": "anyang",
+      "east": "geumjeong",
+      "westSide": "B983T",
+      "eastSide": "B993T",
+      "skipped": []
+    },
+    {
+      "id": "EU:geumjeong>gunpo",
+      "trunk": "EU",
+      "west": "geumjeong",
+      "east": "gunpo",
+      "westSide": "B995T",
+      "eastSide": "B999T",
+      "skipped": []
+    },
+    {
+      "id": "EU:gunpo>uiwang",
+      "trunk": "EU",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B1001T",
+      "eastSide": "B1011T",
+      "skipped": []
+    },
+    {
+      "id": "EU:uiwang>suwon",
+      "trunk": "EU",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B1013T",
+      "eastSide": "B1035T",
+      "skipped": []
+    }
+  ],
+  "intermediate": {
+    "cityhall": {
+      "host": "jonggak",
+      "slots": {
+        "MD": "B060T",
+        "MU": "B055T"
+      }
+    },
+    "sinseoldong": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B012T",
+        "MU": "B011T"
+      }
+    },
+    "dongdaemun": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B020T",
+        "MU": "B021T"
+      }
+    },
+    "jongno5": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B026T",
+        "MU": "B025T"
+      }
+    },
+    "jongno3": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B034T",
+        "MU": "B031T"
+      }
+    },
+    "namyeong": {
+      "host": "seoul",
+      "slots": {
+        "ED": "B908T",
+        "EU": "B909T",
+        "GD": "B602T",
+        "GU": "B601T"
+      }
+    },
+    "gasan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B956T",
+        "GD": "B632T",
+        "GU": "B631T",
+        "EU": "B953T"
+      }
+    },
+    "doksan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B962T",
+        "GD": "B636T",
+        "GU": "B637T",
+        "EU": "B959T"
+      }
+    },
+    "seoksu": {
+      "host": "geumcheon",
+      "slots": {
+        "ED": "B974T",
+        "GD": "B650T",
+        "GU": "B643T",
+        "EU": "B967T"
+      }
+    },
+    "gwanak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B978T",
+        "GD": "B652T",
+        "GU": "B653T",
+        "EU": "B975T"
+      }
+    },
+    "myeonghak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B990T",
+        "GD": "B666T",
+        "GU": "B663T",
+        "EU": "B989T"
+      }
+    },
+    "dangjeong": {
+      "host": "gunpo",
+      "slots": {
+        "ED": "B1006T",
+        "GD": "B682T",
+        "GU": "B679T",
+        "EU": "B1005T"
+      }
+    },
+    "skku": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1022T",
+        "GD": "B700T",
+        "GU": "B693T",
+        "EU": "B1019T"
+      }
+    },
+    "hwaseo": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1032T",
+        "GD": "B710T",
+        "GU": "B703T",
+        "EU": "B1029T"
+      }
+    },
+    "sindorim": {
+      "host": "yeongdeungpo",
+      "slots": {
+        "GD": "B622T",
+        "GU": "B623T",
+        "ED": "B946T",
+        "EU": "B945T"
+      }
+    },
+    "daebang": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B616T1T",
+        "ED": "B932T",
+        "GU": "B615T2T"
+      }
+    },
+    "singil": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B618T2T",
+        "ED": "B938T",
+        "GU": "B619T1T"
+      }
+    },
+    "jegidong": {
+      "host": "cheongnyangni",
+      "slots": {
+        "MD": "B006T",
+        "MU": "B005T"
+      }
+    }
+  },
+  "localGraphs": {
+    "cheongnyangni": {
+      "nodes": 26,
+      "edges": 27,
+      "ports": [
+        {
+          "code": "AT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:145.000,379.000"
+        },
+        {
+          "code": "B002T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1190.000,379.000"
+        },
+        {
+          "code": "A1T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:145.000,481.000"
+        },
+        {
+          "code": "B001T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1190.000,481.000"
+        },
+        {
+          "code": "MT",
+          "rail": "MT",
+          "side": "left",
+          "node": "MT:295.000,430.000"
+        }
+      ]
+    },
+    "dongmyo": {
+      "nodes": 27,
+      "edges": 26,
+      "ports": [
+        {
+          "code": "B014T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:230.000,379.000"
+        },
+        {
+          "code": "B016T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:820.000,379.000"
+        },
+        {
+          "code": "B015T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:230.000,481.000"
+        },
+        {
+          "code": "B017T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:820.000,481.000"
+        },
+        {
+          "code": "CT",
+          "rail": "CT",
+          "side": "left",
+          "node": "CT:383.000,328.000"
+        },
+        {
+          "code": "DT",
+          "rail": "DT",
+          "side": "left",
+          "node": "DT:383.000,532.000"
+        }
+      ]
+    },
+    "jonggak": {
+      "nodes": 18,
+      "edges": 18,
+      "ports": [
+        {
+          "code": "B044T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:326.000,379.000"
+        },
+        {
+          "code": "B046T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:982.000,379.000"
+        },
+        {
+          "code": "B043T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:326.000,481.000"
+        },
+        {
+          "code": "B045T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:982.000,481.000"
+        }
+      ]
+    },
+    "underground-seoul": {
+      "nodes": 26,
+      "edges": 27,
+      "ports": [
+        {
+          "code": "B070T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:313.000,379.000"
+        },
+        {
+          "code": "B072T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1280.000,379.000"
+        },
+        {
+          "code": "B065T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:313.000,481.000"
+        },
+        {
+          "code": "B067T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1280.000,481.000"
+        },
+        {
+          "code": "MT",
+          "rail": "MT",
+          "side": "right",
+          "node": "MT:1148.000,429.000"
+        }
+      ]
+    },
+    "seoul": {
+      "nodes": 57,
+      "edges": 60,
+      "ports": [
+        {
+          "code": "B074T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:35.000,344.000"
+        },
+        {
+          "code": "B902T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:815.000,344.000"
+        },
+        {
+          "code": "B069T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:85.000,395.000"
+        },
+        {
+          "code": "B901T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:815.000,395.000"
+        },
+        {
+          "code": "B602T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1100.000,654.000"
+        },
+        {
+          "code": "B601T",
+          "rail": "7T",
+          "side": "right",
+          "node": "7T:1100.000,705.000"
+        }
+      ]
+    },
+    "yongsan": {
+      "nodes": 76,
+      "edges": 83,
+      "ports": [
+        {
+          "code": "B914T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:136.000,477.000"
+        },
+        {
+          "code": "B916T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:995.000,477.000"
+        },
+        {
+          "code": "B915T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:67.000,527.000"
+        },
+        {
+          "code": "B917T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1090.000,527.000"
+        },
+        {
+          "code": "B608T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:155.000,577.000"
+        },
+        {
+          "code": "B610T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1210.000,577.000"
+        },
+        {
+          "code": "B605T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:155.000,626.000"
+        },
+        {
+          "code": "B607T",
+          "rail": "YT",
+          "side": "right",
+          "node": "YT:1210.000,626.000"
+        },
+        {
+          "code": "CT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:443.000,725.000"
+        }
+      ]
+    },
+    "noryangjin": {
+      "nodes": 32,
+      "edges": 31,
+      "ports": [
+        {
+          "code": "B926T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:82.000,388.000"
+        },
+        {
+          "code": "B928T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:800.000,388.000"
+        },
+        {
+          "code": "B927T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:82.000,439.000"
+        },
+        {
+          "code": "B929T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:800.000,439.000"
+        },
+        {
+          "code": "B612T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:82.000,490.000"
+        },
+        {
+          "code": "B614T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:800.000,490.000"
+        },
+        {
+          "code": "B613T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:82.000,541.000"
+        },
+        {
+          "code": "B615T1T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:800.000,541.000"
+        }
+      ]
+    },
+    "yeongdeungpo": {
+      "nodes": 70,
+      "edges": 76,
+      "ports": [
+        {
+          "code": "B620T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:170.000,346.000"
+        },
+        {
+          "code": "B622T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1275.000,346.000"
+        },
+        {
+          "code": "B619T2T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:170.000,395.000"
+        },
+        {
+          "code": "B621T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1275.000,395.000"
+        },
+        {
+          "code": "B940T",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:170.000,692.000"
+        },
+        {
+          "code": "B942T",
+          "rail": "6T",
+          "side": "right",
+          "node": "6T:1275.000,692.000"
+        },
+        {
+          "code": "B941T",
+          "rail": "7T",
+          "side": "left",
+          "node": "7T:170.000,742.000"
+        },
+        {
+          "code": "B943T",
+          "rail": "7T",
+          "side": "right",
+          "node": "7T:1275.000,742.000"
+        }
+      ]
+    },
+    "guro": {
+      "nodes": 56,
+      "edges": 58,
+      "ports": [
+        {
+          "code": "B628T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:155.000,369.000"
+        },
+        {
+          "code": "B630T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1090.000,369.000"
+        },
+        {
+          "code": "B627T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:155.000,421.000"
+        },
+        {
+          "code": "B629T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1090.000,421.000"
+        },
+        {
+          "code": "B948T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:30.000,729.000"
+        },
+        {
+          "code": "B950T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1090.000,318.000"
+        },
+        {
+          "code": "B949T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:30.000,778.000"
+        },
+        {
+          "code": "F2T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1009.000,778.000"
+        },
+        {
+          "code": "AT",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:175.000,829.000"
+        },
+        {
+          "code": "B951T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1090.000,471.000"
+        },
+        {
+          "code": "F1T",
+          "rail": "F1T",
+          "side": "right",
+          "node": "F1T:1009.000,729.000"
+        }
+      ]
+    },
+    "geumcheon": {
+      "nodes": 64,
+      "edges": 72,
+      "ports": [
+        {
+          "code": "B966T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:14.000,319.000"
+        },
+        {
+          "code": "B968T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1180.000,319.000"
+        },
+        {
+          "code": "B642T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:14.000,370.000"
+        },
+        {
+          "code": "B644T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1180.000,370.000"
+        },
+        {
+          "code": "B639T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:14.000,421.000"
+        },
+        {
+          "code": "B641T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1180.000,421.000"
+        },
+        {
+          "code": "B963T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:14.000,473.000"
+        },
+        {
+          "code": "B965T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1000.000,473.000"
+        },
+        {
+          "code": "26BT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:355.000,524.000"
+        }
+      ]
+    },
+    "anyang": {
+      "nodes": 56,
+      "edges": 60,
+      "ports": [
+        {
+          "code": "B982T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:155.000,426.000"
+        },
+        {
+          "code": "B984T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1163.000,426.000"
+        },
+        {
+          "code": "B658T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:155.000,478.000"
+        },
+        {
+          "code": "B660T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1163.000,478.000"
+        },
+        {
+          "code": "B655T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:155.000,530.000"
+        },
+        {
+          "code": "B657T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1163.000,530.000"
+        },
+        {
+          "code": "B981T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:155.000,581.000"
+        },
+        {
+          "code": "B983T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1163.000,581.000"
+        },
+        {
+          "code": "CT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:384.000,633.000"
+        }
+      ]
+    },
+    "geumjeong": {
+      "nodes": 28,
+      "edges": 28,
+      "ports": [
+        {
+          "code": "B994T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:150.000,426.000"
+        },
+        {
+          "code": "B996T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1008.000,426.000"
+        },
+        {
+          "code": "B993T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:150.000,581.000"
+        },
+        {
+          "code": "B995T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1008.000,581.000"
+        },
+        {
+          "code": "CT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:250.000,375.000"
+        }
+      ]
+    },
+    "gunpo": {
+      "nodes": 35,
+      "edges": 36,
+      "ports": [
+        {
+          "code": "B1000T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:40.000,391.000"
+        },
+        {
+          "code": "B1002T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1130.000,391.000"
+        },
+        {
+          "code": "B678T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:40.000,443.000"
+        },
+        {
+          "code": "B680T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1130.000,443.000"
+        },
+        {
+          "code": "B673T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:40.000,495.000"
+        },
+        {
+          "code": "B675T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1130.000,495.000"
+        },
+        {
+          "code": "B999T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:40.000,546.000"
+        },
+        {
+          "code": "B1001T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1130.000,546.000"
+        }
+      ]
+    },
+    "uiwang": {
+      "nodes": 61,
+      "edges": 67,
+      "ports": [
+        {
+          "code": "GT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:201.000,339.000"
+        },
+        {
+          "code": "FT",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1195.000,339.000"
+        },
+        {
+          "code": "B1012T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:70.000,391.000"
+        },
+        {
+          "code": "B1014T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1320.000,391.000"
+        },
+        {
+          "code": "B690T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:70.000,443.000"
+        },
+        {
+          "code": "B692T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1320.000,443.000"
+        },
+        {
+          "code": "B685T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:70.000,494.000"
+        },
+        {
+          "code": "B687T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1320.000,494.000"
+        },
+        {
+          "code": "B1011T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:70.000,546.000"
+        },
+        {
+          "code": "B1013T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1320.000,546.000"
+        },
+        {
+          "code": "ET",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:190.000,597.000"
+        },
+        {
+          "code": "55BT",
+          "rail": "6T",
+          "side": "right",
+          "node": "6T:1010.000,597.000"
+        }
+      ]
+    },
+    "suwon": {
+      "nodes": 60,
+      "edges": 65,
+      "ports": [
+        {
+          "code": "B1036T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:38.000,391.000"
+        },
+        {
+          "code": "B714T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:38.000,443.000"
+        },
+        {
+          "code": "B709T",
+          "rail": "BT",
+          "side": "left",
+          "node": "BT:38.000,494.000"
+        },
+        {
+          "code": "B1035T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:38.000,546.000"
+        }
+      ]
+    }
+  }
+}

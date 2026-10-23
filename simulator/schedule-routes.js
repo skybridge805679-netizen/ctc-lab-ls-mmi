@@ -24,6 +24,10 @@ function estimate(stationId,direction){
  const arrivals=of('장내').filter(id=>!/^B\d+T/.test(C.routes[id].destination));
  const arr=arrivals.find(id=>C.routes[id].destination===track)||arrivals[0];
  const departures=of('출발').filter(id=>{const m=C.routes[id].destination.match(/^B(\d+)T/);return m&&((+m[1])%2===0)===(direction==='down');});
+ // Prefer departure from the arrival platform and the fewest reverse switches.
+ // Sorting circuit numbers alone sent Anyang's stopping train onto the general line that bypasses Geumjeong.
+ const platform=arr&&C.routes[arr].destination;
+ departures.sort((a,b)=>Number(C.routes[b].geometryRails?.[0]===platform)-Number(C.routes[a].geometryRails?.[0]===platform)||Object.values(C.routes[a].pointPositions).filter(v=>v==='R').length-Object.values(C.routes[b].pointPositions).filter(v=>v==='R').length||nat(a,b));
  const dep=departures[0];
  return {arr:arr&&name(arr),dep:dep&&name(dep)};
 }

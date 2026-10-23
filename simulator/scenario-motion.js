@@ -82,7 +82,7 @@ function create(host){
    }
    if(s.routes[id].occupied||s.routes[id].lock){j.reason='앞 열차 통과·쇄정 해제 대기 · '+id;return;}
    if(s.signals[C.routes[id].signal]!=='GO'){j.reason='진행신호 대기 · '+C.routes[id].signal;return;}
-   const r=C.dispatch(s,{type:'occupy',id,seconds:20,source:'SCENARIO'});if(!r.ok){j.reason=r.message;return;}
+   const r=C.dispatch(s,{type:'occupy',id,number:j.number,seconds:20,source:'SCENARIO'});if(!r.ok){j.reason=r.message;return;}
    Object.assign(s.routes[id].train,{scenario:j.id,uid:j.uid,number:j.number});j.route=id;j.phase='moving';j.fromTime=s.clock;j.until=s.clock+20;j.reason='진로 진행 · '+id;return;
   }
   if(!straight&&!j.manual&&!j.action.handover){j.reason='일치하는 진로가 없습니다 · 수동 이동 확인 필요';return;}

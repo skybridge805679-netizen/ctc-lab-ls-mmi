@@ -1,5 +1,5 @@
-/* One composite network: the line spine owns all stops, each interlocking owns its native track graph.
-   Inter-station edges express known station order, not unprovided physical block/interlocking tables. */
+/* Composite network: source-backed circuit edges join native station graphs.
+   The station spine is a display index; unprovided outside-yard layout is not invented. */
 (function(root){'use strict';
 const node=typeof module!=='undefined',N=node?require('./network'):root.SimNetwork,L=node?require('./line'):root.SimLine;
 const spine=N.stations.map(s=>({id:s.id,name:s.name,order:s.order,controlled:s.controlled}));
@@ -27,8 +27,9 @@ function audit(){
   for(const [id,r]of Object.entries(N.catalog[station].routes)){routes++;if(r.resources.some(e=>!resources.has(e)))issues.push(station+' route resource missing '+id);if(r.resourceModel==='conservative-composite')inferredCompositeRoutes.push({station,route:id,note:r.evidence});else if(!localPath(station,id).contiguous)issues.push(station+' disconnected route '+id);}
   for(const p of g.ports)if(!ids.has(p.node))issues.push(station+' missing boundary '+p.code);
  }
- return {stations:spine.length,controlled:Object.keys(locals).length,segments:segments.length,nodes,edges,routes,branchBoundaries:ports.filter(p=>p.kind==='branch-boundary').length,inferredCompositeRoutes,issues};
+ for(const e of L.graph.edges)if(!L.graph.nodes[e.a]||!L.graph.nodes[e.b])issues.push('missing global endpoint '+e.id);
+ return {circuits:Object.keys(L.graph.circuits).length,globalNodes:Object.keys(L.graph.nodes).length,globalEdges:L.graph.edges.length,externalBoundaries:L.graph.boundaries.length,numberGaps:L.graph.edges.filter(e=>e.numberGap).map(e=>({section:e.section,from:e.a.split(':')[0],to:e.b.split(':')[0]})),stations:spine.length,controlled:Object.keys(locals).length,segments:segments.length,nodes,edges,routes,branchBoundaries:ports.filter(p=>p.kind==='branch-boundary').length,inferredCompositeRoutes,issues};
 }
-const api={spine,segments,locals,ports,trunks:L.line.stations,sections:L.line.sections,path,localPath,audit};
+const api={physical:L.graph,spine,segments,locals,ports,trunks:L.line.stations,sections:L.line.sections,path,localPath,audit};
 if(node)module.exports=api;else root.SimNetworkTopology=api;
 })(typeof window!=='undefined'?window:globalThis);

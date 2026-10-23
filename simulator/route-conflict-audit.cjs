@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict');
 const N=require('./network'),Core=require('./core'),IL=require('./interlocking');
 function audit(){
- const report={version:'0.19.2',scope:'15개 역 원본 배선 추적 데이터·문서화된 오버랩과의 대조. 실물 LS 연동표 전수 확인 아님.',totals:{stations:0,routes:0,pairs:0,orders:0,allowed:0,blocked:0,sharedNormalPairs:0,newlyAllowed:0,lifecycleOrders:0},stations:[],newlyAllowed:[]};
+ const report={version:'0.19.4',scope:'15개 역 원본 배선 추적 데이터·문서화된 오버랩과의 대조. 실물 LS 연동표 전수 확인 아님.',totals:{stations:0,routes:0,pairs:0,orders:0,allowed:0,blocked:0,sharedNormalPairs:0,newlyAllowed:0,lifecycleOrders:0},stations:[],newlyAllowed:[]};
  for(const st of N.stations.filter(s=>s.controlled)){
   const C=Core.forStation(st.id),ids=Object.keys(C.routes),stat={station:st.id,name:st.name,routes:ids.length,pairs:0,allowed:0,blocked:0,sharedNormalPairs:0,newlyAllowed:0};
   report.totals.stations++;report.totals.routes+=ids.length;

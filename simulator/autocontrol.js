@@ -18,7 +18,7 @@ const Network=typeof module!=='undefined'?require('./network-topology.js'):root.
 const internal=text=>String(text||'').replace('_','-');
 
 function create({core,stations,refresh=()=>{}}){
- const mem=new Map(),troubles=new Map(),actual=new Map(),started=new Map();
+ const mem=new Map(),troubles=new Map(),actual=new Map(),started=new Map(),outside=new Map();
  const controlled=new Set(stations.filter(s=>s.controlled).map(s=>s.id));
  function plan(train,call){
   const a=call.arrival,d=call.departure,hasArr=!!call.arrivalRoute&&call.stopType!=='시발',hasDep=!!call.departureRoute&&call.stopType!=='종착';
@@ -47,6 +47,7 @@ function create({core,stations,refresh=()=>{}}){
   }
   todo.sort((x,y)=>x.p.tTrig-y.p.tTrig);        // earliest train first (우선순위)
   for(const {train,call} of todo){
+   if(outside.has(train.id))continue;
    const planned=plan(train,call);
    const station=call.station,s=states[station],c=core.forStation(station);if(!s)continue;
    const t=s.clock,k=key(train,call);let m=mem.get(k);
@@ -78,6 +79,7 @@ function create({core,stations,refresh=()=>{}}){
    if(m.stage===0&&!p.hasArr&&t<p.tTrig)continue;
    // ---- arrival side
    if(p.hasArr&&m.stage<4){
+    if(numbers?.ready&&!numbers.ready(station,train))continue;
     if(m.stage===0){
      // AUTO started while the train already stands at the platform: just place its number
      if(t>=call.arrival+inherited&&started.get(train.id)>=call.arrival+inherited){m.stage=4;numbers?.place(station,R[p.arrRoute]?.destination,train);emit({type:'arrived',station,train:train.id});}
@@ -91,10 +93,11 @@ function create({core,stations,refresh=()=>{}}){
      if(request(p.arrRoute,'장내')==='set')m.stage=2;
     }
     if(m.stage===2){
+     if(numbers?.canEnter&&!numbers.canEnter(station,train))continue;
      if(!s.routes[p.arrRoute]){m.stage=1;continue;}  // the route was cancelled by the controller: ask again if still AUTO
      if(t>=p.tArr&&!s.routes[p.arrRoute].lock){
-      const r=c.dispatch(s,{type:'occupy',id:p.arrRoute,source:'AUTO'});
-      if(r.ok){m.enteredAt=t;m.arrDelay=Math.max(0,t-planned.tArr);m.stage=3;emit({type:'enter',station,train:train.id,route:p.arrRoute});numbers?.place(station,R[p.arrRoute].destination,train);}
+      const r=c.dispatch(s,{type:'occupy',id:p.arrRoute,number:train.id,source:'AUTO'});
+      if(r.ok){s.routes[p.arrRoute].train.number=train.id;m.enteredAt=t;m.arrDelay=Math.max(0,t-planned.tArr);m.stage=3;emit({type:'enter',station,train:train.id,route:p.arrRoute});numbers?.place(station,R[p.arrRoute].destination,train);}
      }
     }
     if(m.stage===3&&t>=m.enteredAt+ENTER_LEAD){
@@ -114,8 +117,8 @@ function create({core,stations,refresh=()=>{}}){
      if(t>=p.tDep&&!s.routes[p.depRoute].lock){
       refresh();
       const blocker=s.exitBlocked?.[R[p.depRoute]?.destination];if(blocker&&blocker!==train.id)continue;
-      const r=c.dispatch(s,{type:'occupy',id:p.depRoute,source:'AUTO'});
-      if(r.ok){m.leftAt=t;m.stage=6;emit({type:'depart',station,train:train.id,route:p.depRoute});numbers?.depart(station,R[p.depRoute].destination,train);}
+      const r=c.dispatch(s,{type:'occupy',id:p.depRoute,number:train.id,source:'AUTO'});
+      if(r.ok){s.routes[p.depRoute].train.number=train.id;m.leftAt=t;m.stage=6;emit({type:'depart',station,train:train.id,route:p.depRoute});numbers?.depart(station,R[p.depRoute].destination,train);}
      }
     }
     if(m.stage===6&&t>=m.leftAt+EXIT_LEAD){
@@ -132,7 +135,9 @@ function create({core,stations,refresh=()=>{}}){
         if(T.valid(copy)){for(let q=i+1;q<train.calls.length;q++){train.calls[q].arrival+=depDelay;train.calls[q].departure+=depDelay;}model.changes.push({type:'delay',auto:true,id:train.id,station:train.calls[i+1].station,seconds:depDelay});m.propagatedDelay=0;emit({type:'reflected',station,train:train.id,seconds:depDelay});}}
       }
      }
-     numbers?.handoff?.(station,train,R[p.depRoute]?.destination,m.propagatedDelay);
+     const boundary=Network.physical.boundaries.find(b=>b.station===station&&b.code===R[p.depRoute]?.destination);
+     if(boundary){outside.set(train.id,boundary);emit({type:'externalHandover',station,train:train.id,boundary:boundary.id});}
+     else numbers?.handoff?.(station,train,R[p.depRoute]?.destination,m.propagatedDelay);
     }
    }
   }
@@ -141,6 +146,7 @@ function create({core,stations,refresh=()=>{}}){
  function run(ctx,cap=25){const all=[];for(let i=0;i<cap;i++){const r=step(ctx);all.push(...r.events);if(!r.changed)break;}return all;}
  function position(train,now){
   if(train.cancelled||!started.has(train.id))return null;
+  const boundary=outside.get(train.id);if(boundary)return {station:boundary.station,order:stations.find(s=>s.id===boundary.station).order,status:'기지 인계',actual:true,boundary:boundary.id};
   const calls=train.calls.filter(c=>!c.cancelled&&controlled.has(c.station));
   const active=calls.find(c=>{const m=mem.get(key(train,c));return m&&!m.skipped&&m.stage<7;});
   if(active){const m=mem.get(key(train,active));if(m.stage>=1)return {station:active.station,order:stations.find(s=>s.id===active.station).order,status:m.stage<3?'접근':m.stage===3?'진입':m.stage===6?'출발':'정차',actual:true};}
@@ -152,7 +158,7 @@ function create({core,stations,refresh=()=>{}}){
   }
   return null;
  }
- return {step,run,position,reset:()=>{mem.clear();troubles.clear();actual.clear();started.clear();},actuals:()=>[...actual.values()],troubles:()=>[...troubles.values()],stageOf:(t,c)=>mem.get(key(t,c))?.stage??0};
+ return {step,run,position,reset:()=>{mem.clear();troubles.clear();actual.clear();started.clear();outside.clear();},actuals:()=>[...actual.values()],troubles:()=>[...troubles.values()],stageOf:(t,c)=>mem.get(key(t,c))?.stage??0};
 }
 const api={create,TRIGGER_LEAD,ENTER_LEAD,DEP_LEAD,EXIT_LEAD,PASS_DWELL};
 if(typeof module!=='undefined')module.exports=api;else root.SimAuto=api;

@@ -7,7 +7,7 @@ assert.ok(/^M[\d. ]+(L[\d. ]+)+$/.test(r.path)&&r.resources.length>4);
 // settable from CCM; it excludes the other 4B route and 4C's routes that share its track
 const s=c.initial();c.dispatch(s,{type:'mode',value:'CCM',source:'x'});
 const set=c.dispatch(s,{type:'route',id:'4B-B660T',source:'x'});assert.ok(set.ok,set.message);assert.strictEqual(s.signals['4B'],'GO');assert.strictEqual(s.points['53'],'R');
-for(const other of ['4B-B984T','4C-B660T','4C-B984T'])assert.ok(!c.dispatch(s,{type:'route',id:other,source:'x'}).ok,other+' conflicts');
+for(const other of ['4B-B984T','4C-B660T'])assert.ok(!c.dispatch(s,{type:'route',id:other,source:'x'}).ok,other+' conflicts');
 assert.ok(c.dispatch(s,{type:'stop',id:'4B',source:'x'}).ok);
 assert.ok(c.dispatch(s,{type:'route',id:'4B-B984T',source:'x'}).ok,'the other 4B route is still settable after the stop');
 // 4A (사진: RT_4A_B984T, RT_4A_B660T): both exist, the long one crosses 1T→2T→3T and excludes the 4B routes
@@ -63,3 +63,6 @@ for(const kind of ['opposite-position','unknown-position','shared-track']){
 }
 {const t=c.initial();for(const id of ['4C-B660T','4A-B984T'])assert(c.dispatch(t,{type:'route',id,auto:true}).ok,'AUTO uses the same observed compatibility');}
 console.log('PASS shared normal locking still rejects opposite/unknown point positions and shared track');
+
+assert(!c.routes['4C-B984T'],'the source 53B→53A crossover does not run from 3T to 2T towards Suwon');
+for(const id of ['4A-B660T','4B-B660T'])assert(require('./network-topology').localPath('anyang',id).contiguous,id+' is now a native continuous route');

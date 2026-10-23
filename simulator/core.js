@@ -131,6 +131,7 @@
   if(a.type==='occupy'){
    const r=routes[a.id],active=s.routes[a.id];if(!r||!active)return log(false,'설정된 진로를 선택하세요.');
    if(active.occupied)return log(false,'이미 점유된 진로입니다.');
+   if(s.exitBlocked?.[r.destination]&&s.exitBlocked[r.destination]!==a.number)return log(false,'전방 폐색 구간('+r.destination+')에 열차 '+s.exitBlocked[r.destination]+'이(가) 있어 진입할 수 없습니다.');
    if(active.lock)return log(false,'접근쇄정 중에는 정지신호입니다. 남은 '+remaining(s,active)+'초');
    delete s.approach[r.signal];active.occupied=true;active.status='OCCUPIED';s.signals[r.signal]='STOP';
    const travelSeconds=Number(a.seconds);active.train={from:s.clock,to:s.clock+(Number.isFinite(travelSeconds)&&travelSeconds>0?travelSeconds:20)};       // 열차가 진로를 지나는 구간(LS의 붉은 점유 표시가 따라 움직임)
