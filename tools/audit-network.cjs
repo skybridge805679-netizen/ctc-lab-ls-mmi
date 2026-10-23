@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),G=require('../simulator/network-topology'),L=require('../simulator/line'),N=require('../simulator/network'),TW=require('../simulator/train-windows');
+const report={version:'0.19.3',reviewedBranch:{ref:'claude/practical-dirac-68tgp6',commit:'cae0a0afa3b44f8b0dc6fbaa0c3e6212983786a4'},scope:'원본 추적 구내 그래프·본선 계열별 연결·역간 실제 운행 순서의 정합 검사. 실설비 연동표 또는 실제 폐색 회로표의 완전 복원 아님.',...G.audit(),sections:L.line.sections,intermediate:L.INTERMEDIATE,localGraphs:Object.fromEntries(Object.entries(G.locals).map(([id,g])=>[id,{nodes:g.nodes.length,edges:g.edges.length,ports:g.ports}]))};
+assert.deepEqual(report.issues,[]);assert.equal(Object.keys(L.INTERMEDIATE).length,N.stations.filter(s=>!s.controlled).length);
+for(const [station,view]of Object.entries(L.INTERMEDIATE))for(const [trunk,slot]of Object.entries(view.slots))assert(TW.data[view.host].some(w=>w.slot===slot),station+' '+trunk+' '+slot);
+for(const sec of L.line.sections)assert(L.entrySlot(sec.east,sec.trunk,'down',TW.data[sec.east].map(w=>w.slot))&&L.entrySlot(sec.west,sec.trunk,'up',TW.data[sec.west].map(w=>w.slot)),sec.id);
+if(process.argv[2])fs.writeFileSync(process.argv[2],JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({stations:report.stations,controlled:report.controlled,sections:report.sections.length,nodes:report.nodes,edges:report.edges,routes:report.routes,inferredCompositeRoutes:report.inferredCompositeRoutes,issues:report.issues},null,2));

@@ -1,6 +1,6 @@
 /* Scenario trains use the same interlocking and virtual clock as timetable trains. */
 (function(root){'use strict';
-const node=typeof module!=='undefined',Core=node?require('./core'):root.SimCore,W=node?require('./wiring'):root.SimWiring,LS=node?require('./ls-view'):root.SimLS,N=node?require('./network'):root.SimNetwork;
+const node=typeof module!=='undefined',Core=node?require('./core'):root.SimCore,W=node?require('./wiring'):root.SimWiring,LS=node?require('./ls-view'):root.SimLS,N=node?require('./network'):root.SimNetwork,L=node?require('./line'):root.SimLine;
 function point(station,slot){
  const def=W.data[station],r=def?.rails.find(r=>r[0]===slot);
  if(r){const x=r[2]??(r[1][0][0]+r[1].at(-1)[0])/2;return [x,LS.railY(def,r[0],x)];}
@@ -37,6 +37,7 @@ function create(host){
   const j={id:'SCM'+(++serial),uid:action.uid,number:f.train.number,station:f.station,fromStation:previous?.action.targetStation||f.station,from:previous?.action.targetSlot||f.slot,to:action.targetSlot||'관제구간 밖',action:{...action},manual,phase:'waiting',reason:'앞 열차 통과 대기'};jobs.push(j);step();return {ok:true,pending:j.phase!=='done',message:f.train.number+' 이동 접수 · '+(j.reason||'진행 중')};
  }
  function begin(j,f){
+  L?.refresh(states(),ls());
   j.station=f.station;j.fromStation=f.station;j.from=f.slot;j.number=f.train.number;if(j.action.op==='move'&&j.action.targetStation===f.station&&j.action.targetSlot===f.slot){j.phase='done';return;}
   const target=j.action.targetStation||f.station;let to=j.action.targetSlot;
   // Deletion at the scenario's exit beat waits for earlier movement, then leaves the displayed area.
@@ -65,7 +66,9 @@ function create(host){
 
   if(id){
    if(s.mode==='LOCAL'||s.pending){j.reason='관제 제어권 확인 대기';return;}
-   const r0=C.routes[id],fault=(s.faults?.signals||[]).includes(r0.signal)||(r0.pointLocks||[]).some(p=>(s.faults?.points||[]).includes(p));
+   const r0=C.routes[id],blocked=s.exitBlocked?.[r0.destination];
+   if(blocked&&blocked!==j.number){j.reason='전방 폐색 구간에 열차 '+blocked+' · '+id;return;}
+   const fault=(s.faults?.signals||[]).includes(r0.signal)||(r0.pointLocks||[]).some(p=>(s.faults?.points||[]).includes(p));
    if(fault){j.reason='진로 내 신호기·전환기 장애';return;}
    const targetRows=ls().stations[target]?.windows[to]||[];
    if(targetRows.some(t=>t.uid!==j.uid)&&W.data[target].rails.some(r=>r[0]===to)&&!j.manual){j.reason='도착 선로의 선행열차 통과 대기';return;}

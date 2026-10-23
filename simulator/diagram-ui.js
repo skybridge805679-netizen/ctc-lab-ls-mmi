@@ -55,7 +55,7 @@
    let best=null;for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1);if(len>12&&Math.max(x1,x2)>left&&Math.min(x1,x2)<left+plotW&&(!best||len>best.len))best={len,x1,y1,x2,y2};}
    if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
-   const pos=T.position(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
+   const pos=(root.SimAutoUI?.position||T.position)(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
   }
   if(options_.conflicts)for(const c of T.conflicts(model)){
    const cx=x(c.time),cy=y(N.catalog[c.station].order);if(cx<left||cx>left+plotW||cy<plotTop||cy>plotTop+plotH)continue;
@@ -73,7 +73,7 @@
   lastLayout={left,plotW,plotTop,plotH,top,row,from,to,start,span,width,height};
   for(const fn of renderHooks)fn(lastLayout);
   $('diaSvg').setAttribute('viewBox',`0 0 ${width} ${height}`);$('diaSvg').setAttribute('width',width);$('diaSvg').setAttribute('height',height);$('diaSvg').innerHTML=svg;
-  const train=model.trains.find(t=>t.id===selected),pos=T.position(train,context.clock());
+  const train=model.trains.find(t=>t.id===selected),pos=(root.SimAutoUI?.position||T.position)(train,context.clock());
   $('graphCancel').textContent=train.cancelled?'운휴 복원':'전체 운휴';
   $('graphDetails').innerHTML=`<h3>${escape(train.id)} · ${train.direction==='down'?'하행':'상행'} · ${train.cancelled?'전체 운휴':pos?(N.catalog[pos.station].name+' '+pos.status):'운행 전 / 운행 종료'}</h3><p>시발 ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → 종착 ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 현재 ${T.clock(context.clock())}</p><div class="call-table"><table><thead><tr><th>역</th><th>최초 도착</th><th>현재 도착</th><th>현재 출발</th></tr></thead><tbody>${train.calls.filter(c=>N.catalog[c.station].order>=from&&N.catalog[c.station].order<=to).map(c=>`<tr><td>${N.catalog[c.station].name}</td><td>${T.clock(train.plan.find(p=>p.station===c.station).arrival)}</td><td>${T.clock(c.arrival)}</td><td>${T.clock(c.departure)}</td></tr>`).join('')}</tbody></table></div>`;
  }

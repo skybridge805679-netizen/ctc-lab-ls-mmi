@@ -41,8 +41,8 @@ function build(){
 }
 const line=build();
 // 본선마다 그 본선으로 들어오는 장내신호기(예: 금천구청 하2선 1A, 하1선 1B, 상1선 2B, 상2선 2A)
-function arrivalSignal(station,trunk){
- const t=line.stations[station]?.trunks[trunk];if(!t)return null;const dir=trunk.endsWith('D')?1:-1;
+function arrivalSignal(station,trunk,direction){
+ const t=line.stations[station]?.trunks[trunk];if(!t)return null;const dir=direction?(direction==='down'?1:-1):(trunk.endsWith('D')?1:-1);
  const sig=W.data[station].signals.find(x=>/^[12][A-Z]$/.test(x[0])&&t.rails.includes(x[1])&&x[4]===dir);
  return sig?sig[0]:null;
 }
@@ -56,16 +56,16 @@ function next(station,trunk,direction){
 function entrySlot(station,trunk,direction,slots){
  const s=line.stations[station],t=s?.trunks[trunk];if(!t)return null;
  const edge=direction==='down'?t.left:t.right,n=numberOf(edge);if(n===null)return null;
- const cand=slots.filter(x=>/^B\d+T$/.test(x)&&trunkOf(x)===trunk).map(x=>({x,n:numberOf(x)}));
+ const cand=slots.filter(x=>numberOf(x)!==null&&trunkOf(x)===trunk).map(x=>({x,n:numberOf(x)}));
  if(!cand.length)return null;
  cand.sort((a,b)=>Math.abs(a.n-n)-Math.abs(b.n-n)||(direction==='down'?a.n-b.n:b.n-a.n));
  return cand[0].x;
 }
 // leaving `station` through its departure route that ends at boundary circuit `dest`: where does the train go?
-function handoff(station,dest,slotsOf){
+function handoff(station,dest,slotsOf,travelDirection){
  const trunk=trunkOf(dest);if(!trunk)return null;
- const direction=trunk.endsWith('D')?'down':'up',n=next(station,trunk,direction);if(!n)return null;
- const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section,signal:arrivalSignal(n.station,trunk)}:null;
+ const direction=travelDirection||(trunk.endsWith('D')?'down':'up'),n=next(station,trunk,direction);if(!n)return null;
+ const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section,signal:arrivalSignal(n.station,trunk,direction)}:null;
 }
 // 비연동 중간역: 이웃 연동역 LS 화면의 역판 아래에 있는 열번창 (본선별). 석수 상2선(EU)=B967T처럼 LS 좌표와 열번창 위치로 정했다.
 const INTERMEDIATE={
@@ -99,7 +99,7 @@ const state={enforce:true,single:new Set()};            // single: "서쪽>동�
 const TW=isNode?require('./train-windows.js'):root.SimTrainWindows;
 const slotsOfDefault=id=>((TW.data||TW)[id]||[]).map(x=>x.slot);
 function sectionNumbers(sec,ls,slotsOf=slotsOfDefault){
- const out=[],pick=(station,test)=>{for(const slot of slotsOf(station)){if(!/^B\d+T$/.test(slot)||trunkOf(slot)!==sec.trunk||!test(numberOf(slot)))continue;for(const r of ls?.stations?.[station]?.windows?.[slot]||[])out.push(r.number);}};
+ const out=[],pick=(station,test)=>{for(const slot of slotsOf(station)){if(numberOf(slot)===null||trunkOf(slot)!==sec.trunk||!test(numberOf(slot)))continue;for(const r of ls?.stations?.[station]?.windows?.[slot]||[])out.push(r.number);}};
  pick(sec.west,n=>n>=numberOf(sec.westSide));pick(sec.east,n=>n<=numberOf(sec.eastSide));return out;
 }
 const key=(sec)=>`${sec.west}>${sec.east}:${sec.trunk[0]}`;
@@ -120,6 +120,20 @@ function blockedExits(ls,slotsOf){
 }
 function refresh(states,ls,slotsOf){
  const blocked=state.enforce?blockedExits(ls,slotsOf):{};
+ // Reserve a single-line section as soon as an outbound route is set, before the number enters.
+ // An empty section must never permit opposing departure routes at the same time.
+ if(state.enforce)for(const sec of line.sections){
+  if(!state.single.has(key(sec)))continue;
+  const start=sec.trunk.endsWith('D')?sec.west:sec.east;
+  const exit=start===sec.west?sec.westSide:sec.eastSide;
+  const active=Object.keys(states[start]?.routes||{}).find(id=>N.catalog[start].routes[id]?.destination===exit);
+  if(!active)continue;
+  for(const mate of line.sections.filter(x=>x.west===sec.west&&x.east===sec.east&&x.trunk[0]===sec.trunk[0]&&x.trunk!==sec.trunk)){
+   const opposite=mate.trunk.endsWith('D')?mate.west:mate.east;
+   const destination=opposite===mate.west?mate.westSide:mate.eastSide;
+   if(destination)(blocked[opposite]??={})[destination]=start+' '+active+' 진로 예약';
+  }
+ }
  for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
  return blocked;
 }

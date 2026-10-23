@@ -1,0 +1,1344 @@
+{
+  "version": "0.19.3",
+  "reviewedBranch": {
+    "ref": "claude/practical-dirac-68tgp6",
+    "commit": "cae0a0afa3b44f8b0dc6fbaa0c3e6212983786a4"
+  },
+  "scope": "원본 추적 구내 그래프·본선 계열별 연결·역간 실제 운행 순서의 정합 검사. 실설비 연동표 또는 실제 폐색 회로표의 완전 복원 아님.",
+  "stations": 33,
+  "controlled": 15,
+  "segments": 32,
+  "nodes": 692,
+  "edges": 734,
+  "routes": 656,
+  "branchBoundaries": 17,
+  "inferredCompositeRoutes": [
+    {
+      "station": "anyang",
+      "route": "4B-B660T",
+      "note": "LS 직접 확인(안양역 4B: RT_4B_B984T, RT_4B_B660T). 전환기 구성은 4C-B984T와 같은 53번 크로스오버 반위로 추정 — LS 검수 후 확정"
+    },
+    {
+      "station": "anyang",
+      "route": "4A-B660T",
+      "note": "LS 사진 확인(안양역 4A: RT_4A_B984T, RT_4A_B660T). 전환기 구성은 추정 — LS 검수 후 확정"
+    }
+  ],
+  "issues": [],
+  "sections": [
+    {
+      "id": "MD:cheongnyangni>dongmyo",
+      "trunk": "MD",
+      "west": "cheongnyangni",
+      "east": "dongmyo",
+      "westSide": "B002T",
+      "eastSide": "B014T",
+      "skipped": []
+    },
+    {
+      "id": "MD:dongmyo>jonggak",
+      "trunk": "MD",
+      "west": "dongmyo",
+      "east": "jonggak",
+      "westSide": "B016T",
+      "eastSide": "B044T",
+      "skipped": []
+    },
+    {
+      "id": "MD:jonggak>underground-seoul",
+      "trunk": "MD",
+      "west": "jonggak",
+      "east": "underground-seoul",
+      "westSide": "B046T",
+      "eastSide": "B070T",
+      "skipped": []
+    },
+    {
+      "id": "MD:underground-seoul>seoul",
+      "trunk": "MD",
+      "west": "underground-seoul",
+      "east": "seoul",
+      "westSide": "B072T",
+      "eastSide": "B074T",
+      "skipped": []
+    },
+    {
+      "id": "MU:cheongnyangni>dongmyo",
+      "trunk": "MU",
+      "west": "cheongnyangni",
+      "east": "dongmyo",
+      "westSide": "B001T",
+      "eastSide": "B015T",
+      "skipped": []
+    },
+    {
+      "id": "MU:dongmyo>jonggak",
+      "trunk": "MU",
+      "west": "dongmyo",
+      "east": "jonggak",
+      "westSide": "B017T",
+      "eastSide": "B043T",
+      "skipped": []
+    },
+    {
+      "id": "MU:jonggak>underground-seoul",
+      "trunk": "MU",
+      "west": "jonggak",
+      "east": "underground-seoul",
+      "westSide": "B045T",
+      "eastSide": "B065T",
+      "skipped": []
+    },
+    {
+      "id": "MU:underground-seoul>seoul",
+      "trunk": "MU",
+      "west": "underground-seoul",
+      "east": "seoul",
+      "westSide": "B067T",
+      "eastSide": "B069T",
+      "skipped": []
+    },
+    {
+      "id": "GD:seoul>yongsan",
+      "trunk": "GD",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B602T",
+      "eastSide": "B608T",
+      "skipped": []
+    },
+    {
+      "id": "GD:yongsan>noryangjin",
+      "trunk": "GD",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B610T",
+      "eastSide": "B612T",
+      "skipped": []
+    },
+    {
+      "id": "GD:noryangjin>yeongdeungpo",
+      "trunk": "GD",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B614T",
+      "eastSide": "B620T",
+      "skipped": []
+    },
+    {
+      "id": "GD:yeongdeungpo>guro",
+      "trunk": "GD",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B622T",
+      "eastSide": "B628T",
+      "skipped": []
+    },
+    {
+      "id": "GD:guro>geumcheon",
+      "trunk": "GD",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B630T",
+      "eastSide": "B642T",
+      "skipped": []
+    },
+    {
+      "id": "GD:geumcheon>anyang",
+      "trunk": "GD",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B644T",
+      "eastSide": "B658T",
+      "skipped": []
+    },
+    {
+      "id": "GD:anyang>gunpo",
+      "trunk": "GD",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B660T",
+      "eastSide": "B678T",
+      "skipped": [
+        "geumjeong"
+      ]
+    },
+    {
+      "id": "GD:gunpo>uiwang",
+      "trunk": "GD",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B680T",
+      "eastSide": "B690T",
+      "skipped": []
+    },
+    {
+      "id": "GD:uiwang>suwon",
+      "trunk": "GD",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B692T",
+      "eastSide": "B714T",
+      "skipped": []
+    },
+    {
+      "id": "GU:seoul>yongsan",
+      "trunk": "GU",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B601T",
+      "eastSide": "B605T",
+      "skipped": []
+    },
+    {
+      "id": "GU:yongsan>noryangjin",
+      "trunk": "GU",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B607T",
+      "eastSide": "B613T",
+      "skipped": []
+    },
+    {
+      "id": "GU:noryangjin>yeongdeungpo",
+      "trunk": "GU",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B615T1T",
+      "eastSide": "B619T2T",
+      "skipped": []
+    },
+    {
+      "id": "GU:yeongdeungpo>guro",
+      "trunk": "GU",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B621T",
+      "eastSide": "B627T",
+      "skipped": []
+    },
+    {
+      "id": "GU:guro>geumcheon",
+      "trunk": "GU",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B629T",
+      "eastSide": "B639T",
+      "skipped": []
+    },
+    {
+      "id": "GU:geumcheon>anyang",
+      "trunk": "GU",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B641T",
+      "eastSide": "B655T",
+      "skipped": []
+    },
+    {
+      "id": "GU:anyang>gunpo",
+      "trunk": "GU",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B657T",
+      "eastSide": "B673T",
+      "skipped": [
+        "geumjeong"
+      ]
+    },
+    {
+      "id": "GU:gunpo>uiwang",
+      "trunk": "GU",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B675T",
+      "eastSide": "B685T",
+      "skipped": []
+    },
+    {
+      "id": "GU:uiwang>suwon",
+      "trunk": "GU",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B687T",
+      "eastSide": "B709T",
+      "skipped": []
+    },
+    {
+      "id": "ED:seoul>yongsan",
+      "trunk": "ED",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B902T",
+      "eastSide": "B914T",
+      "skipped": []
+    },
+    {
+      "id": "ED:yongsan>noryangjin",
+      "trunk": "ED",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B916T",
+      "eastSide": "B926T",
+      "skipped": []
+    },
+    {
+      "id": "ED:noryangjin>yeongdeungpo",
+      "trunk": "ED",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B928T",
+      "eastSide": "B940T",
+      "skipped": []
+    },
+    {
+      "id": "ED:yeongdeungpo>guro",
+      "trunk": "ED",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B942T",
+      "eastSide": "B948T",
+      "skipped": []
+    },
+    {
+      "id": "ED:guro>geumcheon",
+      "trunk": "ED",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B950T",
+      "eastSide": "B966T",
+      "skipped": []
+    },
+    {
+      "id": "ED:geumcheon>anyang",
+      "trunk": "ED",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B968T",
+      "eastSide": "B982T",
+      "skipped": []
+    },
+    {
+      "id": "ED:anyang>geumjeong",
+      "trunk": "ED",
+      "west": "anyang",
+      "east": "geumjeong",
+      "westSide": "B984T",
+      "eastSide": "B994T",
+      "skipped": []
+    },
+    {
+      "id": "ED:geumjeong>gunpo",
+      "trunk": "ED",
+      "west": "geumjeong",
+      "east": "gunpo",
+      "westSide": "B996T",
+      "eastSide": "B1000T",
+      "skipped": []
+    },
+    {
+      "id": "ED:gunpo>uiwang",
+      "trunk": "ED",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B1002T",
+      "eastSide": "B1012T",
+      "skipped": []
+    },
+    {
+      "id": "ED:uiwang>suwon",
+      "trunk": "ED",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B1014T",
+      "eastSide": "B1036T",
+      "skipped": []
+    },
+    {
+      "id": "EU:seoul>yongsan",
+      "trunk": "EU",
+      "west": "seoul",
+      "east": "yongsan",
+      "westSide": "B901T",
+      "eastSide": "B915T",
+      "skipped": []
+    },
+    {
+      "id": "EU:yongsan>noryangjin",
+      "trunk": "EU",
+      "west": "yongsan",
+      "east": "noryangjin",
+      "westSide": "B917T",
+      "eastSide": "B927T",
+      "skipped": []
+    },
+    {
+      "id": "EU:noryangjin>yeongdeungpo",
+      "trunk": "EU",
+      "west": "noryangjin",
+      "east": "yeongdeungpo",
+      "westSide": "B929T",
+      "eastSide": "B941T",
+      "skipped": []
+    },
+    {
+      "id": "EU:yeongdeungpo>guro",
+      "trunk": "EU",
+      "west": "yeongdeungpo",
+      "east": "guro",
+      "westSide": "B943T",
+      "eastSide": "B949T",
+      "skipped": []
+    },
+    {
+      "id": "EU:guro>geumcheon",
+      "trunk": "EU",
+      "west": "guro",
+      "east": "geumcheon",
+      "westSide": "B951T",
+      "eastSide": "B963T",
+      "skipped": []
+    },
+    {
+      "id": "EU:geumcheon>anyang",
+      "trunk": "EU",
+      "west": "geumcheon",
+      "east": "anyang",
+      "westSide": "B965T",
+      "eastSide": "B981T",
+      "skipped": []
+    },
+    {
+      "id": "EU:anyang>geumjeong",
+      "trunk": "EU",
+      "west": "anyang",
+      "east": "geumjeong",
+      "westSide": "B983T",
+      "eastSide": "B993T",
+      "skipped": []
+    },
+    {
+      "id": "EU:geumjeong>gunpo",
+      "trunk": "EU",
+      "west": "geumjeong",
+      "east": "gunpo",
+      "westSide": "B995T",
+      "eastSide": "B999T",
+      "skipped": []
+    },
+    {
+      "id": "EU:gunpo>uiwang",
+      "trunk": "EU",
+      "west": "gunpo",
+      "east": "uiwang",
+      "westSide": "B1001T",
+      "eastSide": "B1011T",
+      "skipped": []
+    },
+    {
+      "id": "EU:uiwang>suwon",
+      "trunk": "EU",
+      "west": "uiwang",
+      "east": "suwon",
+      "westSide": "B1013T",
+      "eastSide": "B1035T",
+      "skipped": []
+    }
+  ],
+  "intermediate": {
+    "cityhall": {
+      "host": "jonggak",
+      "slots": {
+        "MD": "B060T",
+        "MU": "B055T"
+      }
+    },
+    "sinseoldong": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B012T",
+        "MU": "B011T"
+      }
+    },
+    "dongdaemun": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B020T",
+        "MU": "B021T"
+      }
+    },
+    "jongno5": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B026T",
+        "MU": "B025T"
+      }
+    },
+    "jongno3": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B034T",
+        "MU": "B031T"
+      }
+    },
+    "namyeong": {
+      "host": "seoul",
+      "slots": {
+        "ED": "B908T",
+        "EU": "B909T",
+        "GD": "B602T",
+        "GU": "B601T"
+      }
+    },
+    "gasan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B956T",
+        "GD": "B632T",
+        "GU": "B631T",
+        "EU": "B953T"
+      }
+    },
+    "doksan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B962T",
+        "GD": "B636T",
+        "GU": "B637T",
+        "EU": "B959T"
+      }
+    },
+    "seoksu": {
+      "host": "geumcheon",
+      "slots": {
+        "ED": "B974T",
+        "GD": "B650T",
+        "GU": "B643T",
+        "EU": "B967T"
+      }
+    },
+    "gwanak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B978T",
+        "GD": "B652T",
+        "GU": "B653T",
+        "EU": "B975T"
+      }
+    },
+    "myeonghak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B990T",
+        "GD": "B666T",
+        "GU": "B663T",
+        "EU": "B989T"
+      }
+    },
+    "dangjeong": {
+      "host": "gunpo",
+      "slots": {
+        "ED": "B1006T",
+        "GD": "B682T",
+        "GU": "B679T",
+        "EU": "B1005T"
+      }
+    },
+    "skku": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1022T",
+        "GD": "B700T",
+        "GU": "B693T",
+        "EU": "B1019T"
+      }
+    },
+    "hwaseo": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1032T",
+        "GD": "B710T",
+        "GU": "B703T",
+        "EU": "B1029T"
+      }
+    },
+    "sindorim": {
+      "host": "yeongdeungpo",
+      "slots": {
+        "GD": "B622T",
+        "GU": "B623T",
+        "ED": "B946T",
+        "EU": "B945T"
+      }
+    },
+    "daebang": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B616T1T",
+        "ED": "B932T",
+        "GU": "B615T2T"
+      }
+    },
+    "singil": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B618T2T",
+        "ED": "B938T",
+        "GU": "B619T1T"
+      }
+    },
+    "jegidong": {
+      "host": "cheongnyangni",
+      "slots": {
+        "MD": "B006T",
+        "MU": "B005T"
+      }
+    }
+  },
+  "localGraphs": {
+    "cheongnyangni": {
+      "nodes": 26,
+      "edges": 27,
+      "ports": [
+        {
+          "code": "AT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:145.000,379.000"
+        },
+        {
+          "code": "B002T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1190.000,379.000"
+        },
+        {
+          "code": "A1T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:145.000,481.000"
+        },
+        {
+          "code": "B001T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1190.000,481.000"
+        },
+        {
+          "code": "MT",
+          "rail": "MT",
+          "side": "left",
+          "node": "MT:295.000,430.000"
+        }
+      ]
+    },
+    "dongmyo": {
+      "nodes": 27,
+      "edges": 26,
+      "ports": [
+        {
+          "code": "B014T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:230.000,379.000"
+        },
+        {
+          "code": "B016T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:820.000,379.000"
+        },
+        {
+          "code": "B015T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:230.000,481.000"
+        },
+        {
+          "code": "B017T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:820.000,481.000"
+        },
+        {
+          "code": "CT",
+          "rail": "CT",
+          "side": "left",
+          "node": "CT:383.000,328.000"
+        },
+        {
+          "code": "DT",
+          "rail": "DT",
+          "side": "left",
+          "node": "DT:383.000,532.000"
+        }
+      ]
+    },
+    "jonggak": {
+      "nodes": 18,
+      "edges": 18,
+      "ports": [
+        {
+          "code": "B044T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:326.000,379.000"
+        },
+        {
+          "code": "B046T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:982.000,379.000"
+        },
+        {
+          "code": "B043T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:326.000,481.000"
+        },
+        {
+          "code": "B045T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:982.000,481.000"
+        }
+      ]
+    },
+    "underground-seoul": {
+      "nodes": 26,
+      "edges": 27,
+      "ports": [
+        {
+          "code": "B070T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:313.000,379.000"
+        },
+        {
+          "code": "B072T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1280.000,379.000"
+        },
+        {
+          "code": "B065T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:313.000,481.000"
+        },
+        {
+          "code": "B067T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1280.000,481.000"
+        },
+        {
+          "code": "MT",
+          "rail": "MT",
+          "side": "right",
+          "node": "MT:1148.000,429.000"
+        }
+      ]
+    },
+    "seoul": {
+      "nodes": 57,
+      "edges": 60,
+      "ports": [
+        {
+          "code": "B074T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:35.000,344.000"
+        },
+        {
+          "code": "B902T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:815.000,344.000"
+        },
+        {
+          "code": "B069T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:85.000,395.000"
+        },
+        {
+          "code": "B901T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:815.000,395.000"
+        },
+        {
+          "code": "B602T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1100.000,654.000"
+        },
+        {
+          "code": "B601T",
+          "rail": "7T",
+          "side": "right",
+          "node": "7T:1100.000,705.000"
+        }
+      ]
+    },
+    "yongsan": {
+      "nodes": 76,
+      "edges": 83,
+      "ports": [
+        {
+          "code": "B914T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:136.000,477.000"
+        },
+        {
+          "code": "B916T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:995.000,477.000"
+        },
+        {
+          "code": "B915T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:67.000,527.000"
+        },
+        {
+          "code": "B917T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1090.000,527.000"
+        },
+        {
+          "code": "B608T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:155.000,577.000"
+        },
+        {
+          "code": "B610T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1210.000,577.000"
+        },
+        {
+          "code": "B605T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:155.000,626.000"
+        },
+        {
+          "code": "B607T",
+          "rail": "YT",
+          "side": "right",
+          "node": "YT:1210.000,626.000"
+        },
+        {
+          "code": "CT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:443.000,725.000"
+        }
+      ]
+    },
+    "noryangjin": {
+      "nodes": 32,
+      "edges": 31,
+      "ports": [
+        {
+          "code": "B926T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:82.000,388.000"
+        },
+        {
+          "code": "B928T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:800.000,388.000"
+        },
+        {
+          "code": "B927T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:82.000,439.000"
+        },
+        {
+          "code": "B929T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:800.000,439.000"
+        },
+        {
+          "code": "B612T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:82.000,490.000"
+        },
+        {
+          "code": "B614T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:800.000,490.000"
+        },
+        {
+          "code": "B613T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:82.000,541.000"
+        },
+        {
+          "code": "B615T1T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:800.000,541.000"
+        }
+      ]
+    },
+    "yeongdeungpo": {
+      "nodes": 70,
+      "edges": 76,
+      "ports": [
+        {
+          "code": "B620T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:170.000,346.000"
+        },
+        {
+          "code": "B622T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1275.000,346.000"
+        },
+        {
+          "code": "B619T2T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:170.000,395.000"
+        },
+        {
+          "code": "B621T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1275.000,395.000"
+        },
+        {
+          "code": "B940T",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:170.000,692.000"
+        },
+        {
+          "code": "B942T",
+          "rail": "6T",
+          "side": "right",
+          "node": "6T:1275.000,692.000"
+        },
+        {
+          "code": "B941T",
+          "rail": "7T",
+          "side": "left",
+          "node": "7T:170.000,742.000"
+        },
+        {
+          "code": "B943T",
+          "rail": "7T",
+          "side": "right",
+          "node": "7T:1275.000,742.000"
+        }
+      ]
+    },
+    "guro": {
+      "nodes": 56,
+      "edges": 58,
+      "ports": [
+        {
+          "code": "B628T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:155.000,369.000"
+        },
+        {
+          "code": "B630T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1090.000,369.000"
+        },
+        {
+          "code": "B627T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:155.000,421.000"
+        },
+        {
+          "code": "B629T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1090.000,421.000"
+        },
+        {
+          "code": "B948T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:30.000,729.000"
+        },
+        {
+          "code": "B950T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1090.000,318.000"
+        },
+        {
+          "code": "B949T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:30.000,778.000"
+        },
+        {
+          "code": "F2T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1009.000,778.000"
+        },
+        {
+          "code": "AT",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:175.000,829.000"
+        },
+        {
+          "code": "B951T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1090.000,471.000"
+        },
+        {
+          "code": "F1T",
+          "rail": "F1T",
+          "side": "right",
+          "node": "F1T:1009.000,729.000"
+        }
+      ]
+    },
+    "geumcheon": {
+      "nodes": 64,
+      "edges": 72,
+      "ports": [
+        {
+          "code": "B966T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:14.000,319.000"
+        },
+        {
+          "code": "B968T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1180.000,319.000"
+        },
+        {
+          "code": "B642T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:14.000,370.000"
+        },
+        {
+          "code": "B644T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1180.000,370.000"
+        },
+        {
+          "code": "B639T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:14.000,421.000"
+        },
+        {
+          "code": "B641T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1180.000,421.000"
+        },
+        {
+          "code": "B963T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:14.000,473.000"
+        },
+        {
+          "code": "B965T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1000.000,473.000"
+        },
+        {
+          "code": "26BT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:355.000,524.000"
+        }
+      ]
+    },
+    "anyang": {
+      "nodes": 56,
+      "edges": 60,
+      "ports": [
+        {
+          "code": "B982T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:155.000,426.000"
+        },
+        {
+          "code": "B984T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1163.000,426.000"
+        },
+        {
+          "code": "B658T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:155.000,478.000"
+        },
+        {
+          "code": "B660T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1163.000,478.000"
+        },
+        {
+          "code": "B655T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:155.000,530.000"
+        },
+        {
+          "code": "B657T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1163.000,530.000"
+        },
+        {
+          "code": "B981T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:155.000,581.000"
+        },
+        {
+          "code": "B983T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1163.000,581.000"
+        },
+        {
+          "code": "CT",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:384.000,633.000"
+        }
+      ]
+    },
+    "geumjeong": {
+      "nodes": 28,
+      "edges": 28,
+      "ports": [
+        {
+          "code": "B994T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:150.000,426.000"
+        },
+        {
+          "code": "B996T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1008.000,426.000"
+        },
+        {
+          "code": "B993T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:150.000,581.000"
+        },
+        {
+          "code": "B995T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1008.000,581.000"
+        },
+        {
+          "code": "CT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:250.000,375.000"
+        }
+      ]
+    },
+    "gunpo": {
+      "nodes": 35,
+      "edges": 36,
+      "ports": [
+        {
+          "code": "B1000T",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:40.000,391.000"
+        },
+        {
+          "code": "B1002T",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1130.000,391.000"
+        },
+        {
+          "code": "B678T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:40.000,443.000"
+        },
+        {
+          "code": "B680T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1130.000,443.000"
+        },
+        {
+          "code": "B673T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:40.000,495.000"
+        },
+        {
+          "code": "B675T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1130.000,495.000"
+        },
+        {
+          "code": "B999T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:40.000,546.000"
+        },
+        {
+          "code": "B1001T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1130.000,546.000"
+        }
+      ]
+    },
+    "uiwang": {
+      "nodes": 61,
+      "edges": 67,
+      "ports": [
+        {
+          "code": "GT",
+          "rail": "1T",
+          "side": "left",
+          "node": "1T:201.000,339.000"
+        },
+        {
+          "code": "FT",
+          "rail": "1T",
+          "side": "right",
+          "node": "1T:1195.000,339.000"
+        },
+        {
+          "code": "B1012T",
+          "rail": "2T",
+          "side": "left",
+          "node": "2T:70.000,391.000"
+        },
+        {
+          "code": "B1014T",
+          "rail": "2T",
+          "side": "right",
+          "node": "2T:1320.000,391.000"
+        },
+        {
+          "code": "B690T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:70.000,443.000"
+        },
+        {
+          "code": "B692T",
+          "rail": "3T",
+          "side": "right",
+          "node": "3T:1320.000,443.000"
+        },
+        {
+          "code": "B685T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:70.000,494.000"
+        },
+        {
+          "code": "B687T",
+          "rail": "4T",
+          "side": "right",
+          "node": "4T:1320.000,494.000"
+        },
+        {
+          "code": "B1011T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:70.000,546.000"
+        },
+        {
+          "code": "B1013T",
+          "rail": "5T",
+          "side": "right",
+          "node": "5T:1320.000,546.000"
+        },
+        {
+          "code": "ET",
+          "rail": "6T",
+          "side": "left",
+          "node": "6T:190.000,597.000"
+        },
+        {
+          "code": "55BT",
+          "rail": "6T",
+          "side": "right",
+          "node": "6T:1010.000,597.000"
+        }
+      ]
+    },
+    "suwon": {
+      "nodes": 60,
+      "edges": 65,
+      "ports": [
+        {
+          "code": "B1036T",
+          "rail": "3T",
+          "side": "left",
+          "node": "3T:38.000,391.000"
+        },
+        {
+          "code": "B714T",
+          "rail": "4T",
+          "side": "left",
+          "node": "4T:38.000,443.000"
+        },
+        {
+          "code": "B709T",
+          "rail": "BT",
+          "side": "left",
+          "node": "BT:38.000,494.000"
+        },
+        {
+          "code": "B1035T",
+          "rail": "5T",
+          "side": "left",
+          "node": "5T:38.000,546.000"
+        }
+      ]
+    }
+  }
+}

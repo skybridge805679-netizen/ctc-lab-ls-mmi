@@ -17,7 +17,7 @@ const transit=new Map();      // 연동역 사이를 지나는 열차: {train, f
 function put(station,slot,train){removeEverywhere(train.id);root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});}
 function moveTransit(tr){
  const states=host.context().stationStates,now=states[tr.h.station]?.clock??0,t=root.SimDiagram.getModel().trains.find(x=>x.id===tr.train.id);
- const stop=tr.via.find(v=>{const c=t?.calls.find(c=>c.station===v.station&&!c.cancelled);return c&&now<c.departure;});
+ const stop=tr.via.find(v=>{const c=t?.calls.find(c=>c.station===v.station&&!c.cancelled);return c&&now<c.departure+tr.delay;});
  const at=stop?stop.station:'entry';if(at===tr.at)return;tr.at=at;
  if(stop){put(stop.host,stop.slot,tr.train);return;}
  put(tr.h.station,tr.h.slot,tr.train);
@@ -29,16 +29,16 @@ const numbers={
  remove(station,train){removeEverywhere(train.id);},
  // 선로망: 역을 빠져나간 열차번호는 같은 본선의 다음 연동역 진입 열번창(경계 회로)으로 넘어간다 — 그 역의 자동제어가 승강장에 놓을 때까지 그곳에 서 있다.
  // 사이에 정차하는 비연동 중간역(석수·시청 등)이 있으면 그 역의 열번창에서 출발시각까지 서 있다가 넘어간다.
- handoff(station,train,dest){
-  const h=dest&&root.SimLine.handoff(station,dest,id=>(root.SimTrainWindows.data[id]||[]).map(w=>w.slot));
+ handoff(station,train,dest,delay=0){
+  const h=dest&&root.SimLine.handoff(station,dest,id=>(root.SimTrainWindows.data[id]||[]).map(w=>w.slot),train.direction);
   if(!h)return;
-  const tr={train,from:station,h,via:root.SimLine.viaStations(station,h.station,h.trunk),at:null};transit.set(train.id,tr);moveTransit(tr);
+  const tr={train,delay,from:station,h,via:root.SimLine.viaStations(station,h.station,h.trunk),at:null};transit.set(train.id,tr);moveTransit(tr);
  }
 };
 
 function label(){const b=$('mmiAutoBtn');if(b){b.textContent=`자동제어 ${enabled?'ON':'OFF'}`;b.setAttribute('aria-pressed',String(enabled));}const c=$('acEnabled');if(c)c.checked=enabled;}
 function set(on){
- enabled=!!on;engine.reset();try{localStorage.setItem(KEY,enabled?'1':'0');}catch{}
+ enabled=!!on;engine.reset();transit.clear();try{localStorage.setItem(KEY,enabled?'1':'0');}catch{}
  label();mmi().log('event',`열차 자동제어(AUTO) ${enabled?'사용':'중지'}`);
  if(enabled&&step())mmi().render();
  drawTroubles();
@@ -72,10 +72,10 @@ function drawDelays(){
 }
 function init(api){
  host=api;
- engine=A().create({core:root.SimCore,stations:root.SimNetwork.stations});
+ engine=A().create({core:root.SimCore,stations:root.SimNetwork.stations,refresh:()=>root.SimLine.refresh(host.context().stationStates,root.SimLSUI.getModel())});
  try{enabled=localStorage.getItem(KEY)==='1';reflect=localStorage.getItem(RKEY)==='1';}catch{enabled=false;}
  const win=mmi().createWindow('settings',{title:'프로그램 환경설정',x:150,y:80,width:700,body:`<div class="rpt"><fieldset class="rpt-cond"><legend>열차 자동제어 (AUTO)</legend><label class="nt-check"><input type="checkbox" id="acEnabled"> 열차 자동제어 사용 — AUTO 모드 역에서 스케줄의 도착·출발진로를 시각에 맞춰 자동으로 설정합니다</label></fieldset>
-<div class="idm-note">실기3 3.4 기준: 트리거 시점(도착 ${A().TRIGGER_LEAD}초 전)에 접근 열차를 감지해 장내진로 → 출발진로 순으로 요구하고, 진로를 쓸 수 없으면 <b>트러블 등록</b>해 조건이 풀리면 다시 요구합니다. 요구 시점에 역이 AUTO가 아니면 요구하지 않습니다. 가상 열차는 시간표대로 움직이며 열번창의 번호도 따라 움직입니다. 복선만, 입환·분할·병합·역진로(ANTI)·TTB는 다루지 않습니다. 켜고 끄는 값은 이 브라우저에 저장됩니다.</div>
+<div class="idm-note">실기3 3.4 기준: 트리거 시점(도착 ${A().TRIGGER_LEAD}초 전)에 접근 열차를 감지해 장내진로 → 출발진로 순으로 요구하고, 진로를 쓸 수 없으면 <b>트러블 등록</b>해 조건이 풀리면 다시 요구합니다. 요구 시점에 역이 AUTO가 아니면 요구하지 않습니다. 가상 열차는 앞 역의 실제 출발·통과를 기다립니다. 지연은 운행에 전파되며 시간표 반영은 별도 선택입니다. 복선만, 입환·분할·병합·역진로(ANTI)·TTB는 다루지 않습니다. 켜고 끄는 값은 이 브라우저에 저장됩니다.</div>
 <div class="idm-cap">트러블 등록 목록</div><div class="idm-table rpt-table"><table><thead><tr><th>역</th><th>열차</th><th>진로</th><th>사유</th></tr></thead><tbody id="acTroubles"></tbody></table></div>
 <div class="idm-cap">신호 대기 지연 실적</div><div class="idm-table rpt-table"><table><thead><tr><th>역</th><th>열차</th><th>계획 도착</th><th>도착 지연</th><th>계획 출발</th><th>출발 지연</th></tr></thead><tbody id="acDelays"></tbody></table></div><label class="nt-check"><input type="checkbox" id="acReflect"> 지연을 뒤 역의 스케줄에 반영 (기본 꺼짐 — 켜면 시간표가 바뀝니다)</label>
 <div class="idm-buttons"><button type="button" class="sched-btn" id="acClose">닫기</button></div></div>`});
@@ -83,5 +83,5 @@ function init(api){
  const btn=$('mmiAutoBtn');if(btn)btn.onclick=()=>set(!enabled);
  label();drawTroubles();if(enabled)step();
 }
-root.SimAutoUI={init,step,enabled:()=>enabled,set};
+root.SimAutoUI={init,step,enabled:()=>enabled,position:(train,now)=>root.SimScenarioUI?.reservedNumbers().includes(train.id)?root.SimScenarioUI.position(train):enabled?engine.position(train,now):root.SimTimetable.position(train,now),set};
 })(window);

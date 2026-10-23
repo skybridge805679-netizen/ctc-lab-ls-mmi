@@ -68,7 +68,7 @@ function compile(st,def){
    routes[id]={signal,destination:target,pathTracks:[signal,target],geometryRails:trackNames,path,resources,pointLocks:[...locks],pointPositions:Object.fromEntries([...locks].map(id=>[id,trail.some(e=>e.point===id||rails.get(e.rail)?.[5]?.includes(id))?'R':'N'])),source:[st.sources.display],evidence:'PDF 배선 연결을 추적한 연습 경로 · 실설비 진로표 대조 전',switchConditions:null,releaseSeconds:null,geometryDerived:true};paths[id]=path;
   }
  }
- return{signals,points,routes,map:{...st.map,signals:mapSignals,points:mapPoints,paths,labels:{}},traced:{rails:def.rails.length,signals:def.signals.length,points:Object.keys(points).length,routes:Object.keys(routes).length}};
+ return{topology:{nodes:[...nodes].map(([id,n])=>({id,rail:n.rail,point:n.p,targets:n.targets,points:[...n.points]})),edges:edges.map(e=>({...e,resource:st.id+':edge:'+e.id})),ports:def.rails.flatMap(([rail,p,,left,right])=>[[left,p[0],'left'],[right,p.at(-1),'right']].filter(([code])=>code).map(([code,p,side])=>({code,rail,side,node:key(rail,p)})))},signals,points,routes,map:{...st.map,signals:mapSignals,points:mapPoints,paths,labels:{}},traced:{rails:def.rails.length,signals:def.signals.length,points:Object.keys(points).length,routes:Object.keys(routes).length}};
 }
 function apply(network){
  for(const [id,def]of Object.entries(data)){const st=network.catalog[id];Object.assign(st,compile(st,def));}
@@ -116,7 +116,7 @@ function apply(network){
   const pts=r=>r.path.match(/-?\d+(\.\d+)?\s-?\d+(\.\d+)?/g).map(t=>t.split(' ').map(Number));
   if(m.join){const a=pts(A),b=pts(B),cut=b[1][0];const xs=[...a.filter(p=>p[0]<cut),...b.slice(1)];
    const locks=[...new Set([...A.pointLocks,...B.pointLocks])];
-   c.routes[m.id]={...B,signal:A.signal,destination:B.destination,pathTracks:[A.signal,B.destination],geometryRails:['1T','2T','3T'],path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources])],pointLocks:locks,pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...B.pointPositions,...m.points},geometryDerived:false,
+   c.routes[m.id]={...B,signal:A.signal,destination:B.destination,pathTracks:[A.signal,B.destination],geometryRails:['1T','2T','3T'],path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources])],pointLocks:locks,pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...B.pointPositions,...m.points},geometryDerived:false,resourceModel:'conservative-composite',
     evidence:'LS 사진 확인(안양역 4A: RT_4A_B984T, RT_4A_B660T). 전환기 구성은 추정 — LS 검수 후 확정',source:[c.sources.display,'사용자 LS 사진 2026-10-22']};
    c.map.paths[m.id]=c.routes[m.id].path;c.traced.routes++;continue;}
   const a=pts(A),b=pts(B),x=pts(X),diag=x.find((p,i)=>i&&p[1]!==x[i-1][1]);              // the 3T→2T diagonal of 4C-B984T; 2T→3T is its mirror
@@ -124,7 +124,7 @@ function apply(network){
   const locks=[...new Set([...A.pointLocks,...B.pointLocks])];
   c.routes[m.id]={...B,signal:A.signal,destination:B.destination,pathTracks:[A.signal,B.destination],geometryRails:['2T','3T'],
    path:xs.map((p,i)=>(i?'L':'M')+p.join(' ')).join(''),resources:[...new Set([...A.resources,...B.resources,X.resources[1]])],pointLocks:locks,
-   pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...m.points},geometryDerived:false,
+   pointPositions:{...Object.fromEntries(locks.map(id=>[id,'N'])),...m.points},geometryDerived:false,resourceModel:'conservative-composite',
    evidence:'LS 직접 확인(안양역 4B: RT_4B_B984T, RT_4B_B660T). 전환기 구성은 4C-B984T와 같은 53번 크로스오버 반위로 추정 — LS 검수 후 확정',source:[c.sources.display,'사용자 LS 확인 2026-10-22']};
   c.map.paths[m.id]=c.routes[m.id].path;c.traced.routes++;
  }

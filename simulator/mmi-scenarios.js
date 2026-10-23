@@ -72,8 +72,7 @@ function fillTrains(){
  if(!ids.includes($('scTrain').value))$('scTrain').value=ids[0]||'';
  $('scTrainNote').textContent=ids.length?`${sc.direction==='up'?'상행':'하행'} · ${doc.getElementById('scSelect').selectedOptions[0].textContent.split(' ')[0]}에 서는 열차 ${ids.length}개`:'이 역에 서는 열차가 현재 시간표에 없습니다. 열차스케줄 관리에서 열차를 만들거나 번호를 직접 입력하세요.';
 }
-function scriptedRun(){if(root.SimLine?.state.enforce){root.SimLine.state.enforce=false;mmi().log('event','폐색 점유 검사 해제 · 시나리오는 대본의 조건을 구술로 확인합니다 (선로망 창에서 다시 켤 수 있음)');}}
-function startEmergency(sc){scriptedRun();
+function startEmergency(sc){
  host.selectStation(sc.station);
  EM().seed(sc,host.context().stationStates);
  for(const st of sc.stations)mmi().rebase(st);
@@ -145,5 +144,13 @@ function intercept(a){
  const numbers=isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id);
  return numbers.includes(row.number)?motion.request(a,true):null;
 }
-root.SimScenarioUI={init,intercept,snapshot:()=>run?{id:run.sc.id,done:[...run.done],queue:[...run.queue],motions:motion.list()}:null,motionJobs:()=>motion?.list()||[],reservedNumbers:()=>!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id),stepMotion:()=>{if(!motion||!run||mmi().replaying())return false;const before=motion.list().map(j=>j.id+j.phase+j.reason).join('|');evaluate();return before!==motion.list().map(j=>j.id+j.phase+j.reason).join('|');}};
+function actualPosition(train){
+ const f=findRow(train.id);if(!f)return null;
+ const catalog=root.SimNetwork.catalog,j=motion?.list().find(j=>j.uid===f.uid&&!['done','cancelled'].includes(j.phase));
+ const from=catalog[f.station];if(!from)return null;
+ if(j?.phase==='handover'&&j.action.targetStation){const to=catalog[j.action.targetStation],now=host.context().stationStates[j.station].clock,fraction=Math.max(0,Math.min(1,(now-j.fromTime)/(j.until-j.fromTime)));
+  return {station:f.station,nextStation:to.id,order:from.order+(to.order-from.order)*fraction,status:'관할 인계',actual:true};}
+ return {station:f.station,order:from.order,status:j&&j.phase!=='waiting'?'진행':j?'진로 대기':'정차',actual:true};
+}
+root.SimScenarioUI={init,intercept,position:actualPosition,snapshot:()=>run?{id:run.sc.id,done:[...run.done],queue:[...run.queue],motions:motion.list()}:null,motionJobs:()=>motion?.list()||[],reservedNumbers:()=>!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id),stepMotion:()=>{if(!motion||!run||mmi().replaying())return false;const before=motion.list().map(j=>j.id+j.phase+j.reason).join('|');evaluate();return before!==motion.list().map(j=>j.id+j.phase+j.reason).join('|');}};
 })(window);

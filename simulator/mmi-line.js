@@ -8,8 +8,10 @@ const SERIES={M:'지하철',G:'일반선',E:'전동선'};
 function draw(){
  const ls=root.SimLSUI.getModel();
  const rows=L.line.sections.map(sec=>({sec,nums:L.sectionNumbers(sec,ls)}));
- const busy=rows.filter(r=>r.nums.length);
- $('lnRows').innerHTML=busy.length?busy.map(r=>`<tr><td>${esc(nm(r.sec.west))} → ${esc(nm(r.sec.east))}</td><td>${esc(L.NAMES[r.sec.trunk])}</td><td>${esc(r.nums.join(', '))}</td><td>${L.state.single.has(`${r.sec.west}>${r.sec.east}:${r.sec.trunk[0]}`)?'단선지령식':'상용폐색'}</td></tr>`).join(''):'<tr class="empty"><td colspan="4">점유된 구간이 없습니다</td></tr>';
+ const audit=root.SimNetworkTopology.audit();
+ $('lnSummary').textContent=`${audit.stations}개 역 · ${L.line.sections.length}개 본선 구간 · ${audit.controlled}개 구내망 · ${audit.routes}개 진로`;
+ const busy=rows;
+ $('lnRows').innerHTML=busy.length?busy.map(r=>`<tr><td>${esc(nm(r.sec.west))} → ${esc(nm(r.sec.east))}</td><td>${esc(L.NAMES[r.sec.trunk])}</td><td>${esc(r.nums.join(', ')||'비점유')}</td><td>${L.state.single.has(`${r.sec.west}>${r.sec.east}:${r.sec.trunk[0]}`)?'단선지령식':'상용폐색'}</td></tr>`).join(''):'<tr class="empty"><td colspan="4">점유된 구간이 없습니다</td></tr>';
  $('lnEnforce').checked=L.state.enforce;
  $('lnSingleList').textContent=L.state.single.size?[...L.state.single].map(k=>{const [p,x]=k.split(':'),[a,b]=p.split('>');return `${nm(a)}~${nm(b)} ${SERIES[x]}`;}).join(' · '):'시행 중인 단선지령식 없음';
 }
@@ -21,7 +23,7 @@ function pairs(){
 }
 function init(){
  const m=root.SimMMI;
- const w=m.createWindow('lineNet',{title:'선로망 현황 (교육용)',x:210,y:100,width:620,body:`<div class="rpt"><div class="idm-note">노선의 본선(큰 가지)을 구간으로 이어, 구간 안에 열차번호가 있으면 그 구간으로 나가는 출발 진로를 막습니다(한 폐색에 한 열차). 시나리오를 시작하면 검사는 꺼지며 여기서 다시 켤 수 있습니다.</div><label class="nt-check"><input type="checkbox" id="lnEnforce"> 폐색 점유 검사</label><div class="idm-table rpt-table"><table><thead><tr><th>구간</th><th>본선</th><th>열차</th><th>폐색방식</th></tr></thead><tbody id="lnRows"></tbody></table></div><div class="rpt-cond"><label>단선지령식 구간 <select id="lnPair">${pairs().map(p=>`<option value="${p.k}">${esc(p.label)}</option>`).join('')}</select></label><button type="button" class="sched-btn" id="lnSingleOn">시행</button><button type="button" class="sched-btn" id="lnSingleOff">상용폐색 복귀</button></div><div class="idm-note" id="lnSingleList"></div><div class="idm-buttons"><button type="button" class="sched-btn" id="lnClose">닫기</button></div></div>`});
+ const w=m.createWindow('lineNet',{title:'선로망 현황 (교육용)',x:210,y:100,width:720,body:`<div class="rpt"><div class="idm-note">노선의 본선(큰 가지)을 구간으로 이어, 구간 안에 열차번호가 있으면 그 구간으로 나가는 출발 진로를 막습니다(한 폐색에 한 열차). AUTO·수동 제어·시나리오가 같은 폐색 검사를 사용합니다.</div><div class="idm-cap" id="lnSummary"></div><label class="nt-check"><input type="checkbox" id="lnEnforce"> 폐색 점유 검사</label><div class="idm-table rpt-table"><table><thead><tr><th>구간</th><th>본선</th><th>열차</th><th>폐색방식</th></tr></thead><tbody id="lnRows"></tbody></table></div><div class="rpt-cond"><label>단선지령식 구간 <select id="lnPair">${pairs().map(p=>`<option value="${p.k}">${esc(p.label)}</option>`).join('')}</select></label><button type="button" class="sched-btn" id="lnSingleOn">시행</button><button type="button" class="sched-btn" id="lnSingleOff">상용폐색 복귀</button></div><div class="idm-note" id="lnSingleList"></div><div class="idm-buttons"><button type="button" class="sched-btn" id="lnClose">닫기</button></div></div>`});
  $('lnEnforce').onchange=e=>{L.state.enforce=e.target.checked;m.log('event',`폐색 점유 검사 ${L.state.enforce?'사용':'해제'}`);draw();};
  $('lnSingleOn').onclick=()=>{const k=$('lnPair').value,[p,x]=k.split(':'),[a,b]=p.split('>');L.state.single.add(k);m.log('event',`${nm(a)}~${nm(b)} ${SERIES[x]} 단선지령식 시행`);draw();};
  $('lnSingleOff').onclick=()=>{const k=$('lnPair').value,[p,x]=k.split(':'),[a,b]=p.split('>');if(L.state.single.delete(k))m.log('event',`${nm(a)}~${nm(b)} ${SERIES[x]} 상용폐색 복귀`);draw();};
