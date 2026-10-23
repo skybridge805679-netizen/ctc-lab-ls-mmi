@@ -18,4 +18,12 @@ assert.deepStrictEqual(Object.keys(c.routes).filter(id=>c.routes[id].signal==='4
 // the LS popup of 4B lists both routes; the schedule table accepts it as a departure route
 const menu=Object.keys(c.routes).filter(id=>c.routes[id].signal==='4B').sort();assert.deepStrictEqual(menu,['4B-B660T','4B-B984T']);
 assert.ok(R.options('anyang','departure').includes('4B_B660T'));
+// 사진: 4C-B660T가 나 있을 때 4A-B984T도 LS에서 설정 가능 (같은 53번 전환기를 같은 위치로 사용). 다른 쌍은 그대로 경합.
+{const t=c.initial();c.dispatch(t,{type:'mode',value:'CCM',source:'x'});
+ assert.ok(c.dispatch(t,{type:'route',id:'4C-B660T',source:'x'}).ok);const both=c.dispatch(t,{type:'route',id:'4A-B984T',source:'x'});assert.ok(both.ok,both.message);
+ assert.ok(t.routes['4C-B660T']&&t.routes['4A-B984T']);
+ assert.ok(!c.dispatch(t,{type:'route',id:'4B-B984T',source:'x'}).ok,'same 2T track as 4A-B984T');
+ {const w=c.initial();c.dispatch(w,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(w,{type:'route',id:'4B-B984T',source:'x'}).ok);assert.ok(!c.dispatch(w,{type:'route',id:'4C-B660T',source:'x'}).ok,'not whitelisted: still a conflict');}
+ // opposite position of the same point still conflicts: 4A-B660T needs 53 reversed, 4C-B660T has it normal
+ const u=c.initial();c.dispatch(u,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(u,{type:'route',id:'4C-B660T',source:'x'}).ok);assert.ok(!c.dispatch(u,{type:'route',id:'4A-B660T',source:'x'}).ok);}
 console.log('anyang routes: ok');
