@@ -50,5 +50,3 @@ dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto}
 .ls-svg .screen-continuations{pointer-events:none}.ls-svg .seam-link path{fill:none;stroke-linejoin:round;stroke-linecap:butt}.ls-svg .seam-clearance{stroke:#686d68;stroke-width:26}.ls-svg .seam-rail{stroke:#f4f4ef;stroke-width:18}.ls-svg .seam-name{fill:#d6e7e5;font-size:11px;letter-spacing:.5px}
 
 .ls-svg .seam-link.set .seam-rail{stroke:#35dc82}.ls-svg .seam-link.occupied .seam-rail{stroke:#ff5c50}.ls-svg .seam-link.locked .seam-rail{stroke:#ffbd55}
-
-.ls-svg .floating-code{fill:#e7f0ee;paint-order:stroke;stroke:#686d68;stroke-width:3px}

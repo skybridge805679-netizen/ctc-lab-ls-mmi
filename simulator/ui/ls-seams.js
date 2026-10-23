@@ -2,7 +2,8 @@
 // Display ports only: these do not add circuits, switches, routes or engine connections.
 const lineOf=()=>typeof module!=='undefined'?require('../engine/line'):root.SimLine;
 const trunks=['MD','MU','ED','GD','GU','EU'];
-const names={MD:'하선',MU:'상선',ED:'하2선',GD:'하1선',GU:'상1선',EU:'상2선'};
+// The underground pair is surveyed as 1T (down) and 2T (up); retain both direction and track number.
+const names={MD:'하선 · 1선',MU:'상선 · 2선',ED:'하2선',GD:'하1선',GU:'상1선',EU:'상2선'};
 function ports(st,def,scene){
  const Line=lineOf(),own=Line.line.stations[st.id].trunks,out=[];
  for(const side of ['left','right'])for(const trunk of trunks){
@@ -18,9 +19,9 @@ function ports(st,def,scene){
  }
  return out;
 }
-function render(ports,T,height,width){
+function render(ports,T,height,width,inset=0){
  const paths=[],labels=[];
- for(const port of ports){const [x,y]=T([port.x,port.y]),edge=port.side==='left'?0:width,toY=y;
+ for(const port of ports){const [x,y]=T([port.x,port.y]),edge=port.side==='left'?-inset:width+inset,toY=y;
   const d=`M${x} ${y}L${edge} ${toY}`;
   // Clear the edge underlay without adding a junction or a change in direction.
   paths.push(`<g class="seam-link ${port.state||'clear'}" data-track-state="${port.state||'clear'}" data-seam-side="${port.side}" data-seam-trunk="${port.trunk}" data-seam-code="${port.code}" data-seam-y="${toY}"><title>${port.name} · 화면 연결 · ${port.code}</title><path class="seam-clearance" d="${d}"/><path class="seam-rail" d="${d}"/></g>`);

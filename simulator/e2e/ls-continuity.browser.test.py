@@ -1,4 +1,4 @@
-"""Adjacent LS canvases meet at the same physical pixel by line identity, including through tracks."""
+"""Independent LS canvases extend their own boundary rails horizontally to the physical window edge."""
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -22,11 +22,12 @@ try:
      page.select_option('#lsStationSelect',station);page.wait_for_timeout(80)
      data.append(page.locator('#trackSvg').evaluate('''(svg,side)=>{const m=svg.getScreenCTM(),box=svg.getBoundingClientRect();return Object.fromEntries([...svg.querySelectorAll(`[data-seam-side="${side}"]`)].map(g=>{const path=g.querySelector('.seam-rail'),p=path.getPointAtLength(path.getTotalLength()).matrixTransform(m);return [g.dataset.seamTrunk,{x:p.x,y:p.y,edge:side==='left'?0:innerWidth,box:[box.left,box.right]}]}));}''',side))
     common=set(data[0])&set(data[1]);assert common,(west,east)
-    for trunk in common:
-     a,b=data[0][trunk],data[1][trunk];assert abs(a['y']-b['y'])<.5,(width,west,east,trunk,a,b)
-     for port in [a,b]:assert abs(port['x']-port['edge'])<1,(width,west,east,trunk,port)
+    for portset in data:
+     for trunk,port in portset.items():assert abs(port['x']-port['edge'])<1,(width,west,east,trunk,port)
+    for page in pages:
+     assert page.locator('.seam-rail').evaluate_all('es=>es.every(p=>{const a=p.getPointAtLength(0),b=p.getPointAtLength(p.getTotalLength());return Math.abs(a.y-b.y)<.01&&p.getAttribute("d").match(/-?\\d+(?:\\.\\d+)?/g).length===4})')
     if west=='geumjeong':assert {'GD','GU','ED','EU'}<=common
    for page in pages:page.close()
-   print(f'PASS {width}×{height}: all 14 adjacent station interfaces align by trunk at the physical window edge')
+   print(f'PASS {width}×{height}: all station boundary continuations reach the physical window edge horizontally; station heights remain independent')
   assert not errors,errors;browser.close()
 finally:server.shutdown()

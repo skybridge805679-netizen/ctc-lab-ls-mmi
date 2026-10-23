@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');
-const N=require('../engine/network'),W=require('../engine/wiring'),Core=require('../engine/core'),LS=require('./ls-view'),S=require('./ls-switches'),A=require('./ls-alignment');
-const scene=(station,state)=>{const st=N.catalog[station],def=W.data[station],C=Core.forStation(station),L=LS.layout(def,LS.wingOf(st,def),null,A.forStation(station,900));return S.build(st,def,C,state,L.pt);};
+const N=require('../engine/network'),W=require('../engine/wiring'),Core=require('../engine/core'),LS=require('./ls-view'),S=require('./ls-switches');
+const scene=(station,state)=>{const st=N.catalog[station],def=W.data[station],C=Core.forStation(station),L=LS.layout(def,LS.wingOf(st,def));return S.build(st,def,C,state,L.pt);};
 let count=0;
 for(const st of N.stations.filter(s=>s.controlled)){
  const C=Core.forStation(st.id),state=C.initial(),normal=scene(st.id,state);

@@ -6,7 +6,6 @@ const inventory=typeof module!=='undefined'?require('../engine/wings.js'):root.S
 const trainWindows=typeof module!=='undefined'?require('../engine/train-windows.js'):root.SimTrainWindows;
 const fixedSymbols=typeof module!=='undefined'?require('./fixed-symbols.js'):root.SimFixedSymbols;
 const seams=typeof module!=='undefined'?require('./ls-seams'):root.SimLSSeams;
-const alignment=typeof module!=='undefined'?require('./ls-alignment'):root.SimLSAlignment;
 const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
@@ -35,7 +34,7 @@ function wingOf(st,def){
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
-function layout(def,wing,aspect,vertical=null){
+function layout(def,wing,aspect){
  const xs=[],ys=[];
  for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);}
  for(const signal of def.signals)ys.push(signal[3]);
@@ -52,8 +51,8 @@ function layout(def,wing,aspect,vertical=null){
  const railRows=[...new Set(def.rails.flatMap(r=>r[1].slice(1).filter((p,i)=>Math.abs(p[1]-r[1][i][1])<2).map(p=>p[1])))].sort((a,b)=>a-b);
  const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
  const pitch=Math.min(...pitches,80);
- const sx=(WIDTH-2*PADDING)/(maxX-minX),targetH=Number.isFinite(aspect)&&aspect>0?WIDTH/aspect:null;
- const top=110,bottom=120,sy=vertical?vertical.sy:targetH?Math.max(.1,(targetH-top-bottom)/Math.max(1,maxY-minY)):Math.max(sx,80/pitch);
+ const sx=(WIDTH-2*PADDING)/(maxX-minX),targetH=Number.isFinite(aspect)&&aspect>0?Math.max(420,WIDTH/aspect):null;
+ const top=80,bottom=64,sy=targetH?Math.max(48/pitch,(targetH-top-bottom)/Math.max(1,maxY-minY)):Math.max(sx,80/pitch);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
  const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy]);
@@ -62,15 +61,11 @@ function layout(def,wing,aspect,vertical=null){
  const cumulative=[0];weights.forEach((w,i)=>cumulative.push(cumulative.at(-1)+(knots[i+1]-knots[i])*w));
  const xAt=x=>{let i=0;while(i<weights.length-1&&x>knots[i+1])i++;return PADDING+(cumulative[i]+(x-knots[i])*weights[i])*(WIDTH-2*PADDING)/cumulative.at(-1);};
  const yAt=y=>top+(y-minY)*sy;
- return {sx,sy,H:vertical?.H||targetH||Math.max(460,Math.ceil(yAt(maxY)+bottom)),pt:([x,y])=>[+xAt(x).toFixed(2),+(vertical?vertical.yAt(x,y):yAt(y)).toFixed(2)]};
+ return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
 function render(st,def,core,model,neighbours={}){
- const data=sceneOf(st),wing=wingOf(st,def),vertical=alignment.forStation(st.id,Number.isFinite(neighbours.aspect)&&neighbours.aspect>0?WIDTH/neighbours.aspect:900),ports=vertical.ports,L=layout(def,wing,neighbours.aspect,vertical),T=L.pt;
- const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
- const signalColumns=[];for(const s of placed){s.LY=s.Y+(s.lampY-s.railLocal)*L.sy;let column=signalColumns.find(group=>group[0].dir===s.dir&&group[0].side===s.side&&group[0].rail===s.rail&&Math.abs(group[0].X-s.X)<10);if(!column){column=[];signalColumns.push(column);}column.push(s);}
- for(const column of signalColumns){const side=column[0].side;column.sort((a,b)=>side*(a.LY-b.LY));for(let i=1;i<column.length;i++)column[i].LY=side>0?Math.max(column[i].LY,column[i-1].LY+22):Math.min(column[i].LY,column[i-1].LY-22);}
- const signalBoxes=placed.map(s=>s.dir===1?[s.X-10-s.id.length*10.5,s.LY-13,s.X+25,s.LY+9]:[s.X-25,s.LY-13,s.X+10+s.id.length*10.5,s.LY+9]);
+ const data=sceneOf(st),wing=wingOf(st,def),L=layout(def,wing,neighbours.aspect),T=L.pt;
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -103,8 +98,7 @@ function render(st,def,core,model,neighbours={}){
   'gunja-out':{rail:'CT',side:-1},'gunja-in':{rail:'DT',side:1},
   'freight-a':{rail:'1T',side:-1,end:716},'freight-b':{rail:'6T',side:1,start:201,end:716}
  };
- const captionBlockers=signalBoxes.map(box=>[...box]);
- for(const item of trainWindows.data[st.id].filter(w=>w.side==='inline')){const rail=def.rails.find(r=>r[0]===(item.anchorCode||item.code));if(rail){const [x,y]=T([rail[2],railY(def,rail[0],rail[2])]);captionBlockers.push([x-50,y-14,x+50,y+14]);}}
+ const captionBlockers=def.signals.map(([id,rail,x,lampY])=>{const [X,Y]=T([x,lampY]);return [X-48,Y-12,X+48,Y+12];});
  const captionBoxes=wing.fixed.captions.map(c=>{
   const w=Math.max(...c.lines.map(t=>t.length))*15+32,h=c.lines.length*22+20;
   let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
@@ -113,11 +107,11 @@ function render(st,def,core,model,neighbours={}){
    const a=def.rails.find(r=>r[0]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
    const right=T([Math.max(a[0],b[0]),a[1]])[0];y=(T(a)[1]+T(b)[1])/2;x=right+32+w/2;
   }
-  y=Math.min(L.H-52-h/2,Math.max(8+h/2,y));const preferred=y,direction=anchor?.side||1;for(const offset of [0,...Array.from({length:10},(_,i)=>(i+1)*14*direction),...Array.from({length:10},(_,i)=>-(i+1)*14*direction)]){const next=preferred+offset,box=[x-w/2,next-h/2,x+w/2,next+h/2];if(box[1]<8||box[3]>L.H-20||captionBlockers.some(other=>intersects(box,other,6)))continue;y=next;break;}
+  const preferred=y,direction=anchor?.side||1;for(const offset of [0,...Array.from({length:10},(_,i)=>(i+1)*14*direction),...Array.from({length:10},(_,i)=>-(i+1)*14*direction)]){const next=preferred+offset,box=[x-w/2,next-h/2,x+w/2,next+h/2];if(box[1]<8||captionBlockers.some(other=>intersects(box,other,6)))continue;y=next;break;}
   const box=[x-w/2,y-h/2,x+w/2,y+h/2];captionBlockers.push(box);return {...c,x,y,box};
  });
  // Keep bottom captions within the same comfortable canvas inset as the upper bays.
- if(!neighbours.aspect)L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
+ L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
  const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
  const switches=switchView.build(st,def,core,model,T);
  const projectRoute=(points,destination)=>{
@@ -155,18 +149,18 @@ function render(st,def,core,model,neighbours={}){
   paths.push([[start,row.y],[end,row.y]]);
  }
  let platforms='',rails='',sections='',labels='',routes='',symbols='',plates='',pointSymbols='',signalSymbols='',trains='',leaders='',annotations='';
- const occupiedBoxes=[...fixedObstacles,...signalBoxes].map(b=>[...b]);
+ const occupiedBoxes=fixedObstacles.map(b=>[...b]);
  let trainShapes='';
  const layoutKey=st.id+':'+L.H+':'+L.sy;
  let cached=windowLayouts.get(def)?.get(layoutKey);
  if(!cached){
  const windowBoxes=[];
- const obstacles=[...fixedObstacles,...signalBoxes,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
+ const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
  const capsulePositions=[];
  for(const [x,y]of data.capsules){
   if(!data.cells.some(c=>Math.abs(c[1]-y)<30&&x>=c[0]-8&&x<=c[0]+c[2]+8)||def.signals.some(s=>Math.abs(s[2]-x)<22&&Math.abs(s[3]-y)<14))continue;
-  const [X,rawY]=T([x,y]),near=cells.filter(c=>X>=c.x-8&&X<=c.x+c.width+8).sort((a,b)=>Math.abs(a.source[1]-y)-Math.abs(b.source[1]-y))[0];
-  const Y=near&&Math.abs(near.source[1]-y)<30?near.y+(y<near.source[1]?-17:17):rawY;
+  const [X,rawY]=T([x,y]),near=cells.filter(c=>X>=c.x-8&&X<=c.x+c.width+8).sort((a,b)=>Math.abs(a.y-rawY)-Math.abs(b.y-rawY))[0];
+  const Y=near&&Math.abs(near.y-rawY)<Math.max(17,L.sy*30)?near.y+(rawY<near.y?-17:17):rawY;
   capsulePositions.push([X,Y]);obstacles.push([X-8,Y-5,X+11,Y+5]);
  }
  for(const item of trainWindows.data[st.id]||[]){
@@ -191,9 +185,9 @@ function render(st,def,core,model,neighbours={}){
   let best;const preferred=lane[0].item.side==='above'?-50:30,deltas=Array.from({length:41},(_,i)=>lane[0].item.side==='above'?-28-i*2:20+i*2).sort((a,b)=>Math.abs(a-preferred)-Math.abs(b-preferred));
   for(const dy of deltas){let cost=0,choices=[];
    for(const b of lane){let chosen;
-    candidates:for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64,-80,80,-100,100,-120,120]){
+    candidates:for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32]){
      const x=Math.max(4,Math.min(WIDTH-width-4,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;
-     const score=(hits+(y<4||y+20>L.H-4?1:0))*10000+(80-width)+Math.abs(dx)*2;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
+     const score=hits*10000+(80-width)+Math.abs(dx)*2;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
     }
     cost+=chosen.cost;choices.push(chosen);
    }
@@ -222,13 +216,11 @@ function render(st,def,core,model,neighbours={}){
   const atomic=c.label.replaceAll(' · ','');
   const tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   tokens.forEach((label,i)=>{
-   let x=c.x+c.width*(i+.5)/tokens.length,labelY=c.y,found=false;const width=c.width/tokens.length;
+   let x=c.x+c.width*(i+.5)/tokens.length;const width=c.width/tokens.length;
    if(trainWindows.data[st.id]?.some(w=>w.side==='inline'&&w.code===label)){const box=occupiedBoxes.find(b=>x>b[0]&&x<b[2]&&c.y>b[1]&&c.y<b[3]);if(box)x=box[2]+label.length*3.6+4;}
-   const textWidth=Math.min(width-6,label.length*7.2),left=c.x+c.width*i/tokens.length,right=left+width;for(let d=0;d<width;d+=2){for(const offset of d?[d,-d]:[0]){const candidate=x+offset,box=[candidate-textWidth/2,c.y-9,candidate+textWidth/2,c.y+9];if(box[0]<left+2||box[2]>right-2||occupiedBoxes.some(o=>intersects(box,o,1)))continue;x=candidate;found=true;break;}if(found)break;}
-   if(!found){search:for(const dy of [-24,24,-40,40])for(let d=0;d<c.width;d+=2)for(const offset of d?[d,-d]:[0]){const candidate=c.x+c.width/2+offset,box=[candidate-textWidth/2,c.y+dy-9,candidate+textWidth/2,c.y+dy+9];if(box[0]<c.x+2||box[2]>c.x+c.width-2||box[1]<4||box[3]>L.H-4||occupiedBoxes.some(o=>intersects(box,o,2)))continue;x=candidate;labelY=c.y+dy;leaders+=`<path class="annotation-leader" d="M${x} ${c.y}V${labelY}"/>`;break search;}}
    const fit=label.length*7.2>width-6?` textLength="${Math.max(12,width-6)}" lengthAdjust="spacingAndGlyphs"`:'';
-   labels+=`<text class="cell-name${labelY!==c.y?' floating-code':''}" data-circuit-label="${esc(label)}" x="${x}" y="${labelY+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
-   occupiedBoxes.push([x-textWidth/2,labelY-9,x+textWidth/2,labelY+9]);
+   labels+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${x}" y="${c.y+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
+   occupiedBoxes.push([x-Math.min(width-3,label.length*7)/2,c.y-8,x+Math.min(width-3,label.length*7)/2,c.y+8]);
   });
  }
  // Source aliases such as B615T1T represent adjoining identifiers, not an extra overlapping label.
@@ -237,12 +229,11 @@ function render(st,def,core,model,neighbours={}){
   if(!name||hasName(name))return;
   const [baseX,y]=T(anchor),width=name.length*7.2+6;
   const intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
-  let x=baseX+offset,labelY=y,found=false;
+  let x=baseX+offset;
   const deltas=[0];for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
-  for(const dx of deltas){const candidate=baseX+offset+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;found=true;break;}}
-  if(!found){search:for(const dy of [-24,24,-40,40])for(const dx of deltas){const candidate=baseX+offset+dx,box=[candidate-width/2,y+dy-9,candidate+width/2,y+dy+9];if(box[0]<4||box[2]>WIDTH-4||box[1]<4||box[3]>L.H-4||!intervals.some(([a,b])=>candidate>=a&&candidate<=b)||occupiedBoxes.some(o=>intersects(box,o,3)))continue;x=candidate;labelY=y+dy;leaders+=`<path class="annotation-leader" d="M${x} ${y}V${labelY}"/>`;break search;}}
-  labels+=`<text class="rail-name" data-circuit-label="${esc(name)}" x="${x}" y="${labelY+4.3}" text-anchor="middle">${esc(name)}</text>`;
-  occupiedBoxes.push([x-width/2,labelY-9,x+width/2,labelY+9]);
+  for(const dx of deltas){const candidate=baseX+offset+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
+  labels+=`<text class="rail-name" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
+  occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
  };
  for(const [id,poly,target,left,right]of def.rails){
   if(target!==null)addRailName(id,[target,railY(def,id,target)],poly);
@@ -322,9 +313,10 @@ function render(st,def,core,model,neighbours={}){
   return true;
  });
  // Each signal stays at its surveyed mast and lamp coordinates. Paired signals retain their source stack.
+ const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
-  const LY=s.LY,lampX=X+dir*18;
+  const LY=T([0,s.lampY])[1],lampX=X+dir*18;
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
@@ -343,7 +335,7 @@ function render(st,def,core,model,neighbours={}){
   for(let d=12;d<=36;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
   for(const [dx,dy]of offsets){
    const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-7,xx+width/2,yy+7];
-   if(xx<width/2+8||xx>WIDTH-width/2-8||yy<16||yy>L.H-16)continue;
+   if(xx<width/2+8||xx>WIDTH-width/2-8)continue;
    if(!occupiedBoxes.some(o=>intersects(box,o,1))&&!touchesRail(box)){x=xx;y=yy;break;}
   }
   occupiedBoxes.push([x-width/2,y-7,x+width/2,y+7]);
@@ -373,8 +365,9 @@ function render(st,def,core,model,neighbours={}){
  const edgeY=24;
  if(neighbours.left)plates+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(neighbours.left)}</text>`;
  if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
- const portViews=ports.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
- return {width:WIDTH,height:L.H,svg:`${seams.render(portViews,T,L.H,WIDTH)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
+ const ports=seams.ports(st,def,data).map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
+ return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2))}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;
