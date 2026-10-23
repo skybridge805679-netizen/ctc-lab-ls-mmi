@@ -43,7 +43,9 @@ def run(page, url):
     assert any(n.endswith(':K1131') for n in numbers(page, 'cheongnyangni')), numbers(page, 'cheongnyangni')
     tick(30)                                         # t=70: cleared, route released, number gone
     expect(page.locator('#stateRoutes')).to_contain_text('0개 설정')
-    assert not any(n.endswith(':K1131') for n in numbers(page, 'cheongnyangni'))
+    # (제기동 같은 비연동 중간역 열번창에는 정차 중인 열차가 남을 수 있다)
+    via = page.evaluate("Object.values(SimLine.INTERMEDIATE).filter(v=>v.host==='cheongnyangni').flatMap(v=>Object.values(v.slots))")
+    assert not any(n.endswith(':K1131') and n.split(':')[0] not in via for n in numbers(page, 'cheongnyangni')), numbers(page, 'cheongnyangni')
     # the manual-operation history does not list what the controller did
     assert page.evaluate("SimMMI.history().field.filter(r=>r.kind==='진로').length") == 0
     # the next station gets the train: its number appears at 동묘앞 while it arrives

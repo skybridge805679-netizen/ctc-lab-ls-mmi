@@ -79,6 +79,7 @@
    const r=routes[a.id];if(!r)return log(false,'등록되지 않은 진로입니다.');
    if(s.routes[a.id])return log(false,s.routes[a.id].lock?a.id+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[a.id])+'초 후 해정됩니다.':'이미 설정된 진로입니다.');
    if((r.resources||[]).some(t=>s.occupied[t]))return log(false,'진로 안에 점유된 구간이 있습니다.');
+   if(s.exitBlocked?.[r.destination])return log(false,'전방 폐색 구간('+r.destination+')에 열차 '+s.exitBlocked[r.destination]+'이(가) 있어 진로를 설정할 수 없습니다.');
    if((s.faults?.signals||[]).includes(r.signal))return log(false,r.signal+' 신호기가 고장입니다.');
    const badPoint=[...new Set([...(r.pointLocks||[]),...Object.keys(r.pointPositions||{})])].find(id=>(s.faults?.points||[]).includes(id));
    if(badPoint)return log(false,'진로 내 전환기 '+badPoint+'가 고장입니다.');

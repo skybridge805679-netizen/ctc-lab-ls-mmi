@@ -67,6 +67,62 @@ function handoff(station,dest,slotsOf){
  const direction=trunk.endsWith('D')?'down':'up',n=next(station,trunk,direction);if(!n)return null;
  const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section,signal:arrivalSignal(n.station,trunk)}:null;
 }
-const api={line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
+// 비연동 중간역: 이웃 연동역 LS 화면의 역판 아래에 있는 열번창 (본선별). 석수 상2선(EU)=B967T처럼 LS 좌표와 열번창 위치로 정했다.
+const INTERMEDIATE={
+ cityhall:{host:'jonggak',slots:{"MD": "B060T", "MU": "B055T"}},
+ sinseoldong:{host:'dongmyo',slots:{"MD": "B012T", "MU": "B011T"}},
+ dongdaemun:{host:'dongmyo',slots:{"MD": "B020T", "MU": "B021T"}},
+ jongno5:{host:'dongmyo',slots:{"MD": "B026T", "MU": "B025T"}},
+ jongno3:{host:'dongmyo',slots:{"MD": "B034T", "MU": "B031T"}},
+ namyeong:{host:'seoul',slots:{"ED": "B908T", "EU": "B909T", "GD": "B602T", "GU": "B601T"}},
+ gasan:{host:'guro',slots:{"ED": "B956T", "GD": "B632T", "GU": "B631T", "EU": "B953T"}},
+ doksan:{host:'guro',slots:{"ED": "B962T", "GD": "B636T", "GU": "B637T", "EU": "B959T"}},
+ seoksu:{host:'geumcheon',slots:{"ED": "B974T", "GD": "B650T", "GU": "B643T", "EU": "B967T"}},
+ gwanak:{host:'anyang',slots:{"ED": "B978T", "GD": "B652T", "GU": "B653T", "EU": "B975T"}},
+ myeonghak:{host:'anyang',slots:{"ED": "B990T", "GD": "B666T", "GU": "B663T", "EU": "B989T"}},
+ dangjeong:{host:'gunpo',slots:{"ED": "B1006T", "GD": "B682T", "GU": "B679T", "EU": "B1005T"}},
+ skku:{host:'uiwang',slots:{"ED": "B1022T", "GD": "B700T", "GU": "B693T", "EU": "B1019T"}},
+ hwaseo:{host:'uiwang',slots:{"ED": "B1032T", "GD": "B710T", "GU": "B703T", "EU": "B1029T"}},
+ sindorim:{host:'yeongdeungpo',slots:{"GD": "B622T", "GU": "B623T", "ED": "B946T", "EU": "B945T"}},
+ daebang:{host:'noryangjin',slots:{"GD": "B616T1T", "ED": "B932T", "GU": "B615T2T"}},
+ singil:{host:'noryangjin',slots:{"GD": "B618T2T", "ED": "B938T", "GU": "B619T1T"}},
+ jegidong:{host:'cheongnyangni',slots:{"MD": "B006T", "MU": "B005T"}},
+};
+// 연동역 A에서 B로 가는 본선 위에서 열차가 설 수 있는 비연동 중간역 (진행 순서)
+function viaStations(a,b,trunk){
+ const lo=Math.min(N.catalog[a].order,N.catalog[b].order),hi=Math.max(N.catalog[a].order,N.catalog[b].order);
+ const list=N.stations.filter(x=>!x.controlled&&x.order>lo&&x.order<hi&&INTERMEDIATE[x.id]?.slots[trunk]).map(x=>({station:x.id,host:INTERMEDIATE[x.id].host,slot:INTERMEDIATE[x.id].slots[trunk]}));
+ return N.catalog[a].order<N.catalog[b].order?list:list.reverse();
+}
+// ---- 폐색(구간) 점유: 구간 안(양쪽 역의 경계 열번창 포함)에 열차번호가 있으면 그 구간으로 나가는 출발 진로를 막는다 (한 폐색에 한 열차)
+const state={enforce:true,single:new Set()};            // single: "서쪽>동쪽:M|G|E" 단선지령식 시행 중인 구간
+const TW=isNode?require('./train-windows.js'):root.SimTrainWindows;
+const slotsOfDefault=id=>((TW.data||TW)[id]||[]).map(x=>x.slot);
+function sectionNumbers(sec,ls,slotsOf=slotsOfDefault){
+ const out=[],pick=(station,test)=>{for(const slot of slotsOf(station)){if(!/^B\d+T$/.test(slot)||trunkOf(slot)!==sec.trunk||!test(numberOf(slot)))continue;for(const r of ls?.stations?.[station]?.windows?.[slot]||[])out.push(r.number);}};
+ pick(sec.west,n=>n>=numberOf(sec.westSide));pick(sec.east,n=>n<=numberOf(sec.eastSide));return out;
+}
+const key=(sec)=>`${sec.west}>${sec.east}:${sec.trunk[0]}`;
+// exits that are closed right now: {station:{destination circuit: train number}}
+function blockedExits(ls,slotsOf){
+ const out={},put=(st,name,who)=>{if(name)(out[st]??={})[name]??=who;};
+ const occ=new Map(line.sections.map(sec=>[sec.id,sectionNumbers(sec,ls,slotsOf)]));
+ for(const sec of line.sections){
+  const nums=occ.get(sec.id);if(!nums.length)continue;
+  if(sec.trunk.endsWith('D'))put(sec.west,sec.westSide,nums[0]);else put(sec.east,sec.eastSide,nums[0]);
+  if(state.single.has(key(sec))){       // 단선지령식: 한 선로를 양방향이 쓰므로 어느 쪽 열차가 있어도 양쪽 끝에서 나가는 진로를 막는다
+   for(const mate of line.sections.filter(x=>x.west===sec.west&&x.east===sec.east&&x.trunk[0]===sec.trunk[0])){
+    const t=line.stations;for(const st of [sec.west,sec.east])for(const d of ['D','U']){const tr=t[st].trunks[sec.trunk[0]+d];if(tr){put(st,sec.west===st?tr.right:tr.left,nums[0]);}}
+   }
+  }
+ }
+ return out;
+}
+function refresh(states,ls,slotsOf){
+ const blocked=state.enforce?blockedExits(ls,slotsOf):{};
+ for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
+ return blocked;
+}
+const api={INTERMEDIATE,viaStations,state,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

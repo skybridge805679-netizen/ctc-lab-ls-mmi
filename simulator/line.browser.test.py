@@ -19,9 +19,11 @@ def run(page, url):
     page.goto(url, wait_until='networkidle')
     page.evaluate("SimAutoUI.set(true)")
     seen = {}
+    via = set()
     for _ in range(260):
         page.evaluate("()=>{SimMMI.run({type:'tick',seconds:10});SimAutoUI.step();}")
         where = page.evaluate("""()=>{const out={};for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number==='K1131')out[st]=slot;return out;}""")
+        via.update(page.evaluate("""()=>{const out=[];const m=SimLSUI.getModel().stations;for(const [id,v] of Object.entries(SimLine.INTERMEDIATE))for(const sl of Object.values(v.slots))for(const r of (m[v.host]?.windows?.[sl]||[]))if(r.number)out.push(id);return out}"""))
         for st, slot in where.items():
             seen.setdefault(st, set()).add(slot)
             if st == 'dongmyo' and slot.startswith('B') and page.evaluate("!!SimField.state('dongmyo').approach['1B']"):
@@ -36,6 +38,7 @@ def run(page, url):
     page.evaluate("SimLSUI.dispatch({op:'insert',station:'dongmyo',slot:'B008T',number:'K7777',direction:'down'})")
     page.evaluate("document.querySelector('#stationSelect').value='dongmyo';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
     assert 'B008T' in page.evaluate("[...document.querySelectorAll('#lsStage .train-occ')].map(e=>e.dataset.trainOccupied)")
+    assert via, '비연동 중간역(제기동 등) 열번창에 정차 열차가 표시되어야 한다'
     assert not errors, errors
     print('line hand-off: ok', {k: sorted(v) for k, v in list(seen.items())[:3]})
 

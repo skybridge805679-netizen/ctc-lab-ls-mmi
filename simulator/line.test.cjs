@@ -31,4 +31,27 @@ assert.strictEqual(L.handoff('cheongnyangni','B001T',slots),null,'청량리 up: 
 assert.deepStrictEqual(['ED','GD','GU','EU'].map(t=>L.arrivalSignal('geumcheon',t)),['1A','1B','2B','2A']);
 assert.deepStrictEqual(['ED','GD','GU','EU'].map(t=>L.arrivalSignal('anyang',t)),['1A','1B','2B','2A']);
 assert.strictEqual(L.handoff('geumcheon','B968T',slots).signal,'1A');assert.strictEqual(L.handoff('anyang','B655T',slots).signal,'2B');
+// ---- 폐색 점유: a number inside a section (own edge window or the neighbour's) closes the exits into it
+{const Core=require('./core.js'),LSO=require('./ls-operations.js'),catalog=Object.fromEntries(Object.entries(W.data||W).map(([k,a])=>[k,a.map(x=>x.slot)])),ops=LSO.create(catalog),ls=ops.initial();
+ const mk=id=>{const c=Core.forStation(id),s=c.initial();c.dispatch(s,{type:'mode',value:'CCM',source:'x'});return {c,s};};
+ const A=mk('anyang'),G=mk('geumjeong'),states={anyang:A.s,geumjeong:G.s};
+ assert.deepStrictEqual(L.blockedExits(ls),{},'empty line: nothing blocked');
+ ops.dispatch(ls,{op:'insert',station:'geumjeong',slot:'B992T',number:'K0001',direction:'up'});       // 하2선 구간 안양>금정 의 금정 쪽 끝에 열차
+ L.refresh(states,ls);assert.strictEqual(A.s.exitBlocked?.B984T,'K0001');
+ assert.ok(!A.c.dispatch(A.s,{type:'route',id:'4A-B984T',source:'x'}).ok,'exit into an occupied block is refused');
+ assert.ok(A.c.dispatch(A.s,{type:'route',id:'4C-B660T',source:'x'}).ok,'the other trunk is free');
+ const uid=ls.stations.geumjeong.windows.B992T[0].uid;ops.dispatch(ls,{op:'delete',station:'geumjeong',slot:'B992T',uid});L.refresh(states,ls);
+ assert.strictEqual(A.s.exitBlocked,undefined);assert.ok(A.c.dispatch(A.s,{type:'withdraw',id:'4C-B660T',source:'x'}).ok);assert.ok(A.c.dispatch(A.s,{type:'route',id:'4A-B984T',source:'x'}).ok,'free again');
+ // 상행 본선은 동쪽 역에서 나가는 진로가 막힌다
+ ops.dispatch(ls,{op:'insert',station:'anyang',slot:'B975T',number:'K0002',direction:'up'});L.refresh(states,ls);
+ assert.ok(L.blockedExits(ls).anyang&&Object.keys(L.blockedExits(ls).anyang).every(n=>L.trunkOf(n)==='EU'||L.trunkOf(n)==='ED'));
+ // enforcement can be switched off (scripted scenarios)
+ L.state.enforce=false;L.refresh(states,ls);assert.strictEqual(A.s.exitBlocked,undefined);L.state.enforce=true;
+ // 단선지령식: one occupied track closes the exits of both directions at both ends
+ const t=L.line.sections.find(x=>x.trunk==='MU'&&x.west==='jonggak'&&x.east==='underground-seoul');assert.ok(t);
+ const J=mk('jonggak'),U=mk('underground-seoul'),st2={jonggak:J.s,'underground-seoul':U.s};
+ ops.dispatch(ls,{op:'insert',station:'underground-seoul',slot:'B065T',number:'K1137',direction:'down'});
+ L.refresh(st2,ls);const before=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);
+ L.state.single.add('jonggak>underground-seoul:M');L.refresh(st2,ls);const after=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);
+ assert.notStrictEqual(before,after,'single-line operation closes more exits');L.state.single.clear();L.state.enforce=true;}
 console.log('line: ok',line.sections.length,'sections');

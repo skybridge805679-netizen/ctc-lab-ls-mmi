@@ -72,7 +72,8 @@ function fillTrains(){
  if(!ids.includes($('scTrain').value))$('scTrain').value=ids[0]||'';
  $('scTrainNote').textContent=ids.length?`${sc.direction==='up'?'상행':'하행'} · ${doc.getElementById('scSelect').selectedOptions[0].textContent.split(' ')[0]}에 서는 열차 ${ids.length}개`:'이 역에 서는 열차가 현재 시간표에 없습니다. 열차스케줄 관리에서 열차를 만들거나 번호를 직접 입력하세요.';
 }
-function startEmergency(sc){
+function scriptedRun(){if(root.SimLine?.state.enforce){root.SimLine.state.enforce=false;mmi().log('event','폐색 점유 검사 해제 · 시나리오는 대본의 조건을 구술로 확인합니다 (선로망 창에서 다시 켤 수 있음)');}}
+function startEmergency(sc){scriptedRun();
  host.selectStation(sc.station);
  EM().seed(sc,host.context().stationStates);
  for(const st of sc.stations)mmi().rebase(st);

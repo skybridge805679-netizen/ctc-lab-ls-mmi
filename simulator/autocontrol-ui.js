@@ -13,16 +13,26 @@ const model=()=>root.SimLSUI.getModel();
 function removeEverywhere(number){
  for(const [station,st] of Object.entries(model().stations))for(const [slot,rows] of Object.entries(st.windows))for(const r of [...rows])if(r.number===number)root.SimLSUI.dispatch({op:'delete',station,slot,uid:r.uid});
 }
+const transit=new Map();      // 연동역 사이를 지나는 열차: {train, from, h(다음 역·진입 열번창), via(중간역), at}
+function put(station,slot,train){removeEverywhere(train.id);root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});}
+function moveTransit(tr){
+ const states=host.context().stationStates,now=states[tr.h.station]?.clock??0,t=root.SimDiagram.getModel().trains.find(x=>x.id===tr.train.id);
+ const stop=tr.via.find(v=>{const c=t?.calls.find(c=>c.station===v.station&&!c.cancelled);return c&&now<c.departure;});
+ const at=stop?stop.station:'entry';if(at===tr.at)return;tr.at=at;
+ if(stop){put(stop.host,stop.slot,tr.train);return;}
+ put(tr.h.station,tr.h.slot,tr.train);
+ const st=states[tr.h.station];if(st&&tr.h.signal&&!st.approach?.[tr.h.signal])root.SimCore.forStation(tr.h.station).dispatch(st,{type:'approach',signal:tr.h.signal,present:true,source:'AUTO'});
+}
 const numbers={
- place(station,slot,train){removeEverywhere(train.id);if(slot)root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});},
+ place(station,slot,train){transit.delete(train.id);removeEverywhere(train.id);if(slot)root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});},
  depart(station,slot,train){removeEverywhere(train.id);if(slot)root.SimLSUI.dispatch({op:'insert',station,slot,number:train.id,direction:train.direction});},
  remove(station,train){removeEverywhere(train.id);},
- // 선로망: 역을 빠져나간 열차번호는 같은 본선의 다음 연동역 진입 열번창(경계 회로)으로 넘어간다 — 그 역의 자동제어가 승강장에 놓을 때까지 그곳에 서 있다
+ // 선로망: 역을 빠져나간 열차번호는 같은 본선의 다음 연동역 진입 열번창(경계 회로)으로 넘어간다 — 그 역의 자동제어가 승강장에 놓을 때까지 그곳에 서 있다.
+ // 사이에 정차하는 비연동 중간역(석수·시청 등)이 있으면 그 역의 열번창에서 출발시각까지 서 있다가 넘어간다.
  handoff(station,train,dest){
   const h=dest&&root.SimLine.handoff(station,dest,id=>(root.SimTrainWindows.data[id]||[]).map(w=>w.slot));
-  if(h)root.SimLSUI.dispatch({op:'insert',station:h.station,slot:h.slot,number:train.id,direction:train.direction});
-  // 이웃 역의 장내신호기 바깥에 열차가 접근 중이다 (접근쇄정 대상)
-  const st=h&&host.context().stationStates[h.station];if(st&&h.signal&&!st.approach?.[h.signal])root.SimCore.forStation(h.station).dispatch(st,{type:'approach',signal:h.signal,present:true,source:'AUTO'});
+  if(!h)return;
+  const tr={train,from:station,h,via:root.SimLine.viaStations(station,h.station,h.trunk),at:null};transit.set(train.id,tr);moveTransit(tr);
  }
 };
 
@@ -36,6 +46,8 @@ function set(on){
 function step(){
  if(!enabled||!host||mmi().replaying())return false;
  const model=root.SimDiagram.getModel(),reserved=new Set(root.SimScenarioUI?.reservedNumbers?.()||[]);
+ root.SimLine.refresh(host.context().stationStates,root.SimLSUI.getModel());
+ for(const tr of transit.values())moveTransit(tr);
  const events=engine.run({states:host.context().stationStates,model:{...model,trains:model.trains.filter(t=>!reserved.has(t.id))},numbers,reflect});
  for(const e of events){
   if(e.type==='route')mmi().markAuto(`${e.station}|${e.route}|설정`);
