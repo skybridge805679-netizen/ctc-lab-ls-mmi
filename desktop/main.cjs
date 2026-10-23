@@ -1,25 +1,34 @@
 'use strict';
-const {app,BrowserWindow,Menu,screen,dialog,session}=require('electron');
+const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray}=require('electron');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const {fitWindow,readState,writeState}=require('./window-state.cjs');
-// Renderers load only our bundled simulator, with no Node or privileged IPC bridge.
+// Sandboxed renderers load bundled UI and a single constrained simulation IPC bridge.
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
-const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false};
-let ls=null,mmi=null,graph=null,stateFile,layout={},quitting=false;
+const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
+let ls=null,mmi=null,graph=null,stateFile,layout={},quitting=false,engine=null,tray=null;
 if(process.argv.includes('--orpheia-smoke-test')&&process.env.ORPHEIA_TEST_USER_DATA)app.setPath('userData',process.env.ORPHEIA_TEST_USER_DATA);
 const single=app.requestSingleInstanceLock();
 if(!single)app.quit();
 else{
  app.on('second-instance',()=>{if(ls){if(ls.isMinimized())ls.restore();ls.show();ls.focus();}});
- app.whenReady().then(()=>{
+ app.whenReady().then(async()=>{
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
   session.defaultSession.setPermissionRequestHandler((_contents,_permission,respond)=>respond(false));
   session.defaultSession.on('will-download',(_event,item)=>item.setSaveDialogOptions({defaultPath:path.join(app.getPath('downloads'),path.basename(item.getFilename()))}));
+  engine=require('./engine-broker.cjs').create({utilityProcess,onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
+  await engine.ready;
+  ipcMain.on('orpheia:engine',(event,message)=>{
+   if(!ls||event.sender!==ls.webContents||event.senderFrame!==ls.webContents.mainFrame){event.returnValue={error:'Untrusted engine client'};return;}
+   if(!message||typeof message.action?.type!=='string'||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
+   engine.request(message.action,message.since,response=>{event.returnValue=response;});
+  });
   installMenu();createLS();
- });
- app.on('before-quit',()=>{quitting=true;});
+  if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
+
+ }).catch(error=>{dialog.showErrorBox('관제 엔진 시작 오류',error.message);app.quit();});
+ app.on('before-quit',()=>{quitting=true;engine?.stop();tray?.destroy();});
  app.on('window-all-closed',()=>app.quit());
  app.on('activate',()=>{if(!ls)createLS();else ls.show();});
 }
@@ -42,7 +51,7 @@ function protect(win){
  win.webContents.on('will-redirect',event=>event.preventDefault());
  win.webContents.on('render-process-gone',(_event,details)=>{
   if(quitting||details.reason==='clean-exit')return;
-  dialog.showErrorBox('관제 화면 실행 오류','관제 화면이 종료되었습니다. 앱을 다시 실행하세요. 저장하지 않은 실습 상태는 복구되지 않습니다.');
+  dialog.showMessageBox({type:'error',title:'관제 화면 실행 오류',message:'화면이 종료되었지만 별도 엔진의 운행 상태는 유지됩니다.',detail:'화면을 다시 불러오면 현재 엔진 상태로 연결합니다.',buttons:['화면 다시 열기','나중에'],defaultId:0}).then(({response})=>{if(response===0&&!ls?.isDestroyed())ls?.reload();});
  });
 }
 function createLS(){
@@ -64,11 +73,12 @@ function createLS(){
  ls.once('ready-to-show',()=>ls?.show());
  ls.webContents.on('did-finish-load',()=>{
   ls.setTitle('ORPHEIA · LS');
-  // Native same-origin window.open keeps the live MMI DOM and single engine.
+  // Native same-origin window.open shares presentation; authoritative state stays in the utility process.
   ls.webContents.executeJavaScript('window.SimWorkspace.detach()',true).catch(error=>console.error('MMI 분리 실패:',error.message));
  });
+ ls.on('close',event=>{if(!quitting){event.preventDefault();ls.hide();}});
  ls.on('closed',()=>{ls=null;for(const w of [mmi,graph])if(w&&!w.isDestroyed())w.close();});
- ls.loadURL(entryURL);
+ ls.loadURL(entryURL+'?desktop=1');
 }
 function script(code){if(ls&&!ls.isDestroyed())ls.webContents.executeJavaScript(code,true).catch(error=>console.error(error.message));}
 function installMenu(){

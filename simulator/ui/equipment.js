@@ -9,8 +9,9 @@ const faults={};let last=null,sent=[];
 const key=(st,n)=>st+'/'+n;
 const label=n=>INFO[n]?`${n}(${INFO[n]})`:n;
 const name=id=>root.SimMMI?.stationInfo?.(id)?.name||id;
-function isFault(st,n){return !!faults[key(st,n)];}
+function isFault(st,n){if(root.SimRemote)return root.SimRemote.snapshot.equipment.faults.includes(key(st,n));return !!faults[key(st,n)];}
 function set(st,n,on){
+ if(root.SimRemote){const was=isFault(st,n);root.SimRemote.command({type:'equipment',station:st,name:n,on});paint(st);return was!==isFault(st,n);}
  if(!NAMES.includes(n))return false;
  const was=isFault(st,n);on=!!on;if(was===on)return false;
  if(on)faults[key(st,n)]=true;else delete faults[key(st,n)];
@@ -33,16 +34,17 @@ function paint(st){
 function sendTime(why){sent.push(why);root.SimMMI?.log('event',`표준시각 전송 (${why})`);}
 // called every simulated step with the clock in seconds of the day
 function tick(clock){
+ if(root.SimRemote)return;
  const t=((clock%86400)+86400)%86400;
  if(last!==null&&last<SEND&&t>=SEND)sendTime('매일 03:00:00');
  last=t;
 }
-function faultList(){return Object.keys(faults);}
-function reset(){for(const k of faultList())delete faults[k];last=null;sent=[];}
+function faultList(){if(root.SimRemote)return root.SimRemote.snapshot.equipment.faults;return Object.keys(faults);}
+function reset(){if(root.SimRemote){root.SimRemote.command({type:'equipment',reset:true});return;}for(const k of faultList())delete faults[k];last=null;sent=[];}
 function init(){
  const doc=SimDOM.document,$=id=>doc.getElementById(id),m=root.SimMMI;
  const cur=()=>$('lsStage')?.dataset.controlStation||'';
- const draw=()=>{const st=cur();$('eqStation').textContent=st?name(st)+'역':'-';$('eqList').innerHTML=NAMES.map(n=>`<label><input type="checkbox" data-eq="${n}" ${isFault(st,n)?'checked':''}> ${label(n)}</label>`).join('');
+ const draw=()=>{if(root.SimRemote)sent=root.SimRemote.snapshot.equipment.sent;const st=cur();$('eqStation').textContent=st?name(st)+'역':'-';$('eqList').innerHTML=NAMES.map(n=>`<label><input type="checkbox" data-eq="${n}" ${isFault(st,n)?'checked':''}> ${label(n)}</label>`).join('');
   const F=root.SimField;
   if(F&&st){const c=F.core(st),s=F.state(st),keep=id=>$(id).value;
    const fill=(id,list)=>{const v=keep(id);$(id).innerHTML=list.map(x=>`<option>${x}</option>`).join('');if(list.includes(v))$(id).value=v;};
@@ -60,5 +62,5 @@ function init(){
  $('eqClose').onclick=()=>m.close('equipment');
  w.opener=draw;refresh=draw;draw();
 }
-root.SimEquipment={init,NAMES,INFO,set,isFault,paint,tick,faultList,reset,sentTimes:()=>sent.slice()};
+root.SimEquipment={init,NAMES,INFO,set,isFault,paint,tick,faultList,reset,sentTimes:()=>root.SimRemote?root.SimRemote.snapshot.equipment.sent.slice():sent.slice()};
 })(window);

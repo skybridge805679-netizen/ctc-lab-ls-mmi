@@ -1,6 +1,6 @@
 /* LS 창 셸: 상단 얇은 바 + 한 화면에 맞춘 LS + 하단 역 바로가기. MMI 도킹 영역은 같은 창일 때만 아래로 이어진다. */
 html,body{height:100%}
-body.app-ls{display:flex;flex-direction:column;overflow:hidden;min-width:1100px;background:#e9f1ee}
+body.app-ls{display:flex;flex-direction:column;overflow:hidden;min-width:0;background:#e9f1ee}
 .ls-topbar{flex:none;margin:0;height:46px;display:flex;align-items:center;gap:18px;padding:0 14px;background:#173b40;color:#d9efed;border-bottom:2px solid #bee3e3}
 .ls-topbar .brand{display:flex;align-items:center;gap:8px;color:#bee3e3;font-size:15px;letter-spacing:2.4px;text-decoration:none;white-space:nowrap}
 .ls-topbar .brand small{font-size:10px;letter-spacing:1.6px;color:#9fc5c5}
@@ -10,7 +10,7 @@ body.app-ls{display:flex;flex-direction:column;overflow:hidden;min-width:1100px;
 .top-actions{display:flex;gap:6px}
 .ls-topbar button{background:#ffffff14;color:#e7f6f5;border:1px solid #ffffff2e;border-radius:5px;padding:5px 10px;font-size:11.5px;cursor:pointer;white-space:nowrap}
 .ls-topbar button:hover{background:#ffffff26}.ls-topbar button[aria-pressed="true"],.ls-topbar button[aria-expanded="true"]{background:#bee3e3;color:#173c3d}
-body.app-ls>main{flex:1;min-height:0;overflow:auto;padding:0;margin:0;max-width:none;width:100%}
+body.app-ls .ls-viewport>main{flex:1;min-height:0;overflow:auto;padding:0;margin:0;max-width:none;width:100%}
 .ls-panel{height:100%;min-height:420px;display:flex;flex-direction:row;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
 .ls-panel .ls-display{flex:1 1 0;min-width:0;min-height:0;margin:0;border-radius:0;display:flex;flex-direction:column}
 .ls-display .fidelity-note{flex:none;padding:3px 12px;font-size:11px}
@@ -39,3 +39,9 @@ body.app-ls>main{flex:1;min-height:0;overflow:auto;padding:0;margin:0;max-width:
 /* 독립 T/G 창 */
 body.tg-detached{display:block;margin:0;min-width:900px;background:#1e1e1e}
 .tg-detached .graph-panel{margin:0;border-radius:0;min-height:100vh;box-shadow:none}
+
+/* Uniform desktop window scaling; dialogs and context menus remain viewport-local. */
+.ls-viewport{position:absolute;left:0;top:0;display:flex;flex-direction:column;overflow:hidden}
+
+dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto}
+.ls-topbar{gap:12px;padding-left:10px;padding-right:10px}

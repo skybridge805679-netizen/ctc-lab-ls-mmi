@@ -10,7 +10,7 @@ function fitBounds(saved,area,defaults={width:1440,height:1000}){
  return {x,y,width,height};
 }
 function fitWindow(saved,area,role){
- const minWidth=Math.min(role==='mmi'?1100:1000,area.width),minHeight=Math.min(700,area.height);
+ const minWidth=Math.min(role==='ls'?320:role==='mmi'?1100:900,area.width),minHeight=Math.min(role==='ls'?240:700,area.height);
  return {...fitBounds(saved,area,{width:1440,height:1000,minWidth,minHeight}),minWidth,minHeight};
 }
 function readState(file){try{const data=JSON.parse(fs.readFileSync(file,'utf8'));return data&&typeof data==='object'?data:{};}catch{return {};}}

@@ -1,6 +1,6 @@
 /* Scenario trains use the same interlocking and virtual clock as timetable trains. */
 (function(root){'use strict';
-const node=typeof module!=='undefined',Core=node?require('./core'):root.SimCore,W=node?require('./wiring'):root.SimWiring,LS=node?require('../ui/ls-view'):root.SimLS,N=node?require('./network'):root.SimNetwork,L=node?require('./line'):root.SimLine;
+const node=typeof module!=='undefined',Core=node?require('./core'):root.SimCore,W=node?require('./wiring'):root.SimWiring,LS=node?require('./track-geometry'):root.SimTrackGeometry,N=node?require('./network'):root.SimNetwork,L=node?require('./line'):root.SimLine;
 function point(station,slot){
  const def=W.data[station],r=def?.rails.find(r=>r[0]===slot);
  if(r){const x=r[2]??(r[1][0][0]+r[1].at(-1)[0])/2;return [x,LS.railY(def,r[0],x)];}

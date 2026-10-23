@@ -89,6 +89,7 @@ function raiseAlarm(text,state='',level='E',station=''){
 // 열차번호 중복 알람 (실무5 p.15: 충돌·구원연결로 한 열번창에 번호가 겹치면 "K0602 + K0604 열차번호 중복 알람")
 const dupSeen=new Set();
 function checkDuplicates(stationId){
+ if(root.SimRemote)return; // Authoritative engine emits deduplicated alarms.
  const m=root.SimLSUI?.getModel?.(),st=m?.stations?.[stationId];if(!st)return;
  for(const [slot,rows] of Object.entries(st.windows||{})){
   const key=`${stationId}|${slot}`,numbers=rows.map(r=>r.number);

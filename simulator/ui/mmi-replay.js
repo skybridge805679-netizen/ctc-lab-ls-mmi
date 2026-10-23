@@ -21,13 +21,13 @@ function enter(station){
  if(on)return;
  const st=liveState(station),ls=root.SimLSUI.getModel().stations[station];
  backup={station,state:structuredClone(Object.fromEntries(KEYS.map(k=>[k,st[k]]))),ls:ls?structuredClone(ls):null};
- on=true;host.selectStation(station);
+ on=true;if(root.SimRemote)root.SimRemote.command({type:'replay',on:true});host.selectStation(station);
 }
 function restore(){
  if(!on)return;
  const st=liveState(backup.station);for(const k of KEYS)st[k]=structuredClone(backup.state[k]);
  if(backup.ls)root.SimLSUI.getModel().stations[backup.station]=backup.ls;
- on=false;badge('');backup=null;mmi().render();
+ on=false;if(root.SimRemote)root.SimRemote.command({type:'replay',on:false});badge('');backup=null;mmi().render();
 }
 function show(i){
  if(!list.length)return;

@@ -28,5 +28,5 @@ test('a full desktop restores the saved MMI size without forcing 1100px',()=>{
 });
 test('short work areas clamp both native size and minimum height',()=>{
  const result=fitWindow(null,{x:0,y:0,width:1024,height:600},'ls');
- assert.equal(result.height,600);assert.equal(result.minHeight,600);
+ assert.equal(result.height,600);assert.equal(result.minHeight,240);
 });

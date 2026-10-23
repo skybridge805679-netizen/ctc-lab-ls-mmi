@@ -1,0 +1,4 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');const {install}=require('./install-electron.cjs');
+test('a 502 download retries with bounded backoff and then succeeds',async()=>{let calls=0;const delays=[];await install({run:()=>++calls===1?{status:1,stderr:'HTTPError: Response code 502 (Bad Gateway)'}:{status:0},wait:async n=>delays.push(n),log:()=>{}});assert.equal(calls,2);assert.deepEqual(delays,[2000]);});
+test('permanent errors fail immediately and persistent outages stop after four tries',async()=>{let calls=0;await assert.rejects(install({run:()=>{calls++;return {status:1,stderr:'checksum mismatch'};},wait:async()=>{},log:()=>{}}));assert.equal(calls,1);calls=0;await assert.rejects(install({run:()=>{calls++;return {status:1,stderr:'Response code 502'};},wait:async()=>{},log:()=>{}}));assert.equal(calls,4);});

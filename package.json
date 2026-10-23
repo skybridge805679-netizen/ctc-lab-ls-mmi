@@ -1,7 +1,7 @@
 {
   "name": "orpheia-ctc-lab",
   "productName": "ORPHEIA CTC LAB",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "오르페이아 철도관제 LS·MMI 데스크톱 실습",
   "private": true,
   "author": "CTC LAB",
@@ -10,10 +10,11 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test desktop/*.test.cjs simulator/engine/*.test.cjs simulator/ui/*.test.cjs",
-    "test:desktop": "node desktop/smoke.cjs",
+    "test:desktop": "node desktop/smoke.cjs && node desktop/engine-smoke.cjs",
     "pack": "electron-builder --dir --publish never",
     "dist:mac": "electron-builder --mac --arm64 --publish never",
-    "dist:win": "electron-builder --win --x64 --publish never"
+    "dist:win": "electron-builder --win --x64 --publish never",
+    "setup:electron": "node desktop/install-electron.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
@@ -37,9 +38,10 @@
       "!simulator/e2e/**",
       "!simulator/engine/route-conflict-audit.cjs",
       "package.json",
-      "!simulator/**/*.test.*",
       "!simulator/**/*.md",
-      "!simulator/e2e/**"
+      "desktop/engine-process.cjs",
+      "desktop/engine-broker.cjs",
+      "desktop/preload.cjs"
     ],
     "artifactName": "ORPHEIA-CTC-LAB-${version}-${os}-${arch}.${ext}",
     "mac": {

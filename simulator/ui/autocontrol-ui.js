@@ -49,12 +49,14 @@ const numbers={
 
 function label(){const b=$('mmiAutoBtn');if(b){b.textContent=`자동제어 ${enabled?'ON':'OFF'}`;b.setAttribute('aria-pressed',String(enabled));}const c=$('acEnabled');if(c)c.checked=enabled;}
 function set(on){
+ if(root.SimRemote){root.SimRemote.command({type:'auto',enabled:!!on});enabled=!!on;label();drawTroubles();drawDelays();return;}
  enabled=!!on;engine.reset();transit.clear();root.SimLine.journeys.clear();try{localStorage.setItem(KEY,enabled?'1':'0');}catch{}
  label();mmi().log('event',`열차 자동제어(AUTO) ${enabled?'사용':'중지'}`);
  if(enabled&&step())mmi().render();
  drawTroubles();
 }
 function step(){
+ if(root.SimRemote){enabled=root.SimRemote.snapshot.auto.enabled;reflect=root.SimRemote.snapshot.auto.reflect;label();drawTroubles();drawDelays();return true;}
  if(!enabled||!host||mmi().replaying())return false;
  const model=root.SimDiagram.getModel(),reserved=new Set(root.SimScenarioUI?.reservedNumbers?.()||[]);
  root.SimLine.refresh(host.context().stationStates,root.SimLSUI.getModel());
@@ -86,22 +88,23 @@ function drawDelays(){
 }
 function init(api){
  host=api;
- engine=A().create({core:root.SimCore,stations:root.SimNetwork.stations,refresh:()=>root.SimLine.refresh(host.context().stationStates,root.SimLSUI.getModel())});
- try{enabled=localStorage.getItem(KEY)==='1';reflect=localStorage.getItem(RKEY)==='1';}catch{enabled=false;}
+ engine=root.SimRemote?{troubles:()=>root.SimRemote.snapshot.auto.troubles,actuals:()=>root.SimRemote.snapshot.auto.actuals}:A().create({core:root.SimCore,stations:root.SimNetwork.stations,refresh:()=>root.SimLine.refresh(host.context().stationStates,root.SimLSUI.getModel())});
+ if(root.SimRemote){enabled=root.SimRemote.snapshot.auto.enabled;reflect=root.SimRemote.snapshot.auto.reflect;}else try{enabled=localStorage.getItem(KEY)==='1';reflect=localStorage.getItem(RKEY)==='1';}catch{enabled=false;}
  const win=mmi().createWindow('settings',{title:'프로그램 환경설정',x:150,y:80,width:700,body:`<div class="rpt"><fieldset class="rpt-cond"><legend>열차 자동제어 (AUTO)</legend><label class="nt-check"><input type="checkbox" id="acEnabled"> 열차 자동제어 사용 — AUTO 모드 역에서 스케줄의 도착·출발진로를 시각에 맞춰 자동으로 설정합니다</label></fieldset>
 <div class="idm-note">실기3 3.4 기준: 트리거 시점(도착 ${A().TRIGGER_LEAD}초 전)에 접근 열차를 감지해 장내진로 → 출발진로 순으로 요구하고, 진로를 쓸 수 없으면 <b>트러블 등록</b>해 조건이 풀리면 다시 요구합니다. 요구 시점에 역이 AUTO가 아니면 요구하지 않습니다. 가상 열차는 앞 역의 실제 출발·통과를 기다립니다. 지연은 운행에 전파되며 시간표 반영은 별도 선택입니다. 복선만, 입환·분할·병합·역진로(ANTI)·TTB는 다루지 않습니다. 켜고 끄는 값은 이 브라우저에 저장됩니다.</div>
 <div class="idm-cap">트러블 등록 목록</div><div class="idm-table rpt-table"><table><thead><tr><th>역</th><th>열차</th><th>진로</th><th>사유</th></tr></thead><tbody id="acTroubles"></tbody></table></div>
 <div class="idm-cap">신호 대기 지연 실적</div><div class="idm-table rpt-table"><table><thead><tr><th>역</th><th>열차</th><th>계획 도착</th><th>도착 지연</th><th>계획 출발</th><th>출발 지연</th></tr></thead><tbody id="acDelays"></tbody></table></div><label class="nt-check"><input type="checkbox" id="acReflect"> 지연을 뒤 역의 스케줄에 반영 (기본 꺼짐 — 켜면 시간표가 바뀝니다)</label>
 <div class="idm-buttons"><button type="button" class="sched-btn" id="acClose">닫기</button></div></div>`});
- $('acEnabled').onchange=e=>set(e.target.checked);$('acReflect').checked=reflect;$('acReflect').onchange=e=>{reflect=e.target.checked;try{localStorage.setItem(RKEY,reflect?'1':'0');}catch{}};$('acClose').onclick=()=>mmi().close('settings');win.opener=()=>{label();drawTroubles();drawDelays();};
+ $('acEnabled').onchange=e=>set(e.target.checked);$('acReflect').checked=reflect;$('acReflect').onchange=e=>{reflect=e.target.checked;if(root.SimRemote)root.SimRemote.command({type:'auto',reflect});try{localStorage.setItem(RKEY,reflect?'1':'0');}catch{}};$('acClose').onclick=()=>mmi().close('settings');win.opener=()=>{label();drawTroubles();drawDelays();};
  const btn=$('mmiAutoBtn');if(btn)btn.onclick=()=>set(!enabled);
  label();drawTroubles();if(enabled)step();
 }
 function position(train,now){
+ if(root.SimRemote)return root.SimRemote.snapshot.auto.positions[train.id]||root.SimTimetable.position(train,now);
  if(root.SimScenarioUI?.reservedNumbers().includes(train.id))return root.SimScenarioUI.position(train);
  if(!enabled)return root.SimTimetable.position(train,now);
  const tr=transit.get(train.id);if(tr){const a=root.SimNetwork.catalog[tr.from],b=root.SimNetwork.catalog[tr.h.station],fraction=tr.codes.length<2?1:tr.index/(tr.codes.length-1);return {station:a.id,nextStation:b.id,order:a.order+(b.order-a.order)*fraction,status:'역간 운행',actual:true,circuit:tr.codes[tr.index]};}
  return engine.position(train,now);
 }
-root.SimAutoUI={init,step,transits:()=>[...transit.values()].map(tr=>({...tr})),enabled:()=>enabled,position,set};
+root.SimAutoUI={init,step,transits:()=>root.SimRemote?root.SimRemote.snapshot.auto.transits:[...transit.values()].map(tr=>({...tr})),enabled:()=>enabled,position,set};
 })(window);
