@@ -84,7 +84,7 @@ function createLS(){
  ls.loadURL(entryURL+'?desktop=1');
 }
 function createExtraLS(station){
- if(!stations.some(s=>s.id===station))return;
+ if(!require('../simulator/ui/ls-presets').get(station))return;
  const win=new BrowserWindow({...savedBounds('ls:'+station),minWidth:320,minHeight:240,show:false,title:'ORPHEIA · LS',backgroundColor:'#686d68',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
  extraLS.add(win);remember(win,'ls:'+station);protect(win);win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  win.once('ready-to-show',()=>win.show());win.on('closed',()=>extraLS.delete(win));
@@ -94,7 +94,7 @@ function script(code){if(ls&&!ls.isDestroyed())ls.webContents.executeJavaScript(
 function installMenu(){
  const workspace={label:'실습 화면',submenu:[
   {label:'LS 창으로',accelerator:'CmdOrCtrl+1',click:()=>{ls?.show();ls?.focus();}},
-  {label:'LS 추가 창',submenu:stations.map(st=>({label:st.name,click:()=>createExtraLS(st.id)}))},
+  {label:'LS 추가 창',submenu:require('../simulator/ui/ls-presets').list().map(st=>({label:st.name,click:()=>createExtraLS(st.id)}))},
   {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
   {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
   {type:'separator'},

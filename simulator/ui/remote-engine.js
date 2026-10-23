@@ -1,6 +1,6 @@
 (function(root){'use strict';
 if(!root.OrpheiaEngine){if(new URLSearchParams(root.location.search).get('desktop')==='1'){root.SimSession.create=()=>{throw new Error('Desktop engine bridge unavailable; local simulation is disabled.');};}return;}
-const requested=new URLSearchParams(root.location.search).get('lsStation');let viewStation=root.SimNetwork.catalog[requested]?.controlled?requested:null;root.SimExtraLS=!!viewStation;
+const requested=new URLSearchParams(root.location.search).get('lsStation');let viewStation=root.SimLSPresets.get(requested)?.station||null;root.SimExtraLS=!!viewStation;
 let mirror=null,cursor=0,version=-1;const pending=[];
 function reconcile(target,source){
  if(Array.isArray(source)){if(!Array.isArray(target))target=[];target.length=source.length;for(let i=0;i<source.length;i++)target[i]=reconcile(target[i],source[i]);return target;}

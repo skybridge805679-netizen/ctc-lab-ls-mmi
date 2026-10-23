@@ -14,7 +14,11 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=browser.new_page(viewport={'width':1920,'height':1080},accept_downloads=True);errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.add_init_script('window.open=()=>null');page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
   stations=page.locator('#lsStationSelect option').evaluate_all('es=>es.map(e=>e.value)')
   for station in stations:
-   page.select_option('#lsStationSelect',station);page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
+   page.select_option('#lsStationSelect',station)
+   if station=='uiwang-suwon':
+    assert page.locator('[data-point-control]').count()==0
+    continue
+   page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    controls=page.locator('[data-point-control]').evaluate_all('es=>es.map(e=>e.dataset.pointControl)');assert controls,station
    for part in controls:
     before=page.evaluate('([st,part])=>{const C=SimCore.forStation(st);return SimField.state(st).points[C.pointParts[part]||part]}',[station,part])

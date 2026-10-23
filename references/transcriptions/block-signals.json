@@ -1,0 +1,7131 @@
+{
+  "source": "references/diagrams/배선도(관제교육장).pptx",
+  "sha256": "7d1760358158bd4103bac9388635ff6bec49e93a6eb6c3f2a2f3207d4ff66cc0",
+  "notes": "PPT slides 2–19 black numbered block indicators, reviewed against source symbols and circuit captions. PDF omits these digits. code is the source adjacent circuit; anchorCode handles source-edition differences. These are display identifiers, not new interlocking permissions.",
+  "indicators": [
+    {
+      "id": "ppt-2-1598-484",
+      "station": "cheongnyangni",
+      "slide": 2,
+      "sourceSymbol": [
+        1598,
+        484,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1594,
+        504,
+        154,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOO4T",
+      "number": 6,
+      "code": "B004T",
+      "anchorCode": "B004T",
+      "side": "above",
+      "fraction": 0.1558,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-2-1756-484",
+      "station": "cheongnyangni",
+      "slide": 2,
+      "sourceSymbol": [
+        1756,
+        484,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1753,
+        504,
+        155,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOO6T",
+      "number": 5,
+      "code": "B006T",
+      "anchorCode": "B006T",
+      "side": "above",
+      "fraction": 0.1387,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-2-1548-635",
+      "station": "cheongnyangni",
+      "slide": 2,
+      "sourceSymbol": [
+        1548,
+        635,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1435,
+        612,
+        154,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOOIT",
+      "number": 1,
+      "code": "B001T",
+      "anchorCode": "B001T",
+      "side": "below",
+      "fraction": 0.8636,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-2-1707-635",
+      "station": "cheongnyangni",
+      "slide": 2,
+      "sourceSymbol": [
+        1707,
+        635,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1593,
+        612,
+        155,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BOOST",
+      "number": 2,
+      "code": "B003T",
+      "anchorCode": "B003T",
+      "side": "below",
+      "fraction": 0.8645,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-2-1868-635",
+      "station": "cheongnyangni",
+      "slide": 2,
+      "sourceSymbol": [
+        1868,
+        635,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1753,
+        612,
+        155,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BOOST",
+      "number": 3,
+      "code": "B005T",
+      "anchorCode": "B005T",
+      "side": "below",
+      "fraction": 0.8677,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-3-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        3,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        3,
+        508,
+        84,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "BOO8T",
+      "number": 4,
+      "code": "B008T",
+      "anchorCode": "B008T",
+      "side": "above",
+      "fraction": 0.2321,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-92-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        92,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        92,
+        508,
+        83,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BO10T",
+      "number": 3,
+      "code": "B010T",
+      "anchorCode": "B010T",
+      "side": "above",
+      "fraction": 0.2349,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-180-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        180,
+        488,
+        40,
+        15
+      ],
+      "sourceCell": [
+        180,
+        508,
+        84,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BO12T",
+      "number": 2,
+      "code": "B012T",
+      "anchorCode": "B012T",
+      "side": "above",
+      "fraction": 0.2381,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-269-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        269,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        269,
+        508,
+        166,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO14T",
+      "number": 1,
+      "code": "B014T",
+      "anchorCode": "B014T",
+      "side": "above",
+      "fraction": 0.1175,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1106-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1106,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1106,
+        508,
+        82,
+        17
+      ],
+      "ocrNumber": "14",
+      "ocrCode": "BO18T",
+      "number": 14,
+      "code": "B018T",
+      "anchorCode": "B018T",
+      "side": "above",
+      "fraction": 0.2378,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1192-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1192,
+        488,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1192,
+        508,
+        88,
+        17
+      ],
+      "ocrNumber": "13",
+      "ocrCode": "BO20T",
+      "number": 13,
+      "code": "B020T",
+      "anchorCode": "B020T",
+      "side": "above",
+      "fraction": 0.2273,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1284-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1284,
+        488,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1284,
+        508,
+        82,
+        17
+      ],
+      "ocrNumber": "12",
+      "ocrCode": "B022T",
+      "number": 12,
+      "code": "B022T",
+      "anchorCode": "B022T",
+      "side": "above",
+      "fraction": 0.2439,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1371-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1371,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1371,
+        508,
+        87,
+        17
+      ],
+      "ocrNumber": "11",
+      "ocrCode": "BO24T",
+      "number": 11,
+      "code": "B024T",
+      "anchorCode": "B024T",
+      "side": "above",
+      "fraction": 0.2241,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1465-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1465,
+        488,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1462,
+        508,
+        88,
+        17
+      ],
+      "ocrNumber": "10",
+      "ocrCode": "BO26T",
+      "number": 10,
+      "code": "B026T",
+      "anchorCode": "B026T",
+      "side": "above",
+      "fraction": 0.2443,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1557-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1557,
+        488,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1555,
+        508,
+        82,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B028T",
+      "number": 9,
+      "code": "B028T",
+      "anchorCode": "B028T",
+      "side": "above",
+      "fraction": 0.25,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1641-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1641,
+        488,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1641,
+        508,
+        88,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOSOT",
+      "number": 8,
+      "code": "B030T",
+      "anchorCode": "B030T",
+      "side": "above",
+      "fraction": 0.2273,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1733-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1733,
+        488,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1733,
+        508,
+        82,
+        17
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "B032T",
+      "number": 7,
+      "code": "B032T",
+      "anchorCode": "B032T",
+      "side": "above",
+      "fraction": 0.2439,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1820-488",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1820,
+        488,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1820,
+        508,
+        87,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO34T",
+      "number": 6,
+      "code": "B034T",
+      "anchorCode": "B034T",
+      "side": "above",
+      "fraction": 0.2241,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1057-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1057,
+        634,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1020,
+        615,
+        77,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO17T",
+      "number": 1,
+      "code": "B017T",
+      "anchorCode": "B017T",
+      "side": "below",
+      "fraction": 0.7338,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1146-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1146,
+        634,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1102,
+        615,
+        84,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BO19T",
+      "number": 2,
+      "code": "B019T",
+      "anchorCode": "B019T",
+      "side": "below",
+      "fraction": 0.756,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1234-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1234,
+        634,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1191,
+        615,
+        84,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BO21T",
+      "number": 3,
+      "code": "B021T",
+      "anchorCode": "B021T",
+      "side": "below",
+      "fraction": 0.75,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1317-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1317,
+        634,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1280,
+        615,
+        77,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B023T",
+      "number": 4,
+      "code": "B023T",
+      "anchorCode": "B023T",
+      "side": "below",
+      "fraction": 0.7208,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1418-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1418,
+        634,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1362,
+        615,
+        96,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO25T",
+      "number": 5,
+      "code": "B025T",
+      "anchorCode": "B025T",
+      "side": "below",
+      "fraction": 0.7865,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1510-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1510,
+        634,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1463,
+        615,
+        95,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO27T",
+      "number": 6,
+      "code": "B027T",
+      "anchorCode": "B027T",
+      "side": "below",
+      "fraction": 0.7,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1639-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1639,
+        634,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1563,
+        615,
+        114,
+        18
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "BO29T",
+      "number": 7,
+      "code": "B029T",
+      "anchorCode": "B029T",
+      "side": "below",
+      "fraction": 0.8421,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1769-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1769,
+        634,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1682,
+        615,
+        125,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS1T",
+      "number": 8,
+      "code": "B031T",
+      "anchorCode": "B031T",
+      "side": "below",
+      "fraction": 0.856,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-1867-634",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        1867,
+        634,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1812,
+        615,
+        95,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO33T",
+      "number": 9,
+      "code": "B033T",
+      "anchorCode": "B033T",
+      "side": "below",
+      "fraction": 0.7842,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-41-638",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        41,
+        638,
+        37,
+        15
+      ],
+      "sourceCell": [
+        0,
+        616,
+        81,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "BOO7T",
+      "number": 4,
+      "code": "B007T",
+      "anchorCode": "B007T",
+      "side": "below",
+      "fraction": 0.7346,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-129-638",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        129,
+        638,
+        39,
+        15
+      ],
+      "sourceCell": [
+        87,
+        616,
+        82,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOOST",
+      "number": 5,
+      "code": "B009T",
+      "anchorCode": "B009T",
+      "side": "below",
+      "fraction": 0.75,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-229-638",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        229,
+        638,
+        40,
+        15
+      ],
+      "sourceCell": [
+        174,
+        616,
+        96,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO11T",
+      "number": 6,
+      "code": "B011T",
+      "anchorCode": "B011T",
+      "side": "below",
+      "fraction": 0.7812,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-3-306-638",
+      "station": "dongmyo",
+      "slide": 3,
+      "sourceSymbol": [
+        306,
+        638,
+        37,
+        15
+      ],
+      "sourceCell": [
+        275,
+        616,
+        71,
+        17
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "BO13T",
+      "number": 7,
+      "code": "B013T",
+      "anchorCode": "B013T",
+      "side": "below",
+      "fraction": 0.6972,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1207-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1207,
+        485,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1206,
+        504,
+        83,
+        18
+      ],
+      "ocrNumber": "12",
+      "ocrCode": "BO48T",
+      "number": 12,
+      "code": "B048T",
+      "anchorCode": "B048T",
+      "side": "above",
+      "fraction": 0.253,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1296-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1296,
+        485,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1294,
+        504,
+        90,
+        18
+      ],
+      "ocrNumber": "11",
+      "ocrCode": "BOSOT",
+      "number": 11,
+      "code": "B050T",
+      "anchorCode": "B050T",
+      "side": "above",
+      "fraction": 0.2444,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1394-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1394,
+        485,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1389,
+        504,
+        84,
+        18
+      ],
+      "ocrNumber": "10",
+      "ocrCode": "B052T",
+      "number": 10,
+      "code": "B052T",
+      "anchorCode": "B052T",
+      "side": "above",
+      "fraction": 0.2798,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1479-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1479,
+        485,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1478,
+        504,
+        83,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS4T",
+      "number": 9,
+      "code": "B054T",
+      "anchorCode": "B054T",
+      "side": "above",
+      "fraction": 0.253,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1572-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1572,
+        485,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1566,
+        504,
+        84,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS6T",
+      "number": 8,
+      "code": "B056T",
+      "anchorCode": "B056T",
+      "side": "above",
+      "fraction": 0.2917,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1654-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1654,
+        485,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1655,
+        504,
+        78,
+        18
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "BOS8T",
+      "number": 7,
+      "code": "B058T",
+      "anchorCode": "B058T",
+      "side": "above",
+      "fraction": 0.2372,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1739-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1739,
+        485,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1738,
+        504,
+        83,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO6OT",
+      "number": 6,
+      "code": "B060T",
+      "anchorCode": "B060T",
+      "side": "above",
+      "fraction": 0.253,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1826-485",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1826,
+        485,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1826,
+        504,
+        77,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B062T",
+      "number": 5,
+      "code": "B062T",
+      "anchorCode": "B062T",
+      "side": "above",
+      "fraction": 0.2597,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-2-487",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        2,
+        487,
+        40,
+        15
+      ],
+      "sourceCell": [
+        0,
+        504,
+        101,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS6T",
+      "number": 5,
+      "code": "B036T",
+      "anchorCode": "B036T",
+      "side": "above",
+      "fraction": 0.2178,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-106-487",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        106,
+        487,
+        40,
+        15
+      ],
+      "sourceCell": [
+        106,
+        504,
+        102,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "BOS38T",
+      "number": 4,
+      "code": "B038T",
+      "anchorCode": "B038T",
+      "side": "above",
+      "fraction": 0.1961,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-213-487",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        213,
+        487,
+        39,
+        15
+      ],
+      "sourceCell": [
+        213,
+        504,
+        101,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BO40T",
+      "number": 3,
+      "code": "B040T",
+      "anchorCode": "B040T",
+      "side": "above",
+      "fraction": 0.1931,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-319-487",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        319,
+        487,
+        40,
+        15
+      ],
+      "sourceCell": [
+        319,
+        504,
+        102,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B042T",
+      "number": 2,
+      "code": "B042T",
+      "anchorCode": "B042T",
+      "side": "above",
+      "fraction": 0.1961,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-428-487",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        428,
+        487,
+        39,
+        15
+      ],
+      "sourceCell": [
+        425,
+        504,
+        102,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO44T",
+      "number": 1,
+      "code": "B044T",
+      "anchorCode": "B044T",
+      "side": "above",
+      "fraction": 0.2206,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-61-632",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        61,
+        632,
+        39,
+        15
+      ],
+      "sourceCell": [
+        0,
+        612,
+        101,
+        18
+      ],
+      "ocrNumber": "10",
+      "ocrCode": "BO35T",
+      "number": 10,
+      "code": "B035T",
+      "anchorCode": "B035T",
+      "side": "below",
+      "fraction": 0.797,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-167-632",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        167,
+        632,
+        40,
+        15
+      ],
+      "sourceCell": [
+        106,
+        612,
+        102,
+        18
+      ],
+      "ocrNumber": "11",
+      "ocrCode": "BO37T",
+      "number": 11,
+      "code": "B037T",
+      "anchorCode": "B037T",
+      "side": "below",
+      "fraction": 0.7941,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-274-632",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        274,
+        632,
+        39,
+        15
+      ],
+      "sourceCell": [
+        213,
+        612,
+        101,
+        18
+      ],
+      "ocrNumber": "12",
+      "ocrCode": "BOS3ST",
+      "number": 12,
+      "code": "B039T",
+      "anchorCode": "B039T",
+      "side": "below",
+      "fraction": 0.797,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-380-632",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        380,
+        632,
+        40,
+        15
+      ],
+      "sourceCell": [
+        319,
+        612,
+        102,
+        18
+      ],
+      "ocrNumber": "13",
+      "ocrCode": "BO41T",
+      "number": 13,
+      "code": "B041T",
+      "anchorCode": "B041T",
+      "side": "below",
+      "fraction": 0.7941,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1202-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1202,
+        633,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1129,
+        613,
+        113,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO45T",
+      "number": 1,
+      "code": "B045T",
+      "anchorCode": "B045T",
+      "side": "below",
+      "fraction": 0.8186,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1326-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1326,
+        633,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1247,
+        613,
+        119,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BO47T",
+      "number": 2,
+      "code": "B047T",
+      "anchorCode": "B047T",
+      "side": "below",
+      "fraction": 0.8277,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1444-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1444,
+        633,
+        37,
+        14
+      ],
+      "sourceCell": [
+        1371,
+        613,
+        113,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BO49T",
+      "number": 3,
+      "code": "B049T",
+      "anchorCode": "B049T",
+      "side": "below",
+      "fraction": 0.8097,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1568-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1568,
+        633,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1489,
+        613,
+        120,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "BOS1T",
+      "number": 4,
+      "code": "B051T",
+      "anchorCode": "B051T",
+      "side": "below",
+      "fraction": 0.825,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1686-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1686,
+        633,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1614,
+        613,
+        113,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS3T",
+      "number": 5,
+      "code": "B053T",
+      "anchorCode": "B053T",
+      "side": "below",
+      "fraction": 0.8142,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1781-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1781,
+        633,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1732,
+        613,
+        89,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOSST",
+      "number": 6,
+      "code": "B055T",
+      "anchorCode": "B055T",
+      "side": "below",
+      "fraction": 0.7697,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-4-1864-633",
+      "station": "jonggak",
+      "slide": 4,
+      "sourceSymbol": [
+        1864,
+        633,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1826,
+        613,
+        78,
+        17
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "BO57T",
+      "number": 7,
+      "code": "B057T",
+      "anchorCode": "B057T",
+      "side": "below",
+      "fraction": 0.7372,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-8-486",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        8,
+        486,
+        40,
+        15
+      ],
+      "sourceCell": [
+        0,
+        503,
+        136,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "BO64T",
+      "number": 4,
+      "code": "B064T",
+      "anchorCode": "B064T",
+      "side": "above",
+      "fraction": 0.2059,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-141-486",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        141,
+        486,
+        39,
+        15
+      ],
+      "sourceCell": [
+        141,
+        503,
+        143,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BOG6T",
+      "number": 3,
+      "code": "B066T",
+      "anchorCode": "B066T",
+      "side": "above",
+      "fraction": 0.1364,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-302-486",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        302,
+        486,
+        37,
+        15
+      ],
+      "sourceCell": [
+        289,
+        503,
+        136,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BO68T",
+      "number": 2,
+      "code": "B068T",
+      "anchorCode": "B068T",
+      "side": "above",
+      "fraction": 0.2316,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-437-486",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        437,
+        486,
+        40,
+        15
+      ],
+      "sourceCell": [
+        430,
+        503,
+        143,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO70T",
+      "number": 1,
+      "code": "B070T",
+      "anchorCode": "B070T",
+      "side": "above",
+      "fraction": 0.1888,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-95-629",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        95,
+        629,
+        40,
+        15
+      ],
+      "sourceCell": [
+        0,
+        611,
+        136,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOS9T",
+      "number": 8,
+      "code": "B059T",
+      "anchorCode": "B059T",
+      "side": "below",
+      "fraction": 0.8456,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-243-629",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        243,
+        629,
+        40,
+        15
+      ],
+      "sourceCell": [
+        141,
+        611,
+        143,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO61T",
+      "number": 9,
+      "code": "B061T",
+      "anchorCode": "B061T",
+      "side": "below",
+      "fraction": 0.8531,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-385-629",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        385,
+        629,
+        37,
+        15
+      ],
+      "sourceCell": [
+        289,
+        611,
+        136,
+        17
+      ],
+      "ocrNumber": "10",
+      "ocrCode": "BO63T",
+      "number": 10,
+      "code": "B063T",
+      "anchorCode": "B063T",
+      "side": "below",
+      "fraction": 0.8419,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-5-1863-629",
+      "station": "underground-seoul",
+      "slide": 5,
+      "sourceSymbol": [
+        1863,
+        629,
+        39,
+        16
+      ],
+      "sourceCell": [
+        1748,
+        611,
+        155,
+        17
+      ],
+      "ocrNumber": "1",
+      "ocrCode": "BO67T",
+      "number": 1,
+      "code": "B067T",
+      "anchorCode": "B067T",
+      "side": "below",
+      "fraction": 0.8677,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-4-249",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        4,
+        249,
+        39,
+        15
+      ],
+      "sourceCell": [
+        4,
+        267,
+        137,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO74T",
+      "number": 1,
+      "code": "B074T",
+      "anchorCode": "B074T",
+      "side": "above",
+      "fraction": 0.1423,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1169-410",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1169,
+        410,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1168,
+        429,
+        185,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B9O04T",
+      "number": 6,
+      "code": "B904T",
+      "anchorCode": "B904T",
+      "side": "above",
+      "fraction": 0.1108,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1547-411",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1547,
+        411,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1547,
+        429,
+        190,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B908T",
+      "number": 4,
+      "code": "B908T",
+      "anchorCode": "B908T",
+      "side": "above",
+      "fraction": 0.1026,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1360-412",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1360,
+        412,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1357,
+        429,
+        185,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B906T",
+      "number": 5,
+      "code": "B906T",
+      "anchorCode": "B906T",
+      "side": "above",
+      "fraction": 0.1162,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1741-412",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1741,
+        412,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1742,
+        429,
+        166,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B910T",
+      "number": 3,
+      "code": "B910T",
+      "anchorCode": "B910T",
+      "side": "above",
+      "fraction": 0.1145,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1070-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1070,
+        502,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1052,
+        482,
+        58,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "OO",
+      "number": 1,
+      "code": "B903T",
+      "anchorCode": "B903T",
+      "side": "below",
+      "fraction": 0.06,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1230-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1230,
+        502,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1116,
+        482,
+        154,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B903T",
+      "number": 2,
+      "code": "B903T",
+      "anchorCode": "B903T",
+      "side": "below",
+      "fraction": 0.8701,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1392-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1392,
+        502,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1275,
+        482,
+        153,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B90ST",
+      "number": 3,
+      "code": "B905T",
+      "anchorCode": "B905T",
+      "side": "below",
+      "fraction": 0.8954,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1542-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1542,
+        502,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1435,
+        482,
+        146,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B907T",
+      "number": 4,
+      "code": "B907T",
+      "anchorCode": "B907T",
+      "side": "below",
+      "fraction": 0.8699,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1700-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1700,
+        502,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1589,
+        482,
+        148,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B909T",
+      "number": 5,
+      "code": "B909T",
+      "anchorCode": "B909T",
+      "side": "below",
+      "fraction": 0.8818,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1868-502",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1868,
+        502,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1742,
+        482,
+        166,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B911T",
+      "number": 6,
+      "code": "B911T",
+      "anchorCode": "B911T",
+      "side": "below",
+      "fraction": 0.8765,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1630-573",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1630,
+        573,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1629,
+        591,
+        279,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B604T",
+      "number": 3,
+      "code": "B604T",
+      "anchorCode": "B604T",
+      "side": "above",
+      "fraction": 0.0753,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1584-662",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1584,
+        662,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1352,
+        645,
+        272,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B601T",
+      "number": 1,
+      "code": "B601T",
+      "anchorCode": "B601T",
+      "side": "below",
+      "fraction": 0.921,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-6-1868-663",
+      "station": "seoul",
+      "slide": 6,
+      "sourceSymbol": [
+        1868,
+        663,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1629,
+        645,
+        279,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B603T",
+      "number": 2,
+      "code": "B603T",
+      "anchorCode": "B603T",
+      "side": "below",
+      "fraction": 0.9265,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-6-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        6,
+        416,
+        39,
+        15
+      ],
+      "sourceCell": [
+        6,
+        432,
+        131,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B912T",
+      "number": 2,
+      "code": "B912T",
+      "anchorCode": "B912T",
+      "side": "above",
+      "fraction": 0.1489,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-148-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        148,
+        416,
+        37,
+        14
+      ],
+      "sourceCell": [
+        142,
+        432,
+        107,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B914T",
+      "number": 1,
+      "code": "B914T",
+      "anchorCode": "B914T",
+      "side": "above",
+      "fraction": 0.229,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1482-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1482,
+        416,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1484,
+        432,
+        107,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B918T",
+      "number": 5,
+      "code": "B918T",
+      "anchorCode": "B918T",
+      "side": "above",
+      "fraction": 0.1636,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1596-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1596,
+        416,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1596,
+        432,
+        95,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B920T",
+      "number": 4,
+      "code": "B920T",
+      "anchorCode": "B920T",
+      "side": "above",
+      "fraction": 0.2105,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1695-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1695,
+        416,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1696,
+        432,
+        96,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B922T",
+      "number": 3,
+      "code": "B922T",
+      "anchorCode": "B922T",
+      "side": "above",
+      "fraction": 0.1927,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1801-416",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1801,
+        416,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1797,
+        432,
+        113,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B924T",
+      "number": 2,
+      "code": "B924T",
+      "anchorCode": "B924T",
+      "side": "above",
+      "fraction": 0.2124,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1592-504",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1592,
+        504,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1490,
+        486,
+        142,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B917T",
+      "number": 1,
+      "code": "B917T",
+      "anchorCode": "B917T",
+      "side": "below",
+      "fraction": 0.8556,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1704-504",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1704,
+        504,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1637,
+        486,
+        107,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B919T",
+      "number": 2,
+      "code": "B919T",
+      "anchorCode": "B919T",
+      "side": "below",
+      "fraction": 0.8084,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1870-504",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1870,
+        504,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1748,
+        486,
+        162,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B921T",
+      "number": 3,
+      "code": "B921T",
+      "anchorCode": "B921T",
+      "side": "below",
+      "fraction": 0.8735,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-132-506",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        132,
+        506,
+        37,
+        15
+      ],
+      "sourceCell": [
+        6,
+        486,
+        166,
+        17
+      ],
+      "ocrNumber": "7",
+      "ocrCode": "B913T",
+      "number": 7,
+      "code": "B913T",
+      "anchorCode": "B913T",
+      "side": "below",
+      "fraction": 0.8705,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-177-527",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        177,
+        527,
+        40,
+        14
+      ],
+      "sourceCell": [
+        177,
+        543,
+        125,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B608T",
+      "number": 1,
+      "code": "B608T",
+      "anchorCode": "B608T",
+      "side": "above",
+      "fraction": 0.16,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-6-575",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        6,
+        575,
+        39,
+        15
+      ],
+      "sourceCell": [
+        6,
+        596,
+        66,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "TS",
+      "number": 2,
+      "code": "B606T",
+      "anchorCode": "B606T",
+      "side": "above",
+      "fraction": 0.2955,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-185-618",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        185,
+        618,
+        40,
+        15
+      ],
+      "sourceCell": [
+        157,
+        596,
+        69,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "SO",
+      "number": 3,
+      "code": "B605T",
+      "anchorCode": "B605T",
+      "side": "below",
+      "fraction": 0.6957,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-7-1870-618",
+      "station": "yongsan",
+      "slide": 7,
+      "sourceSymbol": [
+        1870,
+        618,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1779,
+        596,
+        131,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B607T",
+      "number": 1,
+      "code": "B607T",
+      "anchorCode": "B607T",
+      "side": "below",
+      "fraction": 0.8435,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1091-414",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1091,
+        414,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1088,
+        431,
+        101,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B930T",
+      "number": 6,
+      "code": "B930T",
+      "anchorCode": "B930T",
+      "side": "above",
+      "fraction": 0.2129,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-0-416",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        0,
+        416,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1,
+        431,
+        208,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B926T",
+      "number": 1,
+      "code": "B926T",
+      "anchorCode": "B926T",
+      "side": "above",
+      "fraction": 0.0889,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1863-472",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1863,
+        472,
+        37,
+        15
+      ],
+      "sourceCell": [
+        1478,
+        539,
+        120,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B618T1T",
+      "number": 5,
+      "code": "B618T1T",
+      "anchorCode": "B618T1T",
+      "side": "above",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-32-505",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        32,
+        505,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1,
+        486,
+        72,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B923T",
+      "number": 4,
+      "code": "B923T",
+      "anchorCode": "B923T",
+      "side": "below",
+      "fraction": 0.7083,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-194-505",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        194,
+        505,
+        40,
+        15
+      ],
+      "sourceCell": [
+        81,
+        486,
+        154,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B925T",
+      "number": 5,
+      "code": "B925T",
+      "anchorCode": "B925T",
+      "side": "below",
+      "fraction": 0.8636,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-3-521",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        3,
+        521,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1,
+        539,
+        237,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B612T",
+      "number": 1,
+      "code": "B612T",
+      "anchorCode": "B612T",
+      "side": "above",
+      "fraction": 0.0928,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1202-521",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1202,
+        521,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1207,
+        539,
+        143,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B616T1T",
+      "number": 5,
+      "code": "B616T1T",
+      "anchorCode": "B616T1T",
+      "side": "above",
+      "fraction": 0.1049,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1354-521",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1354,
+        521,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1354,
+        539,
+        120,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B616T2T",
+      "number": 4,
+      "code": "B616T2T",
+      "anchorCode": "B616T2T",
+      "side": "above",
+      "fraction": 0.1625,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1476-521",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1476,
+        521,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1478,
+        539,
+        120,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B618T1T",
+      "number": 3,
+      "code": "B618T1T",
+      "anchorCode": "B618T1T",
+      "side": "above",
+      "fraction": 0.15,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1598-521",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1598,
+        521,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1603,
+        539,
+        69,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "SO",
+      "number": 2,
+      "code": "B618T1T",
+      "anchorCode": "B618T1T",
+      "side": "above",
+      "fraction": 0.2174,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-100-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        100,
+        614,
+        37,
+        14
+      ],
+      "sourceCell": [
+        1,
+        593,
+        137,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B609T",
+      "number": 2,
+      "code": "B609T",
+      "anchorCode": "B609T",
+      "side": "below",
+      "fraction": 0.8577,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-221-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        221,
+        614,
+        37,
+        14
+      ],
+      "sourceCell": [
+        143,
+        593,
+        119,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B611T",
+      "number": 3,
+      "code": "B611T",
+      "anchorCode": "B611T",
+      "side": "below",
+      "fraction": 0.8109,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1057-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1057,
+        614,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1000,
+        592,
+        108,
+        18
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B615T1T",
+      "number": 1,
+      "code": "B615T1T",
+      "anchorCode": "B615T1T",
+      "side": "below",
+      "fraction": 0.713,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1326-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1326,
+        614,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1191,
+        593,
+        159,
+        18
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B615T2T",
+      "number": 2,
+      "code": "B615T2T",
+      "anchorCode": "B615T2T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1469-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1469,
+        614,
+        39,
+        15
+      ],
+      "sourceCell": [
+        1355,
+        593,
+        154,
+        18
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B617T1T",
+      "number": 3,
+      "code": "B617T1T",
+      "anchorCode": "B617T1T",
+      "side": "below",
+      "fraction": 0.8669,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1622-614",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1622,
+        614,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1514,
+        593,
+        149,
+        18
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B617T2T",
+      "number": 4,
+      "code": "B617T2T",
+      "anchorCode": "B617T2T",
+      "side": "below",
+      "fraction": 0.8591,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1220-757",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1220,
+        757,
+        40,
+        15
+      ],
+      "sourceCell": [
+        1224,
+        775,
+        131,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B932T",
+      "number": 5,
+      "code": "B932T",
+      "anchorCode": "B932T",
+      "side": "above",
+      "fraction": 0.1221,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1360-757",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1360,
+        757,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1361,
+        775,
+        119,
+        17
+      ],
+      "ocrNumber": "4",
+      "ocrCode": "B934T",
+      "number": 4,
+      "code": "B934T",
+      "anchorCode": "B934T",
+      "side": "above",
+      "fraction": 0.1597,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1481-757",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1481,
+        757,
+        39,
+        14
+      ],
+      "sourceCell": [
+        1485,
+        775,
+        125,
+        17
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B936T",
+      "number": 3,
+      "code": "B936T",
+      "anchorCode": "B936T",
+      "side": "above",
+      "fraction": 0.124,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-8-1611-757",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceSymbol": [
+        1611,
+        757,
+        40,
+        14
+      ],
+      "sourceCell": [
+        1615,
+        775,
+        290,
+        17
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B938T",
+      "number": 2,
+      "code": "B938T",
+      "anchorCode": "B938T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1728-335",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1728,
+        335,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1728,
+        351,
+        176,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B24T",
+      "number": 3,
+      "code": "B624T",
+      "anchorCode": "B624T",
+      "side": "above",
+      "fraction": 0.1051,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-5-337",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        5,
+        337,
+        40,
+        13
+      ],
+      "sourceCell": [
+        2,
+        351,
+        235,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B620T",
+      "number": 1,
+      "code": "B620T",
+      "anchorCode": "B620T",
+      "side": "above",
+      "fraction": 0.0979,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1862-414",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1862,
+        414,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1732,
+        398,
+        172,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B623T",
+      "number": 2,
+      "code": "B623T",
+      "anchorCode": "B623T",
+      "side": "below",
+      "fraction": 0.8692,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1687-415",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1687,
+        415,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1561,
+        398,
+        163,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B621T",
+      "number": 1,
+      "code": "B621T",
+      "anchorCode": "B621T",
+      "side": "below",
+      "fraction": 0.8957,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1605-666",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1605,
+        666,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1604,
+        682,
+        81,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BY44T",
+      "number": 3,
+      "code": "B944T",
+      "anchorCode": "B944T",
+      "side": "above",
+      "fraction": 0.2531,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1691-666",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1691,
+        666,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1691,
+        682,
+        213,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BY46T",
+      "number": 2,
+      "code": "B946T",
+      "anchorCode": "B946T",
+      "side": "above",
+      "fraction": 0.0939,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-3-667",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        3,
+        667,
+        40,
+        14
+      ],
+      "sourceCell": [
+        0,
+        682,
+        90,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B940T",
+      "number": 1,
+      "code": "B940T",
+      "anchorCode": "B940T",
+      "side": "above",
+      "fraction": 0.2556,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1650-746",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1650,
+        746,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1539,
+        729,
+        146,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B943T",
+      "number": 1,
+      "code": "B943T",
+      "anchorCode": "B943T",
+      "side": "below",
+      "fraction": 0.8938,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1759-746",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1759,
+        746,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1690,
+        729,
+        108,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B945T",
+      "number": 2,
+      "code": "B945T",
+      "anchorCode": "B945T",
+      "side": "below",
+      "fraction": 0.8102,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-9-1865-746",
+      "station": "yeongdeungpo",
+      "slide": 9,
+      "sourceSymbol": [
+        1865,
+        746,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1803,
+        729,
+        101,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B947T",
+      "number": 3,
+      "code": "B947T",
+      "anchorCode": "B947T",
+      "side": "below",
+      "fraction": 0.797,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1160-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1160,
+        288,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1156,
+        305,
+        76,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B952T",
+      "number": 8,
+      "code": "B952T",
+      "anchorCode": "B952T",
+      "side": "above",
+      "fraction": 0.2961,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1240-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1240,
+        288,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1238,
+        305,
+        80,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B9S4T",
+      "number": 7,
+      "code": "B954T",
+      "anchorCode": "B954T",
+      "side": "above",
+      "fraction": 0.2562,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1322-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1322,
+        288,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1324,
+        305,
+        144,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "BYS6T",
+      "number": 6,
+      "code": "B956T",
+      "anchorCode": "B956T",
+      "side": "above",
+      "fraction": 0.125,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1472-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1472,
+        288,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1473,
+        305,
+        90,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B9S8T",
+      "number": 5,
+      "code": "B958T",
+      "anchorCode": "B958T",
+      "side": "above",
+      "fraction": 0.2111,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1571-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1571,
+        288,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1566,
+        305,
+        84,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B960T",
+      "number": 4,
+      "code": "B960T",
+      "anchorCode": "B960T",
+      "side": "above",
+      "fraction": 0.2798,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1660-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1660,
+        288,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1657,
+        305,
+        94,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B962T",
+      "number": 3,
+      "code": "B962T",
+      "anchorCode": "B962T",
+      "side": "above",
+      "fraction": 0.2394,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1758-288",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1758,
+        288,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1760,
+        305,
+        140,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B964T",
+      "number": 2,
+      "code": "B964T",
+      "anchorCode": "B964T",
+      "side": "above",
+      "fraction": 0.125,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-8-336",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        8,
+        336,
+        40,
+        13
+      ],
+      "sourceCell": [
+        8,
+        352,
+        186,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B626T",
+      "number": 2,
+      "code": "B626T",
+      "anchorCode": "B626T",
+      "side": "above",
+      "fraction": 0.1075,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-200-337",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        200,
+        337,
+        40,
+        13
+      ],
+      "sourceCell": [
+        200,
+        352,
+        174,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B628T",
+      "number": 1,
+      "code": "B628T",
+      "anchorCode": "B628T",
+      "side": "above",
+      "fraction": 0.1149,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1331-370",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1331,
+        370,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1331,
+        352,
+        140,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B632T",
+      "number": 6,
+      "code": "B632T",
+      "anchorCode": "B632T",
+      "side": "below",
+      "fraction": 0.1393,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1476-370",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1476,
+        370,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1476,
+        352,
+        66,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B634T",
+      "number": 5,
+      "code": "B634T",
+      "anchorCode": "B634T",
+      "side": "below",
+      "fraction": 0.303,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1550-370",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1550,
+        370,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1550,
+        352,
+        70,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B636T",
+      "number": 4,
+      "code": "B636T",
+      "anchorCode": "B636T",
+      "side": "below",
+      "fraction": 0.2786,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1628-370",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1628,
+        370,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1628,
+        352,
+        123,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B638T",
+      "number": 3,
+      "code": "B638T",
+      "anchorCode": "B638T",
+      "side": "below",
+      "fraction": 0.1626,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1760-370",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1760,
+        370,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1760,
+        352,
+        141,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B640T",
+      "number": 2,
+      "code": "B640T",
+      "anchorCode": "B640T",
+      "side": "below",
+      "fraction": 0.1418,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1282-383",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1282,
+        383,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1211,
+        399,
+        112,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B629T",
+      "number": 1,
+      "code": "B629T",
+      "anchorCode": "B629T",
+      "side": "above",
+      "fraction": 0.8125,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1425-383",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1425,
+        383,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1330,
+        399,
+        136,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B631T",
+      "number": 2,
+      "code": "B631T",
+      "anchorCode": "B631T",
+      "side": "above",
+      "fraction": 0.8456,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1580-383",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1580,
+        383,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1473,
+        399,
+        148,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B633T",
+      "number": 3,
+      "code": "B633T",
+      "anchorCode": "B633T",
+      "side": "above",
+      "fraction": 0.8581,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1720-383",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1720,
+        383,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1629,
+        399,
+        132,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B635T",
+      "number": 4,
+      "code": "B635T",
+      "anchorCode": "B635T",
+      "side": "above",
+      "fraction": 0.8409,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1860-383",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1860,
+        383,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1771,
+        399,
+        129,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B637T",
+      "number": 5,
+      "code": "B637T",
+      "anchorCode": "B637T",
+      "side": "above",
+      "fraction": 0.8333,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-157-416",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        157,
+        416,
+        39,
+        13
+      ],
+      "sourceCell": [
+        6,
+        399,
+        187,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B625T",
+      "number": 3,
+      "code": "B625T",
+      "anchorCode": "B625T",
+      "side": "below",
+      "fraction": 0.9118,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1282-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1282,
+        461,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1221,
+        446,
+        99,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B951T",
+      "number": 1,
+      "code": "B951T",
+      "anchorCode": "B951T",
+      "side": "below",
+      "fraction": 0.803,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1424-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1424,
+        461,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1329,
+        446,
+        137,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B953T",
+      "number": 2,
+      "code": "B953T",
+      "anchorCode": "B953T",
+      "side": "below",
+      "fraction": 0.8285,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1501-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1501,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1471,
+        446,
+        71,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B955T",
+      "number": 3,
+      "code": "B955T",
+      "anchorCode": "B955T",
+      "side": "below",
+      "fraction": 0.6972,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1582-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1582,
+        461,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1549,
+        446,
+        72,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B957T",
+      "number": 4,
+      "code": "B957T",
+      "anchorCode": "B957T",
+      "side": "below",
+      "fraction": 0.7361,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1717-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1717,
+        461,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1631,
+        446,
+        125,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B959T",
+      "number": 5,
+      "code": "B959T",
+      "anchorCode": "B959T",
+      "side": "below",
+      "fraction": 0.848,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-1858-461",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        1858,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1764,
+        446,
+        137,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B961",
+      "number": 6,
+      "code": "B961T",
+      "anchorCode": "B961T",
+      "side": "below",
+      "fraction": 0.8285,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-10-2-670",
+      "station": "guro",
+      "slide": 10,
+      "sourceSymbol": [
+        2,
+        670,
+        39,
+        13
+      ],
+      "sourceCell": [
+        2,
+        684,
+        137,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B948T",
+      "number": 1,
+      "code": "B948T",
+      "anchorCode": "B948T",
+      "side": "above",
+      "fraction": 0.1423,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-3-289",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        3,
+        289,
+        39,
+        13
+      ],
+      "sourceCell": [
+        0,
+        303,
+        95,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B966T",
+      "number": 1,
+      "code": "B966T",
+      "anchorCode": "B966T",
+      "side": "above",
+      "fraction": 0.2368,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1430-290",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1430,
+        290,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1432,
+        304,
+        171,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B970T",
+      "number": 7,
+      "code": "B970T",
+      "anchorCode": "B970T",
+      "side": "above",
+      "fraction": 0.1053,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1578-290",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1578,
+        290,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1432,
+        304,
+        171,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B970T",
+      "number": 6,
+      "code": "B972T",
+      "anchorCode": "B972T",
+      "side": "above",
+      "fraction": 0.15,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1761-290",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1761,
+        290,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1761,
+        304,
+        143,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B974T",
+      "number": 5,
+      "code": "B974T",
+      "anchorCode": "B974T",
+      "side": "above",
+      "fraction": 0.1399,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1-335",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1,
+        335,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        351,
+        95,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B642T",
+      "number": 1,
+      "code": "B642T",
+      "anchorCode": "B642T",
+      "side": "above",
+      "fraction": 0.2211,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1424-368",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1424,
+        368,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1424,
+        350,
+        179,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B646T",
+      "number": 7,
+      "code": "B646T",
+      "anchorCode": "B646T",
+      "side": "below",
+      "fraction": 0.1117,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1578-368",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1578,
+        368,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1424,
+        350,
+        179,
+        16
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B646T",
+      "number": 6,
+      "code": "B648T",
+      "anchorCode": "B648T",
+      "side": "below",
+      "fraction": 0.15,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1761-368",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1761,
+        368,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1761,
+        350,
+        143,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B650T",
+      "number": 5,
+      "code": "B650T",
+      "anchorCode": "B650T",
+      "side": "below",
+      "fraction": 0.1399,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1515-383",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1515,
+        383,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1248,
+        398,
+        307,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B641T",
+      "number": 1,
+      "code": "B641T",
+      "anchorCode": "B641T",
+      "side": "above",
+      "fraction": 0.93,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1716-383",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1716,
+        383,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1560,
+        398,
+        202,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B643T",
+      "number": 2,
+      "code": "B643T",
+      "anchorCode": "B643T",
+      "side": "above",
+      "fraction": 0.8688,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1864-383",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1864,
+        383,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1767,
+        398,
+        131,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B645T",
+      "number": 3,
+      "code": "B645T",
+      "anchorCode": "B645T",
+      "side": "above",
+      "fraction": 0.8893,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1296-464",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1296,
+        464,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1157,
+        447,
+        179,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B965T",
+      "number": 1,
+      "code": "B965T",
+      "anchorCode": "B965T",
+      "side": "below",
+      "fraction": 0.8855,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1515-464",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1515,
+        464,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1342,
+        447,
+        213,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B967T",
+      "number": 2,
+      "code": "B967T",
+      "anchorCode": "B967T",
+      "side": "below",
+      "fraction": 0.8991,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1722-464",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1722,
+        464,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1560,
+        447,
+        202,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B969T",
+      "number": 3,
+      "code": "B969T",
+      "anchorCode": "B969T",
+      "side": "below",
+      "fraction": 0.8985,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-11-1864-464",
+      "station": "geumcheon",
+      "slide": 11,
+      "sourceSymbol": [
+        1864,
+        464,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1767,
+        447,
+        137,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BY7IT",
+      "number": 4,
+      "code": "B971T",
+      "anchorCode": "B971T",
+      "side": "below",
+      "fraction": 0.8504,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-331-293",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        331,
+        293,
+        39,
+        13
+      ],
+      "sourceCell": [
+        331,
+        308,
+        208,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B982T",
+      "number": 1,
+      "code": "B982T",
+      "anchorCode": "B982T",
+      "side": "above",
+      "fraction": 0.0938,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-2-295",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        2,
+        295,
+        39,
+        13
+      ],
+      "sourceCell": [
+        0,
+        308,
+        107,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B976T",
+      "number": 4,
+      "code": "B976T",
+      "anchorCode": "B976T",
+      "side": "above",
+      "fraction": 0.2009,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-112-295",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        112,
+        295,
+        40,
+        13
+      ],
+      "sourceCell": [
+        112,
+        308,
+        102,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B978T",
+      "number": 3,
+      "code": "B978T",
+      "anchorCode": "B978T",
+      "side": "above",
+      "fraction": 0.1961,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-219-295",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        219,
+        295,
+        39,
+        13
+      ],
+      "sourceCell": [
+        219,
+        308,
+        107,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B980T",
+      "number": 2,
+      "code": "B980T",
+      "anchorCode": "B980T",
+      "side": "above",
+      "fraction": 0.1822,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-8-373",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        8,
+        373,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        355,
+        107,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B652T",
+      "number": 4,
+      "code": "B652T",
+      "anchorCode": "B652T",
+      "side": "below",
+      "fraction": 0.2617,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-82-373",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        82,
+        373,
+        39,
+        13
+      ],
+      "sourceCell": [
+        0,
+        355,
+        107,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B652T",
+      "number": 3,
+      "code": "B654T",
+      "anchorCode": "B654T",
+      "side": "below",
+      "fraction": 0.15,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-201-373",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        201,
+        373,
+        39,
+        13
+      ],
+      "sourceCell": [
+        219,
+        356,
+        107,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BOOT",
+      "number": 2,
+      "code": "B656T",
+      "anchorCode": "B656T",
+      "side": "below",
+      "fraction": 0.85,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-331-373",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        331,
+        373,
+        39,
+        13
+      ],
+      "sourceCell": [
+        331,
+        356,
+        208,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOO8T",
+      "number": 1,
+      "code": "B658T",
+      "anchorCode": "B658T",
+      "side": "below",
+      "fraction": 0.0938,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-39-388",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        39,
+        388,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        403,
+        84,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B47T",
+      "number": 4,
+      "code": "B647T",
+      "anchorCode": "B647T",
+      "side": "above",
+      "fraction": 0.7024,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-157-388",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        157,
+        388,
+        39,
+        13
+      ],
+      "sourceCell": [
+        89,
+        403,
+        125,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO4YT",
+      "number": 5,
+      "code": "B649T",
+      "anchorCode": "B649T",
+      "side": "above",
+      "fraction": 0.7,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-291-388",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        291,
+        388,
+        40,
+        13
+      ],
+      "sourceCell": [
+        219,
+        403,
+        113,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B651T",
+      "number": 6,
+      "code": "B651T",
+      "anchorCode": "B651T",
+      "side": "above",
+      "fraction": 0.8142,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-402-388",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        402,
+        388,
+        40,
+        13
+      ],
+      "sourceCell": [
+        337,
+        403,
+        107,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B653T",
+      "number": 7,
+      "code": "B653T",
+      "anchorCode": "B653T",
+      "side": "above",
+      "fraction": 0.7944,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-1862-421",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        1862,
+        421,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1785,
+        403,
+        119,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B657T",
+      "number": 1,
+      "code": "B657T",
+      "anchorCode": "B657T",
+      "side": "below",
+      "fraction": 0.8025,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-1860-468",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        1860,
+        468,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1785,
+        450,
+        119,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B983T",
+      "number": 1,
+      "code": "B983T",
+      "anchorCode": "B983T",
+      "side": "below",
+      "fraction": 0.7983,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-49-469",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        49,
+        469,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        450,
+        84,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B973T",
+      "number": 5,
+      "code": "B973T",
+      "anchorCode": "B973T",
+      "side": "below",
+      "fraction": 0.8214,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-173-469",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        173,
+        469,
+        40,
+        13
+      ],
+      "sourceCell": [
+        89,
+        450,
+        125,
+        16
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B975T",
+      "number": 6,
+      "code": "B975T",
+      "anchorCode": "B975T",
+      "side": "below",
+      "fraction": 0.832,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-291-469",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        291,
+        469,
+        40,
+        13
+      ],
+      "sourceCell": [
+        219,
+        450,
+        113,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B977T",
+      "number": 7,
+      "code": "B977T",
+      "anchorCode": "B977T",
+      "side": "below",
+      "fraction": 0.8142,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-12-400-469",
+      "station": "anyang",
+      "slide": 12,
+      "sourceSymbol": [
+        400,
+        469,
+        40,
+        13
+      ],
+      "sourceCell": [
+        337,
+        450,
+        107,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B979T",
+      "number": 8,
+      "code": "B979T",
+      "anchorCode": "B979T",
+      "side": "below",
+      "fraction": 0.7757,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-10-290",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        10,
+        290,
+        39,
+        13
+      ],
+      "sourceCell": [
+        7,
+        305,
+        171,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BYY2T",
+      "number": 2,
+      "code": "B992T",
+      "anchorCode": "B992T",
+      "side": "above",
+      "fraction": 0.1316,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-181-290",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        181,
+        290,
+        40,
+        13
+      ],
+      "sourceCell": [
+        183,
+        305,
+        147,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B994T",
+      "number": 1,
+      "code": "B994T",
+      "anchorCode": "B994T",
+      "side": "above",
+      "fraction": 0.1224,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1708-291",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1708,
+        291,
+        39,
+        12
+      ],
+      "sourceCell": [
+        1707,
+        305,
+        173,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B998T",
+      "number": 2,
+      "code": "B998T",
+      "anchorCode": "B996T",
+      "side": "above",
+      "fraction": 0.94,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-10-335",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        10,
+        335,
+        39,
+        13
+      ],
+      "sourceCell": [
+        7,
+        351,
+        446,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B670T",
+      "number": 5,
+      "code": "B670T",
+      "anchorCode": "B670T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-513-336",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        513,
+        336,
+        39,
+        13
+      ],
+      "sourceCell": [
+        458,
+        351,
+        487,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B672T",
+      "number": 4,
+      "code": "B672T",
+      "anchorCode": "B672T",
+      "side": "above",
+      "fraction": 0.153,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-946-336",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        946,
+        336,
+        40,
+        13
+      ],
+      "sourceCell": [
+        951,
+        351,
+        499,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B674T",
+      "number": 3,
+      "code": "B674T",
+      "anchorCode": "B674T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1454-337",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1454,
+        337,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1455,
+        351,
+        425,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B676T",
+      "number": 2,
+      "code": "B676T",
+      "anchorCode": "B676T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1414-413",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1414,
+        413,
+        39,
+        13
+      ],
+      "sourceCell": [
+        965,
+        398,
+        485,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOOYT",
+      "number": 7,
+      "code": "B669T",
+      "anchorCode": "B669T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1854-413",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1854,
+        413,
+        26,
+        13
+      ],
+      "sourceCell": [
+        1455,
+        398,
+        425,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO71T",
+      "number": 8,
+      "code": "B671T",
+      "anchorCode": "B671T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-922-414",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        922,
+        414,
+        40,
+        13
+      ],
+      "sourceCell": [
+        463,
+        398,
+        494,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B67T",
+      "number": 6,
+      "code": "B667T",
+      "anchorCode": "B667T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-420-415",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        420,
+        415,
+        39,
+        13
+      ],
+      "sourceCell": [
+        7,
+        398,
+        451,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B665T",
+      "number": 5,
+      "code": "B665T",
+      "anchorCode": "B665T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-159-460",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        159,
+        460,
+        39,
+        13
+      ],
+      "sourceCell": [
+        7,
+        444,
+        191,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B9SIT",
+      "number": 5,
+      "code": "B991T",
+      "anchorCode": "B991T",
+      "side": "below",
+      "fraction": 0.8979,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1857-460",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1857,
+        460,
+        23,
+        13
+      ],
+      "sourceCell": [
+        1707,
+        444,
+        173,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B997T",
+      "number": 2,
+      "code": "B997T",
+      "anchorCode": "B995T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-14-1663-461",
+      "station": "geumjeong",
+      "slide": 14,
+      "sourceSymbol": [
+        1663,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1519,
+        444,
+        183,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B99ST",
+      "number": 1,
+      "code": "B995T",
+      "anchorCode": "B995T",
+      "side": "below",
+      "fraction": 0.4,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-15-0-280",
+      "station": "gunpo",
+      "slide": 15,
+      "sourceSymbol": [
+        0,
+        280,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        297,
+        218,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BIUUUT",
+      "number": 1,
+      "code": "B1000T",
+      "anchorCode": "B1000T",
+      "side": "above",
+      "fraction": 0.0917,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-15-0-328",
+      "station": "gunpo",
+      "slide": 15,
+      "sourceSymbol": [
+        0,
+        328,
+        40,
+        13
+      ],
+      "sourceCell": [
+        0,
+        343,
+        218,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B678T",
+      "number": 1,
+      "code": "B678T",
+      "anchorCode": "B678T",
+      "side": "above",
+      "fraction": 0.0917,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-15-1846-407",
+      "station": "gunpo",
+      "slide": 15,
+      "sourceSymbol": [
+        1846,
+        407,
+        35,
+        13
+      ],
+      "sourceCell": [
+        1653,
+        390,
+        228,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B675T",
+      "number": 1,
+      "code": "B675T",
+      "anchorCode": "B675T",
+      "side": "below",
+      "fraction": 0.9232,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-15-1846-453",
+      "station": "gunpo",
+      "slide": 15,
+      "sourceSymbol": [
+        1846,
+        453,
+        35,
+        13
+      ],
+      "sourceCell": [
+        1658,
+        436,
+        223,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1001T",
+      "number": 1,
+      "code": "B1001T",
+      "anchorCode": "B1001T",
+      "side": "below",
+      "fraction": 0.9215,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-17-0-287",
+      "station": "uiwang",
+      "slide": 17,
+      "sourceSymbol": [
+        0,
+        287,
+        38,
+        13
+      ],
+      "sourceCell": [
+        0,
+        302,
+        232,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1012T",
+      "number": 1,
+      "code": "B1012T",
+      "anchorCode": "B1012T",
+      "side": "above",
+      "fraction": 0.0819,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-17-2-336",
+      "station": "uiwang",
+      "slide": 17,
+      "sourceSymbol": [
+        2,
+        336,
+        39,
+        12
+      ],
+      "sourceCell": [
+        0,
+        351,
+        228,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOYUT",
+      "number": 1,
+      "code": "B690T",
+      "anchorCode": "B690T",
+      "side": "above",
+      "fraction": 0.0943,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-17-1843-417",
+      "station": "uiwang",
+      "slide": 17,
+      "sourceSymbol": [
+        1843,
+        417,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1662,
+        399,
+        224,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B687T",
+      "number": 1,
+      "code": "B687T",
+      "anchorCode": "B687T",
+      "side": "below",
+      "fraction": 0.8951,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-17-1844-465",
+      "station": "uiwang",
+      "slide": 17,
+      "sourceSymbol": [
+        1844,
+        465,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1710,
+        447,
+        176,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1013T",
+      "number": 1,
+      "code": "B1013T",
+      "anchorCode": "B1013T",
+      "side": "below",
+      "fraction": 0.8722,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-19-10-283",
+      "station": "suwon",
+      "slide": 19,
+      "sourceSymbol": [
+        10,
+        283,
+        39,
+        13
+      ],
+      "sourceCell": [
+        6,
+        299,
+        177,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1036T",
+      "number": 1,
+      "code": "B1036T",
+      "anchorCode": "B1036T",
+      "side": "above",
+      "fraction": 0.1328,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-19-7-361",
+      "station": "suwon",
+      "slide": 19,
+      "sourceSymbol": [
+        7,
+        361,
+        39,
+        13
+      ],
+      "sourceCell": [
+        6,
+        346,
+        177,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B714T",
+      "number": 1,
+      "code": "B714T",
+      "anchorCode": "B714T",
+      "side": "below",
+      "fraction": 0.1158,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-19-119-457",
+      "station": "suwon",
+      "slide": 19,
+      "sourceSymbol": [
+        119,
+        457,
+        39,
+        13
+      ],
+      "sourceCell": [
+        6,
+        439,
+        147,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1033T",
+      "number": 11,
+      "code": "B1033T",
+      "anchorCode": "B1035T",
+      "side": "below",
+      "fraction": 0.9014,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-8-283",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        8,
+        283,
+        37,
+        13
+      ],
+      "sourceCell": [
+        2,
+        298,
+        610,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B986T",
+      "number": 5,
+      "code": "B986T",
+      "anchorCode": "B986T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-614-283",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        614,
+        283,
+        40,
+        13
+      ],
+      "sourceCell": [
+        617,
+        298,
+        651,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B988T",
+      "number": 4,
+      "code": "B988T",
+      "anchorCode": "B988T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1271-284",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1271,
+        284,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1273,
+        298,
+        633,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B9S0T",
+      "number": 3,
+      "code": "B990T",
+      "anchorCode": "B990T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1485-330",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1485,
+        330,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1425,
+        346,
+        481,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B668T",
+      "number": 6,
+      "code": "B668T",
+      "anchorCode": "B668T",
+      "side": "above",
+      "fraction": 0.1653,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-4-331",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        4,
+        331,
+        39,
+        13
+      ],
+      "sourceCell": [
+        2,
+        346,
+        468,
+        15
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B62T",
+      "number": 9,
+      "code": "B662T",
+      "anchorCode": "B662T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-526-331",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        526,
+        331,
+        39,
+        13
+      ],
+      "sourceCell": [
+        475,
+        346,
+        457,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BO4T",
+      "number": 8,
+      "code": "B664T",
+      "anchorCode": "B664T",
+      "side": "above",
+      "fraction": 0.1543,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-935-332",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        935,
+        332,
+        40,
+        13
+      ],
+      "sourceCell": [
+        935,
+        346,
+        487,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B666T",
+      "number": 7,
+      "code": "B666T",
+      "anchorCode": "B666T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-572-411",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        572,
+        411,
+        40,
+        13
+      ],
+      "sourceCell": [
+        2,
+        393,
+        610,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B659T",
+      "number": 2,
+      "code": "B659T",
+      "anchorCode": "B659T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1862-411",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1862,
+        411,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1273,
+        393,
+        633,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B663T",
+      "number": 4,
+      "code": "B663T",
+      "anchorCode": "B663T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1166-412",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1166,
+        412,
+        40,
+        13
+      ],
+      "sourceCell": [
+        617,
+        393,
+        651,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B661T",
+      "number": 3,
+      "code": "B661T",
+      "anchorCode": "B661T",
+      "side": "below",
+      "fraction": 0.874,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1228-456",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1228,
+        456,
+        39,
+        13
+      ],
+      "sourceCell": [
+        617,
+        440,
+        651,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B987T",
+      "number": 3,
+      "code": "B987T",
+      "anchorCode": "B987T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-575-458",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        575,
+        458,
+        40,
+        13
+      ],
+      "sourceCell": [
+        2,
+        440,
+        610,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B985T",
+      "number": 2,
+      "code": "B985T",
+      "anchorCode": "B985T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-13-1861-458",
+      "station": "anyang",
+      "slide": 13,
+      "sourceSymbol": [
+        1861,
+        458,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1273,
+        440,
+        633,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B989T",
+      "number": 4,
+      "code": "B989T",
+      "anchorCode": "B989T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-10-281",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        10,
+        281,
+        39,
+        13
+      ],
+      "sourceCell": [
+        5,
+        298,
+        528,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1004T",
+      "number": 5,
+      "code": "B1004T",
+      "anchorCode": "B1004T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1012-281",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1012,
+        281,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1013,
+        298,
+        435,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1008T",
+      "number": 3,
+      "code": "B1008T",
+      "anchorCode": "B1008T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1446-281",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1446,
+        281,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1453,
+        298,
+        440,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B1010T",
+      "number": 2,
+      "code": "B1010T",
+      "anchorCode": "B1010T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-537-282",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        537,
+        282,
+        39,
+        13
+      ],
+      "sourceCell": [
+        538,
+        298,
+        470,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1006T",
+      "number": 4,
+      "code": "B1006T",
+      "anchorCode": "B1006T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-7-329",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        7,
+        329,
+        39,
+        13
+      ],
+      "sourceCell": [
+        5,
+        344,
+        528,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B682T",
+      "number": 5,
+      "code": "B682T",
+      "anchorCode": "B682T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-596-329",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        596,
+        329,
+        39,
+        13
+      ],
+      "sourceCell": [
+        538,
+        344,
+        470,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B684T",
+      "number": 4,
+      "code": "B684T",
+      "anchorCode": "B684T",
+      "side": "above",
+      "fraction": 0.1649,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1012-329",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1012,
+        329,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1013,
+        344,
+        435,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B686T",
+      "number": 3,
+      "code": "B686T",
+      "anchorCode": "B686T",
+      "side": "above",
+      "fraction": 0.06,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1514-329",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1514,
+        329,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1453,
+        344,
+        440,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BO88T",
+      "number": 2,
+      "code": "B688T",
+      "anchorCode": "B688T",
+      "side": "above",
+      "fraction": 0.1807,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1851-406",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1851,
+        406,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1453,
+        391,
+        440,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B683T",
+      "number": 5,
+      "code": "B683T",
+      "anchorCode": "B683T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1411-407",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1411,
+        407,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1013,
+        391,
+        435,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B681T",
+      "number": 4,
+      "code": "B681T",
+      "anchorCode": "B681T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-495-408",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        495,
+        408,
+        37,
+        13
+      ],
+      "sourceCell": [
+        5,
+        391,
+        528,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B677T",
+      "number": 2,
+      "code": "B677T",
+      "anchorCode": "B677T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-905-408",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        905,
+        408,
+        39,
+        13
+      ],
+      "sourceCell": [
+        538,
+        391,
+        470,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B679T",
+      "number": 3,
+      "code": "B679T",
+      "anchorCode": "B679T",
+      "side": "below",
+      "fraction": 0.8223,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-972-454",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        972,
+        454,
+        39,
+        13
+      ],
+      "sourceCell": [
+        538,
+        437,
+        470,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1005T",
+      "number": 3,
+      "code": "B1005T",
+      "anchorCode": "B1005T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1409-454",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1409,
+        454,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1013,
+        437,
+        435,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1007T",
+      "number": 4,
+      "code": "B1007T",
+      "anchorCode": "B1007T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-1854-454",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        1854,
+        454,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1453,
+        437,
+        440,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1009T",
+      "number": 5,
+      "code": "B1009T",
+      "anchorCode": "B1009T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-16-494-455",
+      "station": "gunpo",
+      "slide": 16,
+      "sourceSymbol": [
+        494,
+        455,
+        39,
+        13
+      ],
+      "sourceCell": [
+        5,
+        437,
+        528,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B1003T",
+      "number": 2,
+      "code": "B1003T",
+      "anchorCode": "B1003T",
+      "side": "below",
+      "fraction": 0.94,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-8-282",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        8,
+        282,
+        39,
+        13
+      ],
+      "sourceCell": [
+        5,
+        298,
+        187,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1016T",
+      "number": 11,
+      "code": "B1016T",
+      "anchorCode": "B1016T",
+      "side": "above",
+      "fraction": 0.1203,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-197-282",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        197,
+        282,
+        39,
+        13
+      ],
+      "sourceCell": [
+        197,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1018T",
+      "number": 10,
+      "code": "B1018T",
+      "anchorCode": "B1018T",
+      "side": "above",
+      "fraction": 0.1066,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-765-282",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        765,
+        282,
+        39,
+        13
+      ],
+      "sourceCell": [
+        766,
+        298,
+        182,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1024T",
+      "number": 7,
+      "code": "B1024T",
+      "anchorCode": "B1024T",
+      "side": "above",
+      "fraction": 0.1016,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-381-283",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        381,
+        283,
+        39,
+        13
+      ],
+      "sourceCell": [
+        385,
+        298,
+        188,
+        16
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B1020T",
+      "number": 9,
+      "code": "B1020T",
+      "anchorCode": "B1020T",
+      "side": "above",
+      "fraction": 0.0824,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-576-283",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        576,
+        283,
+        39,
+        13
+      ],
+      "sourceCell": [
+        578,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1022T",
+      "number": 8,
+      "code": "B1022T",
+      "anchorCode": "B1022T",
+      "side": "above",
+      "fraction": 0.0956,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-953-283",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        953,
+        283,
+        37,
+        13
+      ],
+      "sourceCell": [
+        953,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B1026T",
+      "number": 6,
+      "code": "B1026T",
+      "anchorCode": "B1026T",
+      "side": "above",
+      "fraction": 0.1011,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1138-283",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1138,
+        283,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1141,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1028T",
+      "number": 5,
+      "code": "B1028T",
+      "anchorCode": "B1028T",
+      "side": "above",
+      "fraction": 0.0902,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1704-283",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1704,
+        283,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1709,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B1034T",
+      "number": 2,
+      "code": "B1034T",
+      "anchorCode": "B1034T",
+      "side": "above",
+      "fraction": 0.082,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1329-284",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1329,
+        284,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1329,
+        298,
+        188,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1030T",
+      "number": 4,
+      "code": "B1030T",
+      "anchorCode": "B1030T",
+      "side": "above",
+      "fraction": 0.0984,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1519-284",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1519,
+        284,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1522,
+        298,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1032T",
+      "number": 3,
+      "code": "B1032T",
+      "anchorCode": "B1032T",
+      "side": "above",
+      "fraction": 0.0902,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1331-362",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1331,
+        362,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1329,
+        347,
+        188,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B708T",
+      "number": 4,
+      "code": "B708T",
+      "anchorCode": "B708T",
+      "side": "below",
+      "fraction": 0.117,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1709-362",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1709,
+        362,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1709,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B712T",
+      "number": 2,
+      "code": "B712T",
+      "anchorCode": "B712T",
+      "side": "below",
+      "fraction": 0.1066,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-6-363",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        6,
+        363,
+        39,
+        13
+      ],
+      "sourceCell": [
+        5,
+        347,
+        187,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOY4T",
+      "number": 11,
+      "code": "B694T",
+      "anchorCode": "B694T",
+      "side": "below",
+      "fraction": 0.1096,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-763-363",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        763,
+        363,
+        39,
+        13
+      ],
+      "sourceCell": [
+        766,
+        347,
+        182,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B7U2T",
+      "number": 7,
+      "code": "B702T",
+      "anchorCode": "B702T",
+      "side": "below",
+      "fraction": 0.0907,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-952-363",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        952,
+        363,
+        39,
+        13
+      ],
+      "sourceCell": [
+        953,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B704T",
+      "number": 6,
+      "code": "B704T",
+      "anchorCode": "B704T",
+      "side": "below",
+      "fraction": 0.1011,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-197-364",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        197,
+        364,
+        39,
+        13
+      ],
+      "sourceCell": [
+        197,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BOY6T",
+      "number": 10,
+      "code": "B696T",
+      "anchorCode": "B696T",
+      "side": "below",
+      "fraction": 0.1066,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-574-364",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        574,
+        364,
+        40,
+        13
+      ],
+      "sourceCell": [
+        578,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B7UUT",
+      "number": 8,
+      "code": "B700T",
+      "anchorCode": "B700T",
+      "side": "below",
+      "fraction": 0.0874,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1141-364",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1141,
+        364,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1141,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B706T",
+      "number": 5,
+      "code": "B706T",
+      "anchorCode": "B706T",
+      "side": "below",
+      "fraction": 0.1066,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1520-364",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1520,
+        364,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1522,
+        347,
+        183,
+        15
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B710T",
+      "number": 3,
+      "code": "B710T",
+      "anchorCode": "B710T",
+      "side": "below",
+      "fraction": 0.0956,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-384-365",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        384,
+        365,
+        39,
+        13
+      ],
+      "sourceCell": [
+        385,
+        347,
+        188,
+        15
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "BOY8T",
+      "number": 9,
+      "code": "B698T",
+      "anchorCode": "B698T",
+      "side": "below",
+      "fraction": 0.0984,
+      "stem": "left",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-240-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        240,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        4,
+        395,
+        276,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "BOS9T",
+      "number": 2,
+      "code": "B689T",
+      "anchorCode": "B689T",
+      "side": "above",
+      "fraction": 0.9257,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-534-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        534,
+        380,
+        40,
+        13
+      ],
+      "sourceCell": [
+        285,
+        395,
+        288,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B691T",
+      "number": 3,
+      "code": "B691T",
+      "anchorCode": "B691T",
+      "side": "above",
+      "fraction": 0.934,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-725-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        725,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        578,
+        395,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B693T",
+      "number": 4,
+      "code": "B693T",
+      "anchorCode": "B693T",
+      "side": "above",
+      "fraction": 0.9098,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-909-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        909,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        766,
+        395,
+        182,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B695T",
+      "number": 5,
+      "code": "B695T",
+      "anchorCode": "B695T",
+      "side": "above",
+      "fraction": 0.8929,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1103-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1103,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        953,
+        395,
+        183,
+        16
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B697T",
+      "number": 6,
+      "code": "B697T",
+      "anchorCode": "B697T",
+      "side": "above",
+      "fraction": 0.9262,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1287-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1287,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1141,
+        395,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B699T",
+      "number": 7,
+      "code": "B699T",
+      "anchorCode": "B699T",
+      "side": "above",
+      "fraction": 0.9044,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1479-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1479,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1329,
+        395,
+        188,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B701T",
+      "number": 8,
+      "code": "B701T",
+      "anchorCode": "B701T",
+      "side": "above",
+      "fraction": 0.9016,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1666-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1666,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1522,
+        395,
+        183,
+        16
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B703T",
+      "number": 9,
+      "code": "B703T",
+      "anchorCode": "B703T",
+      "side": "above",
+      "fraction": 0.8934,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1760-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1760,
+        380,
+        40,
+        13
+      ],
+      "sourceCell": [
+        1709,
+        395,
+        90,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B705T",
+      "number": 10,
+      "code": "B705T",
+      "anchorCode": "B705T",
+      "side": "above",
+      "fraction": 0.7889,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1853-380",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1853,
+        380,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1802,
+        395,
+        90,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B707T",
+      "number": 11,
+      "code": "B707T",
+      "anchorCode": "B707T",
+      "side": "above",
+      "fraction": 0.7833,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-243-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        243,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        4,
+        444,
+        276,
+        16
+      ],
+      "ocrNumber": "2",
+      "ocrCode": "B1015T",
+      "number": 2,
+      "code": "B1015T",
+      "anchorCode": "B1015T",
+      "side": "below",
+      "fraction": 0.9366,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-536-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        536,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        285,
+        444,
+        288,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1017T",
+      "number": 3,
+      "code": "B1017T",
+      "anchorCode": "B1017T",
+      "side": "below",
+      "fraction": 0.9392,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-726-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        726,
+        461,
+        40,
+        13
+      ],
+      "sourceCell": [
+        578,
+        444,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "BIUIST",
+      "number": 4,
+      "code": "B1019T",
+      "anchorCode": "B1019T",
+      "side": "below",
+      "fraction": 0.918,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-914-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        914,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        766,
+        444,
+        182,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1021T",
+      "number": 5,
+      "code": "B1021T",
+      "anchorCode": "B1021T",
+      "side": "below",
+      "fraction": 0.9203,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1099-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1099,
+        461,
+        40,
+        13
+      ],
+      "sourceCell": [
+        953,
+        444,
+        183,
+        16
+      ],
+      "ocrNumber": "5",
+      "ocrCode": "B1023T",
+      "number": 6,
+      "code": "B1023T",
+      "anchorCode": "B1023T",
+      "side": "below",
+      "fraction": 0.9071,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1285-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1285,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1141,
+        444,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1025T",
+      "number": 7,
+      "code": "B1025T",
+      "anchorCode": "B1025T",
+      "side": "below",
+      "fraction": 0.8934,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1477-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1477,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1329,
+        444,
+        188,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1027T",
+      "number": 8,
+      "code": "B1027T",
+      "anchorCode": "B1027T",
+      "side": "below",
+      "fraction": 0.891,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1664-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1664,
+        461,
+        37,
+        13
+      ],
+      "sourceCell": [
+        1522,
+        444,
+        183,
+        16
+      ],
+      "ocrNumber": "3",
+      "ocrCode": "B1029T",
+      "number": 9,
+      "code": "B1029T",
+      "anchorCode": "B1029T",
+      "side": "below",
+      "fraction": 0.877,
+      "stem": "right",
+      "reviewed": true
+    },
+    {
+      "id": "ppt-18-1852-461",
+      "station": "uiwang",
+      "slide": 18,
+      "sourceSymbol": [
+        1852,
+        461,
+        39,
+        13
+      ],
+      "sourceCell": [
+        1709,
+        444,
+        183,
+        16
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B1031T",
+      "number": 10,
+      "code": "B1031T",
+      "anchorCode": "B1031T",
+      "side": "below",
+      "fraction": 0.888,
+      "stem": "right",
+      "reviewed": true
+    }
+  ]
+}

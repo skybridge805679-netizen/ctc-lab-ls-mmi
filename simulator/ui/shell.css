@@ -50,3 +50,7 @@ dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto}
 .ls-svg .screen-continuations{pointer-events:none}.ls-svg .seam-link path{fill:none;stroke-linejoin:round;stroke-linecap:butt}.ls-svg .seam-clearance{stroke:#686d68;stroke-width:26}.ls-svg .seam-rail{stroke:#f4f4ef;stroke-width:18}.ls-svg .seam-name{fill:#d6e7e5;font-size:11px;letter-spacing:.5px}
 
 .ls-svg .seam-link.set .seam-rail{stroke:#35dc82}.ls-svg .seam-link.occupied .seam-rail{stroke:#ff5c50}.ls-svg .seam-link.locked .seam-rail{stroke:#ffbd55}
+
+.ls-svg .block-indicator{pointer-events:none}.ls-svg .block-body{fill:#111811;stroke:#26332c;stroke-width:.7}.ls-svg .block-stem{fill:none;stroke:#111811;stroke-width:2}.ls-svg .block-number{fill:#fff;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;stroke:none;letter-spacing:0}
+.ls-stage[data-monitor="true"] .ls-train-slot{cursor:default}.ls-stage[data-monitor="true"] .ls-train-slot:hover rect{stroke:#b5b9ac;stroke-width:1}.tab-dot.monitor{background:#bee3e3;border-color:#49716c}
+.ls-topbar button[hidden]{display:none!important}
