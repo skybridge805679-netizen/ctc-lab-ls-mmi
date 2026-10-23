@@ -43,8 +43,11 @@ def run(page, url):
     done = lambda: page.locator('#scSteps li.sc-do.done').count()
     rename('K0602', 'G0602')
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(1)
+    page.evaluate("SimMMI.run({type:'tick',seconds:20})")
     page.wait_for_function("()=>(SimLSUI.getModel().stations.dongmyo.windows.B017T||[]).some(r=>r.number==='K0606')")      # rescue train comes in from 동대문 (B021T), G0602 leaves
     assert row('K0607') == 'dongmyo/B012T/down' and row('K0608') == 'jonggak/B055T/up'
+    page.wait_for_timeout(550)
+    page.evaluate("SimMMI.run({type:'tick',seconds:20})")
     assert row('G0602') is None
     at('dongmyo', {'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
     for sig in ('3A', '1B', '4A'):
@@ -57,9 +60,11 @@ def run(page, url):
     page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length===7")
     mv = lambda n, st, slot: ls({'op': 'move', **page.evaluate("n=>{for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number===n)return {station:st,slot,uid:r.uid};}", n), 'targetStation': st, 'targetSlot': slot})
     assert mv('K0608', 'dongmyo', 'B011T')['ok']                                       # 시청 → 신설동 (수동 열번 이동)
+    page.evaluate("SimMMI.run({type:'tick',seconds:20})")
     rename('K0606', 'G0606')
     f = page.evaluate("()=>{for(const [slot,rows] of Object.entries(SimLSUI.getModel().stations.dongmyo.windows))for(const r of rows)if(r.number==='G0606')return {station:'dongmyo',slot,uid:r.uid};}")
     assert ls({'op': 'move', **f, 'targetStation': 'dongmyo', 'targetSlot': '2T'})['ok']
+    page.evaluate("SimMMI.run({type:'tick',seconds:20})")
     expect(page.locator('#alarmLogBody')).to_contain_text('G0606'); ack()          # 구원연결: 번호 중복 알람
     f = page.evaluate("()=>{for(const [slot,rows] of Object.entries(SimLSUI.getModel().stations.dongmyo.windows))for(const r of rows)if(r.number==='G0606')return {station:'dongmyo',slot,uid:r.uid};}")
     assert ls({'op': 'delete', **f})['ok']

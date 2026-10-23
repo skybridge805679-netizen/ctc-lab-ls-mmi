@@ -33,7 +33,8 @@ function set(on){
 }
 function step(){
  if(!enabled||!host||mmi().replaying())return false;
- const events=engine.run({states:host.context().stationStates,model:root.SimDiagram.getModel(),numbers,reflect});
+ const model=root.SimDiagram.getModel(),reserved=new Set(root.SimScenarioUI?.reservedNumbers?.()||[]);
+ const events=engine.run({states:host.context().stationStates,model:{...model,trains:model.trains.filter(t=>!reserved.has(t.id))},numbers,reflect});
  for(const e of events){
   if(e.type==='route')mmi().markAuto(`${e.station}|${e.route}|설정`);
   else if((e.type==='arrived'||e.type==='left')&&e.route)mmi().markAuto(`${e.station}|${e.route}|해정`);

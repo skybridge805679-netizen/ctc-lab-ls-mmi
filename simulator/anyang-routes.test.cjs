@@ -27,3 +27,39 @@ assert.ok(R.options('anyang','departure').includes('4B_B660T'));
  // opposite position of the same point still conflicts: 4A-B660T needs 53 reversed, 4C-B660T has it normal
  const u=c.initial();c.dispatch(u,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(u,{type:'route',id:'4C-B660T',source:'x'}).ok);assert.ok(!c.dispatch(u,{type:'route',id:'4A-B660T',source:'x'}).ok);}
 console.log('anyang routes: ok');
+// Real LS observation (2026-10-23): 4C-B660T and 4A-B984T coexist.
+// Both share switch 53 in N, but no track resource. Confirm both command orders.
+for(const order of [['4C-B660T','4A-B984T'],['4A-B984T','4C-B660T']]){
+ const t=c.initial();c.dispatch(t,{type:'mode',value:'CCM'});
+ for(const id of order){const result=c.dispatch(t,{type:'route',id});assert(result.ok,result.message);}
+ assert.strictEqual(t.signals['4A'],'GO');assert.strictEqual(t.signals['4C'],'GO');assert.strictEqual(t.points['53'],'N');
+ assert(!c.dispatch(t,{type:'point',id:'53',value:'R'}).ok,'shared switch must stay locked');
+ assert(c.dispatch(t,{type:'occupy',id:order[0]}).ok);
+ assert.strictEqual(t.signals[c.routes[order[1]].signal],'GO','one train entering must preserve the other signal');
+ assert(c.dispatch(t,{type:'clear',id:order[0]}).ok);
+ assert(t.routes[order[1]],'one route passing must preserve the other route');
+ assert(!c.dispatch(t,{type:'point',id:'53',value:'R'}).ok,'remaining route still locks switch 53');
+ assert(c.dispatch(t,{type:'stop',id:c.routes[order[1]].signal}).ok);
+ assert(c.dispatch(t,{type:'point',id:'53',value:'R'}).ok,'switch releases only after the last route');
+}
+// Simultaneous occupancy is independent because the two paths use disjoint edges.
+{const t=c.initial();c.dispatch(t,{type:'mode',value:'CCM'});
+ for(const id of ['4C-B660T','4A-B984T']){assert(c.dispatch(t,{type:'route',id}).ok);assert(c.dispatch(t,{type:'occupy',id}).ok);}
+ const preserved=c.routes['4A-B984T'].resources;assert(c.dispatch(t,{type:'clear',id:'4C-B660T'}).ok);
+ assert(preserved.every(p=>t.occupied[p]==='4A-B984T'));assert(t.routes['4A-B984T'].occupied);
+}
+console.log('PASS observed Anyang parallel routes: both orders, independent occupancy/release and shared switch protection');
+// Shared normal locking is not a blanket bypass: changed/unknown point positions and
+// shared track still fail closed if future geometry data changes.
+for(const kind of ['opposite-position','unknown-position','shared-track']){
+ const first=c.routes['4C-B660T'],second=c.routes['4A-B984T'],savedPositions=second.pointPositions,savedResources=second.resources;
+ try{
+  if(kind==='opposite-position')second.pointPositions={...savedPositions,'53':'R'};
+  if(kind==='unknown-position'){second.pointPositions={...savedPositions};delete second.pointPositions['53'];}
+  if(kind==='shared-track')second.resources=[...savedResources,first.resources[0]];
+  const t=c.initial();c.dispatch(t,{type:'mode',value:'CCM'});assert(c.dispatch(t,{type:'route',id:'4C-B660T'}).ok);
+  assert(!c.dispatch(t,{type:'route',id:'4A-B984T'}).ok,kind);
+ }finally{second.pointPositions=savedPositions;second.resources=savedResources;}
+}
+{const t=c.initial();for(const id of ['4C-B660T','4A-B984T'])assert(c.dispatch(t,{type:'route',id,auto:true}).ok,'AUTO uses the same observed compatibility');}
+console.log('PASS shared normal locking still rejects opposite/unknown point positions and shared track');

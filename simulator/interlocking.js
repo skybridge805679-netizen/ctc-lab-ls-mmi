@@ -14,12 +14,10 @@ const overlap={
   '1A-1T':{points:{},clearSignals:['4B'],note:'4B 출발신호기 해정 후 진행(오버랩 때문)',source:'실무5 영등포 1번 대피 대본 해설(1A 해정 후 4B 오버랩 해정)'}
  }
 };
-// Route pairs that share a point (both with it in the same position) but are set together on the real LS (사진/사용자 확인).
-// 다른 진로쌍은 같은 전환기를 쓰면 경합으로 본다 (예: 지하서울 서쪽 건넘선).
-const compatible={
- anyang:[['4A-B984T','4C-B660T']]    // 안양역: 4C-B660T가 나 있을 때 4A-B984T 설정 가능 (2026-10-23 LS 사진)
-};
-const isCompatible=(station,a,b)=>(compatible[station]||[]).some(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-const api={approach,overlap,compatible,isCompatible,rulesFor:(station,route)=>overlap[station]?.[route]||null};
+// Simultaneous routes confirmed by the user's observation of the real LS.
+// This is a regression observation for the generic shared-N rule, not a route-pair exception.
+const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}]};
+const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
+const api={approach,overlap,parallel,parallelFor,rulesFor:(station,route)=>overlap[station]?.[route]||null};
 if(typeof module!=='undefined')module.exports=api;else root.SimInterlocking=api;
 })(typeof window!=='undefined'?window:globalThis);

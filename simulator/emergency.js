@@ -72,7 +72,7 @@ const OVERLAY={
    26:[move('G0454','geumcheon',SEOKSU_UP2,'G0454 열차번호를 K0452가 있는 석수역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G0454','geumcheon')],
    27:[rename('K0452','G0452','geumcheon')]}},
  '04':{station:'anyang',stations:['anyang','gunpo','geumjeong'],
-  cast:[['K0809','geumjeong'],['K0811','anyang'],['A1003','anyang','2T'],['K0813','anyang','B978T'],['K1114','gunpo'],['K1116','gunpo','B1005T']],
+  cast:[['K0809','geumjeong'],['K0811','anyang','2T'],['A1003','anyang','2T'],['K0813','anyang','B978T'],['K1114','gunpo'],['K1116','gunpo','B1005T']],
   seeds:{anyang:['4B','4C','1B'],gunpo:['1A','1B']},
   before:{
    16:[mode('anyang','CCM'),stop('anyang',['4B'],' (필요시 4C 출발·1B 장내도 정지)'),mode('gunpo','CCM'),stop('gunpo',['1A','1B'])],
@@ -113,6 +113,26 @@ const OVERLAY={
    19:[mode('anyang','CCM'),stop('anyang',['3B']),mode('geumcheon','CCM'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],
    21:[rename('K0452','G0452','geumcheon')]}}
 };
+// Explicit movement cues reviewed against the numbered spoken instructions in emergency-data.js.
+// Only named departure/resumption instructions create motion; broadcasts and stop instructions do not.
+const exit=(...numbers)=>numbers.map(number=>({op:'delete',number}));
+const trip=(number,legs)=>legs.map(([station,slot,handover=false])=>({op:'move',number,station,slot,handover}));
+const north=number=>trip(number,[['anyang','B655T'],['geumcheon','B641T',true],['geumcheon','5T'],['geumcheon','B963T']]);
+const guroTrip=number=>trip(number,[['geumcheon','B639T'],['guro','B631T',true],['guro','5T']]);
+const MOTION={
+ '01':{n11:exit('K1006'),n21:exit('K1137','K1135')},
+ '02':{n25:exit('K0608')},
+ '03':{n14:exit('A1001','K0401','A1002'),n23:north('K0456'),n27:exit('G0452')},
+ '04':{n12:exit('A1003','K1114'),n17:trip('K0811',[['anyang','B660T'],['gunpo','B678T',true],['gunpo','1T']]),n20:exit('G0809')},
+ '05':{n15:guroTrip('K1212'),n18:exit('G1208')},
+ '05-1':{n12:guroTrip('K1210')},
+ '06':{n13:exit('A1001','K0401','A1004'),n21:north('K0456'),n25:exit('G0452')},
+ '06-1':{n13:exit('A1001','K0401','A1004'),n21:north('K0456'),n25:exit('G0452')},
+ '06-2':{n14:exit('A1001','K0401','A1004'),n20:north('K0456'),n21:exit('G0452')}
+};
+for(const [key,tags]of Object.entries(MOTION))for(const [tag,actions]of Object.entries(tags)){
+ const autos=OVERLAY[key].autos??={};autos[tag]=[...(autos[tag]||[]),...actions];
+}
 // where in the script each operation block belongs can only be checked against the original text; see simulator/emergency.test.cjs for the structural checks
 const direction=number=>(+String(number).slice(-1))%2?'down':'up';       // 홀수 = 하행, 짝수 = 상행 (대본의 번호 체계)
 const platform=(st,dir)=>{const a=R.routesFor(st,dir,false,false).arrivalRoute||'';return a.split('_')[1]||null;};
@@ -120,13 +140,17 @@ const platform=(st,dir)=>{const a=R.routesFor(st,dir,false,false).arrivalRoute||
 function applyAutos(sc,run,dispatch,model){
  const out=[];
  sc.steps.forEach((st,i)=>{
-  if(!st.tag||!run.done[i]||run.fired.has(st.tag))return;run.fired.add(st.tag);
-  for(const a of sc.autos[st.tag]||[]){
+  if(!st.tag||!run.done[i]||run.fired.has(st.tag))return;
+  run.autoApplied??=new Set();const actions=sc.autos[st.tag]||[];
+  for(const [index,a]of actions.entries()){
+   const key=st.tag+':'+index;if(run.autoApplied.has(key))continue;let result=null;
    const f=(()=>{for(const [station,x] of Object.entries(model().stations))for(const [slot,rows] of Object.entries(x.windows))for(const r of rows)if(r.number===a.number)return {station,slot,uid:r.uid};return null;})();
-   if(a.op==='insert'){if(!f)out.push(dispatch({op:'insert',station:a.station,slot:a.slot||platform(a.station,a.dir),number:a.number,direction:a.dir}));}
-   else if(f&&a.op==='delete')out.push(dispatch({op:'delete',...f}));
-   else if(f&&a.op==='move')out.push(dispatch({op:'move',...f,targetStation:a.station,targetSlot:a.slot}));
+   if(a.op==='insert')result=f?{ok:true}:dispatch({op:'insert',station:a.station,slot:a.slot||platform(a.station,a.dir),number:a.number,direction:a.dir});
+   else if(f&&a.op==='delete')result=dispatch({op:'delete',...f});
+   else if(f&&a.op==='move')result=dispatch({op:'move',...f,targetStation:a.station,targetSlot:a.slot,handover:!!a.handover});
+   if(result){out.push(result);if(result.ok)run.autoApplied.add(key);}
   }
+  if(actions.every((_,i)=>run.autoApplied.has(st.tag+':'+i)))run.fired.add(st.tag);
  });
  return out;
 }
@@ -153,7 +177,8 @@ function seed(sc,states){
  for(const st of sc.stations){const c=c0.forStation(st);for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial());}
  for(const [st,sigs] of Object.entries(sc.seeds)){
   const c=c0.forStation(st),s=states[st];c.dispatch(s,{type:'mode',value:'CCM',source:'SCENARIO'});
-  for(const sig of sigs){const id=Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&!/^B/.test(c.routes[r].destination)).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
+  for(const sig of sigs){const departure=c.signals[sig]?.kind==='출발';
+   const id=Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
    if(id)c.dispatch(s,{type:'route',id,source:'SCENARIO'});}      // a route that cannot be set (conflict) just stays stopped
   c.dispatch(s,{type:'mode',value:'AUTO',source:'SCENARIO'});
  }
@@ -166,6 +191,6 @@ function numbersOf(sc){
  for(const st of sc.steps)if(st.act)for(const k of ['from','to','number'])if(st.act[k])set.add(st.act[k]);
  return [...set];
 }
-const api={numbersOf,list,seed,castFor,applyAutos,direction,platform,OVERLAY,variants:D.variants};
+const api={numbersOf,list,seed,castFor,applyAutos,direction,platform,OVERLAY,MOTION,variants:D.variants};
 if(isNode)module.exports=api;else root.SimEmergency=api;
 })(typeof window!=='undefined'?window:globalThis);

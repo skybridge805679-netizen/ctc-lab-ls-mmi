@@ -83,7 +83,13 @@
    const badPoint=[...new Set([...(r.pointLocks||[]),...Object.keys(r.pointPositions||{})])].find(id=>(s.faults?.points||[]).includes(id));
    if(badPoint)return log(false,'진로 내 전환기 '+badPoint+'가 고장입니다.');
    if((r.pointLocks||[]).some(id=>s.blockedPoints.includes(id)))return log(false,'진로 내 전환기가 쇄정되어 있습니다.');
-   const conflict=Object.keys(s.routes).find(id=>routes[id].signal===r.signal||(routes[id].resources||[]).some(t=>(r.resources||[]).includes(t))||(!IL.isCompatible(config.id,id,a.id)&&(routes[id].pointLocks||[]).some(t=>(r.pointLocks||[]).includes(t))));
+   const conflict=Object.keys(s.routes).find(id=>{
+    const other=routes[id];
+    // A switch group may serve independent straight tracks in N. Holding N twice is not movement.
+    // Shared reverse/unknown requirements remain exclusive; track and overlap conflicts are checked separately.
+    const pointConflict=(other.pointLocks||[]).some(pid=>(r.pointLocks||[]).includes(pid)&&!(r.pointPositions?.[pid]==='N'&&other.pointPositions?.[pid]==='N'));
+    return other.signal===r.signal||(other.resources||[]).some(t=>(r.resources||[]).includes(t))||pointConflict;
+   });
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');
    const ov=overlapOf(a.id);
    if(ov?.clearSignals){const open=Object.keys(s.routes).find(id=>ov.clearSignals.includes(routes[id].signal));if(open)return log(false,'오버랩 구간의 '+routes[open].signal+' 신호를 먼저 해정하세요. ('+ov.note+')');}
@@ -126,14 +132,14 @@
    if(active.occupied)return log(false,'이미 점유된 진로입니다.');
    if(active.lock)return log(false,'접근쇄정 중에는 정지신호입니다. 남은 '+remaining(s,active)+'초');
    delete s.approach[r.signal];active.occupied=true;active.status='OCCUPIED';s.signals[r.signal]='STOP';
-   active.train={from:s.clock,to:s.clock+(a.seconds||20)};       // 열차가 진로를 지나는 구간(LS의 붉은 점유 표시가 따라 움직임)
+   const travelSeconds=Number(a.seconds);active.train={from:s.clock,to:s.clock+(Number.isFinite(travelSeconds)&&travelSeconds>0?travelSeconds:20)};       // 열차가 진로를 지나는 구간(LS의 붉은 점유 표시가 따라 움직임)
    for(const t of r.resources)s.occupied[t]=a.id;
    return log(true,a.id+' 모의 열차 진입 · 신호 정지 · 진로 쇄정');
   }
   if(a.type==='clear'){
    const r=routes[a.id],active=s.routes[a.id];if(!r||!active?.occupied)return log(false,'점유된 진로를 선택하세요.');
    for(const t of r.resources)delete s.occupied[t];
-   if(active.control==='continuous'&&s.mode==='CCM'&&!s.pending&&!r.pointLocks.some(id=>s.blockedPoints.includes(id))){active.occupied=false;active.status='SET';s.signals[r.signal]='GO';}
+   if(active.control==='continuous'&&s.mode==='CCM'&&!s.pending&&!r.pointLocks.some(id=>s.blockedPoints.includes(id))){active.occupied=false;delete active.train;active.status='SET';s.signals[r.signal]='GO';}
    else delete s.routes[a.id];
    return log(true,a.id+' 모의 열차 통과 · '+(s.routes[a.id]?'연속진로 재설정':'진로 해정'));
   }
