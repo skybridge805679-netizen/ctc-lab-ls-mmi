@@ -27,4 +27,8 @@ const h1=L.handoff('geumcheon','B968T',slots);assert.deepStrictEqual([h1.station
 const h2=L.handoff('anyang','B655T',slots);assert.deepStrictEqual([h2.station,h2.trunk,h2.direction],['geumcheon','GU','up']);assert.ok(slots('geumcheon').includes(h2.slot),h2.slot);
 assert.strictEqual(L.handoff('suwon','B1035T',slots).station,'uiwang');assert.strictEqual(L.handoff('seoul','B902T',slots).station,'yongsan');assert.strictEqual(L.handoff('underground-seoul','B072T',slots).station,'seoul');
 assert.strictEqual(L.handoff('cheongnyangni','B001T',slots),null,'청량리 up: nothing further');
+// 장내신호기: every trunk with an arrival signal on it (the 3 stations missing one are terminals/yards) and the known 금천구청 / 안양 layout
+assert.deepStrictEqual(['ED','GD','GU','EU'].map(t=>L.arrivalSignal('geumcheon',t)),['1A','1B','2B','2A']);
+assert.deepStrictEqual(['ED','GD','GU','EU'].map(t=>L.arrivalSignal('anyang',t)),['1A','1B','2B','2A']);
+assert.strictEqual(L.handoff('geumcheon','B968T',slots).signal,'1A');assert.strictEqual(L.handoff('anyang','B655T',slots).signal,'2B');
 console.log('line: ok',line.sections.length,'sections');

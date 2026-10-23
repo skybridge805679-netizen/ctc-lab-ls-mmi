@@ -40,6 +40,12 @@ function build(){
  return {order,stations,sections,NAMES};
 }
 const line=build();
+// 본선마다 그 본선으로 들어오는 장내신호기(예: 금천구청 하2선 1A, 하1선 1B, 상1선 2B, 상2선 2A)
+function arrivalSignal(station,trunk){
+ const t=line.stations[station]?.trunks[trunk];if(!t)return null;const dir=trunk.endsWith('D')?1:-1;
+ const sig=W.data[station].signals.find(x=>/^[12][A-Z]$/.test(x[0])&&t.rails.includes(x[1])&&x[4]===dir);
+ return sig?sig[0]:null;
+}
 // the station a train reaches next when it leaves `station` on `trunk` going down (towards 수원) or up, and the circuit it enters at
 function next(station,trunk,direction){
  const s=direction==='down'?line.sections.find(x=>x.trunk===trunk&&x.west===station):line.sections.find(x=>x.trunk===trunk&&x.east===station);
@@ -59,8 +65,8 @@ function entrySlot(station,trunk,direction,slots){
 function handoff(station,dest,slotsOf){
  const trunk=trunkOf(dest);if(!trunk)return null;
  const direction=trunk.endsWith('D')?'down':'up',n=next(station,trunk,direction);if(!n)return null;
- const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section}:null;
+ const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section,signal:arrivalSignal(n.station,trunk)}:null;
 }
-const api={line,NAMES,trunkOf,numberOf,next,entrySlot,handoff,build};
+const api={line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

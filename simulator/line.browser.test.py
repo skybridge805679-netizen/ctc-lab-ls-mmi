@@ -24,9 +24,12 @@ def run(page, url):
         where = page.evaluate("""()=>{const out={};for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number==='K1131')out[st]=slot;return out;}""")
         for st, slot in where.items():
             seen.setdefault(st, set()).add(slot)
+            if st == 'dongmyo' and slot.startswith('B') and page.evaluate("!!SimField.state('dongmyo').approach['1B']"):
+                seen.setdefault('approach-1B', set()).add(slot)
     # K1131 leaves 청량리 and shows up at 동묘앞 in a boundary (B###T) window before it stops on a platform track, and so on down the line
     assert any(s.startswith('B') for s in seen.get('dongmyo', [])), seen
     assert any(not s.startswith('B') for s in seen.get('dongmyo', [])), seen        # and later the platform window
+    assert 'approach-1B' in seen, 'the next station gets the approach (접근) at its arrival signal'
     assert 'jonggak' in seen and 'underground-seoul' in seen, list(seen)
     # the boundary circuit is red on the next station's LS while the number stands there
     page.evaluate("SimAutoUI.set(false)")

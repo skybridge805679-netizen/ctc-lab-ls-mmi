@@ -21,6 +21,8 @@ const numbers={
  handoff(station,train,dest){
   const h=dest&&root.SimLine.handoff(station,dest,id=>(root.SimTrainWindows.data[id]||[]).map(w=>w.slot));
   if(h)root.SimLSUI.dispatch({op:'insert',station:h.station,slot:h.slot,number:train.id,direction:train.direction});
+  // 이웃 역의 장내신호기 바깥에 열차가 접근 중이다 (접근쇄정 대상)
+  const st=h&&host.context().stationStates[h.station];if(st&&h.signal&&!st.approach?.[h.signal])root.SimCore.forStation(h.station).dispatch(st,{type:'approach',signal:h.signal,present:true,source:'AUTO'});
  }
 };
 
