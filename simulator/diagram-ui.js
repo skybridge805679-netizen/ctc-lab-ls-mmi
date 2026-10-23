@@ -1,6 +1,6 @@
 (function(root){
  'use strict';
- const N=root.SimNetwork,T=root.SimTimetable,$=id=>document.getElementById(id);
+ const N=root.SimNetwork,T=root.SimTimetable,$=id=>SimDOM.document.getElementById(id);
  const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');

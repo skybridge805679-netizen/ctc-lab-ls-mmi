@@ -2,7 +2,7 @@
 'use strict';
 // 운영자 선호화면 설정 (교통관제운영 4권 p.374-376): L/S 3개 모니터별로 표시할 역을 추가·삭제·위/아래 이동하고 [확인]으로 적용.
 // This simulator has one L/S, so the chosen monitor's list is shown first in the L/S station selector (optgroup "운영자 선호화면").
-const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork,KEY='orpheia.preferred';
+const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork,KEY='orpheia.preferred';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stations=N.stations.filter(s=>s.controlled);
 let cfg={1:[],2:[],3:[]},mon=1,sel=null,pool=null;

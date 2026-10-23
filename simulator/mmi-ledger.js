@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // 운전정리 대장 창: 스케줄 변경을 운전명령 / 관제승인 / 단순 운전정리로 분류해 보여 준다 (교통관제운영 1권 p.50-52).
-const doc=document,$=id=>doc.getElementById(id),L=root.SimLedger,T=root.SimTimetable;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),L=root.SimLedger,T=root.SimTimetable;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stamps=new Map();      // change index -> clock when first seen
 function seen(){

@@ -2,7 +2,7 @@
 'use strict';
 // 관제 실기 시나리오 window: runs the 부본선 대피 exam scripts of scenarios.js. The 'do' steps tick themselves when the station
 // state / operator events match (in order); the spoken 'say' lines are ticked by the operator. Grading is this simulator's own.
-const doc=document,$=id=>doc.getElementById(id),SC=()=>root.SimScenarios;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),SC=()=>root.SimScenarios;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mmi=()=>root.SimMMI,EM=()=>root.SimEmergency,SS=()=>root.SimScheduleScenarios;
 const all=()=>SC().list.concat(EM().list,SS().list);

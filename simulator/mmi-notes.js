@@ -3,7 +3,7 @@
 // 노트관리 ([시스템 관리] > [노트관리]) and the T/G 노트편집, after the 실기1 textbook (4장 8절 p.92-96, 5장 p.149-151).
 // A note has 노트종류, 대상명, 제목, 내용(추가기록), 글자크기, 표시기간, 표시구간, 리마인더 and an optional automatic 일지 copy.
 // Notes are drawn on the T/G as message boxes; a 리마인더 note pops up when its time/section comes into view.
-const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KINDS=['시설물','열차번호','이벤트','시스템'];
 const mmi=()=>root.SimMMI,D=()=>root.SimDiagram;

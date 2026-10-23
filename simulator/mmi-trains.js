@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const $=id=>document.getElementById(id),N=root.SimNetwork,esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>SimDOM.document.getElementById(id),N=root.SimNetwork,esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let host,lastStation;
 const model=()=>root.SimLSUI.getModel(),station=()=>host.context().station,rows=(st,slot)=>model().stations[st]?.windows[slot]||[];
 function options(el,list,value){el.innerHTML=list.map(([id,label])=>`<option value="${esc(id)}">${esc(label)}</option>`).join('');if(list.some(x=>x[0]===value))el.value=value;}

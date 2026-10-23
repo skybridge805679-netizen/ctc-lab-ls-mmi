@@ -3,7 +3,7 @@
 // 로그재생 (프로그램 > 로그재생(R), 실기1 p.39-42): pick a station, date and time range, search the stored state changes, then play them
 // back on the LS. Controls: 맨처음 · 한 줄 위 · 잠시 멈춤 · 재생 · 종료 · 한 줄 아래 · 맨끝, 재생 속도, 파일로 저장. While a replay is
 // shown the live simulation is paused and operations are refused; the LS carries a "로그재생중" text. 종료 restores the live state.
-const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEYS=['mode','pending','clock','points','signals','routes','approach','occupied','blockedPoints'];
 const mmi=()=>root.SimMMI;

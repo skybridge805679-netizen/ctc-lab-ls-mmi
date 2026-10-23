@@ -3,7 +3,7 @@
 // 시스템 조회 windows built from the search conditions and result columns of the 실기1 textbook (4장 4·7절, p.48-92).
 // Layouts were never photographed, so the arrangement is the simulator's own; the data comes from the simulator:
 // 실적 = a call whose time has passed on the simulated clock (with the delays and routes of the current plan).
-const doc=document,$=id=>document.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
+const doc=SimDOM.document,$=id=>SimDOM.document.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const model=()=>root.SimDiagram.getModel(),mmi=()=>root.SimMMI;
 let host=null;

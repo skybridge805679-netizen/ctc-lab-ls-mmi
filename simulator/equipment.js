@@ -40,7 +40,7 @@ function tick(clock){
 function faultList(){return Object.keys(faults);}
 function reset(){for(const k of faultList())delete faults[k];last=null;sent=[];}
 function init(){
- const doc=document,$=id=>doc.getElementById(id),m=root.SimMMI;
+ const doc=SimDOM.document,$=id=>doc.getElementById(id),m=root.SimMMI;
  const cur=()=>$('lsStage')?.dataset.controlStation||'';
  const draw=()=>{const st=cur();$('eqStation').textContent=st?name(st)+'역':'-';$('eqList').innerHTML=NAMES.map(n=>`<label><input type="checkbox" data-eq="${n}" ${isFault(st,n)?'checked':''}> ${label(n)}</label>`).join('');
   const F=root.SimField;

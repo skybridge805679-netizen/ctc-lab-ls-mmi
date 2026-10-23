@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // 선로망 현황 (교육용): 구간별 점유 열차, 폐색 점유 검사 켜기/끄기, 단선지령식 시행·복귀 (비상시 조치 01·02의 상선/하선 단선지령식)
-const doc=document,$=id=>doc.getElementById(id),L=root.SimLine;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),L=root.SimLine;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nm=id=>root.SimNetwork.catalog[id]?.name||id;
 const SERIES={M:'지하철',G:'일반선',E:'전동선'};

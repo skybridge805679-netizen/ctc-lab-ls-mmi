@@ -1,5 +1,5 @@
 'use strict';
-const $=id=>document.getElementById(id),BaseCore=window.SimCore,N=window.SimNetwork;
+const $=id=>SimDOM.document.getElementById(id),BaseCore=window.SimCore,N=window.SimNetwork;
 let C=BaseCore,selectedStation='underground-seoul';
 const stationStates=Object.fromEntries(N.stations.filter(st=>st.controlled).map(st=>[st.id,BaseCore.forStation(st.id).initial()]));
 let state=stationStates[selectedStation],paused=false,practice='guided',activeTask=null,taskIndex=0,taskStart=0,dialogAction=null,toastTimer,completed=[];
@@ -64,11 +64,11 @@ function renderLogs(){$('logCount').textContent=state.logs.length+' events';$('l
 function render(){
  const st=N.catalog[selectedStation];
  $('stationScope').textContent=`${st.name} · ${st.map.view.intermediate.join(' · ')||'구내 및 역간'}`;
- document.querySelectorAll('#stationTabs [data-station]').forEach(b=>{const s=stationStates[b.dataset.station],n=Object.keys(s.routes).length;b.classList.toggle('selected',b.dataset.station===selectedStation);b.querySelector('.tab-dot').className='tab-dot '+s.mode.toLowerCase();b.querySelector('.tab-count').textContent=n?n:'';b.title=`${N.catalog[b.dataset.station].name} · ${s.mode} · ${n}개 진로`;});
- document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
- document.querySelector('.sessionbar>div:first-child').innerHTML=`<span class="live-dot"></span><b>조작·경로 확인</b><span class="bar-sep"></span><span>${st.name}</span><span class="muted">${st.code}</span>`;
- document.querySelector('.side-station').innerHTML=`<span class="live-dot"></span>${st.name} <small>${st.code}</small>`;
- document.querySelector('.fidelity-note').innerHTML=`${st.name} LS<b>${(st.map.view.intermediate.length?'관할 '+st.map.view.intermediate.join(' · ')+' · ':'')+'접근쇄정·오버랩 연습'}</b>`;
+ SimDOM.document.querySelectorAll('#stationTabs [data-station]').forEach(b=>{const s=stationStates[b.dataset.station],n=Object.keys(s.routes).length;b.classList.toggle('selected',b.dataset.station===selectedStation);b.querySelector('.tab-dot').className='tab-dot '+s.mode.toLowerCase();b.querySelector('.tab-count').textContent=n?n:'';b.title=`${N.catalog[b.dataset.station].name} · ${s.mode} · ${n}개 진로`;});
+ SimDOM.document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
+ SimDOM.document.querySelector('.sessionbar>div:first-child').innerHTML=`<span class="live-dot"></span><b>조작·경로 확인</b><span class="bar-sep"></span><span>${st.name}</span><span class="muted">${st.code}</span>`;
+ SimDOM.document.querySelector('.side-station').innerHTML=`<span class="live-dot"></span>${st.name} <small>${st.code}</small>`;
+ SimDOM.document.querySelector('.fidelity-note').innerHTML=`${st.name} LS<b>${(st.map.view.intermediate.length?'관할 '+st.map.view.intermediate.join(' · ')+' · ':'')+'접근쇄정·오버랩 연습'}</b>`;
  const controlled=N.stations.filter(s=>s.controlled),index=controlled.findIndex(s=>s.id===selectedStation);
  $('previousStation').textContent=index>0?'◀ '+controlled[index-1].name:'시점';$('previousStation').disabled=index===0;
  $('nextStation').textContent=index<controlled.length-1?controlled[index+1].name+' ▶':'종점';$('nextStation').disabled=index===controlled.length-1;
@@ -95,12 +95,12 @@ function signalAction(id,at){
  // 실제 LS는 신호기 옆에 "[ 진로 제어 ]" 제목과 RT_<신호기>_<도착> 목록만 보여 준다. 목록의 출처(원본/배선 도출)는 마우스를 올리면 나온다.
  openAction('[ 진로 제어 ]',entries.map(key=>`<button type="button" class="route-choice" data-route-choice="${key}" title="${C.menuVerifiedFor(id)?'원본 LS 목록':C.routes[key].geometryDerived?'배선 연결으로 도출한 경로 (실제 LS 목록은 확인되지 않음)':'교재·대본·LS 확인 경로'}">RT_${key.replace('-','_')}</button>`).join(''),null,'예 · 실행','route',at);
  $('dialogConfirm').hidden=true;
- document.querySelectorAll('[data-route-choice]').forEach(button=>button.onclick=()=>{$('actionDialog').close();$('dialogConfirm').hidden=false;run({type:'route',id:button.dataset.routeChoice,source:'LS'});});
+ SimDOM.document.querySelectorAll('[data-route-choice]').forEach(button=>button.onclick=()=>{$('actionDialog').close();$('dialogConfirm').hidden=false;run({type:'route',id:button.dataset.routeChoice,source:'LS'});});
 }
 function taskView(){const t=tasks[taskIndex];$('taskSelect').value=taskIndex;$('taskBody').innerHTML=practice==='free'?'<div class="task-card"><div class="task-heading"><span class="task-num">∞</span><h3>원본 배선도와 경로 대조</h3></div><p>1A·2A·3A·4A를 눌러 경로 근거를 확인하고, 전환기 구성을 대조하세요. 설정한 신호기를 다시 눌러 정지·해정할 수 있습니다.</p></div>':`<div class="task-card"><div class="task-heading"><span class="task-num">${String(taskIndex+1).padStart(2,'0')}</span><h3>${t.title}</h3><span class="task-badge">${completed.includes(taskIndex)?'✓ 달성':activeTask===taskIndex?'진행 중':'시작 전'}</span></div><p>${t.desc}</p>${practice==='guided'?`<p class="task-hint">↳ ${t.hint}</p>`:''}<p>근거: ${t.source}</p><p id="taskResult"></p></div>`;for(const id of ['startTask','checkTask','nextTask'])$(id).hidden=practice==='free';}
 function startTask(){if(state.logs.length&&!confirm('현재 상태와 기록을 초기화하고 과제를 시작할까요?'))return;selectStation('underground-seoul');state=C.initial();state.clock=stationStates[selectedStation].clock;stationStates[selectedStation]=state;window.SimLSUI.reset(selectedStation);window.SimMMI?.syncAll(stationStates);taskStart=0;activeTask=taskIndex;paused=false;$('pauseBtn').textContent='Ⅱ 일시정지';$('controlSelect').value='mode';fields();render();taskView();toast('과제 시작 · '+tasks[taskIndex].title);}
 $('taskSelect').innerHTML=tasks.map((t,i)=>`<option value="${i}">${String(i+1).padStart(2,'0')} · ${t.title}</option>`).join('');$('taskSelect').onchange=e=>{taskIndex=+e.target.value;taskView();};
-document.querySelectorAll('[data-practice]').forEach(b=>b.onclick=()=>{practice=b.dataset.practice;document.querySelectorAll('[data-practice]').forEach(x=>x.classList.toggle('selected',x===b));taskView();});
+SimDOM.document.querySelectorAll('[data-practice]').forEach(b=>b.onclick=()=>{practice=b.dataset.practice;SimDOM.document.querySelectorAll('[data-practice]').forEach(x=>x.classList.toggle('selected',x===b));taskView();});
 $('lsDisplay').onclick=e=>{
  const mode=e.target.closest('[data-mode]'),signal=e.target.closest('[data-signal]'),stop=e.target.closest('[data-stop-all]');
  if(mode&&state.mode==='LOCAL'&&mode.dataset.mode==='CCM'&&!state.pending){
@@ -116,11 +116,21 @@ $('lsStage').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e
 
 $('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
 $('handoverBar').onclick=e=>{const b=e.target.closest('[data-handover]');if(b)run({type:'handover',accept:b.dataset.handover==='yes',source:'현장'});};
-$('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>document.querySelector(`input[name="${n}"]:checked`).value;
+$('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>SimDOM.document.querySelector(`input[name="${n}"]:checked`).value;
  if(type==='mode')run({type,value:checked('mmiMode'),source:'MMI'});
  if(type==='route')run({type:checked('routeAction')==='select'?'route':'withdraw',id:$('mmiRoute').value,control:$('routeControl').value,source:'MMI'});
  if(type==='point'){const op=checked('pointAction');run({type:op==='move'?'point':'pointLock',id:$('mmiPoint').value,value:checked('pointPosition'),lock:op==='lock',source:'MMI'});}
- if(type==='stopAll')openAction('신호기 일괄정지',N.catalog[selectedStation].name+' 신호기를 모두 정지하시겠습니까?',{type:'stopAll',source:'MMI'});
+ if(type==='stopAll'){
+  // LS may change stations while this MMI dialog remains open. Keep its target.
+  const target=selectedStation;
+  window.SimMMI.confirmBox(N.catalog[target].name+' 신호기를 모두 정지하시겠습니까?',()=>{
+   const action={type:'stopAll',source:'MMI'};
+   if(target===selectedStation){run(action);return;}
+   if(window.SimMMI.replaying()){toast('로그재생 중에는 조작할 수 없습니다.',true);return;}
+   const result=BaseCore.forStation(target).dispatch(stationStates[target],action);
+   window.SimMMI.sync(target,stationStates[target],action,result);render();toast(result.message,!result.ok);
+  },{title:'신호기 일괄정지'});
+ }
  if(type==='scan')run({type,scope:checked('mmiScope'),source:'MMI'});
 };
 $('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
@@ -128,10 +138,10 @@ $('resetBtn').onclick=()=>{if(!confirm('현재 상태와 조작 기록을 초기
 $('startTask').onclick=startTask;$('nextTask').onclick=()=>{taskIndex=(taskIndex+1)%tasks.length;taskView();};
 $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toast('지하서울로 전환해 과제를 확인하세요.',true);if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart),state);if(ok){if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
 for(const id of ['guideBtn','footerGuide'])$(id).onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
-$('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.19.4',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>SimDOM.document.querySelector('.log-panel').scrollIntoView({behavior:'smooth'});$('workspaceNav').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.20.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 const lockSig=()=>Object.entries(state.routes).map(([id,r])=>id+(r.lock?'L':'')).join();
-setInterval(()=>{if(!paused&&!window.SimMMI?.replaying?.()&&!window.SimLSUI.isInteracting()&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig(),movingBefore=trainRunning(state);for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,{type:'tick',seconds});const scenarioChanged=window.SimScenarioUI?.stepMotion(),autoChanged=window.SimAutoUI?.step();window.SimEquipment?.tick(state.clock);window.SimMMI?.syncAll(stationStates);if(lockSig()!==before||autoChanged||scenarioChanged||movingBefore||trainRunning(state))render();else for(const row of document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
+setInterval(()=>{if(!paused&&!window.SimMMI?.replaying?.()&&!window.SimLSUI.isInteracting()&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig(),movingBefore=trainRunning(state);for(const [id,st]of Object.entries(stationStates))BaseCore.forStation(id).dispatch(st,{type:'tick',seconds});const scenarioChanged=window.SimScenarioUI?.stepMotion(),autoChanged=window.SimAutoUI?.step();window.SimEquipment?.tick(state.clock);window.SimMMI?.syncAll(stationStates);if(lockSig()!==before||autoChanged||scenarioChanged||movingBefore||trainRunning(state))render();else for(const row of SimDOM.document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
 window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates}),run,render,openAction,toast,selectStation});
 fields();render();taskView();
 

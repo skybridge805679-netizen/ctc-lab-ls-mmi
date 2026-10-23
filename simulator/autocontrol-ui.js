@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // UI binding of autocontrol.js: the on/off switch (MMI bar + 프로그램 환경설정), numbers moving through the LS 열번창, trouble log.
-const doc=document,$=id=>doc.getElementById(id),A=()=>root.SimAuto,mmi=()=>root.SimMMI;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),A=()=>root.SimAuto,mmi=()=>root.SimMMI;
 const KEY='orpheia.autocontrol';
 let host=null,engine=null,enabled=false,reflect=false;
 const RKEY='orpheia.autoreflect';

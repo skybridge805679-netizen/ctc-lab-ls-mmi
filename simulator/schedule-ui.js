@@ -1,14 +1,14 @@
 (function(root){
  'use strict';
  // [CA028_02] online train schedule window (수정 / 복사 / 생성), laid out after the real MMI photos
- const N=root.SimNetwork,T=root.SimTimetable,D=root.SimDiagram,$=id=>document.getElementById(id),model=D.getModel();
+ const N=root.SimNetwork,T=root.SimTimetable,D=root.SimDiagram,$=id=>SimDOM.document.getElementById(id),model=D.getModel();
  let draft=null,patternKey='',draftRevision=0,patternWin=null;
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const seconds=value=>{if(!/^\d{2}:\d{2}(:\d{2})?$/.test(value))return NaN;const [h,m,s=0]=value.split(':').map(Number);return h*3600+m*60+s-28800;};
- const radio=name=>document.querySelector(`input[name="${name}"]:checked`)?.value;
+ const radio=name=>SimDOM.document.querySelector(`input[name="${name}"]:checked`)?.value;
  const mode=()=>radio('scheduleMode'),selectedId=()=>$('scheduleList').value;
  const stationName=id=>N.catalog[id].name;
- const attributes=()=>({kind:$('scheduleKind').value,carCount:Number($('scheduleCars').value),relatedTrain:$('scheduleRelated').value.trim().toUpperCase(),service:$('scheduleService').value,flags:[...document.querySelectorAll('input[name="scheduleFlag"]:checked')].map(i=>i.value)});
+ const attributes=()=>({kind:$('scheduleKind').value,carCount:Number($('scheduleCars').value),relatedTrain:$('scheduleRelated').value.trim().toUpperCase(),service:$('scheduleService').value,flags:[...SimDOM.document.querySelectorAll('input[name="scheduleFlag"]:checked')].map(i=>i.value)});
  const key=()=>[draft?.calls[0]?.station,draft?.calls.at(-1)?.station,$('scheduleStart').value].join('|');
  function message(text){$('scheduleMessage').textContent=text;}
  // modal 확인 box; failures and completions are both announced like on the real MMI
@@ -64,14 +64,14 @@
   const create=m==='create';
   $('scheduleCreateBox').hidden=m==='edit';$('scheduleNumber').readOnly=m==='edit';
   $('schedulePatternOpen').disabled=!create;
-  for(const el of document.querySelectorAll('[name="scheduleEditType"],#scheduleEditTo,#scheduleSuspend,#scheduleResume,[name="scheduleCancelType"],#scheduleCancelFrom,#scheduleCancelTo'))el.disabled=create;
+  for(const el of SimDOM.document.querySelectorAll('[name="scheduleEditType"],#scheduleEditTo,#scheduleSuspend,#scheduleResume,[name="scheduleCancelType"],#scheduleCancelFrom,#scheduleCancelTo'))el.disabled=create;
   if(create){
    draft=null;$('scheduleNumber').value='A0000';$('scheduleStart').value='09:00:00';
   }else if(source){
    draft=structuredClone(source);
    if(m==='edit')$('scheduleNumber').value=source.id;
    $('scheduleKind').value=source.kind;$('scheduleCars').value=source.carCount??10;$('scheduleRelated').value=source.relatedTrain??'';$('scheduleService').value=source.service??'정기';
-   for(const box of document.querySelectorAll('input[name="scheduleFlag"]'))box.checked=(source.flags??[]).includes(box.value);
+   for(const box of SimDOM.document.querySelectorAll('input[name="scheduleFlag"]'))box.checked=(source.flags??[]).includes(box.value);
    if(m==='copy'){$('scheduleFrom').value=source.calls[0].station;$('scheduleTo').value=source.calls.at(-1).station;$('scheduleNumber').value='C'+source.id.slice(1);$('scheduleStart').value=T.clock(source.calls[0].departure);}
   }else draft=null;
   draftRevision=model.changes.length;table();message('');
@@ -99,7 +99,7 @@
    candidate.cancelled=candidate.calls.every(c=>c.cancelled);
    result=m==='create'?T.create(model,candidate):T.update(model,id,candidate);
   }
-  if(result.ok){const target=m==='edit'?id:newId;if(m!=='edit')document.querySelector('input[name="scheduleMode"][value="edit"]').checked=true;$('scheduleSearch').value='';list(target);load();D.selectTrain(target);}
+  if(result.ok){const target=m==='edit'?id:newId;if(m!=='edit')SimDOM.document.querySelector('input[name="scheduleMode"][value="edit"]').checked=true;$('scheduleSearch').value='';list(target);load();D.selectTrain(target);}
   notify(result.message);
  }
  function cancelRange(cancelled){
@@ -137,8 +137,8 @@
  $('onlineScheduleBtn').onclick=()=>{list();load();$('schedulePanel').hidden=false;};
  $('closeSchedule').onclick=()=>{$('schedulePanel').hidden=true;draft=null;if(patternWin)root.SimMMI.close('patternSelect');};
  $('scheduleClose').onclick=()=>root.SimMMI.close('schedule');
- for(const el of document.querySelectorAll('input[name="scheduleMode"]'))el.onchange=load;
- for(const el of document.querySelectorAll('input[name="scheduleDir"],input[name="scheduleDay"]'))el.onchange=()=>list();
+ for(const el of SimDOM.document.querySelectorAll('input[name="scheduleMode"]'))el.onchange=load;
+ for(const el of SimDOM.document.querySelectorAll('input[name="scheduleDir"],input[name="scheduleDay"]'))el.onchange=()=>list();
  $('scheduleList').onchange=load;$('scheduleLoad').onclick=load;$('scheduleDiscard').onclick=load;
  $('scheduleFind').onclick=()=>{list();load();message(`${$('scheduleList').options.length}건 조회`);};
  $('scheduleSearch').oninput=()=>list();
@@ -147,5 +147,5 @@
  $('schedulePatternOpen').onclick=openPattern;
  $('scheduleApply').onclick=apply;
  $('scheduleSuspend').onclick=()=>cancelRange(true);$('scheduleResume').onclick=()=>cancelRange(false);
- root.SimScheduleUI={open(m,id){const M=root.SimMMI;M.open('schedule');document.querySelector(`input[name="scheduleMode"][value="${m}"]`).checked=true;$('scheduleSearch').value='';list(id||selectedId());load();}};
+ root.SimScheduleUI={open(m,id){const M=root.SimMMI;M.open('schedule');SimDOM.document.querySelector(`input[name="scheduleMode"][value="${m}"]`).checked=true;$('scheduleSearch').value='';list(id||selectedId());load();}};
 })(window);

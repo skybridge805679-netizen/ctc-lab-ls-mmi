@@ -2,7 +2,7 @@
 'use strict';
 // "ORPHEIA MMI" shell (a parody of the real school MMI; no school logo is used): Windows-style menu bar, floating windows and the alarm / event log panes, as seen on the real MMI
 // (photos 2026-10-21). Existing panels (field control, graph, schedule) are hosted as windows; their element ids are kept.
-const N=root.SimNetwork,doc=document,$=id=>doc.getElementById(id);
+const N=root.SimNetwork,doc=SimDOM.document,$=id=>doc.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PENDING='원본 화면을 아직 확인하지 못해 구현하지 않았습니다.';
 // Menu structure copied from the photos. Items without `open` are known names whose windows are not implemented yet;
@@ -119,7 +119,7 @@ const emit=e=>{for(const f of eventListeners)f(e);};
 function sync(stationId,state,action,result){
  if(action&&result&&action.type!=='tick')emit({...action,station:stationId,ok:result.ok!==false});
  // 제어 확인 (photo 2026-10-22): a control command outside CCM is refused with a modal error box, not an alarm pop-up
- if(action&&result&&result.ok===false&&CONTROL.includes(action.type)&&state.mode!=='CCM'){alertBox('CCM 모드가 아니므로 제어할 수 없습니다.',null,{title:'제어 확인',icon:'error'});return;}
+ if(action&&result&&result.ok===false&&CONTROL.includes(action.type)&&state.mode!=='CCM'){alertBox('CCM 모드가 아니므로 제어할 수 없습니다.',null,{title:'제어 확인',icon:'error',document:action.source==='LS'?root.SimDOM.primary:null});return;}
  if(action&&result&&result.ok===false&&action.type!=='tick'){const info=stationInfo(stationId),who=`${info.name}${info.code?`(${info.code})`:''}역`;
   if(action.type==='route'&&action.id)raiseAlarm(`${who} ${routeText(action.id)}진로 요구중 ${result.message}`,'수동진로설정불가','E',info.name);else if(result.message)raiseAlarm(`${who} ${result.message}`,'','E',info.name);}
  const st=stationLabel(stationId),prev=seen[stationId],now=new Set(Object.keys(state.routes));
@@ -161,25 +161,28 @@ function createWindow(id,{title,x=24,y=24,width,body,host=null,onClose=null}){
 }
 // modal message box (원본의 "확인" 대화상자): a shield blocks the desktop until it is acknowledged
 function alertBox(text,done,opts={}){
- const shield=doc.createElement('dialog');shield.className='mmi-shield';
+ const shield=doc.createElement('dialog');shield.className='mmi-shield';if(opts.document===root.SimDOM.primary)shield.dataset.lsOwned='true';
  const box=doc.createElement('div');box.className='mmi-alert';box.setAttribute('role','alertdialog');
  box.classList.toggle('error',opts.icon==='error');
  box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">${esc(opts.title||'확인')}</span></div><p>${opts.icon==='error'?'<i class="mmi-err" aria-hidden="true">✕</i>':''}<span>${esc(text)}</span></p><button type="button" id="mmiAlertOk">확인</button>`;
- shield.appendChild(box);doc.body.appendChild(shield);shield.showModal();
+ shield.appendChild(box);(opts.document||doc).body.appendChild(shield);shield.showModal();
  const ok=box.querySelector('button');ok.focus();ok.onclick=()=>{shield.close();shield.remove();done?.();};shield.addEventListener('cancel',e=>{e.preventDefault();ok.click();});
 }
 // 예/아니오 확인 상자 (the real MMI asks "[예]를 선택" before deleting or saving)
 function confirmBox(text,onYes,opts={}){
- const shield=doc.createElement('dialog');shield.className='mmi-shield';
+ const shield=doc.createElement('dialog');shield.className='mmi-shield';if(opts.document===root.SimDOM.primary)shield.dataset.lsOwned='true';
  const box=doc.createElement('div');box.className='mmi-alert';box.setAttribute('role','alertdialog');
  box.innerHTML=`<div class="mmi-title"><span class="mmi-title-text">${esc(opts.title||'확인')}</span></div><p><span>${esc(text)}</span></p><div class="mmi-confirm-row"><button type="button" id="mmiConfirmYes">예(Y)</button><button type="button" id="mmiConfirmNo">아니오(N)</button></div>`;
- shield.appendChild(box);doc.body.appendChild(shield);shield.showModal();
+ shield.appendChild(box);(opts.document||doc).body.appendChild(shield);shield.showModal();
  const end=yes=>{shield.close();shield.remove();if(yes)onYes?.();};
  box.querySelector('#mmiConfirmYes').onclick=()=>end(true);box.querySelector('#mmiConfirmNo').onclick=()=>end(false);shield.addEventListener('cancel',e=>{e.preventDefault();end(false);});
 }
 function fitDesktop(){
  if(!desktop)return;let bottom=0;for(const w of Object.values(windows))if(!w.el.hidden)bottom=Math.max(bottom,w.el.offsetTop+w.el.offsetHeight);
- desktop.style.minHeight=Math.max(760,bottom+16)+'px';
+ const owner=desktop.ownerDocument,split=owner!==root.SimDOM.primary;
+ const chrome=split?Array.from($('mmiShell').children).filter(el=>el!==desktop).reduce((sum,el)=>sum+el.offsetHeight,0):0;
+ const base=split?Math.max(360,owner.defaultView.innerHeight-64-chrome):760;
+ desktop.style.minHeight=Math.max(base,bottom+16)+'px';
 }
 function place(w,x=w.el.offsetLeft,y=w.el.offsetTop){if(w.docked)return;w.el.style.left=Math.max(0,Math.min(desktop.clientWidth-w.el.offsetWidth,x))+'px';w.el.style.top=Math.max(0,y)+'px';}
 function dock(id,on=true){const w=windows[id];if(!w)return;w.docked=on;w.el.classList.toggle('docked',on);w.el.querySelector('.mmi-dock').textContent=on?'창으로':'도킹';desktop.classList.toggle('has-docked',Object.values(windows).some(w=>w.docked&&!w.el.hidden));if(!on)place(w);fitDesktop();}
@@ -235,8 +238,8 @@ function init(){
  shell.querySelector('#mmiCdrsBtn').onclick=()=>open('cdrs');
  shell.querySelector('#mmiLineBtn').onclick=()=>open('lineNet');
  shell.querySelector('#mmiLedgerBtn').onclick=()=>open('ledger');
- shell.querySelector('.mmi-ls-link').onclick=()=>$('lsDisplay').scrollIntoView({block:'start'});
- const toMMI=doc.createElement('button');toMMI.className='text-btn';toMMI.textContent='MMI 화면 ↓';toMMI.onclick=()=>shell.scrollIntoView({block:'start'});doc.querySelector('.ls-panel .panel-title').append(toMMI);
+ shell.querySelector('.mmi-ls-link').onclick=()=>{root.focus();$('lsDisplay').scrollIntoView({block:'start'});};
+ const toMMI=doc.createElement('button');toMMI.className='text-btn';toMMI.textContent='MMI 화면 ↓';toMMI.onclick=()=>root.SimWorkspace?.detached()?root.SimWorkspace.focusMMI():shell.scrollIntoView({block:'start'});doc.querySelector('.ls-panel .panel-title').append(toMMI);
  shell.appendChild(buildMenu());
  desktop=doc.createElement('div');desktop.className='mmi-desktop';desktop.id='mmiDesktop';
  desktop.innerHTML=brand();

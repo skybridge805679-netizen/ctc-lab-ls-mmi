@@ -3,7 +3,7 @@
 // Windows added from the real-MMI photos of 2026-10-22: [CA028_01] 온라인열차스케줄ID관리, [CA018_05] 진입예고열차정리,
 // [CF003_1] 열차위치추적, and the 시스템 조회 lists. Window layouts follow the photos; the behaviour behind them is the
 // simulator's own (the original screens were only photographed, never operated). Sample IDs/names are invented teaching data.
-const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const model=()=>root.SimDiagram.getModel(),mmi=()=>root.SimMMI;
 let host=null;

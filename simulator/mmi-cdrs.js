@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // CDRS 해소안 창: 경합 검지 → 해소안 제시 → [확인] 승인(스케줄 자동 변경) / [취소](수동 운전정리). 교통관제운영 2권 5장 2.3.
-const doc=document,$=id=>doc.getElementById(id),C=root.SimCDRS,T=root.SimTimetable,N=root.SimNetwork;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),C=root.SimCDRS,T=root.SimTimetable,N=root.SimNetwork;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nm=id=>N.catalog[id]?.name||id;
 let dismissed=[],plans=[],lastCount=0,timer=null;

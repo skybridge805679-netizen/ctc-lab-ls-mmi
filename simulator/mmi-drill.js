@@ -4,7 +4,7 @@
 // A temporary train B0000 is copied from a down train of the current timetable and sped up over a stretch so that it closes in on its leader.
 // The operator finds the conflict on the T/G and resolves it at the nearest upstream 해소역 by moving the time (+2분) and the
 // arrival/departure routes of B0000 there. Grading is not part of the real system; it only checks what the scenario text asks for.
-const doc=document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork,T=root.SimTimetable;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ID='B0000',OFFSET=240,SHIFTS=[50,100,150,150,150,100,50];
 const mmi=()=>root.SimMMI,D=()=>root.SimDiagram,model=()=>D().getModel();

@@ -4,7 +4,7 @@
 // 실기1 textbook (5장 4절, p.130-151): 화면모드(툴팁보기·십자선보기·돋보기·영역확대), Dia 보기(확대/축소, 역축/시간축 설정,
 // 열차정보보기옵션, 열차별 색상 및 선속성), 즐겨찾기(F9), 열차검색, 편집(복사·붙여넣기·생성·수정·노트). The icons whose functions were
 // never seen stay disabled. Kilometre-post values are not in the sources, so the crosshair shows time and station only.
-const doc=document,$=id=>doc.getElementById(id),D=()=>root.SimDiagram,T=()=>root.SimTimetable,N=()=>root.SimNetwork;
+const doc=SimDOM.document,$=id=>doc.getElementById(id),D=()=>root.SimDiagram,T=()=>root.SimTimetable,N=()=>root.SimNetwork;
 const SPANS=[10,15,30,60,120,180,360,720],ROWS=[12,16,20,26,32,44];
 const KINDS=['전동열차','일반열차','회송열차','KTX'];
 const FAV='orpheia.tg.favorite';
