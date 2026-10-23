@@ -14,6 +14,10 @@ const overlap={
   '1A-1T':{points:{},clearSignals:['4B'],note:'4B 출발신호기 해정 후 진행(오버랩 때문)',source:'실무5 영등포 1번 대피 대본 해설(1A 해정 후 4B 오버랩 해정)'}
  }
 };
-const api={approach,overlap,rulesFor:(station,route)=>overlap[station]?.[route]||null};
+// Simultaneous routes confirmed by the user's observation of the real LS.
+// This only permits shared switches in the same known position; shared track is still forbidden.
+const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}]};
+const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
+const api={approach,overlap,parallel,parallelFor,rulesFor:(station,route)=>overlap[station]?.[route]||null};
 if(typeof module!=='undefined')module.exports=api;else root.SimInterlocking=api;
 })(typeof window!=='undefined'?window:globalThis);

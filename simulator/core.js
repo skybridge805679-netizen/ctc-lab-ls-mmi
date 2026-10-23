@@ -83,7 +83,11 @@
    const badPoint=[...new Set([...(r.pointLocks||[]),...Object.keys(r.pointPositions||{})])].find(id=>(s.faults?.points||[]).includes(id));
    if(badPoint)return log(false,'진로 내 전환기 '+badPoint+'가 고장입니다.');
    if((r.pointLocks||[]).some(id=>s.blockedPoints.includes(id)))return log(false,'진로 내 전환기가 쇄정되어 있습니다.');
-   const conflict=Object.keys(s.routes).find(id=>routes[id].signal===r.signal||(routes[id].resources||[]).some(t=>(r.resources||[]).includes(t))||(routes[id].pointLocks||[]).some(t=>(r.pointLocks||[]).includes(t)));
+   const conflict=Object.keys(s.routes).find(id=>{
+    const other=routes[id],parallel=IL.parallelFor(config.id,id,a.id);
+    const pointConflict=(other.pointLocks||[]).some(pid=>(r.pointLocks||[]).includes(pid)&&(!parallel||!['N','R'].includes(r.pointPositions?.[pid])||r.pointPositions[pid]!==other.pointPositions?.[pid]));
+    return other.signal===r.signal||(other.resources||[]).some(t=>(r.resources||[]).includes(t))||pointConflict;
+   });
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');
    const ov=overlapOf(a.id);
    if(ov?.clearSignals){const open=Object.keys(s.routes).find(id=>ov.clearSignals.includes(routes[id].signal));if(open)return log(false,'오버랩 구간의 '+routes[open].signal+' 신호를 먼저 해정하세요. ('+ov.note+')');}

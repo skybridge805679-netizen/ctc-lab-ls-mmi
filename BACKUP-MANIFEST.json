@@ -1,6 +1,6 @@
 {
-  "version": "0.19.0",
-  "backupDate": "2026-10-22",
+  "version": "0.19.1",
+  "backupDate": "2026-10-23",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
     {
@@ -10,13 +10,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 28413,
-      "sha256": "e85f8252e234bb27f3d9d226ab240247dc297c553db2e724c4c8231afaf0962b"
+      "bytes": 28974,
+      "sha256": "cb43fcf713bc2b43304bde37eaf0eade3dfb0ede8049871303fe8c56a734be29"
     },
     {
       "path": "README.md",
-      "bytes": 10455,
-      "sha256": "e7159d85b830527f8ab3b67305eef33a5f418b6bde37f114939f6620839839af"
+      "bytes": 10813,
+      "sha256": "bdd4b2168ac15e8f7350f3540c4e5218a5c35db8885e7f482657b4c1f513ad28"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -97,6 +97,11 @@
       "path": "archive/CTC-LAB-v0.19.0.zip",
       "bytes": 9882555,
       "sha256": "e5758258b2d1a5ae06595327805f558f7f8073c2d74258e6a60708de9cad7747"
+    },
+    {
+      "path": "archive/CTC-LAB-v0.19.1.zip",
+      "bytes": 9885286,
+      "sha256": "5e13ef9e5371d9cee7e2f151191dad4f1771e0a367931da1f215c93910c34c7a"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -1449,6 +1454,11 @@
       "sha256": "0e3d1bbb856e0b1b8ea622d81f68c4c7f79f504eabd39dae7349c9a62d306383"
     },
     {
+      "path": "docs/preview-v0.19.1-anyang-parallel.png",
+      "bytes": 95507,
+      "sha256": "2d9703c51c78ef07a3693ae887341614616b852ba62e564e4addada241a362aa"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -1679,6 +1689,11 @@
       "sha256": "968b83c2bfcdd3ebf613cf2efdc9d352dad12bab3654bcd29a378571d1ec6e7b"
     },
     {
+      "path": "docs/v0.19.1-안양동시진로.md",
+      "bytes": 1958,
+      "sha256": "a60c50413daa6607eeabba209a8ec643497b65fc7c52de98f8d79713744c9878"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -1690,8 +1705,8 @@
     },
     {
       "path": "docs/구현현황.md",
-      "bytes": 8768,
-      "sha256": "3abdf5933cfed24a5d65394b2c965fa9bd21a9ca885411a04cb0bf0b143e3b65"
+      "bytes": 8948,
+      "sha256": "b76c4359e6e09b0b31bca461e91c42a9bc8823059e20b25daaadb2805136bafc"
     },
     {
       "path": "docs/데스크톱배선정리.md",
@@ -1760,18 +1775,23 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 6531,
-      "sha256": "d5387fec776147b114a14e9d8dba17d54798c98946b0d23a6a64b67cdfebe1ef"
+      "bytes": 6685,
+      "sha256": "39fe26bc5091dd47ac73fbacd8f22b123776b007a2cc23d47ad451fe67a2f233"
+    },
+    {
+      "path": "simulator/anyang-parallel.browser.test.py",
+      "bytes": 2264,
+      "sha256": "c46dcbbb24a224df76c1a5b6cffeb8c3c5f1b42c651beaa5a015b19dd9e9f221"
     },
     {
       "path": "simulator/anyang-routes.test.cjs",
-      "bytes": 2169,
-      "sha256": "aa72ee63f6c0918ff946ab5d47d9a19a7d091bcc951782dd7a26d19afd05987d"
+      "bytes": 5143,
+      "sha256": "991fe208f1a2474cac5274af55056efd643a11254df1a6211953e9a30e2785cc"
     },
     {
       "path": "simulator/app.js",
       "bytes": 27916,
-      "sha256": "505e88917107b1ae383f7693a7bfb8f5c4c34dc883aabd5b3bb4d02b7035244e"
+      "sha256": "cf92057d3c286e55f016e40b1eeb6f064d8d2b7112ab0d2987bcab3b9c67e65c"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -1975,8 +1995,8 @@
     },
     {
       "path": "simulator/core.js",
-      "bytes": 13993,
-      "sha256": "d8e3d65765bc6d5f3b7aa11f5cf8d480dfdcef4e4b4628daf086998b4c8eec37"
+      "bytes": 14223,
+      "sha256": "fc73a9d2b9d5cbe405cf3e07fc53e7b8cda26301ca204cf941759e59a2f09bdc"
     },
     {
       "path": "simulator/core.test.cjs",
@@ -2056,7 +2076,7 @@
     {
       "path": "simulator/index.html",
       "bytes": 21232,
-      "sha256": "ceaf972d3d1b18253321e46176f90f524a3aa66f75e1c217f44844bbb5516474"
+      "sha256": "51bd0d401ac8bf60ce80e1db9c0cbaa7fe8f8c8340b6890b65f210205245bc00"
     },
     {
       "path": "simulator/interlocking.browser.test.py",
@@ -2065,8 +2085,8 @@
     },
     {
       "path": "simulator/interlocking.js",
-      "bytes": 1233,
-      "sha256": "af4afecf1d4f79bb1ad8165428c2803e9e981448d55833495763da2b75f66fcd"
+      "bytes": 1717,
+      "sha256": "e1e53a3e09b073c50bc5d56744159775ef51dda01a39113aa050704c3db6897d"
     },
     {
       "path": "simulator/interlocking.test.cjs",
@@ -2455,8 +2475,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 22564,
-      "sha256": "9a79c1eea37089f272298110d28bc94f139632bb5e9df59c76860b1ac139c39a"
+      "bytes": 23286,
+      "sha256": "45c6143ad43fb6cc11f6310a8326bd156d2f3ebf0cac099113cb8e89748d5d5a"
     },
     {
       "path": "simulator/고증대조표.json",
