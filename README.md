@@ -1,10 +1,16 @@
 # CTC LAB — LS·MMI 관제 조작 연습
 
-매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.20.0: LS·MMI 별도 창과 동일 관제 세션 공유.**
+매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.21.0: M1 Mac·Windows 데스크톱 앱.**
 
-[v0.20.0 실행본 ZIP](archive/CTC-LAB-v0.20.0.zip)을 내려받아 압축을 풀어도 됩니다.
+[v0.21.0 브라우저 실행본 ZIP](archive/CTC-LAB-v0.21.0.zip)을 내려받아 압축을 풀어도 됩니다.
 
 **데스크톱 전용입니다. 모바일 레이아웃·모바일 검증은 제거했습니다.**
+
+## v0.21.0 데스크톱 프로그램
+
+**M1 Mac은 `mac-arm64.dmg`, Windows는 `win-x64.exe`**를 사용합니다. [설치 파일 다운로드](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/releases) · [빌드 상태](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/actions/workflows/desktop.yml)
+
+기존 기능과 디자인을 유지하며 오프라인으로 실행합니다. 앱 시작 시 LS·MMI가 각각 열리고 창 배치를 기억합니다. Node.js/Python 설치 없이 사용할 수 있습니다. **배포 서명·Apple 공증은 아직 없으며, 새 설치 파일은 두 운영체제의 자동 빌드 성공 후 게시됩니다.** [사용법·빌드·검증 범위](docs/v0.21.0-데스크톱앱.md)
 
 ## v0.20.0 LS·MMI 두 창
 
