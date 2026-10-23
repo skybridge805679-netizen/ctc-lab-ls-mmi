@@ -2,10 +2,6 @@
 
 매뉴얼과 교육장 배선도에 맞춰 LS와 MMI 조작을 반복 연습하는 프로그램입니다. **v0.21.0: M1 Mac·Windows 데스크톱 앱.**
 
-[v0.21.0 브라우저 실행본 ZIP](archive/CTC-LAB-v0.21.0.zip)을 내려받아 압축을 풀어도 됩니다.
-
-**데스크톱 전용입니다. 모바일 레이아웃·모바일 검증은 제거했습니다.**
-
 ## v0.21.0 데스크톱 프로그램
 
 **M1 Mac은 `mac-arm64.dmg`, Windows는 `win-x64.exe`**를 사용합니다. [설치 파일 다운로드](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/releases) · [빌드 상태](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/actions/workflows/desktop.yml)

@@ -9,7 +9,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "start": "electron .",
-    "test": "node --test desktop/*.test.cjs simulator/*.test.cjs",
+    "test": "node --test desktop/*.test.cjs simulator/engine/*.test.cjs simulator/ui/*.test.cjs",
     "test:desktop": "node desktop/smoke.cjs",
     "pack": "electron-builder --dir --publish never",
     "dist:mac": "electron-builder --mac --arm64 --publish never",
@@ -33,7 +33,9 @@
       "desktop/window-state.cjs",
       "desktop/resources/**",
       "simulator/**",
-      "!simulator/*.test.*",
+      "!simulator/**/*.test.*",
+      "!simulator/e2e/**",
+      "!simulator/engine/route-conflict-audit.cjs",
       "!simulator/*.md",
       "package.json"
     ],

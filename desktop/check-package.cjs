@@ -4,7 +4,7 @@ const asar=require('@electron/asar');
 const platform=process.platform;
 const resources=platform==='darwin'?path.join('dist','mac-arm64','ORPHEIA CTC LAB.app','Contents','Resources'):path.join('dist','win-unpacked','resources');
 const archive=path.join(resources,'app.asar');
-for(const file of ['desktop/main.cjs','desktop/window-state.cjs','simulator/index.html','simulator/workspace-dom.js','simulator/workspace-windows.js','simulator/core.js','simulator/assets/orpheia/emblem.png'])assert.ok(asar.extractFile(archive,path.normalize(file)).length,file);
+for(const file of ['desktop/main.cjs','desktop/window-state.cjs','simulator/index.html','simulator/ui/workspace-dom.js','simulator/ui/workspace-windows.js','simulator/engine/core.js','simulator/assets/orpheia/emblem.png'])assert.ok(asar.extractFile(archive,path.normalize(file)).length,file);
 assert.ok(!asar.listPackage(archive).some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')));
 const outputs=fs.readdirSync('dist').filter(f=>platform==='darwin'?/mac-arm64\.(dmg|zip)$/.test(f):/win-x64\.(exe|zip)$/.test(f));
 assert.equal(outputs.length,2,outputs);

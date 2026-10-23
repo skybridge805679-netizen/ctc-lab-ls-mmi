@@ -1,5 +1,5 @@
 // Writes docs/LS확인요청.md: per station, what is confirmed / presumed / unknown, for the user to check on the real LS.
-const fs=require('fs'),path=require('path'),Core=require('../simulator/core.js'),N=require('../simulator/network.js'),MENUS=require('../simulator/route-menus.js'),WG=require('../simulator/wings.js'),W=require('../simulator/wiring.js');
+const fs=require('fs'),path=require('path'),Core=require('../simulator/engine/core.js'),N=require('../simulator/engine/network.js'),MENUS=require('../simulator/engine/route-menus.js'),WG=require('../simulator/engine/wings.js'),W=require('../simulator/engine/wiring.js');
 const rule=(C,id)=>{const r=C.routes[id],s=C.signals[r.signal],d=r.destination,m=d.match(/^B(\d+)T/);if(s.kind==='장내')return !m;if(m){const even=(+m[1])%2===0;return s.dir===1?even:!even;}return /^(A1T|AT)$/.test(d);};
 const nat=(a,b)=>a.localeCompare(b,'en',{numeric:true});
 // User answers (same format as the transcribed lists), one file per answering session.

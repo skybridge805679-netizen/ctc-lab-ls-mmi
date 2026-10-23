@@ -1,7 +1,7 @@
 // Compares a hand-transcribed LS route-menu list (references/route-menus/*.txt) with the routes the simulator derives.
 // Usage: node tools/compare-route-menus.cjs [file]   — format: a station id line, then "<signal> - RT_<signal>_<dest>, ..." lines.
 const fs=require('fs'),path=require('path');
-const Core=require('../simulator/core.js');
+const Core=require('../simulator/engine/core.js');
 const file=process.argv[2]||path.join(__dirname,'../references/route-menus/ls-route-menus-transcribed.txt');
 const user={};let st=null;
 for(const l of fs.readFileSync(file,'utf8').split('\n').filter(Boolean)){

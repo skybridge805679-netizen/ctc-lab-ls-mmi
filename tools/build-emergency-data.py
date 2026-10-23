@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""references/extracted/emergency/*.txt (비상시 조치 평가 대본, hwp 추출문) -> simulator/emergency-data.js
+"""references/extracted/emergency/*.txt (비상시 조치 평가 대본, hwp 추출문) -> simulator/engine/emergency-data.js
 
 원문 문장은 고치지 않고 번호별 단계(제목 + 통화·지시 줄)로 나눈다. 시뮬레이터 쪽 조작·열차 배치는 simulator/emergency.js에서 따로 정의한다.
 """

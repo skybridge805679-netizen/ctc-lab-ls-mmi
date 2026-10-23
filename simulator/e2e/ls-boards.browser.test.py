@@ -1,0 +1,103 @@
+"""L/S 표지판(반투명·크기 조절)과 사진 모양의 진로 제어 팝업·제어 확인 상자 (Chromium)."""
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from threading import Thread
+from playwright.sync_api import sync_playwright, expect
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+class Quiet(SimpleHTTPRequestHandler):
+    def log_message(self, *_a):
+        pass
+
+
+def run(page, url):
+    errors = []
+    page.on('pageerror', lambda e: errors.append(str(e)))
+    page.goto(url, wait_until='networkidle')
+    page.evaluate("document.querySelector('#stationSelect').value='anyang';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
+    run_ = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
+    run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
+    # ---- 진로 제어 팝업: 제목 + RT_ 목록만, 신호기 옆에 뜸
+    page.locator('#lsStage [data-signal="4A"]').click()
+    dlg = page.locator('#actionDialog')
+    expect(dlg).to_have_attribute('data-variant', 'route')
+    expect(page.locator('#dialogTitle')).to_have_text('[ 진로 제어 ]')
+    assert page.locator('[data-route-choice]').all_inner_texts() == ['RT_4A_B984T', 'RT_4A_B660T'], page.locator('[data-route-choice]').all_inner_texts()
+    box = dlg.bounding_box(); sig = page.locator('#lsStage [data-signal="4A"]').bounding_box()
+    assert abs(box['x'] - sig['x']) < 120 and abs(box['y'] - sig['y']) < 120, (box, sig)      # near the signal, not centred
+    page.locator('[data-route-choice="4A-B660T"]').click()
+    assert page.evaluate("SimField.state('anyang').routes['4A-B660T']!==undefined")
+    # ---- 해정: 윈도 스타일 제어 확인 상자, Y 키로 [예]
+    page.locator('#lsStage [data-signal="4A"]').click()
+    expect(dlg).to_have_attribute('data-variant', 'confirm')
+    expect(page.locator('#dialogTitle')).to_have_text('제어 확인')
+    expect(dlg).to_contain_text('해정 하시겠습니까?')
+    expect(page.locator('#dialogConfirm')).to_have_text('예(Y)')
+    expect(dlg.locator('[value="cancel"]')).to_have_text('아니요(N)')
+    page.keyboard.press('n'); expect(dlg).not_to_be_visible()
+    assert page.evaluate("SimField.state('anyang').routes['4A-B660T']!==undefined")      # N keeps the route
+    page.locator('#lsStage [data-signal="4A"]').click(); page.keyboard.press('y')
+    page.wait_for_function("()=>SimField.state('anyang').routes['4A-B660T']===undefined")
+    # ---- L/S 표지판: 반투명, 제목줄 + 본문, 늘리고 줄임, 고정하면 조절 불가
+    run_({'type': 'lsOperation', 'operation': {'op': 'boardAdd', 'station': 'anyang', 'kind': '열간작업', 'text': '열간작업', 'x': 600, 'y': 300}, 'source': 'LS'})
+    board = page.locator('#lsStage [data-ls-board]').first
+    expect(board).to_be_visible()
+    assert float(board.locator('.bd-body').evaluate("e=>getComputedStyle(e).fillOpacity")) < 1          # 반투명
+    w0 = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0].w")
+    board.locator('[data-board-resize]').scroll_into_view_if_needed()
+    grip = board.locator('[data-board-resize]').bounding_box()
+    page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down()
+    page.mouse.move(grip['x'] + 160, grip['y'] + 70, steps=6); page.mouse.up()
+    b = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
+    assert b['w'] > w0 + 50 and b['h'] > 80, b
+    page.mouse.move(grip['x'] + 160 - 2, grip['y'] + 70 - 2)
+    page.locator('#lsStage [data-ls-board] [data-board-resize]').scroll_into_view_if_needed()
+    grip = page.locator('#lsStage [data-ls-board] [data-board-resize]').bounding_box()
+    page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down(); page.mouse.move(grip['x'] - 300, grip['y'] - 150, steps=6); page.mouse.up()
+    s = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
+    assert s['w'] >= 60 and s['h'] >= 30 and s['w'] < b['w'], s                                          # shrinks, never below the minimum
+    run_({'type': 'lsOperation', 'operation': {'op': 'boardFix', 'station': 'anyang', 'id': s['id'], 'fixed': True}, 'source': 'LS'})
+    expect(page.locator('#lsStage [data-ls-board] [data-board-resize]')).to_have_count(0)
+    # ---- 열차 점유 표시 (FTS): 열번창에 번호가 서 있는 궤도회로는 붉게, 번호가 움직이면 따라 움직임
+    occ = lambda: page.evaluate("[...document.querySelectorAll('#lsStage .train-occ')].map(e=>e.dataset.trainOccupied)")
+    ls = lambda o: page.evaluate("o=>SimMMI.run({type:'lsOperation',operation:o,source:'LS'})", o)
+    assert occ() == []
+    ls({'op': 'insert', 'station': 'anyang', 'slot': '5T', 'number': 'K1004', 'direction': 'up'})
+    assert occ() == ['5T'], occ()
+    uid = page.evaluate("SimLSUI.getModel().stations.anyang.windows['5T'][0].uid")
+    ls({'op': 'move', 'station': 'anyang', 'slot': '5T', 'uid': uid, 'targetStation': 'anyang', 'targetSlot': 'B981T'})
+    assert occ() == ['B981T'], occ()
+    page.evaluate("SimMMI.run({type:'lsOperation',operation:{op:'delete',station:'anyang',slot:'B981T',uid:SimLSUI.getModel().stations.anyang.windows['B981T'][0].uid},source:'LS'})")
+    assert occ() == []
+    # ---- 열차 진행에 따른 점유: 접근 → 진입(진로를 따라 붉은 구간이 이동) → 해정
+    page.evaluate("document.querySelector('#stationSelect').value='yongsan';document.querySelector('#stationSelect').dispatchEvent(new Event('change'))")
+    run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
+    run_({'type': 'approach', 'signal': '2A', 'present': True, 'source': 'LS'})
+    assert page.evaluate("[...document.querySelectorAll('#lsStage .train-occ')].map(e=>e.dataset.trainOccupied)") == ['접근 2A']
+    run_({'type': 'route', 'id': '2A-5T', 'source': 'LS'}); run_({'type': 'tick', 'seconds': 95})      # 접근쇄정은 신호를 정지한 경우에만 걸림: here the route is simply entered
+    run_({'type': 'occupy', 'id': '2A-5T', 'source': 'LS', 'seconds': 20})
+    run_({'type': 'tick', 'seconds': 3})
+    seg = lambda: page.evaluate("document.querySelector('#lsStage [data-train-run=\"2A-5T\"]')?.getAttribute('d')||''")
+    d1 = seg(); assert d1.startswith('M'), d1                                  # a red piece of the route, the rest stays green
+    assert page.evaluate("document.querySelectorAll('#lsStage [data-active-route=\"2A-5T\"]').length") == 1
+    run_({'type': 'tick', 'seconds': 8}); d2 = seg()
+    assert d2 and d2 != d1, (d1, d2)                                            # it moved with the clock
+    run_({'type': 'tick', 'seconds': 15}); d3 = seg(); assert d3 and d3 != d2
+    run_({'type': 'clear', 'id': '2A-5T', 'source': 'LS'})
+    assert seg() == ''
+    assert not errors, errors
+    print('ls boards and dialogs: ok')
+
+
+with sync_playwright() as p:
+    server = ThreadingHTTPServer(('127.0.0.1', 0), partial(Quiet, directory=str(ROOT)))
+    Thread(target=server.serve_forever, daemon=True).start()
+    browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
+    for width, height in [(1440, 1000), (1920, 1080)]:
+        page=browser.new_page(viewport={'width': width, 'height': height})
+        run(page, f'http://127.0.0.1:{server.server_port}/')
+        page.close()
+    browser.close(); server.shutdown()

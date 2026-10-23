@@ -24,8 +24,8 @@ if len(args) < 2:
 station, images = args[0], args[1:]
 
 known = json.loads(subprocess.check_output(['node', '-e', """
-const C=require('./simulator/core.js').forStation(process.argv[1]);
-const W=require('./simulator/wiring.js').data[process.argv[1]];
+const C=require('./simulator/engine/core.js').forStation(process.argv[1]);
+const W=require('./simulator/engine/wiring.js').data[process.argv[1]];
 const dests=new Set(Object.values(C.routes).map(r=>r.destination));
 for(const c of (W.cells||[]))dests.add(c[2]);
 console.log(JSON.stringify({signals:Object.keys(C.signals),routes:Object.keys(C.routes),dests:[...dests]}));""", station], cwd=ROOT, text=True))

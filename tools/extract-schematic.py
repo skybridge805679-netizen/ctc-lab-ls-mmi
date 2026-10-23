@@ -40,5 +40,5 @@ for page in [2,3,4]:
 with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
  for _ in pool.map(read_word,jobs):pass
 out={'source':'1.전체노선.pdf, pages 2–4','coordinateSystem':[2048,768],'pages':pages}
-(ROOT/'simulator/schematic-source.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+(ROOT/'simulator/engine/schematic-source.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
 print({p:(len(d['sections']),sum(bool(r['label']) for r in d['sections']),len(d['platforms'])) for p,d in pages.items()})
