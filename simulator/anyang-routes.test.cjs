@@ -23,7 +23,7 @@ assert.ok(R.options('anyang','departure').includes('4B_B660T'));
  assert.ok(c.dispatch(t,{type:'route',id:'4C-B660T',source:'x'}).ok);const both=c.dispatch(t,{type:'route',id:'4A-B984T',source:'x'});assert.ok(both.ok,both.message);
  assert.ok(t.routes['4C-B660T']&&t.routes['4A-B984T']);
  assert.ok(!c.dispatch(t,{type:'route',id:'4B-B984T',source:'x'}).ok,'same 2T track as 4A-B984T');
- {const w=c.initial();c.dispatch(w,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(w,{type:'route',id:'4B-B984T',source:'x'}).ok);assert.ok(!c.dispatch(w,{type:'route',id:'4C-B660T',source:'x'}).ok,'not whitelisted: still a conflict');}
+
  // opposite position of the same point still conflicts: 4A-B660T needs 53 reversed, 4C-B660T has it normal
  const u=c.initial();c.dispatch(u,{type:'mode',value:'CCM',source:'x'});assert.ok(c.dispatch(u,{type:'route',id:'4C-B660T',source:'x'}).ok);assert.ok(!c.dispatch(u,{type:'route',id:'4A-B660T',source:'x'}).ok);}
 console.log('anyang routes: ok');
