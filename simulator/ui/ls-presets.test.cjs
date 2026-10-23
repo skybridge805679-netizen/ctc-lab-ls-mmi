@@ -7,10 +7,10 @@ test('the corridor is a display preset between Uiwang and Suwon, retaining only 
  assert.equal(V.list().length,16);assert.equal(N.stations.filter(s=>s.controlled).length,15);
  const i=V.list().findIndex(v=>v.id==='uiwang');assert.deepEqual(V.list().slice(i,i+3).map(v=>v.id),['uiwang','uiwang-suwon','suwon']);assert.equal(V.get('uiwang-suwon').station,'uiwang');assert.equal(V.get('uiwang-suwon').monitor,true);
 });
-test('splitting Uiwang preserves every circuit, block number and train slot exactly once across both presets',()=>{
+test('split presets retain every train slot and block number; handoff circuits remain visible at Suwon',()=>{
  const all=view(''),main=view('uiwang'),corridor=view('uiwang-suwon');
  for(const name of ['data-train-slot','data-block-id','data-track-circuit']){
-  const original=attrs(all,name).filter(Boolean),a=attrs(main,name).filter(Boolean),b=attrs(corridor,name).filter(Boolean);
+  let original=attrs(all,name).filter(Boolean);const a=attrs(main,name).filter(Boolean),b=attrs(corridor,name).filter(Boolean);if(name==='data-track-circuit'){const handoff=require('./ls-corridor-source').handoffToSuwon,suwon=C.forStation('suwon'),v=LS.render(N.catalog.suwon,W.suwon,suwon,suwon.initial());for(const code of handoff)assert.ok(v.svg.includes('data-circuit-label="'+code+'"'),'Suwon retains '+code);original=original.filter(code=>!handoff.includes(code));}
   assert.deepEqual([...a,...b].sort(),original.sort(),name);assert.ok(!a.some(x=>b.includes(x)),name+' duplicated');
  }
  assert.ok(!main.svg.includes('성균관대'));assert.ok(!main.svg.includes('화서'));assert.ok(corridor.svg.includes('성균관대'));assert.ok(corridor.svg.includes('화서'));

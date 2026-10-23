@@ -277,8 +277,8 @@
       "path": "references/transcriptions/README.md",
       "original_name": "README.md",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 3271,
-      "sha256": "07ab5a27e3d2e3465721c6cd67a86339899a733973d4e6792c91022c0a52e688"
+      "bytes": 3821,
+      "sha256": "e494b039abe1f80e7d1946106a8370ac1f699b91e16074ffb6ebb275256e650d"
     },
     {
       "path": "references/transcriptions/intermediate-circuits.json",
@@ -411,6 +411,13 @@
       "note": "Derived transcription from the unchanged user-provided PPT.",
       "bytes": 128704,
       "sha256": "ad1b3439ad09ebfca8503ad5a0b32895e62ffc851528bea27db79f01f8b784c6"
+    },
+    {
+      "path": "references/transcriptions/corridor-layout.json",
+      "original_name": "corridor-layout.json",
+      "source": "Derived original PPT slide 18 geometry; original attachments preserved",
+      "bytes": 5424,
+      "sha256": "93e5d97dd3db7129b1dfcfb620e88fbd7e3e71664c52723149024df5b4eda6dc"
     }
   ],
   "superseded_attachments": [

@@ -71,6 +71,7 @@ function render(st,def,core,model,neighbours={}){
  if(prepared.corridor)model={...model,routes:{},approach:{},scenarioMotions:[]};
  const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor);
  const L=layout(def,wing,neighbours.aspect),T=L.pt;
+ const plateGap=prepared.corridor?128:94;
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -86,7 +87,7 @@ function render(st,def,core,model,neighbours={}){
  const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
   const [x,a]=T([p[0],p[1]]),[right,b]=T([p[2],p[3]]),mid=(p[0]+p[2])/2,central=!prepared.corridor&&p[3]-p[1]>=15&&mid>=Math.min(...coreXs)&&mid<=Math.max(...coreXs);
   const height=Math.max(8,Math.min(central?64:16,b-a));let y=(a+b-height)/2;
-  if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell)y=cell.y+((a+b)/2<cell.y?-28-height:28);}
+  if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell)y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}
   return {x,y,right,height,kind:p[4]};
  });
  // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
@@ -178,7 +179,7 @@ function render(st,def,core,model,neighbours={}){
  }
  // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
- for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),x=(a+b)/2,w=Math.max(b-a,plate.name.length*16+18);obstacles.push([x-w/2,Math.max(8,windowTop-94),x+w/2,Math.max(8,windowTop-94)+25]);}
+ for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),x=(a+b)/2,w=Math.max(b-a,plate.name.length*16+18);obstacles.push([x-w/2,Math.max(8,windowTop-plateGap),x+w/2,Math.max(8,windowTop-plateGap)+25]);}
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  const windowLanes=new Map();for(const b of windowBoxes.filter(b=>!b.inline)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  for(const lane of windowLanes.values()){
@@ -283,7 +284,7 @@ function render(st,def,core,model,neighbours={}){
  for(const plate of wing.plates){
   const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),x=(left+right)/2,width=Math.max(right-left,plate.name.length*16+18);
   // Station names have their own upper band; train-number windows stay on straight row baselines.
-  const y=Math.max(8,topRow-94);
+  const y=Math.max(8,topRow-plateGap);
   plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
   occupiedBoxes.push([x-width/2-3,y-4,x+width/2+3,y+36]);
  }

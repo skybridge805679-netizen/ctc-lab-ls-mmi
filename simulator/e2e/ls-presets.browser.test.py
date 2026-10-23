@@ -30,8 +30,12 @@ try:
   page.click('#nextStation');expect(page.locator('#trackSvg')).to_contain_text('K252');page.click('#nextStation');expect(page.locator('#lsStationSelect')).to_have_value('suwon');page.click('#previousStation');expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon')
   # Re-applying preferred screens must keep the new preset and current selection.
   page.evaluate('SimPreferred.apply()');expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon')
-  for width,height in [(1440,1000),(960,720)]:
+  for width,height in [(1920,1080),(1440,1000),(960,720)]:
    page.set_viewport_size({'width':width,'height':height});page.wait_for_timeout(200);expect(page.locator('#trackSvg')).to_contain_text('K252');expect(page.locator('#trackSvg')).to_contain_text('화서')
    assert page.locator('[data-train-slot="B1022T"]').is_visible()
+   plates=page.locator('#trackSvg').evaluate("svg=>{const box=svg.getBoundingClientRect();return [...svg.querySelectorAll('.inter-station .plate')].map(e=>{const r=e.getBoundingClientRect();return {center:(r.x+r.width/2-box.x)/box.width,width:r.width/box.width,left:(r.x-box.x)/box.width,right:(r.right-box.x)/box.width}})}")
+   assert .33<plates[0]['center']<.38 and .82<plates[1]['center']<.88,(width,plates)
+   assert all(.07<r['width']<.11 for r in plates),(width,plates)
+   assert plates[1]['left']-plates[0]['right']>.38,(width,plates)
   assert not errors,errors;browser.close();print('PASS 16 LS views / 15 control stations, Uiwang–Suwon navigation, passive monitor controls and shared live train state, preferred screens and corridor resizing')
 finally:server.shutdown()
