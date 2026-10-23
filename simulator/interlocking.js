@@ -15,7 +15,7 @@ const overlap={
  }
 };
 // Simultaneous routes confirmed by the user's observation of the real LS.
-// This only permits shared switches in the same known position; shared track is still forbidden.
+// This is a regression observation for the generic shared-N rule, not a route-pair exception.
 const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}]};
 const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
 const api={approach,overlap,parallel,parallelFor,rulesFor:(station,route)=>overlap[station]?.[route]||null};

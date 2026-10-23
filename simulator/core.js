@@ -84,8 +84,10 @@
    if(badPoint)return log(false,'진로 내 전환기 '+badPoint+'가 고장입니다.');
    if((r.pointLocks||[]).some(id=>s.blockedPoints.includes(id)))return log(false,'진로 내 전환기가 쇄정되어 있습니다.');
    const conflict=Object.keys(s.routes).find(id=>{
-    const other=routes[id],parallel=IL.parallelFor(config.id,id,a.id);
-    const pointConflict=(other.pointLocks||[]).some(pid=>(r.pointLocks||[]).includes(pid)&&(!parallel||!['N','R'].includes(r.pointPositions?.[pid])||r.pointPositions[pid]!==other.pointPositions?.[pid]));
+    const other=routes[id];
+    // A switch group may serve independent straight tracks in N. Holding N twice is not movement.
+    // Shared reverse/unknown requirements remain exclusive; track and overlap conflicts are checked separately.
+    const pointConflict=(other.pointLocks||[]).some(pid=>(r.pointLocks||[]).includes(pid)&&!(r.pointPositions?.[pid]==='N'&&other.pointPositions?.[pid]==='N'));
     return other.signal===r.signal||(other.resources||[]).some(t=>(r.resources||[]).includes(t))||pointConflict;
    });
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');

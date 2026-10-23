@@ -41,7 +41,7 @@ for(const order of [['4C-B660T','4A-B984T'],['4A-B984T','4C-B660T']]){
  assert(preserved.every(p=>t.occupied[p]==='4A-B984T'));assert(t.routes['4A-B984T'].occupied);
 }
 console.log('PASS observed Anyang parallel routes: both orders, independent occupancy/release and shared switch protection');
-// The observed pair is not a blanket bypass: changed/unknown point positions and
+// Shared normal locking is not a blanket bypass: changed/unknown point positions and
 // shared track still fail closed if future geometry data changes.
 for(const kind of ['opposite-position','unknown-position','shared-track']){
  const first=c.routes['4C-B660T'],second=c.routes['4A-B984T'],savedPositions=second.pointPositions,savedResources=second.resources;
@@ -54,4 +54,4 @@ for(const kind of ['opposite-position','unknown-position','shared-track']){
  }finally{second.pointPositions=savedPositions;second.resources=savedResources;}
 }
 {const t=c.initial();for(const id of ['4C-B660T','4A-B984T'])assert(c.dispatch(t,{type:'route',id,auto:true}).ok,'AUTO uses the same observed compatibility');}
-console.log('PASS compatibility remains scoped to the observed pair, matching known point positions and disjoint track');
+console.log('PASS shared normal locking still rejects opposite/unknown point positions and shared track');

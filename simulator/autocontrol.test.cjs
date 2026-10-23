@@ -36,8 +36,8 @@ const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',
 // 3) a route that cannot be set becomes a trouble and is retried until the condition clears
 {const model=T.initial(),states=fresh(),a=make();
  const st='seoul',c=Core.forStation(st);
- // block the arrival route of K1131 at 서울 with a conflicting manual route
- c.dispatch(states[st],{type:'mode',value:'CCM',source:'x'});const blocker='2B-2T';const r=c.dispatch(states[st],{type:'route',id:blocker,source:'x'});assert.ok(r.ok,r.message);c.dispatch(states[st],{type:'mode',value:'AUTO',source:'x'});
+ // Block the departure route of K1131 at 서울 with a route sharing its eastbound track.
+ c.dispatch(states[st],{type:'mode',value:'CCM',source:'x'});const blocker='4B-B902T';const r=c.dispatch(states[st],{type:'route',id:blocker,source:'x'});assert.ok(r.ok,r.message);c.dispatch(states[st],{type:'mode',value:'AUTO',source:'x'});
  let troubled=false,resolved=false;
  for(let t=0;t<4000;t+=5){tick(states,5);if(t===1500){/* keep blocker until K1141 is due */}
   for(const e of a.run({states,model})){if(e.type==='trouble'&&e.station===st)troubled=true;}
