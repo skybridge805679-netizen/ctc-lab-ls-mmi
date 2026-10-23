@@ -1,11 +1,10 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const asar=require('@electron/asar');
+const {verifyArchive}=require('./package-audit.cjs');
 const platform=process.platform;
 const resources=platform==='darwin'?path.join('dist','mac-arm64','ORPHEIA CTC LAB.app','Contents','Resources'):path.join('dist','win-unpacked','resources');
 const archive=path.join(resources,'app.asar');
-for(const file of ['desktop/main.cjs','desktop/window-state.cjs','simulator/index.html','simulator/workspace-dom.js','simulator/workspace-windows.js','simulator/core.js','simulator/assets/orpheia/emblem.png'])assert.ok(asar.extractFile(archive,file).length,file);
-assert.ok(!asar.listPackage(archive).some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')));
+const checked=verifyArchive(archive);
 const outputs=fs.readdirSync('dist').filter(f=>platform==='darwin'?/mac-arm64\.(dmg|zip)$/.test(f):/win-x64\.(exe|zip)$/.test(f));
 assert.equal(outputs.length,2,outputs);
-console.log('PASS bundled app, local UI/assets and both deliverables:',outputs.join(', '));
+console.log(`PASS ${checked} bundled files match source bytes, including all runtime assets; both deliverables:`,outputs.join(', '));
