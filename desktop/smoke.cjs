@@ -2,6 +2,7 @@
 const {_electron:electron}=require('playwright');
 const {expect}=require('@playwright/test');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict');
+const {fitWindow}=require('./window-state.cjs');
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-native-'));
 let application;const errors=[];
 (async()=>{
@@ -24,13 +25,24 @@ let application;const errors=[];
  await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');
  await ls.waitForFunction(()=>SimField.state('suwon').mode==='CCM');
  await ls.evaluate(()=>SimMMI.open('graph'));await expect(mmi.locator('#diaSvg')).toBeVisible();
- // Window geometry uses native APIs; minimum dimensions and restoration survive close.
- const saved=await application.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI'));w.unmaximize();w.setBounds({x:30,y:40,width:1200,height:800});return w.getNormalBounds();});
+ // A restored window must fit the current monitor, including small CI displays.
+ await application.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI'));w.unmaximize();w.setBounds({x:30,y:40,width:1200,height:800},false);});
+ // Native resize delivery is asynchronous on macOS. Read after the OS reports it.
+ await expect.poll(()=>application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI')).isMaximized())).toBe(false);
+ const saved=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI')).getNormalBounds());
  await mmi.close();await expect(ls.locator('#mmiShell')).toBeVisible();await expect(ls.locator('.mmi-alarm')).toBeVisible();
  await ls.click('#detachMMIBtn');await ls.waitForFunction(()=>SimWorkspace.detached());
  mmi=application.windows().find(p=>p!==ls);await expect(mmi.locator('#mmiShell')).toBeVisible();
- const current=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI')).getNormalBounds());
- assert.equal(current.width,saved.width);assert.equal(current.height,saved.height);
+ const area=await application.evaluate(({screen},bounds)=>screen.getDisplayMatching(bounds).workArea,saved);
+ const expected=fitWindow(saved,area,'mmi');
+ console.log('Native geometry:',JSON.stringify({saved,area,expected}));
+ // Native window-frame conversion can round by one or two DIP. A 100px loss still fails.
+ await expect.poll(async()=>{
+  const current=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI')).getNormalBounds());
+  return Math.max(Math.abs(current.width-expected.width),Math.abs(current.height-expected.height));
+ }).toBeLessThanOrEqual(2);
+ const persisted=JSON.parse(fs.readFileSync(path.join(profile,'window-layout.json'),'utf8'));
+ assert.ok(persisted.mmi,'native geometry was persisted');
  assert.deepEqual(errors,[]);
  fs.mkdirSync('test-results',{recursive:true});await ls.screenshot({path:'test-results/desktop-ls.png'});await mmi.screenshot({path:'test-results/desktop-mmi.png'});
  console.log(`PASS native Electron ${process.platform}/${process.arch}: automatic LS/MMI, shared control/graph, MMI alarm with LS operation, sandbox, close/reopen and native layout`);

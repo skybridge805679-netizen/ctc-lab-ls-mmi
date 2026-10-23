@@ -2,7 +2,7 @@
 const {app,BrowserWindow,Menu,screen,dialog,session}=require('electron');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
-const {fitBounds,readState,writeState}=require('./window-state.cjs');
+const {fitWindow,readState,writeState}=require('./window-state.cjs');
 // Renderers load only our bundled simulator, with no Node or privileged IPC bridge.
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
@@ -26,7 +26,7 @@ else{
 function savedBounds(role){
  const displays=screen.getAllDisplays(),saved=layout[role];
  const display=saved?.bounds?screen.getDisplayMatching(saved.bounds):(role==='mmi'?(displays.find(d=>d.id!==screen.getPrimaryDisplay().id)||screen.getPrimaryDisplay()):screen.getPrimaryDisplay());
- return fitBounds(saved?.bounds,display.workArea);
+ return fitWindow(saved?.bounds,display.workArea,role);
 }
 function remember(win,role){
  const save=()=>{
@@ -46,11 +46,11 @@ function protect(win){
  });
 }
 function createLS(){
- ls=new BrowserWindow({...savedBounds('ls'),minWidth:1000,minHeight:700,show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
+ ls=new BrowserWindow({...savedBounds('ls'),show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
  remember(ls,'ls');protect(ls);
  ls.webContents.setWindowOpenHandler(({url,frameName})=>{
   if(url!=='about:blank'||!frameName.startsWith('orpheia-mmi-')||mmi)return {action:'deny'};
-  return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),minWidth:1100,minHeight:700,title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
+  return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
  });
  ls.webContents.on('did-create-window',child=>{
   mmi=child;remember(child,'mmi');protect(child);

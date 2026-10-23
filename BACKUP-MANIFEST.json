@@ -15,8 +15,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 36872,
-      "sha256": "bd4c91ae70550e0b8cd1609b4d91734e3236a9359545b70c9820ac717ca633cc"
+      "bytes": 37186,
+      "sha256": "4a1bbdd6d8147136d37085f6c6e22affbecb193fb388c3936db5ba8f9a1f3869"
     },
     {
       "path": "README.md",
@@ -135,8 +135,8 @@
     },
     {
       "path": "archive/CTC-LAB-v0.21.0.zip",
-      "bytes": 9926632,
-      "sha256": "370476683d18f2d6a299217f55bf6ce089856c22b1ac2a8f8a8344608897611a"
+      "bytes": 9926761,
+      "sha256": "ad8488ff2a98e37317c758f4d493678ebc2d9a744915fad2ff13289a107ada63"
     },
     {
       "path": "archive/CTC-LAB-v0.3.zip",
@@ -195,8 +195,8 @@
     },
     {
       "path": "desktop/main.cjs",
-      "bytes": 5530,
-      "sha256": "39cb6ae42ce9a95014008beee808631cf0b6e511a27c31dea0d0a8f698ea38e3"
+      "bytes": 5479,
+      "sha256": "8b127c43bc7750fa4c0cd78ee93b6401f354ecd772163f6d89fcf068d6d81709"
     },
     {
       "path": "desktop/release-notes.md",
@@ -215,18 +215,18 @@
     },
     {
       "path": "desktop/smoke.cjs",
-      "bytes": 3777,
-      "sha256": "0b8967a2eb81489a6bbc4afa8e5b986f8273c0ddb5d4276f3b2541cfcd141448"
+      "bytes": 4720,
+      "sha256": "a471dbeac7a52dad6506cba78770cac60fb35f8e1279854f0cd145cb835c0874"
     },
     {
       "path": "desktop/window-state.cjs",
-      "bytes": 1102,
-      "sha256": "170f16e0237501081d3a35a737213a895dc8be3c6ef8066a6da2515516afb430"
+      "bytes": 1386,
+      "sha256": "e785853479a9d9d8d0a4c703df0d344d7abf9f284289e55e9ab00dcb875c7aca"
     },
     {
       "path": "desktop/window-state.test.cjs",
-      "bytes": 1372,
-      "sha256": "a3eefce8a849507af8669eddd66ab78280d333c4007b9b29aca1630764cff482"
+      "bytes": 2146,
+      "sha256": "f90b5fbe1ff9ba5ce4f5a77de2ebaee0265d0440f9263fceb03aba0a23184cf1"
     },
     {
       "path": "docs/LS재작성.md",
@@ -1830,8 +1830,8 @@
     },
     {
       "path": "docs/v0.21.0-데스크톱앱.md",
-      "bytes": 5490,
-      "sha256": "1221d74aa72d8be508caea102a171d6eb4a6b2a87b8ad67af8f029aa8ad6b91d"
+      "bytes": 6756,
+      "sha256": "5cbdf18fb85e49664000c3c39601d62239ee25102c3d748798ef488c969b27cd"
     },
     {
       "path": "docs/개발로드맵.md",
@@ -2720,8 +2720,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 28470,
-      "sha256": "e80bb3d9544ff50b09d10ba6c64279efd020b70e7da736fde114cb723b9e452b"
+      "bytes": 28793,
+      "sha256": "a97d710889b4b95f1baecc4ac01915a19eddf47633546c89bbc65c99e5aa36b4"
     },
     {
       "path": "simulator/고증대조표.json",
