@@ -12,13 +12,15 @@ function assetFiles(root,relative='simulator/assets'){
  });
 }
 function verifyArchive(archive,{sourceRoot=path.join(__dirname,'..'),files}={}){
- const required=files||['desktop/main.cjs','desktop/window-state.cjs','simulator/index.html','simulator/workspace-dom.js','simulator/workspace-windows.js','simulator/core.js',...assetFiles(sourceRoot)];
+ const entry=files?'':fs.readFileSync(path.join(sourceRoot,'simulator/index.html'),'utf8');
+ const entriesFromHTML=[...entry.matchAll(/(?:src|href)="((?:engine|ui)\/[^"?#]+)"/g)].map(m=>'simulator/'+m[1]);
+ const required=files||[...new Set(['desktop/main.cjs','desktop/window-state.cjs','simulator/index.html',...entriesFromHTML,...assetFiles(sourceRoot)])];
  for(const file of required){
   const actual=asar.extractFile(archive,nativeArchivePath(file));
   assert.deepEqual(actual,fs.readFileSync(path.join(sourceRoot,nativeArchivePath(file))),`packaged file differs: ${file}`);
  }
  const entries=asar.listPackage(archive).map(portableArchivePath);
- assert.ok(!entries.some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')),'reference archive or test runtime included');
+ assert.ok(!entries.some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')||f.startsWith('/simulator/e2e/')||/\.test\.(?:cjs|js|py)$/.test(f)),'reference archive or test runtime included');
  return required.length;
 }
 module.exports={nativeArchivePath,portableArchivePath,verifyArchive};

@@ -1,7 +1,7 @@
 // Writes a DRAFT LS route-menu list for the stations that have no verified list yet.
 // Arrival/departure signals use the rule induced from the verified stations (see docs/진로목록-원본대조.md);
 // shunting signals list every route the wiring allows (candidates: delete the ones the real LS does not offer).
-const fs=require('fs'),path=require('path'),Core=require('../simulator/core.js'),N=require('../simulator/network.js'),MENUS=require('../simulator/route-menus.js');
+const fs=require('fs'),path=require('path'),Core=require('../simulator/engine/core.js'),N=require('../simulator/engine/network.js'),MENUS=require('../simulator/engine/route-menus.js');
 function mainRule(C,id){const r=C.routes[id],s=C.signals[r.signal],d=r.destination,m=d.match(/^B(\d+)T/);
  if(s.kind==='장내')return !m;if(m){const even=(+m[1])%2===0;return s.dir===1?even:!even;}return /^(A1T|AT)$/.test(d);}
 const nat=(a,b)=>a.localeCompare(b,'en',{numeric:true});

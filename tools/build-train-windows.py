@@ -6,7 +6,7 @@ from PIL import Image,ImageOps
 from scipy.ndimage import label,find_objects,minimum_filter,maximum_filter,minimum_filter1d,maximum_filter1d
 import numpy as np, subprocess, json, tempfile, concurrent.futures, difflib, os, sys
 ROOT=Path(__file__).resolve().parents[1]
-known=json.loads(subprocess.check_output(['node','-e',"const N=require('./simulator/network'),L=require('./simulator/ls-view');console.log(JSON.stringify(N.stations.filter(s=>s.controlled).map(s=>({id:s.id,slide:s.slide,codes:[...new Set(L.sceneOf(s).cells.map(c=>c[3].replaceAll(' · ',''))).values()]}))))"],cwd=ROOT,text=True))
+known=json.loads(subprocess.check_output(['node','-e',"const N=require('./simulator/engine/network'),L=require('./simulator/ui/ls-view');console.log(JSON.stringify(N.stations.filter(s=>s.controlled).map(s=>({id:s.id,slide:s.slide,codes:[...new Set(L.sceneOf(s).cells.map(c=>c[3].replaceAll(' · ',''))).values()]}))))"],cwd=ROOT,text=True))
 slides={s['slide']:s['id'] for s in known};slides.update({13:'anyang',16:'gunpo',18:'uiwang'})
 allcodes=set(c for s in known for c in s['codes'] if c)
 jobs=[]
@@ -57,6 +57,6 @@ for r in records:
  data[r['station']].append({k:r[k] for k in ['slot','code','side','fraction','slide','sourceWindow']+(['anchorCode'] if 'anchorCode' in r else [])})
 out={'source':'references/diagrams/배선도(관제교육장).pptx','notes':'Includes detached and on-rail train-number windows. Original coordinates/OCR and reviewed code/row corrections are retained. anchorCode maps source-edition boundary labels to current PDF geometry. Runtime uses SVG.','windows':records}
 (ROOT/'references/transcriptions/train-windows.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
-(ROOT/'simulator/train-windows.js').write_text("(function(root){'use strict';\n// Reviewed PPT train-number windows; source coordinates in references/transcriptions/train-windows.json.\nconst data="+json.dumps(data,ensure_ascii=False,separators=(',',':'))+";\nconst api={data};if(typeof module!=='undefined')module.exports=api;else root.SimTrainWindows=api;\n})(typeof window!=='undefined'?window:globalThis);\n")
+(ROOT/'simulator/engine/train-windows.js').write_text("(function(root){'use strict';\n// Reviewed PPT train-number windows; source coordinates in references/transcriptions/train-windows.json.\nconst data="+json.dumps(data,ensure_ascii=False,separators=(',',':'))+";\nconst api={data};if(typeof module!=='undefined')module.exports=api;else root.SimTrainWindows=api;\n})(typeof window!=='undefined'?window:globalThis);\n")
 for r in records:print(r['station'],r['slide'],r['sourceWindow'],r['candidate'],'=>',r['code'],r['side'],r['fraction'])
 print('Extracted',len(records))

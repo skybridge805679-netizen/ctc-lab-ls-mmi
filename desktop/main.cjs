@@ -7,7 +7,7 @@ const {fitWindow,readState,writeState}=require('./window-state.cjs');
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false};
-let ls=null,mmi=null,stateFile,layout={},quitting=false;
+let ls=null,mmi=null,graph=null,stateFile,layout={},quitting=false;
 if(process.argv.includes('--orpheia-smoke-test')&&process.env.ORPHEIA_TEST_USER_DATA)app.setPath('userData',process.env.ORPHEIA_TEST_USER_DATA);
 const single=app.requestSingleInstanceLock();
 if(!single)app.quit();
@@ -25,7 +25,7 @@ else{
 }
 function savedBounds(role){
  const displays=screen.getAllDisplays(),saved=layout[role];
- const display=saved?.bounds?screen.getDisplayMatching(saved.bounds):(role==='mmi'?(displays.find(d=>d.id!==screen.getPrimaryDisplay().id)||screen.getPrimaryDisplay()):screen.getPrimaryDisplay());
+ const display=saved?.bounds?screen.getDisplayMatching(saved.bounds):(role!=='ls'?(displays.find(d=>d.id!==screen.getPrimaryDisplay().id)||screen.getPrimaryDisplay()):screen.getPrimaryDisplay());
  return fitWindow(saved?.bounds,display.workArea,role);
 }
 function remember(win,role){
@@ -49,13 +49,17 @@ function createLS(){
  ls=new BrowserWindow({...savedBounds('ls'),show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
  remember(ls,'ls');protect(ls);
  ls.webContents.setWindowOpenHandler(({url,frameName})=>{
-  if(url!=='about:blank'||!frameName.startsWith('orpheia-mmi-')||mmi)return {action:'deny'};
-  return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
+  if(url!=='about:blank')return {action:'deny'};
+  if(frameName.startsWith('orpheia-mmi-')&&!mmi)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-tg-')&&!graph)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('graph'),title:'ORPHEIA · 열차 그래프',backgroundColor:'#1e1e1e',autoHideMenuBar:true,webPreferences:prefs}};
+  return {action:'deny'};
  });
- ls.webContents.on('did-create-window',child=>{
-  mmi=child;remember(child,'mmi');protect(child);
+ ls.webContents.on('did-create-window',(child,{frameName})=>{
+  const isGraph=frameName.startsWith('orpheia-tg-');
+  if(isGraph)graph=child;else mmi=child;
+  remember(child,isGraph?'graph':'mmi');protect(child);
   child.webContents.setWindowOpenHandler(()=>({action:'deny'}));
-  child.on('closed',()=>{if(mmi===child)mmi=null;});
+  child.on('closed',()=>{if(mmi===child)mmi=null;if(graph===child)graph=null;});
  });
  ls.once('ready-to-show',()=>ls?.show());
  ls.webContents.on('did-finish-load',()=>{
@@ -63,7 +67,7 @@ function createLS(){
   // Native same-origin window.open keeps the live MMI DOM and single engine.
   ls.webContents.executeJavaScript('window.SimWorkspace.detach()',true).catch(error=>console.error('MMI 분리 실패:',error.message));
  });
- ls.on('closed',()=>{ls=null;if(mmi&&!mmi.isDestroyed())mmi.close();});
+ ls.on('closed',()=>{ls=null;for(const w of [mmi,graph])if(w&&!w.isDestroyed())w.close();});
  ls.loadURL(entryURL);
 }
 function script(code){if(ls&&!ls.isDestroyed())ls.webContents.executeJavaScript(code,true).catch(error=>console.error(error.message));}
@@ -71,7 +75,7 @@ function installMenu(){
  const workspace={label:'실습 화면',submenu:[
   {label:'LS 창으로',accelerator:'CmdOrCtrl+1',click:()=>{ls?.show();ls?.focus();}},
   {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
-  {label:'한 화면으로 합치기',click:()=>script('window.SimWorkspace.restore()')},
+  {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
   {type:'separator'},
   {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script('document.getElementById("exportBtn").click()')},
   {role:'togglefullscreen',label:'전체 화면'}
