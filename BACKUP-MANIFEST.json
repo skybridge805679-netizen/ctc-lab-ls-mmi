@@ -1,5 +1,5 @@
 {
-  "version": "0.24.0",
+  "version": "0.25.0",
   "backupDate": "2026-10-23",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 41401,
-      "sha256": "1f8e721abcdadc5e3afcfe262420ac5dee2c970e518ac77991d586c3573e6c82"
+      "bytes": 41876,
+      "sha256": "7fb155c13472f5c2516deb297da8b09bb126a5dad990d9784704665b9675eb1d"
     },
     {
       "path": "README.md",
-      "bytes": 14658,
-      "sha256": "a364fc062ab5e065c0d3c0f1df21f3138a2728efdd1e895baa552d5ecae88ec8"
+      "bytes": 15239,
+      "sha256": "cfe57add2a2b2243dd94f7a95f8fa0179f45fb16bbe0d55770d20bc867ee25f8"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -154,6 +154,11 @@
       "sha256": "b384c43853b4477f34f3d61cb4895f80dccefbb37c70019719c36f696de42e02"
     },
     {
+      "path": "archive/CTC-LAB-v0.25.0.zip",
+      "bytes": 9976993,
+      "sha256": "2fa3e7971d2433f78f47a99e38f0188d5294aa7b2253f747fd2b031820f038cc"
+    },
+    {
       "path": "archive/CTC-LAB-v0.3.zip",
       "bytes": 59222,
       "sha256": "53201b52f258f30aa3c335ab67e230ac1afe6b2a0379fa5fca70e9e9388dd55a"
@@ -239,9 +244,14 @@
       "sha256": "ba25bc3b8e6f79937424b43ffee171543562d93a7cb5ea8fc854faff127e4adc"
     },
     {
+      "path": "desktop/ls-windows-smoke.cjs",
+      "bytes": 4215,
+      "sha256": "91ea575b782cea01beb5156aafb40298299bb1d1cecb3283d0573dc870470f13"
+    },
+    {
       "path": "desktop/main.cjs",
-      "bytes": 9506,
-      "sha256": "fbd9ab87e2d956819b5a0221a7a641301aeb63c8eab355ce9b3865cf98882c9f"
+      "bytes": 10721,
+      "sha256": "681f52de63918ec52b8788538d6f58fc1cd547563926d8a9fb708120904996ed"
     },
     {
       "path": "desktop/package-audit.cjs",
@@ -255,13 +265,13 @@
     },
     {
       "path": "desktop/preload.cjs",
-      "bytes": 220,
-      "sha256": "5dfd4c49ed2bf8ab86237ac9164c7dde0bf26314c9a05ce76305ddb9de46f80f"
+      "bytes": 293,
+      "sha256": "a7bd14213f3ff256205a9031bf70435283e4d05891caa6ff04999a5e52774ee9"
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 2805,
-      "sha256": "32a964f166bb90b596d5e59ff8cee6575a9c8d7b62dfe466222e1a510d0d313e"
+      "bytes": 3350,
+      "sha256": "219560c36bf0a4a3454f1c5b98941677c45e94ccee6f513de3506d0286b29c7e"
     },
     {
       "path": "desktop/resources/icon.ico",
@@ -290,13 +300,13 @@
     },
     {
       "path": "desktop/window-state.cjs",
-      "bytes": 1417,
-      "sha256": "1e13308ee0e6208bd20f39f539a182dd2efb4b2e75912e5d47fdc52d96fc928a"
+      "bytes": 1452,
+      "sha256": "3d89f3ca669da790be4d4107b68d917e8359b3ae74ef44747ca173435d4b184b"
     },
     {
       "path": "desktop/window-state.test.cjs",
-      "bytes": 2146,
-      "sha256": "e7ffca5f8a9e5686cd296ef264eb4a05ec2aca4d0e3b159d69a01cf76532817b"
+      "bytes": 2427,
+      "sha256": "78e2b4e3756e0ac6c3ea70b43d2926192e067d48453b4971c772cfc05069cb0a"
     },
     {
       "path": "docs/LS재작성.md",
@@ -1649,6 +1659,16 @@
       "sha256": "80f684b074cc5082c494019bb982d33cd4e41ede14fe08ccdbeee54219ca4be4"
     },
     {
+      "path": "docs/preview-v0.25.0-all-stations.jpg",
+      "bytes": 597299,
+      "sha256": "5693d3499673c997dc5af053fd78a7f9bc1d255c317e2e45b0d1ef03e18c9a9b"
+    },
+    {
+      "path": "docs/preview-v0.25.0-two-ls.png",
+      "bytes": 144454,
+      "sha256": "f356a703139cbf8e9b2375645165ff24c84849daee7d9b25c4ceb2021acd4bb1"
+    },
+    {
       "path": "docs/preview-v0.3.png",
       "bytes": 82098,
       "sha256": "53bf06adda79e6002a894a85d7784031d6b32a0f5688c9d244bd440a6280a1b2"
@@ -1939,6 +1959,11 @@
       "sha256": "4cf1cdeb90992b9c3c6357f02e9f15c190cfcba2e82bc990d61dee03c1fbd982"
     },
     {
+      "path": "docs/v0.25.0-LS연속화면.md",
+      "bytes": 4309,
+      "sha256": "cfb50c06abee9258825faa124430f9471ca73b09256c9e387f4065a959a3bd11"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -1950,8 +1975,8 @@
     },
     {
       "path": "docs/구조-엔진과-화면.md",
-      "bytes": 2955,
-      "sha256": "84779bd13484346af6869cc2694bbb55e2f834a6f5adc431bfba0544370f5b07"
+      "bytes": 3335,
+      "sha256": "358be6cebe37a1639091cdc5b67d1b1fb221a10b48d2c73db1b663344b25afa8"
     },
     {
       "path": "docs/구현현황.md",
@@ -2031,17 +2056,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "a1e382e5d2f973f81d30f3f71e300df7ba3c48491d5f9f3b4725cdaf69a93577"
+      "sha256": "fcde58c57aa1f24b8c0ce036891542434f53f781aa3aede33e705d93ca834c8d"
     },
     {
       "path": "package.json",
-      "bytes": 2148,
-      "sha256": "4d2072a825b0fe4a94df39cf3557a169e51cce2619924967d6d983eb99b5a836"
+      "bytes": 2185,
+      "sha256": "ccd755bcaa625098d460d28b3e33c026b5f4c3c0cfefaae5fff6b0fe06da9341"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 8411,
-      "sha256": "7532791ae2539057390542952ca293d138b25f19280166dd546c0c26655fdc57"
+      "bytes": 8684,
+      "sha256": "ac981f02b88f74939e60536c50d188fd73c8914ed3a6caaf4a4863d2420dcda9"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2282,6 +2307,11 @@
       "path": "simulator/e2e/ls-context.browser.test.py",
       "bytes": 10714,
       "sha256": "6c6685247eb6e8fdabef6740508e48670ce633dd3f1f80709bab55a823924223"
+    },
+    {
+      "path": "simulator/e2e/ls-continuity.browser.test.py",
+      "bytes": 2370,
+      "sha256": "d3f02174e9350dc75cde94794f192d3784f9b7232ee96b8e43630f49208ec1d3"
     },
     {
       "path": "simulator/e2e/ls-header.browser.test.py",
@@ -2745,13 +2775,13 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 21184,
-      "sha256": "1e29ee5293663dc8610d4a8f80cf690417eb231fca7994372922c55a4d96267a"
+      "bytes": 21639,
+      "sha256": "5111dd50ba94131c7f19ed301d84a2d79951e0825ea188934675d8d73b580f3e"
     },
     {
       "path": "simulator/ui/app.js",
-      "bytes": 30336,
-      "sha256": "927a110d41defc8aed55a5fc90f8a8029970fd0e5af6b3fd3fda61a8ec96dad9"
+      "bytes": 30951,
+      "sha256": "3f7e2457e0b8b7b990e75dc4880a10402141dd46f0e2e7943ba1586e4dec6861"
     },
     {
       "path": "simulator/ui/autocontrol-ui.js",
@@ -2779,9 +2809,24 @@
       "sha256": "edd4fcd9f00590138b98ca8236925148f4b0496c8c645d37d6a6eaaed2d3a9ac"
     },
     {
+      "path": "simulator/ui/ls-alignment.js",
+      "bytes": 4766,
+      "sha256": "e6a6ce7a8179fd2d8eca789acf54d89e76cc26e23a5eee9cc7814a4bd2bdd024"
+    },
+    {
       "path": "simulator/ui/ls-context.js",
       "bytes": 19334,
       "sha256": "829ffcf317664022e06cdb337246172d98531c1eca61e896ac6a65c620574d60"
+    },
+    {
+      "path": "simulator/ui/ls-seams.js",
+      "bytes": 2417,
+      "sha256": "04ffe104a2657a33863e9cd95b32f7f8940de18fe38d0d4c03281eb962997393"
+    },
+    {
+      "path": "simulator/ui/ls-seams.test.cjs",
+      "bytes": 2823,
+      "sha256": "68ed407a127b9ca0016938a55c4a36254a4680c252e24b5337475ca4aaef0855"
     },
     {
       "path": "simulator/ui/ls-switches.js",
@@ -2790,13 +2835,13 @@
     },
     {
       "path": "simulator/ui/ls-switches.test.cjs",
-      "bytes": 3263,
-      "sha256": "ccd935a3433ae2e7f45292506945ad9777a15e33915c7df2bc0d0255240a1392"
+      "bytes": 3322,
+      "sha256": "d06561accf6651608bd94c9932aa15e023a504140665be5850e934794aac9f72"
     },
     {
       "path": "simulator/ui/ls-view.js",
-      "bytes": 34174,
-      "sha256": "1874e4832e23e07b79b23334534219b974e21311ed8d7fba3bb6eddfd7dc89dd"
+      "bytes": 37123,
+      "sha256": "72344d239ac44e069616fe93ecc8688a2273545892d3942d42730e3bcba48aee"
     },
     {
       "path": "simulator/ui/ls-view.test.cjs",
@@ -2880,8 +2925,8 @@
     },
     {
       "path": "simulator/ui/remote-engine.js",
-      "bytes": 3732,
-      "sha256": "c5ed880cd7a96c0da4a7624e6864dd6a4f8ee55b54b0f4d882d9759ad9e807bb"
+      "bytes": 3988,
+      "sha256": "cd479a3c8cbb7f655ef2b07fa678e9fa60f48a87df5e539dd6c7393792a902cc"
     },
     {
       "path": "simulator/ui/schedule-ui.js",
@@ -2890,8 +2935,8 @@
     },
     {
       "path": "simulator/ui/shell.css",
-      "bytes": 4511,
-      "sha256": "15c7535f1b7a09b6b3530a598869fc9591a36d22de98ae83e2804b9179866998"
+      "bytes": 5145,
+      "sha256": "cdbcbf9b545b1ef57c832b260edc5e480a0f3506c696e99426b7ebd8ce4e3e9d"
     },
     {
       "path": "simulator/ui/shell.js",

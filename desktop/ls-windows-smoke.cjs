@@ -1,0 +1,22 @@
+'use strict';
+const {_electron}=require('playwright'),{expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-ls-windows-'));let app;
+(async()=>{
+ const packaged=process.env.ORPHEIA_PACKAGED_EXECUTABLE,executablePath=packaged?path.resolve(packaged):require('electron'),args=packaged?['--orpheia-smoke-test']:[path.join(__dirname,'..'),'--orpheia-smoke-test'];if(process.env.ORPHEIA_TEST_NO_SANDBOX==='1')args.unshift('--no-sandbox');
+ app=await _electron.launch({executablePath,args,env:{...process.env,ORPHEIA_TEST_USER_DATA:profile},timeout:60000});
+ const primary=await app.firstWindow();await primary.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());const errors=[];
+ primary.on('pageerror',e=>errors.push(String(e)));await primary.evaluate(()=>SimRemote.command({type:'clock',paused:true}));const original=await primary.inputValue('#lsStationSelect');
+ const additional=async station=>{const next=app.waitForEvent('window');await primary.evaluate(st=>OrpheiaEngine.openView('ls',st),station);const page=await next;page.on('pageerror',e=>errors.push(String(e)));await page.waitForFunction(()=>!!window.SimExtraLS&&!!window.SimShell);return page;};
+ const west=await additional('guro'),east=await additional('geumcheon');assert.equal(await primary.inputValue('#lsStationSelect'),original);assert.equal(await west.inputValue('#lsStationSelect'),'guro');assert.equal(await east.inputValue('#lsStationSelect'),'geumcheon');
+ await app.evaluate(({BrowserWindow})=>{const windows=BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('lsStation='));windows.forEach((w,i)=>w.setBounds({x:i*960,y:0,width:960,height:720}));});
+ await expect.poll(()=>west.evaluate(()=>innerWidth)).toBeLessThan(961);await expect.poll(()=>east.evaluate(()=>innerWidth)).toBeLessThan(961);
+ const positions=async(page,side)=>page.locator('#trackSvg').evaluate((svg,side)=>{const m=svg.getScreenCTM();return Object.fromEntries([...svg.querySelectorAll(`[data-seam-side="${side}"]`)].map(g=>{const p=g.querySelector('.seam-rail'),end=p.getPointAtLength(p.getTotalLength()).matrixTransform(m);return [g.dataset.seamTrunk,{x:end.x,y:end.y}]}));},side);
+ await expect.poll(async()=>{const a=await positions(west,'right'),b=await positions(east,'left');return Object.keys(a).every(k=>b[k]&&Math.abs(a[k].y-b[k].y)<.5);}).toBe(true);
+ const pid=await primary.evaluate(()=>SimRemote.snapshot.pid);assert.equal(await west.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await east.evaluate(()=>SimRemote.snapshot.pid),pid);
+ await east.locator('[data-mode="CCM"]').click();await east.click('#dialogConfirm');await east.waitForFunction(()=>SimField.state('geumcheon').mode==='CCM');await east.locator('[data-point-control="51A"]').click();await east.click('#dialogConfirm');await east.waitForFunction(()=>SimField.state('geumcheon').points['52']==='R');await primary.evaluate(()=>SimRemote.poll());assert.equal(await primary.evaluate(()=>SimField.state('geumcheon').points['52']),'R');
+ assert.equal(await west.inputValue('#lsStationSelect'),'guro');assert.equal(await primary.inputValue('#lsStationSelect'),original);
+ await west.screenshot({path:'/tmp/v250-native-guro.png'});await east.screenshot({path:'/tmp/v250-native-geumcheon.png'});
+ await east.click('#detachMMIBtn');await expect.poll(()=>app.windows().length).toBe(4);await expect(primary.locator('body')).toHaveClass(/workspace-split/);
+ await east.close();await expect.poll(()=>app.windows().length).toBe(3);assert.equal(await primary.evaluate(()=>SimRemote.snapshot.pid),pid);await west.selectOption('#lsStationSelect','anyang');assert.equal(await primary.inputValue('#lsStationSelect'),original);
+ assert.deepEqual(errors,[]);console.log('PASS multiple independent LS station windows share one authoritative engine and the primary MMI; closure and station selection stay local');await app.close();app=null;
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});

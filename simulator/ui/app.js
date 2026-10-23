@@ -37,10 +37,11 @@ function drawBoard(){
 function trainRunning(s){return Object.values(s.routes).some(r=>r.occupied&&r.train&&s.clock<=r.train.to+1)||(s.scenarioMotions||[]).some(m=>s.clock<=m.to+1);}
 function trainOccupied(id){const st=window.SimLSUI?.getModel?.().stations?.[id],set=new Set(Object.keys(stationStates[id]?.circuitOccupied||{}));if(st)for(const [slot,rows] of Object.entries(st.windows))if(rows.some(t=>!window.SimScenarioMotion?.inTransit(stationStates[id],t.uid)&&!window.SimLine?.journeys.has(t.number)))set.add(slot);return set;}
 function drawTracks(){
- const stage=$('lsStage'),aspect=(stage.clientWidth-20)/Math.max(160,stage.clientHeight-(stage.querySelector('.ls-head')?.offsetHeight||52)-14);
+ const stage=$('lsStage'),aspect=stage.clientWidth/Math.max(160,stage.clientHeight-(stage.querySelector('.ls-head')?.offsetHeight||52)-14);
  const st=N.catalog[selectedStation],ctl=N.stations.filter(s=>s.controlled),at=ctl.findIndex(s=>s.id===selectedStation),view=window.SimLS.render(st,window.SimWiring.data[selectedStation],C,state,{aspect,left:ctl[at-1]?.name,right:ctl[at+1]?.name,occupied:trainOccupied(selectedStation)});
  const head=`<div class="ls-head"><div class="ls-modes" role="group" aria-label="${st.name} 역제어모드">${['AUTO','CCM','LOCAL'].map(m=>`<button type="button" class="mode-btn ${m.toLowerCase()} ${state.mode===m?'on':''}" data-mode="${m}" aria-pressed="${state.mode===m}">${m}</button>`).join('')}</div><button type="button" class="stop-all" data-stop-all="true" aria-label="신호기 일괄정지"><span>신호기</span><span>일괄정지</span></button><div class="ls-name ${['cheongnyangni','dongmyo','jonggak','underground-seoul'].includes(selectedStation)?'metro':''}"><b>${escapeHTML(window.SimMMI?.stationInfo(selectedStation).name||st.name)}</b><span>${st.code}</span></div><div class="ls-equipment" aria-label="원본 장치 표시">${['N1','N2','C','REC','UPS','ShP','EIS1','EIS2','DTS1','DTS2','RC'].map(name=>`<span data-equipment="${name}" title="${name} · 장치 통신 상태 미연결">${name}</span>`).join('')}</div></div>`;
  $('lsStage').dataset.controlStation=selectedStation;
+ if(window.SimExtraLS)document.title='ORPHEIA · LS · '+st.name;
  $('lsStage').innerHTML=head+`<svg id="trackSvg" class="ls-svg" viewBox="0 0 ${view.width} ${view.height}" role="img" aria-label="${escapeHTML(st.name)} LS 선로 배선">${view.svg}</svg>`;
  window.SimLSUI.decorate();drawBoard();window.SimEquipment?.paint(selectedStation);
 }
@@ -140,7 +141,7 @@ $('startTask').onclick=startTask;$('nextTask').onclick=()=>{taskIndex=(taskIndex
 $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toast('지하서울로 전환해 과제를 확인하세요.',true);if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart),state);if(ok){if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
 $('guideBtn').onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>window.SimShell?.drawer(true);
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.24.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.25.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 const lockSig=()=>Object.entries(state.routes).map(([id,r])=>id+(r.lock?'L':'')).join();
 setInterval(()=>{if(window.SimRemote){window.SimRemote.poll();paused=window.SimRemote.snapshot.clock.paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';window.SimAutoUI?.step();window.SimScenarioUI?.stepMotion();window.SimMMI.syncAll(stationStates);render();window.SimDiagram.render();return;}if(!paused&&!window.SimMMI?.replaying?.()&&!window.SimLSUI.isInteracting()&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig(),movingBefore=trainRunning(state);session.tick(seconds);const scenarioChanged=window.SimScenarioUI?.stepMotion(),autoChanged=window.SimAutoUI?.step();window.SimEquipment?.tick(state.clock);window.SimMMI?.syncAll(stationStates);if(lockSig()!==before||autoChanged||scenarioChanged||movingBefore||trainRunning(state))render();else for(const row of SimDOM.document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
 window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates}),run,render,openAction,toast,selectStation});
@@ -158,3 +159,15 @@ if(window.SimRemote){$('graphSpeed').value=String(window.SimRemote.snapshot.cloc
 
 // Re-layout in logical desktop coordinates when the window or side drawer changes.
 let lsResizeFrame;new ResizeObserver(()=>{cancelAnimationFrame(lsResizeFrame);lsResizeFrame=requestAnimationFrame(()=>drawTracks());}).observe($('lsStage'));
+
+$('extraLSBtn').hidden=!window.OrpheiaEngine;
+$('extraLSBtn').onclick=()=>window.OrpheiaEngine?.openView('ls',selectedStation);
+if(window.SimExtraLS){
+ document.body.classList.add('workspace-split');
+ window.addEventListener('DOMContentLoaded',()=>{
+ $('detachMMIBtn').onclick=()=>window.OrpheiaEngine.openView('mmi');
+ $('graphWinBtn').onclick=()=>window.OrpheiaEngine.openView('graph');
+ window.SimWorkspace.detach=()=>window.OrpheiaEngine.openView('mmi');
+ window.SimWorkspace.openGraph=()=>window.OrpheiaEngine.openView('graph');
+ },{once:true});
+}

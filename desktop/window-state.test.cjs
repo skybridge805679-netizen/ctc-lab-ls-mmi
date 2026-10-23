@@ -30,3 +30,5 @@ test('short work areas clamp both native size and minimum height',()=>{
  const result=fitWindow(null,{x:0,y:0,width:1024,height:600},'ls');
  assert.equal(result.height,600);assert.equal(result.minHeight,240);
 });
+
+test('an additional LS window restores a compact desktop size using the LS minimum',()=>{const result=fitWindow({x:100,y:40,width:640,height:480},{x:0,y:0,width:1920,height:1080},'ls:guro');assert.deepEqual(result,{x:100,y:40,width:640,height:480,minWidth:320,minHeight:240});});

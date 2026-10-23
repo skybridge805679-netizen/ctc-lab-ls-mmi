@@ -14,8 +14,8 @@ body.app-ls .ls-viewport>main{flex:1;min-height:0;overflow:auto;padding:0;margin
 .ls-panel{height:100%;min-height:420px;display:flex;flex-direction:row;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
 .ls-panel .ls-display{flex:1 1 0;min-width:0;min-height:0;margin:0;border-radius:0;display:flex;flex-direction:column}
 .ls-display .fidelity-note{flex:none;padding:3px 12px;font-size:11px}
-.ls-display .ls-stage{flex:1;min-height:0;padding:8px 10px 0;display:flex;flex-direction:column;overflow:hidden}
-.ls-display .ls-head{flex:none;margin-bottom:6px;gap:8px 16px}
+.ls-display .ls-stage{flex:1;min-height:0;padding:8px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.ls-display .ls-head{padding:0 20px;flex:none;margin-bottom:6px;gap:8px 16px}
 .ls-display .mode-btn{min-height:44px;font-size:15px}.ls-display .stop-all{min-height:44px;padding:4px 14px;font-size:14px}.ls-display .ls-name{min-height:46px;min-width:170px;padding:2px 18px}.ls-display .ls-name b{font-size:19px;letter-spacing:5px}
 .ls-display .ls-svg{flex:1;min-height:0;min-width:0;width:100%;height:100%}
 /* 하단 역 바로가기 (원본 LS처럼 화면 아래) */
@@ -45,3 +45,10 @@ body.tg-detached{display:block;margin:0;min-width:900px;background:#1e1e1e}
 
 dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto}
 .ls-topbar{gap:12px;padding-left:10px;padding-right:10px}
+
+/* Edge ports align by main-line identity across neighboring LS windows. */
+.ls-svg .screen-continuations{pointer-events:none}.ls-svg .seam-link path{fill:none;stroke-linejoin:round;stroke-linecap:butt}.ls-svg .seam-clearance{stroke:#686d68;stroke-width:26}.ls-svg .seam-rail{stroke:#f4f4ef;stroke-width:18}.ls-svg .seam-name{fill:#d6e7e5;font-size:11px;letter-spacing:.5px}
+
+.ls-svg .seam-link.set .seam-rail{stroke:#35dc82}.ls-svg .seam-link.occupied .seam-rail{stroke:#ff5c50}.ls-svg .seam-link.locked .seam-rail{stroke:#ffbd55}
+
+.ls-svg .floating-code{fill:#e7f0ee;paint-order:stroke;stroke:#686d68;stroke-width:3px}

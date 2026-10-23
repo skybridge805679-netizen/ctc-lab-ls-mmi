@@ -2,6 +2,8 @@
 const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray}=require('electron');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
+const stations=require('../simulator/engine/network').stations.filter(s=>s.controlled),extraLS=new Set();
+const trustedLS=sender=>[ls,...extraLS].some(win=>win&&!win.isDestroyed()&&win.webContents===sender);
 const {fitWindow,readState,writeState}=require('./window-state.cjs');
 // Sandboxed renderers load bundled UI and a single constrained simulation IPC bridge.
 const entry=path.join(__dirname,'../simulator/index.html');
@@ -20,10 +22,11 @@ else{
   engine=require('./engine-broker.cjs').create({utilityProcess,stateFile:path.join(app.getPath('userData'),'engine-session.orpheia'),onWarning:message=>{if(!quitting)dialog.showMessageBox({type:'warning',title:'실습 저장 알림',message});},onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
   await engine.ready;
   ipcMain.on('orpheia:engine',(event,message)=>{
-   if(!ls||event.sender!==ls.webContents||event.senderFrame!==ls.webContents.mainFrame){event.returnValue={error:'Untrusted engine client'};return;}
+   if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame){event.returnValue={error:'Untrusted engine client'};return;}
    if(!message||typeof message.action?.type!=='string'||message.action.type.startsWith('session:')||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
+  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='mmi')script('SimWorkspace.detach()');else if(kind==='graph')script('SimWorkspace.openGraph()');});
   installMenu();createLS();
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
@@ -51,7 +54,7 @@ function protect(win){
  win.webContents.on('will-redirect',event=>event.preventDefault());
  win.webContents.on('render-process-gone',(_event,details)=>{
   if(quitting||details.reason==='clean-exit')return;
-  dialog.showMessageBox({type:'error',title:'관제 화면 실행 오류',message:'화면이 종료되었지만 별도 엔진의 운행 상태는 유지됩니다.',detail:'화면을 다시 불러오면 현재 엔진 상태로 연결합니다.',buttons:['화면 다시 열기','나중에'],defaultId:0}).then(({response})=>{if(response===0&&!ls?.isDestroyed())ls?.reload();});
+  dialog.showMessageBox({type:'error',title:'관제 화면 실행 오류',message:'화면이 종료되었지만 별도 엔진의 운행 상태는 유지됩니다.',detail:'화면을 다시 불러오면 현재 엔진 상태로 연결합니다.',buttons:['화면 다시 열기','나중에'],defaultId:0}).then(({response})=>{const target=extraLS.has(win)?win:ls;if(response===0&&target&&!target.isDestroyed())target.reload();});
  });
 }
 function createLS(){
@@ -80,10 +83,18 @@ function createLS(){
  ls.on('closed',()=>{ls=null;for(const w of [mmi,graph])if(w&&!w.isDestroyed())w.close();});
  ls.loadURL(entryURL+'?desktop=1');
 }
+function createExtraLS(station){
+ if(!stations.some(s=>s.id===station))return;
+ const win=new BrowserWindow({...savedBounds('ls:'+station),minWidth:320,minHeight:240,show:false,title:'ORPHEIA · LS',backgroundColor:'#686d68',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
+ extraLS.add(win);remember(win,'ls:'+station);protect(win);win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+ win.once('ready-to-show',()=>win.show());win.on('closed',()=>extraLS.delete(win));
+ win.loadURL(entryURL+'?desktop=1&lsStation='+encodeURIComponent(station));
+}
 function script(code){if(ls&&!ls.isDestroyed())ls.webContents.executeJavaScript(code,true).catch(error=>console.error(error.message));}
 function installMenu(){
  const workspace={label:'실습 화면',submenu:[
   {label:'LS 창으로',accelerator:'CmdOrCtrl+1',click:()=>{ls?.show();ls?.focus();}},
+  {label:'LS 추가 창',submenu:stations.map(st=>({label:st.name,click:()=>createExtraLS(st.id)}))},
   {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
   {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
   {type:'separator'},
