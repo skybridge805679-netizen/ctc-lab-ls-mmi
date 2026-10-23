@@ -16,11 +16,23 @@ class Quiet(SimpleHTTPRequestHandler):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
+    page.clock.install()
     page.goto(url, wait_until='networkidle')
+    page.locator('#pauseBtn').click()
     page.locator('#mmiScenarioBtn').click()
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')
     assert page.locator('#scSelect option').count() == 16
-    do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
+    def do(action):
+        result = page.evaluate('a=>SimMMI.run(a)', action)
+        page.clock.run_for(600)  # UI evaluation timers run; the paused virtual train clock advances only by explicit ticks.
+        return result
+
+    def advance_until(predicate, arg=None):
+        for _ in range(60):
+            if page.evaluate(predicate, arg):
+                return
+            do({'type': 'tick', 'seconds': 10})
+        raise AssertionError({'snapshot': page.evaluate('SimScenarioUI.snapshot()'), 'status': page.locator('#scMotionStatus').inner_text()})
     # the timetable is user data: rename every train and drop the first up train -> the choices follow the current timetable
     page.evaluate("""()=>{const m=SimDiagram.getModel();for(const t of m.trains)t.id=(t.direction==='up'?'U':'D')+t.id.slice(1);
       m.trains.splice(m.trains.findIndex(t=>t.direction==='up'),1);SimDiagram.render();}""")
@@ -62,18 +74,27 @@ def run(page, url):
     do({'type': 'route', 'id': '2A-5T', 'source': 'LS'})
     do({'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(5)
-    page.wait_for_function("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['5T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # the broken train pulled into 5번 부본선
+    assert where(train) == 'yongsan/B607T/up', 'a route request must not teleport the train'
+    advance_until("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['5T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # the broken train pulled into 5번 부본선
     assert where(train) == 'yongsan/5T/up'
     expect(page.locator('#scSteps li.current')).to_contain_text('스케줄 수정')
     expect(page.locator('#scStatus')).not_to_contain_text('합격')
     page.evaluate("""id=>{const m=SimDiagram.getModel(),t=m.trains.find(x=>x.id===id),d=structuredClone(t);
       d.calls.find(c=>c.station==='yongsan').departureRoute='3C_B605T';SimTimetable.update(m,id,d);}""", train)
+    page.clock.run_for(600)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(6)
-    page.wait_for_function("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['B605T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # edited departure route -> out to B605T
+    advance_until("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['B605T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # edited departure route -> out to B605T
     expect(page.locator('#scStatus')).to_contain_text('구술')
     for box in page.locator('#scSteps input[data-say]').all():
         box.check()
+    expect(page.locator('#scStatus')).to_contain_text('열차 이동과 도착을 기다리고 있습니다')
+    expect(page.locator('#eventLogBody')).not_to_contain_text('실기 시나리오 합격')
+    advance_until('''()=>{const s=SimScenarioUI.snapshot();return !s.queue.length&&s.motions.every(j=>['done','cancelled'].includes(j.phase));}''')
     expect(page.locator('#scStatus')).to_contain_text('합격')
+    assert page.evaluate("SimScenarioUI.motionJobs().every(j=>j.phase==='done')"), page.evaluate('SimScenarioUI.motionJobs()')
+    for member in page.evaluate('SimScenarioUI.snapshot().motions.map(j=>j.number)'):
+        assert where(member) is None, member + ' still remains on the LS after passing'
+    assert page.evaluate("!Object.values(SimField.state('yongsan').routes).some(r=>r.occupied)")
     expect(page.locator('#eventLogBody')).to_contain_text('실기 시나리오 합격')
     # a second scenario seeds its own station
     page.locator('#scSelect').select_option('geumcheon-6'); page.locator('#scStart').click()

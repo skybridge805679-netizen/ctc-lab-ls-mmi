@@ -10,8 +10,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 34746,
-      "sha256": "cc8a6004cf049f7dda1b822d2d1af2e349cf0e130da04dbb35c637e53a644553"
+      "bytes": 35151,
+      "sha256": "63c9c3bdb09b3f31512e48f17d2feb7efdad0e36e3d14474ca94e86633b4391b"
     },
     {
       "path": "README.md",
@@ -110,8 +110,8 @@
     },
     {
       "path": "archive/CTC-LAB-v0.19.3.zip",
-      "bytes": 9911673,
-      "sha256": "5f258efe60260bcc7ee3b10ad519a043d3cb64a8c74f35cb4c805d5f4058aaa1"
+      "bytes": 9912274,
+      "sha256": "bc7ffe94dfc10738a65be5bb0590e265ab7e398376bad98e524a6c96b8c87714"
     },
     {
       "path": "archive/CTC-LAB-v0.2.zip",
@@ -1729,6 +1729,11 @@
       "sha256": "7524c4baf4ed9070fe794f3c405ce5c14dca99eace25b067152713c1cfbafa3a"
     },
     {
+      "path": "docs/v0.19.3-시나리오시험수정.md",
+      "bytes": 1676,
+      "sha256": "edd8c4818375e3eae04940761a126ecbc230b371912f25cf4f9f96a243d53035"
+    },
+    {
       "path": "docs/v0.19.3-전체선로망검수.md",
       "bytes": 6213,
       "sha256": "3ad6885d5f9553f32ff7d82ddca5c6533f5c1c5b5447900ae111c7a903739a31"
@@ -2315,8 +2320,8 @@
     },
     {
       "path": "simulator/mmi-scenarios.browser.test.py",
-      "bytes": 6589,
-      "sha256": "abfd229b2ddaa7cb048f8199234c2a679b9659cd8390a6d1960ceb5d1e989c1e"
+      "bytes": 8005,
+      "sha256": "8a442c858a0108ef75a4dc87d93e4d66a935c12152a9a23a45b7bd68768782a7"
     },
     {
       "path": "simulator/mmi-scenarios.js",
@@ -2575,8 +2580,8 @@
     },
     {
       "path": "simulator/검증결과.md",
-      "bytes": 25131,
-      "sha256": "0daf25964c2bcd7770aa173b275830b6ea4c55acfe43deee0861128f17f1673b"
+      "bytes": 25499,
+      "sha256": "4162e458edeff74f33fa6fdf96c34372e3a217ae943ea52bdbc2c37cdf1e80fb"
     },
     {
       "path": "simulator/고증대조표.json",
