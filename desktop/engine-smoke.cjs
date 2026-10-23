@@ -39,7 +39,7 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  assert.equal(await ls.evaluate(id=>SimRemote.snapshot.timetable.trains.find(t=>t.id===id).kind,edited),'회송열차');
  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('LS')).show());
  assert.deepEqual(errors,[]);console.log(`PASS independent engine PID ${pid}, scenario motion, timetable persistence, renderer stall/close/reload survival and proportional native desktop resizing`);
- await app.close();app=null;
+ ls.removeAllListeners('pageerror');await app.close();app=null;
  const disk=require('./session-store.cjs').read(path.join(profile,'engine-session.orpheia'));assert.equal(disk.format,'ORPHEIA-SESSION');assert.equal(disk.timetable.trains.find(x=>x.id===edited).kind,'회송열차');
  app=await _electron.launch({executablePath,args,env:{...process.env,ORPHEIA_TEST_USER_DATA:profile},timeout:60000});
  const reopened=await app.firstWindow();reopened.on('pageerror',e=>errors.push(String(e)));await reopened.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
