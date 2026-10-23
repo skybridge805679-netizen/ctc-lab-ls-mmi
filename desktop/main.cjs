@@ -17,18 +17,18 @@ else{
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
   session.defaultSession.setPermissionRequestHandler((_contents,_permission,respond)=>respond(false));
   session.defaultSession.on('will-download',(_event,item)=>item.setSaveDialogOptions({defaultPath:path.join(app.getPath('downloads'),path.basename(item.getFilename()))}));
-  engine=require('./engine-broker.cjs').create({utilityProcess,onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
+  engine=require('./engine-broker.cjs').create({utilityProcess,stateFile:path.join(app.getPath('userData'),'engine-session.orpheia'),onWarning:message=>{if(!quitting)dialog.showMessageBox({type:'warning',title:'실습 저장 알림',message});},onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
   await engine.ready;
   ipcMain.on('orpheia:engine',(event,message)=>{
    if(!ls||event.sender!==ls.webContents||event.senderFrame!==ls.webContents.mainFrame){event.returnValue={error:'Untrusted engine client'};return;}
-   if(!message||typeof message.action?.type!=='string'||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
-   engine.request(message.action,message.since,response=>{event.returnValue=response;});
+   if(!message||typeof message.action?.type!=='string'||message.action.type.startsWith('session:')||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
+   engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
   installMenu();createLS();
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
  }).catch(error=>{dialog.showErrorBox('관제 엔진 시작 오류',error.message);app.quit();});
- app.on('before-quit',()=>{quitting=true;engine?.stop();tray?.destroy();});
+ app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;const finish=()=>{engine?.stop();tray?.destroy();app.quit();};if(engine)engine.request({type:'session:persist'},0,response=>{if(response.error)dialog.showErrorBox('실습 저장 실패',response.error);finish();});else finish();});
  app.on('window-all-closed',()=>app.quit());
  app.on('activate',()=>{if(!ls)createLS();else ls.show();});
 }
@@ -87,13 +87,23 @@ function installMenu(){
   {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
   {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
   {type:'separator'},
-  {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script('document.getElementById("exportBtn").click()')},
+  {label:'실습 세션 저장…',accelerator:'CmdOrCtrl+Shift+S',click:()=>sessionFile(false)},
+  {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>graph?.isFocused()?script('SimTimetableFiles.open()'):sessionFile(true)},
+  {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script(graph?.isFocused()?'SimTimetableFiles.save()':'document.getElementById("exportBtn").click()')},
   {role:'togglefullscreen',label:'전체 화면'}
  ]};
  const menu=[...(process.platform==='darwin'?[{label:app.name,submenu:[{role:'about',label:'ORPHEIA 정보'},{type:'separator'},{role:'hide',label:'숨기기'},{role:'hideOthers',label:'다른 앱 숨기기'},{type:'separator'},{role:'quit',label:'종료'}]}]:[]),workspace,
-  {label:'편집',submenu:[{role:'undo',label:'실행 취소'},{role:'redo',label:'다시 실행'},{type:'separator'},{role:'cut',label:'잘라내기'},{role:'copy',label:'복사'},{role:'paste',label:'붙여넣기'},{role:'selectAll',label:'모두 선택'}]},
+  {label:'편집',submenu:[{label:'실행 취소',accelerator:'CmdOrCtrl+Z',click:()=>editHistory(false)},{label:'다시 실행',accelerator:'CmdOrCtrl+Shift+Z',click:()=>editHistory(true)},{type:'separator'},{role:'cut',label:'잘라내기'},{role:'copy',label:'복사'},{role:'paste',label:'붙여넣기'},{role:'selectAll',label:'모두 선택'}]},
   {label:'창',submenu:[{role:'minimize',label:'최소화'},...(process.platform==='darwin'?[{role:'front',label:'모두 앞으로'}]:[{role:'quit',label:'프로그램 종료'}])]}
  ];
  if(!app.isPackaged)menu.push({label:'개발',submenu:[{role:'toggleDevTools'}]});
  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 }
+
+async function sessionFile(open){
+ const filters=[{name:'ORPHEIA 실습 세션',extensions:['orpheia']}],choice=open?await dialog.showOpenDialog({title:'실습 세션 열기',filters,properties:['openFile']}):await dialog.showSaveDialog({title:'실습 세션 저장',filters,defaultPath:path.join(app.getPath('downloads'),'orpheia-session.orpheia')});
+ if(choice.canceled)return;const file=open?choice.filePaths[0]:choice.filePath;
+ engine.request({type:open?'session:open':'session:save',file},0,response=>{if(response.error)dialog.showErrorBox('실습 세션 파일 오류',response.error);else if(open)ls?.reload();});
+}
+
+async function editHistory(redo){const win=BrowserWindow.getFocusedWindow();if(!win)return;const input=await win.webContents.executeJavaScript('!!document.activeElement?.closest("input,textarea,[contenteditable=true]")');if(win===graph&&!input)script('SimTimetableFiles.'+(redo?'redo':'undo')+'()');else win.webContents[redo?'redo':'undo']();}

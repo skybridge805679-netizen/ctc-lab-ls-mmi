@@ -1,0 +1,15 @@
+{
+  "platform": "linux",
+  "node": "v24.19.0",
+  "trains": 10000,
+  "calls": 20000,
+  "conflicts": 19312,
+  "importMs": 157.63196,
+  "conflictMs": 44.45031,
+  "fullMs": 68.11801799999995,
+  "fullBytes": 7709109,
+  "idlePollMs": 0.0025336759999999574,
+  "idlePollBytes": 46,
+  "tickAndPatchMs": 10.622779999999977,
+  "patchBytes": 151172
+}

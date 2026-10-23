@@ -9,7 +9,7 @@ function point(station,slot){
  const rail=def?.rails.find(r=>r[3]===slot||r[4]===slot);return rail?(rail[3]===slot?rail[1][0]:rail[1].at(-1)):null;
 }
 function candidates(station,from,to,direction){
- const def=W.data[station],C=Core.forStation(station),a=point(station,from),b=point(station,to);if(!a||!b)return [];
+ const def=W.data[station],C=cachedCore(station),a=point(station,from),b=point(station,to);if(!a||!b)return [];
  const platform=def.rails.some(r=>r[0]===from),targetPlatform=def.rails.some(r=>r[0]===to),dir=direction==='up'?-1:1;
  return Object.entries(C.routes).flatMap(([id,r])=>{
   const sig=def.signals.find(s=>s[0]===r.signal);if(!sig||sig[4]!==dir)return [];
@@ -21,11 +21,12 @@ function candidates(station,from,to,direction){
   return [{id,score:(r.destination===to?0:100000)+Math.abs(sig[2]-a[0])+Math.abs(end[0]-b[0])}];
  }).sort((a,b)=>a.score-b.score).map(x=>x.id);
 }
+const coreCache=new Map();function cachedCore(id){if(!coreCache.has(id))coreCache.set(id,Core.forStation(id));return coreCache.get(id);}
 function create(host){
  let serial=0,jobs=[];const states=()=>host.states(),ls=()=>host.model();
  const locate=uid=>{for(const [station,s]of Object.entries(ls().stations))for(const [slot,rows]of Object.entries(s.windows))for(const train of rows)if(train.uid===uid)return {station,slot,train};return null;};
  const now=j=>states()[j.station]?.clock??0;
- function release(j){if(j.route&&states()[j.station]?.routes[j.route]?.train?.scenario===j.id){Core.forStation(j.station).dispatch(states()[j.station],{type:'clear',id:j.route,source:'SCENARIO'});}for(const s of Object.values(states()))if(s.scenarioMotions)s.scenarioMotions=s.scenarioMotions.filter(m=>m.id!==j.id);}
+ function release(j){if(j.route&&states()[j.station]?.routes[j.route]?.train?.scenario===j.id){cachedCore(j.station).dispatch(states()[j.station],{type:'clear',id:j.route,source:'SCENARIO'});}for(const s of Object.values(states()))if(s.scenarioMotions)s.scenarioMotions=s.scenarioMotions.filter(m=>m.id!==j.id);}
  function request(action,manual=false){
   const f=locate(action.uid);if(!f)return {ok:false,message:'이동할 열차번호가 없습니다.'};
   let check=host.validate({...action,station:f.station,slot:f.slot});
@@ -44,7 +45,7 @@ function create(host){
   if(j.action.op==='delete'){
    const def=W.data[f.station],dir=f.train.direction==='up'?-1:1;
    if(def.rails.some(r=>r[0]===f.slot)){
-    const C=Core.forStation(f.station),id=Object.keys(C.routes).find(id=>/^B/.test(C.routes[id].destination)&&def.signals.some(sig=>sig[0]===C.routes[id].signal&&sig[1]===f.slot&&sig[4]===dir));
+    const C=cachedCore(f.station),id=Object.keys(C.routes).find(id=>/^B/.test(C.routes[id].destination)&&def.signals.some(sig=>sig[0]===C.routes[id].signal&&sig[1]===f.slot&&sig[4]===dir));
     if(!id){j.reason='출발진로 확인 필요';return;}to=C.routes[id].destination;
    }else{
     const a=point(f.station,f.slot);if(!a){j.reason='출발 회로 확인 필요';return;}
@@ -54,7 +55,7 @@ function create(host){
     else {const s=states()[f.station];j.phase='block';j.fromTime=s.clock;j.until=s.clock+20;j.reason='관제구간 밖으로 출발';(s.scenarioMotions??=[]).push({id:j.id,uid:j.uid,number:j.number,points:[a,[a[0]+dir*40,a[1]]],from:s.clock,to:s.clock+20});return;}
    }
   }
-  const C=Core.forStation(f.station),s=states()[f.station];
+  const C=cachedCore(f.station),s=states()[f.station];
   const a=point(f.station,f.slot),b=point(target,to),def=W.data[f.station];
   const straight=target===f.station&&a&&b&&Math.abs(a[1]-b[1])<6&&!def.rails.some(r=>r[0]===f.slot||r[0]===to)&&!def.signals.some(sig=>Math.abs(LS.railY(def,sig[1],sig[2])-a[1])<6&&sig[2]>Math.min(a[0],b[0])&&sig[2]<Math.max(a[0],b[0]));
   const ids=target===f.station&&!straight?candidates(f.station,f.slot,to,f.train.direction):[];
@@ -113,8 +114,9 @@ function create(host){
   return changed;
  }
  function step(){let changed=false;for(let i=0;i<Math.min(jobs.length+1,32);i++){const result=stepOnce();changed||=result;if(!result)break;}return changed;}
+ function cancel(uid){for(const j of jobs)if(j.uid===uid&&!['done','cancelled'].includes(j.phase)){release(j);j.phase='cancelled';j.reason='수동 열차번호 조작';}}
  function reset(){for(const j of jobs)release(j);jobs=[];}
- return {request,step,reset,list:()=>jobs.map(j=>({...j,action:{...j.action}})),busy:()=>jobs.some(j=>!['done','cancelled'].includes(j.phase))};
+ return {request,step,reset,cancel,checkpoint:()=>({serial,jobs:structuredClone(jobs)}),restore:data=>{serial=data.serial;jobs=structuredClone(data.jobs);},list:()=>jobs.map(j=>({...j,action:{...j.action}})),busy:()=>jobs.some(j=>!['done','cancelled'].includes(j.phase))};
 }
 const inTransit=(state,uid)=>Object.values(state?.routes||{}).some(r=>r.occupied&&r.train?.scenario&&r.train.uid===uid)||(state?.scenarioMotions||[]).some(m=>m.uid===uid);
 const api={create,candidates,point,inTransit};if(node)module.exports=api;else root.SimScenarioMotion=api;

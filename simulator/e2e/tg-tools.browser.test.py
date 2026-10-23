@@ -48,7 +48,7 @@ def run(page, url):
     open_graph(page)
     expect(page.locator('#tgStatus')).to_have_text('준비')
     # menus: photographed 편집(E) plus the textbook's Dia 보기 / 화면설정 / 즐겨찾기 structure
-    assert tg_labels(page, '편집(E)') == ['열차복사(C) Ctrl+C', '붙여놓기(V) Ctrl+V', '열차생성(A) Ctrl+A', '열차정보수정(F5) F5', '노트편집(N) Ctrl+N']
+    assert tg_labels(page, '편집(E)') == ['실행 취소 Ctrl+Z', '다시 실행 Ctrl+Shift+Z', '열차복사(C) Ctrl+C', '붙여놓기(V) Ctrl+V', '열차생성(A) Ctrl+A', '열차정보수정(F5) F5', '노트편집(N) Ctrl+N']
     assert tg_labels(page, 'Dia 보기') == ['확대/축소', '다이얼로그', '보이기/감추기', '열차별 색상 및 선속성']
     assert tg_labels(page, 'Dia 보기', '확대/축소') == ['시간축 확대 +', '시간축 축소 -', '역축 확대 *', '역축 축소 /']
     assert tg_labels(page, 'Dia 보기', '다이얼로그') == ['역축/시간축 설정', '열차정보보기옵션']

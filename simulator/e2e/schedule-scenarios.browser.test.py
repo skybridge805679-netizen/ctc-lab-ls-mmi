@@ -59,7 +59,7 @@ def run(page, url):
     page.evaluate("()=>{const s=document.querySelector('#stationSelect');s.value='%s';s.dispatchEvent(new Event('change'))}" % nearest)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(8, timeout=5000)
     # the last step needs the spoken line ticked; the whole thing is a pass
-    page.locator('#scSteps li.sc-say input').nth(0).check(); page.locator('#scSteps li.sc-say input').nth(1).check()
+    page.evaluate("SimMMI.run({type:'tick',seconds:60})");page.wait_for_timeout(600)
     expect(page.locator('#scStatus')).to_contain_text('합격')
     # ------------------------------------------------------------ 스케줄 생성 시나리오
     page.evaluate("SimMMI.close('schedule')") if False else None
@@ -94,7 +94,7 @@ def run(page, url):
         box.set_checked(box.get_attribute('value') == flag)
     page.locator('#scheduleApply').click(); expect(page.locator('.mmi-alert')).to_contain_text('편집 적용 완료'); ok()
     page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length>=5")
-    page.locator('#scSteps li.sc-say input').last.check()
+    page.evaluate("SimMMI.run({type:'tick',seconds:60})");page.wait_for_timeout(600)
     expect(page.locator('#scStatus')).to_contain_text('합격')
     assert not errors, errors
     print('schedule scenarios: ok')

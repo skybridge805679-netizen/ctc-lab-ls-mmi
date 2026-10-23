@@ -158,7 +158,7 @@ function create({core,stations,refresh=()=>{}}){
   }
   return null;
  }
- return {step,run,position,reset:()=>{mem.clear();troubles.clear();actual.clear();started.clear();outside.clear();},actuals:()=>[...actual.values()],troubles:()=>[...troubles.values()],stageOf:(t,c)=>mem.get(key(t,c))?.stage??0};
+ return {step,run,position,checkpoint:()=>({mem:[...mem],troubles:[...troubles],actual:[...actual],started:[...started],outside:[...outside]}),restore:data=>{for(const [target,key]of [[mem,'mem'],[troubles,'troubles'],[actual,'actual'],[outside,'outside']]){target.clear();for(const [k,v]of data[key]||[])target.set(k,v);}started.clear();for(const id of data.started||[])started.add(id);},reset:()=>{mem.clear();troubles.clear();actual.clear();started.clear();outside.clear();},actuals:()=>[...actual.values()],troubles:()=>[...troubles.values()],stageOf:(t,c)=>mem.get(key(t,c))?.stage??0};
 }
 const api={create,TRIGGER_LEAD,ENTER_LEAD,DEP_LEAD,EXIT_LEAD,PASS_DWELL};
 if(typeof module!=='undefined')module.exports=api;else root.SimAuto=api;

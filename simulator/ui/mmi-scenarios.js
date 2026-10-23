@@ -53,19 +53,19 @@ function render(){
  const fill=t=>SC().fill(t,run),firstOpen=run.sc.steps.findIndex((s,i)=>s.kind==='do'&&!run.done[i]);
  box.innerHTML=run.sc.steps.map((s,i)=>s.kind==='do'
   ?`<li class="sc-do ${run.done[i]?'done':''} ${i===firstOpen?'current':''}"><span class="sc-mark">${run.done[i]?'✔':i===firstOpen?'▶':'○'}</span><span>${esc(fill(s.text))}${i===firstOpen&&s.hint?`<small class="sc-hint">힌트: ${esc(s.hint)}</small>`:''}${i===firstOpen&&run.explain?`<small class="sc-hint sc-explain">${esc(run.explain)}</small>`:''}</span></li>`
-  :`<li class="sc-say ${run.done[i]?'done':''}"><label><input type="checkbox" data-say="${i}" ${run.done[i]?'checked':''}>${s.lines?`<span class="sc-lines"><b>${s.no}. ${esc(s.heading||'')}</b>${s.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</span>`:`<span>${esc(fill(s.text))}</span>`}</label></li>`).join('');
+  :`<li class="sc-say ${run.done[i]?'done':''}" data-speech-step="${i}"><div class="sc-speech"><span class="sc-mark">${run.done[i]?'✔':run.speechDue?.[i]?'▶':'○'}</span>${s.lines?`<span class="sc-lines"><b>${s.no}. ${esc(s.heading||'')}</b>${s.lines.map(l=>`<span>${esc(l)}</span>`).join('')}</span>`:`<span>${esc(fill(s.text))}</span>`}</div></li>`).join('');
  const total=run.sc.steps.length,doneCount=run.done.filter(Boolean).length;
  $('scProgress').textContent=`진행 ${doneCount}/${total}`;
  const doOpen=run.sc.steps.some((s,i)=>s.kind==='do'&&!run.done[i]),sayOpen=run.sc.steps.some((s,i)=>s.kind==='say'&&!run.done[i]);
  if(!doOpen&&!sayOpen&&(motion.busy()||run.queue.length))$('scStatus').textContent='조작·구술 완료 — 열차 이동과 도착을 기다리고 있습니다.';
  else if(!doOpen&&!sayOpen){$('scStatus').textContent='합격: 조작과 구술 항목을 모두 마쳤습니다. 이상입니다!';if(!passed){passed=true;if(!root.SimRemote)mmi().log('event',`실기 시나리오 합격 · ${run.sc.title}`);}}
- else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 남은 구술(체크) 항목을 확인하세요.';
+ else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 통보·구술 대본이 자동으로 진행됩니다.';
  else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
 let lastRemoteUI='';
 let remoteStarted=null;
 function remoteRender(){run=root.SimRemote.snapshot.scenario.run;if(run&&run.started!==remoteStarted){remoteStarted=run.started;$('scSelect').value=run.sc.id;$('scProblem').innerHTML=`<b>문제</b> ${esc(SC().fill(run.sc.problem||'',run))}<br><small>출처: ${esc(run.sc.source||'실기 시나리오')}</small>`;$('scNotes').innerHTML=(run.sc.notes||[]).map(n=>`<li>${esc(n)}</li>`).join('');}render();renderMotion();}
-function evaluate(){if(root.SimRemote){const ui=uiState(),signature=JSON.stringify(ui);if(signature!==lastRemoteUI){lastRemoteUI=signature;root.SimRemote.command({type:'scenario:ui',ui});}remoteRender();return;}if(!run||mmi().replaying())return;const c=ctx();let redraw=SC().advance(run,c);if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of new Set([...run.sc.stations,...(run.sc.castStations||[])]))mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}if(motion.step()){mmi().syncAll(host.context().stationStates);mmi().render();render();}renderMotion();const stamp=motion.list().map(j=>j.id+j.phase+j.reason).join('|');if(redraw||stamp!==motionStamp){motionStamp=stamp;render();}}
+function evaluate(){if(root.SimRemote){const ui=uiState(),signature=JSON.stringify(ui);if(signature!==lastRemoteUI){lastRemoteUI=signature;root.SimRemote.command({type:'scenario:ui',ui});}remoteRender();return;}if(!run||mmi().replaying())return;const c=ctx();let redraw=SC().advance(run,c);redraw=root.SimScenarioFlow.advance(run,station().clock)||redraw;if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]),text=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(c):'';if(text!==run.explain){run.explain=text;redraw=true;}}if(isEm(run.sc)){if(EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),()=>root.SimLSUI.getModel()).length){for(const st of new Set([...run.sc.stations,...(run.sc.castStations||[])]))mmi().checkDuplicates(st);mmi().render();}}else{fireBeats();runQueue();}if(motion.step()){mmi().syncAll(host.context().stationStates);mmi().render();render();}renderMotion();const stamp=motion.list().map(j=>j.id+j.phase+j.reason).join('|');if(redraw||stamp!==motionStamp){motionStamp=stamp;render();}}
 const current=()=>all().find(s=>s.id===$('scSelect').value);
 // The faulty train is chosen from the CURRENT timetable (it changes from scenario to scenario); any number may also be typed.
 function fillTrains(){
@@ -131,7 +131,7 @@ function init(api){
  motion=root.SimRemote?{list:()=>root.SimRemote.snapshot.scenario.jobs,busy:()=>root.SimRemote.snapshot.scenario.jobs.some(j=>!['done','cancelled'].includes(j.phase)),reset:()=>root.SimRemote.command({type:'scenario:stop'}),request:a=>root.SimRemote.command({type:'scenario:move',action:a})}:root.SimScenarioMotion.create({states:()=>host.context().stationStates,model:lsm,validate:a=>root.SimLSUI.validate(a),commit:a=>{const result=root.SimLSUI.dispatchDirect(a);if(result.ok){for(const id of new Set([a.station,a.targetStation]))if(id)mmi().checkDuplicates(id);mmi().log('event','시나리오 열차 이동 완료 · '+a.station+' '+a.slot+' → '+(a.targetSlot||'관제구간 밖'));if(run){SC().advance(run,ctx());render();}}return result;}});
  const win=mmi().createWindow('scenario',{title:'관제 실기 시나리오 (대피 5 · 비상 9 · 스케줄 2)',x:90,y:40,width:820,body:`<div class="rpt sc"><div class="rpt-cond"><label>시나리오<select id="scSelect"><optgroup label="부본선 대피">${SC().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="비상시 조치">${EM().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup><optgroup label="스케줄 연습 (MMI·그래프)">${SS().list.map(s=>`<option value="${s.id}">${esc(s.title)}</option>`).join('')}</optgroup></select></label><span id="scTrainRow"><label>고장열차<input id="scTrain" list="scTrainList" maxlength="6" autocomplete="off"><datalist id="scTrainList"></datalist></label><small id="scTrainNote"></small></span><button type="button" class="sched-btn primary" id="scStart">시작 (역 상태를 시나리오 초기값으로)</button><span id="scProgress"></span></div>
 <div id="scProblem" class="sc-problem">시나리오를 고르고 [시작]을 누르세요.</div>
-<p class="idm-note">열차 이동은 가상시계를 따릅니다. 일시정지 시 멈추며, 진로 대기 이유와 도착 상태를 아래에서 확인할 수 있습니다.</p><div id="scMotionStatus" class="sc-motion-status" role="status"></div><ol id="scSteps" class="sc-steps"></ol>
+<p class="idm-note">통보·구술 대본과 열차 이동은 체크 없이 가상시계를 따라 자동 진행합니다. 실제 관제 조작이 필요한 단계에서는 조작을 기다립니다. 일시정지 시 멈추며, 진로 대기 이유와 도착 상태를 아래에서 확인할 수 있습니다.</p><div id="scMotionStatus" class="sc-motion-status" role="status"></div><ol id="scSteps" class="sc-steps"></ol>
 <div id="scStatus" class="trc-msg" role="status"></div>
 <ul id="scNotes" class="sc-notes"></ul>
 <details class="sc-variants"><summary>상황변경 시 대응 요령 (비상시조치 평가 참고 원문)</summary><pre id="scVariants"></pre></details>
@@ -140,7 +140,7 @@ function init(api){
  $('scVariants').textContent=EM().variants.lines.join('\n');
  $('scStop').onclick=()=>{motion.reset();run=null;passed=false;$('scSteps').innerHTML='';$('scProgress').textContent='';$('scStatus').textContent='시나리오 중지 · 이동 대기와 시나리오 점유를 정리했습니다.';renderMotion();mmi().render();};
  $('scStart').onclick=start;$('scSelect').onchange=fillTrains;win.opener=fillTrains;$('scClose').onclick=()=>mmi().close('scenario');
- $('scSteps').onchange=e=>{const i=e.target.dataset?.say;if(i===undefined||!run)return;if(root.SimRemote){root.SimRemote.command({type:'scenario:say',index:Number(i),checked:e.target.checked});remoteRender();return;}run.done[Number(i)]=e.target.checked;evaluate();render();};
+
  mmi().onEvent(e=>{if(!run)return;run.events.push(e);evaluate();});
  timer=setInterval(evaluate,500);
 }
@@ -150,12 +150,9 @@ function renderMotion(){
  el.hidden=!jobs.length;
  el.innerHTML=jobs.map(j=>`<div><b>${esc(j.number)}</b><span>${esc(mmi().stationInfo(j.fromStation||j.station).name)} · ${esc(j.from)} → ${j.action.targetStation?esc(mmi().stationInfo(j.action.targetStation).name)+' · ':''}${esc(j.to)}</span><small>${esc(j.reason)}</small></div>`).join('');
 }
-function intercept(a){
- if(!run||isSch(run.sc)||a.op!=='move')return null;
- const row=lsm().stations[a.station]?.windows[a.slot]?.find(t=>t.uid===a.uid);if(!row)return null;
- const numbers=isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id);
- return numbers.includes(row.number)?motion.request(a,true):null;
-}
+function intercept(){return null;}
+function manualNumberAction(a){if(['move','swap','delete'].includes(a.op)){motion?.cancel?.(a.uid);if(a.targetUid)motion?.cancel?.(a.targetUid);}}
+
 function actualPosition(train){
  if(root.SimRemote)return root.SimRemote.snapshot.auto.positions[train.id]||null;
  const f=findRow(train.id);if(!f)return null;
@@ -165,5 +162,5 @@ function actualPosition(train){
   return {station:f.station,nextStation:to.id,order:from.order+(to.order-from.order)*fraction,status:'관할 인계',actual:true};}
  return {station:f.station,order:from.order,status:j&&j.phase!=='waiting'?'진행':j?'진로 대기':'정차',actual:true};
 }
-root.SimScenarioUI={init,intercept,position:actualPosition,snapshot:()=>run?{id:run.sc.id,done:[...run.done],queue:[...run.queue],motions:motion.list()}:null,motionJobs:()=>motion?.list()||[],reservedNumbers:()=>root.SimRemote?root.SimRemote.snapshot.scenario.reserved:!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id),stepMotion:()=>{if(root.SimRemote){evaluate();return true;}if(!motion||!run||mmi().replaying())return false;const before=motion.list().map(j=>j.id+j.phase+j.reason).join('|');evaluate();return before!==motion.list().map(j=>j.id+j.phase+j.reason).join('|');}};
+root.SimScenarioUI={init,intercept,manualNumberAction,position:actualPosition,snapshot:()=>run?{id:run.sc.id,done:[...run.done],queue:[...run.queue],motions:motion.list()}:null,motionJobs:()=>motion?.list()||[],reservedNumbers:()=>root.SimRemote?root.SimRemote.snapshot.scenario.reserved:!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id),stepMotion:()=>{if(root.SimRemote){evaluate();return true;}if(!motion||!run||mmi().replaying())return false;const before=motion.list().map(j=>j.id+j.phase+j.reason).join('|');evaluate();return before!==motion.list().map(j=>j.id+j.phase+j.reason).join('|');}};
 })(window);

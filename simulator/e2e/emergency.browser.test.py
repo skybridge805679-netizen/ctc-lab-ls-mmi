@@ -29,7 +29,7 @@ def run(page, url):
     row = lambda n: page.evaluate("n=>{for(const [st,s] of Object.entries(SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(s.windows))for(const r of rows)if(r.number===n)return st+'/'+slot+'/'+r.direction;return null;}", n)
     assert row('K0602') == 'dongmyo/2T/up', row('K0602')
     # ticking spoken step 1 (collision) puts K0604 into the same 열번창 -> 열차번호 중복 알람
-    page.locator('#scSteps li.sc-say').first.locator('input').check()
+    expect(page.locator('#scSteps input[data-say]')).to_have_count(0);page.evaluate("SimMMI.run({type:'tick',seconds:20})")
     page.wait_for_function("()=>!!SimLSUI.getModel().stations.dongmyo.windows['2T'] && SimLSUI.getModel().stations.dongmyo.windows['2T'].length===2")
     expect(page.locator('#alarmLogBody')).to_contain_text('열차번호 중복')
     ack = lambda: page.evaluate("()=>{document.querySelectorAll('.mmi-alarm:not([hidden]) input[data-alarm-i]').forEach(b=>{if(!b.checked){b.checked=true;b.dispatchEvent(new Event('change',{bubbles:true}));}});document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click()}")

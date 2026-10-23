@@ -174,7 +174,7 @@ const list=Object.keys(OVERLAY).map(build).filter(Boolean);
 // ---- engine pieces used by the scenario window
 function seed(sc,states){
  const c0=core();
- for(const st of sc.stations){const c=c0.forStation(st);for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial());}
+ for(const st of sc.stations){const c=c0.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});}
  for(const [st,sigs] of Object.entries(sc.seeds)){
   const c=c0.forStation(st),s=states[st];c.dispatch(s,{type:'mode',value:'CCM',source:'SCENARIO'});
   for(const sig of sigs){const departure=c.signals[sig]?.kind==='출발';

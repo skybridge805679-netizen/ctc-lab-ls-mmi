@@ -60,6 +60,6 @@ function grade(){let message='';const say=text=>{message=text;},list=()=>{};
 }
  evaluate();return {ok:true,message};
 }
-return {ID,createProblem,grade,reset(){if(problemTrain())T.remove(model(),ID);baseline=null;start=null;},snapshot:()=>({baseline,start})};
+return {ID,createProblem,grade,restore:data=>{baseline=data.baseline;start=data.start;},reset(){if(problemTrain())T.remove(model(),ID);baseline=null;start=null;},snapshot:()=>({baseline,start})};
 }
 module.exports={create};

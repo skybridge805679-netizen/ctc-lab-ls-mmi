@@ -53,7 +53,7 @@ def run(page, url):
             assert len(followers) == 2, followers
             do({'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
             idx = page.evaluate("[...document.querySelectorAll('#scSteps li.sc-say')].findIndex(li=>li.textContent.includes('진입 완료'))")
-            page.locator('#scSteps li.sc-say').nth(idx).locator('input').check()
+            page.evaluate("SimMMI.run({type:'tick',seconds:120})")
             do({'type':'tick','seconds':20})
             page.wait_for_function("([n])=>(SimLSUI.getModel().stations.yongsan.windows['7T']||[]).some(r=>r.number===n)", arg=[followers[0]])
             do({'type': 'tick', 'seconds': 35})

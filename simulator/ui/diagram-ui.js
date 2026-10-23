@@ -1,16 +1,17 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>SimDOM.document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0].id;
+ const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0]?.id||'',trainOptionKey='';
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
  function selectTrain(id){selected=id;$('graphTrain').value=id;render();}
  function render(){
   if(!context)return;
-  if(!model.trains.some(t=>t.id===selected))selected=model.trains[0].id; // the selected train may have been removed (경합해소 실습 초기화)
+  if(!model.trains.some(t=>t.id===selected))selected=model.trains[0]?.id||''; // the selected train may have been removed (경합해소 실습 초기화)
   while(notified<model.changes.length){const change=model.changes[notified++];for(const listener of subscribers)listener(change);}
-  $('graphTrain').innerHTML=model.trains.map(t=>`<option>${escape(t.id)}</option>`).join('');$('graphTrain').value=selected;
+  const optionKey=model.trains.map(t=>t.id).join('|');if(optionKey!==trainOptionKey){trainOptionKey=optionKey;$('graphTrain').innerHTML=model.trains.map(t=>`<option>${escape(t.id)}</option>`).join('');}$('graphTrain').value=selected;
+  if(!model.trains.length){$('diaSvg').innerHTML='';$('graphDetails').textContent='등록된 열차가 없습니다. 시간표를 열거나 열차를 생성하세요.';message('등록된 열차 0개');return;}
   if($('graphPanel').hidden)return;
   const from=N.catalog[$('graphFrom').value].order,to=N.catalog[$('graphTo').value].order;
   const parts=$('graphStart').value.split(':').map(Number),span=Number($('graphSpan').value)*60;
@@ -75,7 +76,7 @@
   $('diaSvg').setAttribute('viewBox',`0 0 ${width} ${height}`);$('diaSvg').setAttribute('width',width);$('diaSvg').setAttribute('height',height);$('diaSvg').innerHTML=svg;
   const train=model.trains.find(t=>t.id===selected),pos=(root.SimAutoUI?.position||T.position)(train,context.clock());
   $('graphCancel').textContent=train.cancelled?'운휴 복원':'전체 운휴';
-  $('graphDetails').innerHTML=`<h3>${escape(train.id)} · ${train.direction==='down'?'하행':'상행'} · ${train.cancelled?'전체 운휴':pos?(N.catalog[pos.station].name+' '+pos.status):'운행 전 / 운행 종료'}</h3><p>시발 ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → 종착 ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 현재 ${T.clock(context.clock())}</p><div class="call-table"><table><thead><tr><th>역</th><th>최초 도착</th><th>현재 도착</th><th>현재 출발</th></tr></thead><tbody>${train.calls.filter(c=>N.catalog[c.station].order>=from&&N.catalog[c.station].order<=to).map(c=>`<tr><td>${N.catalog[c.station].name}</td><td>${T.clock(train.plan.find(p=>p.station===c.station).arrival)}</td><td>${T.clock(c.arrival)}</td><td>${T.clock(c.departure)}</td></tr>`).join('')}</tbody></table></div>`;
+  $('graphDetails').innerHTML=`<h3>${escape(train.id)} · ${train.direction==='down'?'하행':'상행'} · ${train.cancelled?'전체 운휴':pos?(N.catalog[pos.station].name+' '+pos.status):'운행 전 / 운행 종료'}</h3><p>시발 ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → 종착 ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 현재 ${T.clock(context.clock())}</p><div class="call-table"><table><thead><tr><th>역</th><th>최초 도착</th><th>현재 도착</th><th>현재 출발</th></tr></thead><tbody>${train.calls.filter(c=>N.catalog[c.station].order>=from&&N.catalog[c.station].order<=to).map(c=>`<tr><td>${N.catalog[c.station].name}</td><td>${T.clock((train.plan?.find(p=>p.station===c.station)||c).arrival)}</td><td>${T.clock(c.arrival)}</td><td>${T.clock(c.departure)}</td></tr>`).join('')}</tbody></table></div>`;
  }
  function init(api){
   context=api;

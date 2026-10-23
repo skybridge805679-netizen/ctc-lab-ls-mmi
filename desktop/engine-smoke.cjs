@@ -8,6 +8,7 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  const ls=await app.firstWindow();ls.on('pageerror',e=>errors.push(String(e)));await ls.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
  const pid=await ls.evaluate(()=>SimRemote.snapshot.pid),renderer=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].webContents.getOSProcessId());assert.notEqual(pid,renderer);
  await ls.evaluate(()=>SimRemote.command({type:'clock',paused:true}));
+ await ls.selectOption('#lsStationSelect','geumcheon');await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');await ls.locator('[data-point-control="51A"]').click();await expect(ls.locator('#actionDialog')).toContainText('SW_51A');await ls.click('#dialogConfirm');await ls.waitForFunction(()=>SimRemote.snapshot.states.geumcheon.points['52']==='R');await expect(ls.locator('[data-switch-connection="52"]')).toHaveAttribute('data-connected','true');
  const t=await ls.evaluate(()=>SimRemote.snapshot.timetable.trains.find(t=>t.direction==='up'&&t.calls.some(c=>c.station==='yongsan')).id);
  let mmi=app.windows().find(p=>p!==ls);await mmi.click('#mmiScenarioBtn');await mmi.selectOption('#scSelect','yongsan-5');await mmi.fill('#scTrain',t);await mmi.click('#scStart');
  for(const action of [{type:'mode',value:'CCM',source:'MMI'},{type:'stop',id:'2A',source:'LS'},{type:'tick',seconds:90},{type:'route',id:'2A-5T',source:'LS'}])assert.ok((await ls.evaluate(a=>SimMMI.run(a),action)).ok);
@@ -39,4 +40,9 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('LS')).show());
  assert.deepEqual(errors,[]);console.log(`PASS independent engine PID ${pid}, scenario motion, timetable persistence, renderer stall/close/reload survival and proportional native desktop resizing`);
  await app.close();app=null;
+ const disk=require('./session-store.cjs').read(path.join(profile,'engine-session.orpheia'));assert.equal(disk.format,'ORPHEIA-SESSION');assert.equal(disk.timetable.trains.find(x=>x.id===edited).kind,'회송열차');
+ app=await _electron.launch({executablePath,args,env:{...process.env,ORPHEIA_TEST_USER_DATA:profile},timeout:60000});
+ const reopened=await app.firstWindow();reopened.on('pageerror',e=>errors.push(String(e)));await reopened.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
+ assert.notEqual(await reopened.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await reopened.evaluate(()=>SimRemote.snapshot.clock.paused),true);await expect(reopened.locator('[data-train-slot="5T"]')).toContainText(t);assert.equal(await reopened.evaluate(id=>SimRemote.snapshot.timetable.trains.find(x=>x.id===id).kind,edited),'회송열차');assert.ok(await reopened.evaluate(()=>SimEquipment.isFault('yongsan','N2')));assert.deepEqual(errors,[]);
+ console.log('PASS durable native restart restores train numbers, timetable, equipment and scenario into a new paused engine');await app.close();app=null;
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});

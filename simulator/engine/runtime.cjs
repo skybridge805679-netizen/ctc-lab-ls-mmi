@@ -3,7 +3,7 @@ const Session=require('./session'),Core=require('./core'),Network=require('./net
 function create(){
  const session=Session.create(),states=session.states,model=Timetable.initial();
  const ops=Operations.create(Object.fromEntries(Object.entries(Windows.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),ls=ops.initial();
- let seq=0,paused=false,speed=1,replay=false;const events=[];
+ let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;const published=new Map();const events=[];
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
  const root={SimCore:{...Core,forStation:session.core},SimNetwork:Network,SimTimetable:Timetable,SimTrainWindows:Windows,SimTrackNetwork:require('./track-network'),SimLine:require('./line'),SimAuto:require('./autocontrol'),SimScenarios:require('./scenarios'),SimEmergency:require('./emergency'),SimScheduleScenarios:require('./schedule-scenarios'),SimScenarioMotion:require('./scenario-motion')};
  root.SimLine.journeys.clear();root.SimLine.state.enforce=true;root.SimLine.state.single.clear();
@@ -19,8 +19,14 @@ function create(){
  root.SimScenarioUI=require('./scenario-controller.cjs').create(root,host);
  root.SimAutoUI=require('./auto-controller.cjs').create(root,host);
  function refresh(){root.SimLine.refresh(states,ls);for(const station of Object.keys(states))checkDuplicates(station);}
- function tick(seconds){if(!Number.isFinite(seconds)||seconds<0||seconds>86400)throw new Error('Invalid clock step');session.tick(seconds);root.SimScenarioUI.step();root.SimAutoUI.step();root.SimEquipment.tick(states[session.selected].clock);refresh();}
- function command(action){
+ function step(seconds){if(!Number.isFinite(seconds)||seconds<0||seconds>86400)throw new Error('Invalid clock step');session.tick(seconds);root.SimScenarioUI.step();root.SimAutoUI.step();root.SimEquipment.tick(states[session.selected].clock);refresh();}
+ function tick(seconds){
+  if(!Number.isFinite(seconds)||seconds<0||seconds>86400)throw new Error('Invalid clock step');
+  const quantum=root.SimScenarioUI.snapshot().run?1:root.SimAutoUI.enabled()?5:Math.max(seconds,1);
+  if(seconds===0)step(0);else for(let left=seconds;left>0;){const dt=Math.min(quantum,left);step(dt);left-=dt;}
+  if(root.SimAutoUI.enabled()&&root.SimAutoUI.reflecting())tableDirty=true;
+ }
+ function execute(action){
   const {type}=action;
   if(type==='poll')return {ok:true};
   if(type==='replay'){replay=!!action.on;return {ok:true};}
@@ -31,12 +37,12 @@ function create(){
   if(type==='control'){
    refresh();const result=session.dispatch(action.station,action.action);emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
   }
-  if(type==='numbers'){const r=root.SimLSUI.dispatch(action.action),a=action.action,s=states[a.station];if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});refresh();return r;}
+  if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok)root.SimScenarioUI.manualNumberAction(a);if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});refresh();return r;}
   if(type==='numbers:validate')return root.SimLSUI.validate(action.action);
   if(type==='numbers:reset'){ls.stations[action.station]={windows:{},boards:[]};refresh();return {ok:true};}
   if(type==='station:reset'){const clock=states[action.station].clock;Object.assign(states[action.station],session.core(action.station).initial(),{clock});return {ok:true};}
   if(type==='timetable'){
-   const allowed=['delay','cancel','setCancelled','create','update','remove','copy'];if(!allowed.includes(action.method))throw new Error('Unknown timetable operation');
+   const allowed=['delay','cancel','setCancelled','create','update','remove','copy','import','undo','redo'];if(!allowed.includes(action.method))throw new Error('Unknown timetable operation');
    const r=Timetable[action.method](model,...action.args);root.SimScenarioUI.step();return r;
   }
   if(type==='line'){if(action.enforce!==undefined)root.SimLine.state.enforce=!!action.enforce;if(action.key!==undefined){if(!root.SimLine.line.sections.some(sec=>sec.west+'>'+sec.east+':'+sec.trunk[0]===action.key))throw new Error('Invalid single-line section');if(action.on)root.SimLine.state.single.add(action.key);else root.SimLine.state.single.delete(action.key);}refresh();return {ok:true};}
@@ -52,11 +58,29 @@ function create(){
   if(type==='drill:reset'){root.SimDrill.reset();return {ok:true};}
   throw new Error('Unknown engine command: '+type);
  }
- function snapshot(since=0){
+ function command(action){const result=execute(action);if(!['poll','numbers:validate'].includes(action.type)){revision++;cache=null;if(['timetable','scenario:start','drill:create','drill:reset','auto'].includes(action.type))tableDirty=true;}return result;}
+ function current(){
+  if(cache)return cache;
+
   const positions=Object.fromEntries(model.trains.map(t=>[t.id,root.SimAutoUI.position(t,states[session.selected].clock)]));
-  const value={seq,pid:process.pid,selected:session.selected,states,ls,timetable:model,clock:{paused,speed,replay},line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],events:events.filter(e=>e.seq>since)};
-  return JSON.parse(JSON.stringify(value,(_key,v)=>typeof v==='function'?undefined:v instanceof Set?[...v]:v));
+  const value={editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],events};
+  if(tableDirty||!tableCache){tableCache=JSON.parse(JSON.stringify(model));tableDirty=false;}
+  cache=JSON.parse(JSON.stringify(value,(_key,v)=>typeof v==='function'?undefined:v instanceof Set?[...v]:v));cache.timetable=tableCache;
+  for(const [key,v]of Object.entries(cache)){if(key==='events')continue;const previous=published.get(key);if(previous?.value===v)continue;const hash=JSON.stringify(v);if(previous?.hash!==hash)published.set(key,{at:revision,hash,value:v});}
+  return cache;
  }
- return {command,snapshot,pulse:()=>{if(!paused&&!replay)tick(speed);}};
+ function snapshot(since=0){const copy=structuredClone(current());copy.events=events.filter(e=>e.seq>since).map(e=>structuredClone(e));return copy;}
+ function transport(version=-1,since=0){const data=current(),delta=Number.isInteger(version)&&version>=0&&version<=revision,out={delta,version:revision,seq,events:events.filter(e=>e.seq>since)};for(const [key,value]of Object.entries(data))if(key!=='events'&&(!delta||published.get(key)?.at>version))out[key]=value;return out;}
+ function checkpoint(){return structuredClone({format:'ORPHEIA-SESSION',schema:1,selected:session.selected,states,ls,timetable:model,clock:{paused,speed},line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single],journeys:[...root.SimLine.journeys]},equipment:root.SimEquipment.checkpoint(),auto:root.SimAutoUI.checkpoint(),scenario:root.SimScenarioUI.checkpoint(),drill:root.SimDrill.snapshot(),seq,events});}
+ function restore(saved){
+  if(saved?.format!=='ORPHEIA-SESSION'||saved.schema!==1||!states[saved.selected]||!Array.isArray(saved.timetable?.trains)||saved.timetable.trains.some(t=>!Timetable.valid(t))||new Set(saved.timetable.trains.map(t=>t.id)).size!==saved.timetable.trains.length)throw new Error('Invalid saved session');
+  for(const id of Object.keys(states)){const st=saved.states?.[id],numbers=saved.ls?.stations?.[id];if(!st||!numbers||!Number.isFinite(st.clock)||!['AUTO','CCM','LOCAL'].includes(st.mode)||Object.keys(st.routes||{}).some(key=>!session.core(id).routes[key]))throw new Error('Invalid saved station '+id);for(const [slot,rows]of Object.entries(numbers.windows))if(!Windows.data[id].some(w=>w.slot===slot)||!Array.isArray(rows))throw new Error('Invalid saved number window');}
+  if(!Number.isFinite(saved.clock?.speed)||saved.clock.speed<0||saved.clock.speed>120||!saved.auto?.engine||!saved.scenario?.motion||!Array.isArray(saved.events))throw new Error('Invalid saved controller');
+  const data=structuredClone(saved);for(const id of Object.keys(states)){for(const k of Object.keys(states[id]))delete states[id][k];Object.assign(states[id],data.states[id]);}
+  Object.assign(ls,data.ls);Object.assign(model,data.timetable);session.select(data.selected);paused=true;speed=data.clock.speed;replay=false;
+  root.SimLine.state.enforce=data.line.enforce;root.SimLine.state.single.clear();for(const key of data.line.single)root.SimLine.state.single.add(key);root.SimLine.journeys.clear();for(const [key,value]of data.line.journeys)root.SimLine.journeys.set(key,value);
+  root.SimEquipment.restore(data.equipment);root.SimAutoUI.restore(data.auto);root.SimDrill.restore(data.drill);root.SimScenarioUI.restore(data.scenario);seq=data.seq;events.length=0;events.push(...data.events);emit('log',{channel:'event',text:'저장된 실습 세션을 복원했습니다. 일시정지 상태에서 시작합니다.',level:'I'});refresh();revision++;cache=null;tableDirty=true;published.clear();
+ }
+ return {command,snapshot,transport,checkpoint,restore,pulse:()=>{if(!paused&&!replay){tick(speed);revision++;cache=null;}}};
 }
 module.exports={create};

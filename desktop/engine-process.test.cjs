@@ -1,0 +1,10 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),{fork}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+function launch(file){const child=fork(path.join(__dirname,'engine-process.cjs'),[file],{stdio:['ignore','ignore','ignore','ipc']}),pending=new Map();let serial=0;const ready=new Promise(resolve=>child.on('message',m=>{if(m.ready)resolve();const p=pending.get(m.id);if(p){pending.delete(m.id);clearTimeout(p.timer);p.resolve(m);}}));return {ready,request(action){return new Promise(resolve=>{const id=++serial,timer=setTimeout(()=>{pending.delete(id);resolve({error:'timeout'});},5000);pending.set(id,{resolve,timer});child.send({id,action,since:0,version:-1});});},stop:()=>new Promise(resolve=>{child.once('exit',resolve);child.kill();})};}
+test('the process restores a valid backup after a corrupt autosave and rejects a malformed session atomically',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-process-')),file=path.join(dir,'state.orpheia');let engine=launch(file);
+ try{await engine.ready;await engine.request({type:'clock',paused:true});await engine.request({type:'tick',seconds:600});assert.ok((await engine.request({type:'session:persist'})).result.ok);await engine.request({type:'tick',seconds:10});await engine.request({type:'session:persist'});await engine.stop();engine=null;
+  const bytes=fs.readFileSync(file);bytes[bytes.length-1]^=1;fs.writeFileSync(file,bytes);engine=launch(file);await engine.ready;let reply=await engine.request({type:'poll'});assert.equal(reply.snapshot.states.anyang.clock,600);assert.equal(reply.snapshot.clock.paused,true);
+  const bad=path.join(dir,'bad.orpheia');fs.writeFileSync(bad,'broken');assert.ok((await engine.request({type:'session:open',file:bad})).error);reply=await engine.request({type:'poll'});assert.equal(reply.snapshot.states.anyang.clock,600);
+ }finally{if(engine)await engine.stop();fs.rmSync(dir,{recursive:true,force:true});}
+});

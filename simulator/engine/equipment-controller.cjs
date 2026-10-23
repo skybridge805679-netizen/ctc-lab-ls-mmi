@@ -29,6 +29,6 @@ function tick(clock){
 }
 function faultList(){return Object.keys(faults);}
 function reset(){for(const k of faultList())delete faults[k];last=null;sent=[];}
-return {set,isFault,tick,faultList,reset,sentTimes:()=>sent.slice()};
+return {checkpoint:()=>({faults,last,sent}),restore:data=>{reset();Object.assign(faults,data.faults);last=data.last;sent=data.sent;},set,isFault,tick,faultList,reset,sentTimes:()=>sent.slice()};
 }
 module.exports={create};

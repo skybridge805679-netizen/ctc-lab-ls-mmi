@@ -169,7 +169,7 @@ function pickCast(sc,model,faultId){
 const movesFor=(sc,tag)=>(sc.beats?.[tag]||[]).map(([key,slot,after=0])=>({key,slot,after}));
 // ---- engine
 function seed(sc,state){
- const c=core().forStation(sc.station),fresh=c.initial();
+ const c=core().forStation(sc.station),fresh=c.initial();fresh.clock=Number.isFinite(state.clock)?state.clock:0;
  for(const k of Object.keys(state))delete state[k];Object.assign(state,fresh);
  c.dispatch(state,{type:'mode',value:'CCM',source:'SCENARIO'});
  for(const id of sc.seed.routes){const r=c.dispatch(state,{type:'route',id,source:'SCENARIO'});if(!r.ok)throw new Error(`${sc.id}: seed route ${id}: ${r.message}`);}
@@ -177,7 +177,7 @@ function seed(sc,state){
  c.dispatch(state,{type:'mode',value:'AUTO',source:'SCENARIO'});
  return state;
 }
-// A run keeps `done` flags per step; do-steps complete strictly in order, say-steps are ticked freely.
+// Operator steps are recognised in order; spoken steps advance from scenario-flow.js on the clock.
 function newRun(sc,train=''){return {sc,train,done:sc.steps.map(()=>false),events:[],started:Date.now()};}
 // '{고장}' in a script line stands for the chosen train
 const fill=(text,run)=>text.replaceAll('{고장}',run.train||'고장열차');
@@ -185,7 +185,7 @@ function advance(run,ctx){
  const c={...ctx,events:run.events,train:run.train};let changed=false;
  for(let i=0;i<run.sc.steps.length;i++){
   const s=run.sc.steps[i];if(s.kind!=='do'||run.done[i])continue;
-  if(s.check(c)){run.done[i]=true;changed=true;}else break;     // the first unmet do-step blocks the later ones
+  if(s.check(c)){run.done[i]=true;(run.completedAt??={})[i]=ctx.state?.clock??0;changed=true;}else break;     // the first unmet do-step blocks the later ones
  }
  return changed;
 }

@@ -17,17 +17,17 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 
 // the icons in the order photographed (top to bottom)
 const TOOLS=[
- {g:'📂',tip:'(기능명 미확인)'},
+ {g:'📂',tip:'시간표 JSON 열기',run:'open'},
  {g:'⎘',tip:'열차복사(C)',run:'copy'},{g:'📋',tip:'붙여놓기(V)',run:'paste'},{g:'NEW',tip:'열차생성(A)',run:'create'},{g:'✎',tip:'열차정보수정(F5)',run:'edit'},
- {g:'📁',tip:'(기능명 미확인)'},{g:'UNDO',tip:'(기능명 미확인 · 구현하지 않음)'},{g:'DO',tip:'(기능명 미확인 · 구현하지 않음)'},{g:'☰',tip:'(기능명 미확인)'},
+ {g:'📁',tip:'(기능명 미확인)'},{g:'UNDO',tip:'편집 실행 취소 (Ctrl+Z)',run:'undo'},{g:'REDO',tip:'편집 다시 실행 (Ctrl+Shift+Z)',run:'redo'},{g:'☰',tip:'(기능명 미확인)'},
  {g:'📁✔',tip:'(기능명 미확인)'},{g:'📁🔍',tip:'(기능명 미확인)'},
  {g:'ZOOM◯',tip:'확대영역설정',run:'axisDialog'},{g:'▭',tip:'툴팁 보기',run:'m:tooltip'},{g:'┼',tip:'십자선보기',run:'m:cross'},
  {g:'ZOOM',tip:'영역 확대',run:'m:area'},{g:'🔍',tip:'돋보기',run:'m:magnify'},
- {g:'💾',tip:'(기능명 미확인)'},{g:'💾',tip:'(기능명 미확인)'}
+ {g:'💾',tip:'시간표 JSON 저장',run:'save'},{g:'💾',tip:'(기능명 미확인)'}
 ];
 const MENUS=[
- {label:'파일(F)',items:[{label:'열기(O)',run:'open'},{label:'인쇄(P)',run:'print'}]},
- {label:'편집(E)',items:[{label:'열차복사(C)',key:'Ctrl+C',run:'copy'},{label:'붙여놓기(V)',key:'Ctrl+V',run:'paste'},{label:'열차생성(A)',key:'Ctrl+A',run:'create'},{label:'열차정보수정(F5)',key:'F5',run:'edit'},{label:'노트편집(N)',key:'Ctrl+N',run:'note'}]},
+ {label:'파일(F)',items:[{label:'열기(O)',run:'open'},{label:'저장(S)',run:'save'},{label:'인쇄(P)',run:'print'}]},
+ {label:'편집(E)',items:[{label:'실행 취소',key:'Ctrl+Z',run:'undo'},{label:'다시 실행',key:'Ctrl+Shift+Z',run:'redo'},{label:'열차복사(C)',key:'Ctrl+C',run:'copy'},{label:'붙여놓기(V)',key:'Ctrl+V',run:'paste'},{label:'열차생성(A)',key:'Ctrl+A',run:'create'},{label:'열차정보수정(F5)',key:'F5',run:'edit'},{label:'노트편집(N)',key:'Ctrl+N',run:'note'}]},
  {label:'보기(V)',items:[{label:'현재시각으로(F9)',key:'F9',run:'jumpNow'},{label:'경합 표시 (교육용)',run:'t:conflicts',check:'conflicts',off:true},{label:'경합해소 실습 (교육용)',run:'drill'}]},
  {label:'Dia 보기(V)',items:[
   {label:'확대/축소',items:[{label:'시간축 확대',key:'+',run:'timeIn'},{label:'시간축 축소',key:'-',run:'timeOut'},{label:'역축 확대',key:'*',run:'stationIn'},{label:'역축 축소',key:'/',run:'stationOut'}]},
@@ -38,7 +38,7 @@ const MENUS=[
   {label:'화면모드설정',items:[{label:'툴팁보기',run:'m:tooltip',mode:'tooltip'},{label:'십자선보기',run:'m:cross',mode:'cross'},{label:'돋보기',run:'m:magnify',mode:'magnify'},{label:'영역확대',run:'m:area',mode:'area'}]},
   {label:'열차검색',run:'findDialog'}]},
  {label:'즐겨찾기',items:[{label:'즐겨찾기설정',run:'favSet'},{label:'즐겨찾기가기',run:'favGo'}]},
- {label:'도움말(H)'}
+ {label:'도움말(H)',items:[{label:'그래프 조작 안내',run:'help'}]}
 ];
 
 // ---------------------------------------------------------------- floating dialogs (small MMI windows)
@@ -65,7 +65,8 @@ function applyMode(){
 }
 function setMode(m){mode=mode===m?'':m;crossPt=null;applyMode();status(mode?`${{tooltip:'툴팁보기',cross:'십자선보기',magnify:'돋보기',area:'영역확대'}[mode]} · ${{tooltip:'열차를 선택하면 기본정보가 표시됩니다.',cross:'그래프를 클릭하면 시간과 위치가 표시됩니다.',magnify:'확대할 곳을 클릭하세요.',area:'확대할 영역을 끌어서 지정하세요.'}[mode]}`:'화면모드 해제');}
 const ACTIONS={
- open(){root.SimMMI.alertBox('스케줄 열기는 구현하지 않았습니다. 현재는 오늘 운행일의 온라인 스케줄 1개만 다룹니다.');},
+ help(){root.SimMMI.alertBox('열차 선택: 그래프 열차선 클릭 · 검색: Ctrl+F · 복사/붙이기: Ctrl+C/V · 수정: F5 · 실행 취소/다시 실행: Ctrl+Z / Ctrl+Shift+Z · 파일 메뉴: 시간표 JSON 열기/저장 · 인쇄: PDF 또는 프린터.');},
+ open(){root.SimTimetableFiles.open();},save(){root.SimTimetableFiles.save();},undo(){root.SimTimetableFiles.undo();},redo(){root.SimTimetableFiles.redo();},
  print(){
   const f=doc.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';doc.body.appendChild(f);
   const d=f.contentDocument;d.open();d.write(`<!doctype html><meta charset="utf-8"><title>온라인 열차그래프</title><style>body{margin:0}svg{width:100%;height:auto}</style>${$('diaSvg').outerHTML}`);d.close();
@@ -213,8 +214,9 @@ function init(panel){
  graph.addEventListener('keydown',e=>{
   if(e.target.closest('input,select,textarea'))return;
   const k=e.key,lk=k.toLowerCase();
-  const map=e.ctrlKey?{c:'copy',v:'paste',a:'create',n:'note',r:'edit'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
-  const name=map[e.ctrlKey?lk:k];if(name){e.preventDefault();ACTIONS[name]();}
+  const modifier=e.ctrlKey||e.metaKey;if(modifier&&lk==='z'){e.preventDefault();ACTIONS[e.shiftKey?'redo':'undo']();return;}
+  const map=modifier?{c:'copy',v:'paste',a:'create',n:'note',r:'edit'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
+  const name=map[modifier?lk:k];if(name){e.preventDefault();ACTIONS[name]();}
  });
  graph.tabIndex=-1;
  bindPlot();

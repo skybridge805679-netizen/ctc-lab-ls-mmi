@@ -20,7 +20,7 @@ try:
     page.select_option('#stationSelect',station)
     for reverse in [False,True]:
      if reverse:
-      page.evaluate('''id=>{const st=SimNetwork.catalog[id],C=SimCore.forStation(id),s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});for(const id of Object.keys(C.points))C.dispatch(s,{type:'point',id,value:'R'});const v=SimLS.render(st,SimWiring.data[id],C,s);document.querySelector('#trackSvg').innerHTML=v.svg;}''',station)
+      page.evaluate('''id=>{const st=SimNetwork.catalog[id],C=SimCore.forStation(id),s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});for(const id of Object.keys(C.points))C.dispatch(s,{type:'point',id,value:'R'});const svg=document.querySelector('#trackSvg'),aspect=svg.viewBox.baseVal.width/svg.viewBox.baseVal.height;const v=SimLS.render(st,SimWiring.data[id],C,s,{aspect});svg.setAttribute('viewBox',`0 0 ${v.width} ${v.height}`);svg.innerHTML=v.svg;}''',station)
      result=page.evaluate('''()=>{
       const svg=document.querySelector('#trackSvg'),v=svg.viewBox.baseVal;
       const texts=[...svg.querySelectorAll('text')].map(e=>({name:e.textContent,b:e.getBBox()}));
@@ -32,7 +32,7 @@ try:
        }
       }return {overlaps,clipped};}''')
      assert result=={'overlaps':[],'clipped':[]},(width,station,reverse,result)
-     expect(page.locator('#trackSvg .point-tag rect, #trackSvg .bed-outer, #trackSvg .wing-outer')).to_have_count(0)
+     expect(page.locator('#trackSvg .point-tag rect:not([fill="transparent"]), #trackSvg .bed-outer, #trackSvg .wing-outer')).to_have_count(0)
    page.close();print(f'PASS {width}px: every text label at all 15 stations is separate and inside the canvas in N/R states')
   browser.close()
 finally:server.shutdown();server.server_close()

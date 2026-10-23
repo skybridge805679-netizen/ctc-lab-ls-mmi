@@ -1,0 +1,7 @@
+(function(root){'use strict';
+const doc=SimDOM.document,T=()=>root.SimTimetable,model=()=>root.SimDiagram.getModel();
+function refresh(result){root.SimDiagram.render();root.SimMMI.log('event',result.message);root.SimMMI.alertBox(result.message);return result;}
+function save(){const data={format:'ORPHEIA-TIMETABLE',version:1,timetable:model()},url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=doc.createElement('a');a.href=url;a.download='orpheia-timetable-'+model().serviceDate+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function open(){const input=doc.createElement('input');input.type='file';input.accept='.json,application/json';input.hidden=true;input.dataset.timetableFile='';doc.body.append(input);input.onchange=async()=>{try{const file=input.files[0];if(!file)return;if(file.size>64*1024*1024)throw new Error('시간표 파일은 64MB까지 열 수 있습니다.');const data=JSON.parse(await file.text()),table=data.timetable||data;if(!Array.isArray(table.trains))throw new Error('시간표 JSON 파일을 선택하세요.');root.SimMMI.confirmBox(`${table.trains.length}개 열차의 시간표로 교체하시겠습니까? 편집 메뉴에서 실행 취소할 수 있습니다.`,()=>refresh(T().import(model(),data)),{title:'시간표 열기'});}catch(error){root.SimMMI.alertBox('시간표를 열지 못했습니다: '+error.message);}finally{input.remove();}};input.addEventListener('cancel',()=>input.remove());input.click();}
+root.SimTimetableFiles={open,save,undo:()=>refresh(T().undo(model())),redo:()=>refresh(T().redo(model()))};
+})(window);

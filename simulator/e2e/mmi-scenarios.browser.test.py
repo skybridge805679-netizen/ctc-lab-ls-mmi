@@ -84,12 +84,8 @@ def run(page, url):
     page.clock.run_for(600)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(6)
     advance_until("(n)=>{for(const s of Object.values(SimLSUI.getModel().stations))if((s.windows['B605T']||[]).some(r=>r.number===n))return true;return false;}", arg=train)   # edited departure route -> out to B605T
-    expect(page.locator('#scStatus')).to_contain_text('구술')
-    for box in page.locator('#scSteps input[data-say]').all():
-        box.check()
-    expect(page.locator('#scStatus')).to_contain_text('열차 이동과 도착을 기다리고 있습니다')
-    expect(page.locator('#eventLogBody')).not_to_contain_text('실기 시나리오 합격')
-    advance_until('''()=>{const s=SimScenarioUI.snapshot();return !s.queue.length&&s.motions.every(j=>['done','cancelled'].includes(j.phase));}''')
+    expect(page.locator('#scSteps input[data-say]')).to_have_count(0)
+    advance_until("()=>document.querySelector('#scStatus').textContent.includes('합격')")
     expect(page.locator('#scStatus')).to_contain_text('합격')
     assert page.evaluate("SimScenarioUI.motionJobs().every(j=>j.phase==='done')"), page.evaluate('SimScenarioUI.motionJobs()')
     for member in page.evaluate('SimScenarioUI.snapshot().motions.map(j=>j.number)'):

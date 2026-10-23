@@ -44,12 +44,14 @@
   return null;
  }
  function valid(train){
+  if(!train||typeof train!=='object')return false;
   if(!/^[A-Z][0-9]{3,5}$/.test(train.id)||!Array.isArray(train.calls)||train.calls.length<2)return false;
   if(!Number.isInteger(train.carCount??10)||(train.carCount??10)<1||(train.carCount??10)>20)return false;
   if(!KINDS.includes(train.kind))return false;
   if(train.service!==undefined&&!['정기','부정기'].includes(train.service))return false;
   if(train.flags!==undefined&&(!Array.isArray(train.flags)||train.flags.some(f=>!FLAGS.includes(f))))return false;
   if(train.relatedTrain&&(!/^[A-Z][0-9]{3,5}$/.test(train.relatedTrain)||train.relatedTrain===train.id))return false;
+  if(train.calls.some(c=>!c||typeof c!=='object'))return false;
   const orders=train.calls.map(c=>N.catalog[c.station]?.order);
   if(orders.some(o=>o===undefined)||new Set(orders).size!==orders.length)return false;
   const direction=orders.at(-1)>orders[0]?1:-1;
@@ -107,9 +109,11 @@ const MIN_HEADWAY=120;
 const RESOLVE_STATIONS=['yongsan','yeongdeungpo','geumcheon','anyang','gunpo','uiwang'];
 function conflicts(model,minHeadway=MIN_HEADWAY){
  const out=[],trains=model.trains.filter(t=>!t.cancelled);
- for(let i=0;i<trains.length;i++)for(let j=i+1;j<trains.length;j++){
+ const index=typeof module!=='undefined'?require('./conflict-index'):root.SimConflictIndex;
+ for(const [i,j]of index.pairs(trains,minHeadway,id=>N.catalog[id].order)){
   const a=trains[i],b=trains[j];if(a.direction!==b.direction)continue;
-  const common=a.calls.filter(c=>!c.cancelled&&b.calls.some(d=>d.station===c.station&&!d.cancelled)).map(c=>({a:c,b:b.calls.find(d=>d.station===c.station)}));
+  const calls=new Map(b.calls.filter(c=>!c.cancelled).map(c=>[c.station,c]));
+  const common=a.calls.filter(c=>!c.cancelled&&calls.has(c.station)).map(c=>({a:c,b:calls.get(c.station)}));
   common.sort((x,y)=>(N.catalog[x.a.station].order-N.catalog[y.a.station].order)*(a.direction==='down'?1:-1));
   const found=[];let lastSign=0,lastStation=null;
   for(const {a:ca,b:cb} of common){
@@ -131,5 +135,18 @@ function nearestResolveStation(station,direction){
  const candidates=RESOLVE_STATIONS.map(id=>N.catalog[id]).filter(s=>(s.order-order)*sign<=0).sort((x,y)=>(y.order-x.order)*sign);
  return candidates[0]?.id??null;
 }
-const api={initial,delay,cancel,setCancelled,position,clock,valid,pattern,create,update,remove,copy,conflicts,nearestResolveStation,MIN_HEADWAY,RESOLVE_STATIONS,KINDS,FLAGS,STOPS};if(typeof module!=='undefined')module.exports=api;else root.SimTimetable=api;
+const H=typeof module!=='undefined'?require('./timetable-history'):root.SimTimetableHistory,histories=new WeakMap();
+ const history=model=>{if(!histories.has(model))histories.set(model,H.create());return histories.get(model);};
+ function importFile(model,input){
+  const data=input?.timetable||input;
+  if(!data||!Array.isArray(data.trains)||data.trains.length>20000||!/^\d{4}-\d{2}-\d{2}$/.test(data.serviceDate||''))return {ok:false,message:'ORPHEIA 시간표 JSON 형식과 운행일을 확인하세요. (최대 20,000열차)'};
+  const timestamp=Date.parse(data.serviceDate+'T00:00:00Z');if(!Number.isFinite(timestamp)||new Date(timestamp).toISOString().slice(0,10)!==data.serviceDate)return {ok:false,message:'시간표 운행일을 확인하세요.'};
+  const ids=new Set();for(const train of data.trains){if(!valid(train)||ids.has(train.id))return {ok:false,message:'잘못되거나 중복된 열차 데이터입니다: '+String(train?.id||'')};ids.add(train.id);}
+  const copies=structuredClone(data.trains);for(const t of copies)if(!Array.isArray(t.plan)||!valid({...t,calls:t.plan}))t.plan=structuredClone(t.calls);
+  return history(model).perform(model,[...new Set([...model.trains.map(t=>t.id),...ids])],()=>{model.trains=copies;model.serviceDate=data.serviceDate;model.changes.push({type:'import',count:copies.length});return {ok:true,message:copies.length+'개 열차 시간표를 열었습니다.'};});
+ }
+ const api={initial,delay,cancel,setCancelled,position,clock,valid,pattern,create,update,remove,copy,conflicts,nearestResolveStation,MIN_HEADWAY,RESOLVE_STATIONS,KINDS,FLAGS,STOPS};
+ for(const method of ['delay','cancel','setCancelled','create','update','remove','copy']){const fn=api[method];api[method]=(model,...args)=>history(model).perform(model,[method==='create'?args[0]?.id:method==='copy'?args[1]:args[0]],()=>fn(model,...args));}
+ Object.assign(api,{import:importFile,undo:model=>history(model).undo(model),redo:model=>history(model).redo(model),history:model=>history(model).status()});
+ if(typeof module!=='undefined')module.exports=api;else root.SimTimetable=api;
 })(typeof window!=='undefined'?window:globalThis);

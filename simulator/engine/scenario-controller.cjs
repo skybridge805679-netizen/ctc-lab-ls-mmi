@@ -1,4 +1,5 @@
 'use strict';
+const Flow=require('./scenario-flow');
 function create(root,host){
  const SC=()=>root.SimScenarios,EM=()=>root.SimEmergency,SS=()=>root.SimScheduleScenarios,mmi=()=>root.SimMMI;
  const isEm=sc=>sc?.group==='emergency',isSch=sc=>sc?.group==='schedule';
@@ -37,19 +38,16 @@ const station=()=>host.context().stationStates[run.sc.station];
 const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:lsm(),ui:lastUI});
 function evaluate(){
  if(!run||mmi().replaying())return;
- SC().advance(run,ctx());
+ SC().advance(run,ctx());Flow.advance(run,station().clock);
  if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]);run.explain=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(ctx()):'';}
  if(isEm(run.sc)){EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),lsm);}
  else{fireBeats();runQueue();}
  if(motion.step())SC().advance(run,ctx());
  if(run.done.every(Boolean)&&!motion.busy()&&!run.queue.length&&!run.passed){run.passed=true;mmi().log('event','실기 시나리오 합격 · '+run.sc.title);}
 }
-function intercept(a){
- if(!run||isSch(run.sc)||a.op!=='move')return null;
- const row=lsm().stations[a.station]?.windows[a.slot]?.find(t=>t.uid===a.uid);if(!row)return null;
- const numbers=isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id);
- return numbers.includes(row.number)?motion.request(a,true):null;
-}
+function intercept(){return null;}
+function manualNumberAction(a){if(['move','swap','delete'].includes(a.op)){motion.cancel(a.uid);if(a.targetUid)motion.cancel(a.targetUid);}}
+
 function actualPosition(train){
  const f=findRow(train.id);if(!f)return null;
  const catalog=root.SimNetwork.catalog,j=motion?.list().find(j=>j.uid===f.uid&&!['done','cancelled'].includes(j.phase));
@@ -61,21 +59,29 @@ function actualPosition(train){
 
 function start(id,train='',ui={}){
  motion.reset();if(run)clearNumbers(isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id));lastUI=ui;
+ let parameters=null;
  let sc=SC().list.concat(EM().list,SS().list).find(s=>s.id===id);if(!sc)return {ok:false,message:'시나리오를 확인하세요.'};
  const model=root.SimDiagram.getModel();
  if(isSch(sc)){
-  if(id==='sch-conflict'){const d=root.SimDrill;if(model.trains.some(t=>t.id===d.ID))d.reset();const r=d.createProblem({select:false});if(!r.ok)return r;sc=SS().conflictScenario({id:d.ID,leader:r.leader,nearest:r.nearest,baseline:r.baseline});}
-  else sc=SS().createScenario(SS().planCreate(model));
+  if(id==='sch-conflict'){const d=root.SimDrill;if(model.trains.some(t=>t.id===d.ID))d.reset();const r=d.createProblem({select:false});if(!r.ok)return r;parameters={id:d.ID,leader:r.leader,nearest:r.nearest,baseline:r.baseline};sc=SS().conflictScenario(parameters);}
+  else{parameters=SS().planCreate(model);sc=SS().createScenario(parameters);}
  }else if(isEm(sc))EM().seed(sc,host.context().stationStates);
  else{
   if(sc.steps.some(s=>s.kind==='do'&&/스케줄 수정/.test(s.text))&&!model.trains.some(t=>t.id===train&&t.calls.some(c=>c.station===sc.station)))return {ok:false,message:'스케줄 수정에 사용할 시간표 열차를 선택하세요.'};
   SC().seed(sc,host.context().stationStates[sc.station]);
  }
- run=SC().newRun(sc,train);run.fired=new Set();run.queue=[];run.explain='';
+ run=SC().newRun(sc,train);run.parameters=parameters;run.fired=new Set();run.queue=[];run.explain='';
  run.cast=isSch(sc)?[]:isEm(sc)?EM().castFor(sc).map(c=>({key:c.number,id:c.number,dir:c.dir,slot:c.slot,station:c.station})):SC().pickCast(sc,model,train);
  if(!isSch(sc))placeCast();evaluate();return {ok:true,station:sc.station};
 }
+function checkpoint(){return {run:run?{...run,sc:null,scID:run.sc.id,fired:[...run.fired],autoApplied:[...(run.autoApplied||[])]}:null,motion:motion.checkpoint()};}
+function restore(data){
+ if(!data.run){run=null;motion.restore(data.motion);return;}
+ const saved=data.run,id=saved.scID,sc=id==='sch-conflict'?SS().conflictScenario(saved.parameters):id==='sch-create'?SS().createScenario(saved.parameters):SC().list.concat(EM().list).find(s=>s.id===id);
+ if(!sc)throw new Error('Unknown saved scenario');
+ run={...saved,sc,fired:new Set(saved.fired),autoApplied:new Set(saved.autoApplied)};lastUI={};motion.restore(data.motion);
+}
 function snapshot(){return {run,jobs:motion.list(),reserved:!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id)};}
-return {reservedNumbers:()=>snapshot().reserved,start,intercept,position:actualPosition,snapshot,step:()=>{evaluate();},ui:value=>{lastUI=value;evaluate();},say(index,checked){if(run&&run.sc.steps[index]?.kind==='say'){run.done[index]=!!checked;evaluate();}},event(e){if(run){run.events.push(e);evaluate();}},stop(){motion.reset();run=null;},request:a=>motion.request(a,true)};
+return {checkpoint,restore,reservedNumbers:()=>snapshot().reserved,start,intercept,manualNumberAction,position:actualPosition,snapshot,step:()=>{evaluate();},ui:value=>{lastUI=value;evaluate();},say(index,checked){if(run&&run.sc.steps[index]?.kind==='say'){run.done[index]=!!checked;evaluate();}},event(e){if(run){run.events.push(e);evaluate();}},stop(){motion.reset();run=null;},request:a=>motion.request(a,true)};
 }
 module.exports={create};

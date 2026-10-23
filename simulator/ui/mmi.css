@@ -235,3 +235,4 @@
 .pref .pref-ul{list-style:none;margin:2px 0 0;padding:0;height:180px;overflow:auto;border:1px solid #9a9a96;background:#fff}.pref .pref-ul li{padding:2px 6px;cursor:default}.pref .pref-ul li.sel{background:#316ac5;color:#fff}.pref .pref-ul li.empty{color:#777}
 .sc-lines{display:flex;flex-direction:column;gap:1px}.sc-lines>b{margin-bottom:2px}.sc-lines>span{white-space:pre-wrap;font-size:11.5px}
 .sc-variants{margin:6px 0;font-size:11.5px}.sc-variants pre{max-height:220px;overflow:auto;white-space:pre-wrap;background:#fff;border:1px solid #9a9a96;padding:6px}
+.sc-speech{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-left:2px solid #bee3e3;background:#edf7f5}.sc-speech>.sc-mark{flex:none;color:#347c79}.sc-speech .sc-lines{flex:1}

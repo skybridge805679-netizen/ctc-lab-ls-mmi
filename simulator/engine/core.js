@@ -3,6 +3,7 @@
  function create(config=null){
  // A visible route path is evidence about geometry, not an interlocking table.
  const {sources,routes,points,signals}=config;
+ const Parts=typeof module!=='undefined'?require('./point-parts'):root.SimPointParts,partInfo=Parts.forStation(config.id),pointParts=partInfo.parts,pointPartLabels=partInfo.labels;
  const IL=typeof module!=='undefined'?require('./interlocking.js'):root.SimInterlocking;
  const MENUS=typeof module!=='undefined'?require('./route-menus.js'):root.SimRouteMenus;
  // Routes the real LS popup offers for a signal. Verified stations use the transcribed list; others fall back to every derived route.
@@ -31,6 +32,7 @@
  function initial(){return {mode:'AUTO',pending:null,clock:0,points:Object.fromEntries(Object.keys(points).map(id=>[id,'N'])),signals:Object.fromEntries(Object.keys(signals).map(id=>[id,'STOP'])),routes:{},approach:{},occupied:{},blockedPoints:[],faults:{signals:[],points:[]},ttb:[],logs:[],events:[],scans:{current:0,all:0},scanUntil:0,inspected:[]};}
  function dispatch(s,a){
   const log=(ok,message)=>{s.logs.unshift({time:s.clock,source:a.source||'안내',action:a.type,result:ok?'완료':'보류',message});if(ok)s.events.push({...a,time:s.clock});return{ok,message};};
+  if(['point','pointLock','inspectPoint'].includes(a.type)||a.type==='fault'&&a.kind==='point'){if(pointParts[a.id])a={...a,pointPart:a.id,id:pointParts[a.id]};}
   if(config?.controlled===false&&['mode','route','withdraw','stop','point'].includes(a.type))return log(false,'비연동역입니다. 연결 연동역에서 진로를 제어하세요.');
   // 설비 고장·TTB 설정은 교육용 상황 설정이라 제어권이 필요 없다 (실기3 3.4 자동제어 조건 ④⑤⑥)
   if(a.type==='fault'){
@@ -44,7 +46,7 @@
    const arr=(s.ttb??=[]),at=arr.indexOf(a.id);if(a.on&&at<0)arr.push(a.id);if(!a.on&&at>=0)arr.splice(at,1);
    return log(true,a.id+' 연속통과진로(TTB) '+(a.on?'설정':'해제'));
   }
-  if(a.type==='tick'){s.clock+=a.seconds||1;for(const [id,r] of Object.entries(s.routes))if(r.lock&&s.clock>=r.lock.until){delete s.routes[id];s.signals[routes[id].signal]='STOP';s.logs.unshift({time:s.clock,source:'연동장치',action:'approachRelease',result:'완료',message:id+' 접근쇄정 '+r.lock.seconds+'초 경과 · 진로 해정'});s.events.push({type:'approachRelease',id,time:s.clock});}return{ok:true};}
+  if(a.type==='tick'){const seconds=a.seconds??1;if(!Number.isFinite(seconds)||seconds<0)return log(false,'시간 진행 값은 0 이상의 유한한 초여야 합니다.');s.clock+=seconds;for(const [id,r] of Object.entries(s.routes))if(r.lock&&s.clock>=r.lock.until){delete s.routes[id];s.signals[routes[id].signal]='STOP';s.logs.unshift({time:s.clock,source:'연동장치',action:'approachRelease',result:'완료',message:id+' 접근쇄정 '+r.lock.seconds+'초 경과 · 진로 해정'});s.events.push({type:'approachRelease',id,time:s.clock});}return{ok:true};}
   if(a.type==='approach'){
    const sig=signals[a.signal];if(!sig||!lockSeconds(a.signal))return log(false,'접근쇄정은 장내·출발신호기에만 적용됩니다.');
    const present=a.present!==false,active=Object.keys(s.routes).find(id=>routes[id].signal===a.signal);
@@ -116,11 +118,12 @@
   if(a.type==='point'){
    if(!points[a.id]||!['N','R'].includes(a.value))return log(false,'전환기와 정·반위를 선택하세요.');
    if(s.blockedPoints.includes(a.id))return log(false,'수동 쇄정된 전환기입니다.');
+   if((s.faults?.points||[]).includes(a.id))return log(false,'고장 상태의 선로전환기는 전환할 수 없습니다.');
    const using=Object.keys(s.routes).find(id=>(routes[id].pointLocks||[]).includes(a.id));
    if(using)return log(false,s.routes[using].lock?'접근쇄정 중 · 남은 '+remaining(s,s.routes[using])+'초 후 조작하세요.':'이 전환기를 사용하는 진로를 먼저 해정하세요.');
    const ovUse=Object.keys(s.routes).find(id=>overlapOf(id)?.points[a.id]);
    if(ovUse)return log(false,ovUse+' 진로의 오버랩 쇄정 전환기입니다. 진로를 해정한 뒤 조작하세요.');
-   s.points[a.id]=a.value;return log(true,a.id+' 전환기 '+(a.value==='N'?'정위':'반위')+' 조작 연습 완료');
+   s.points[a.id]=a.value;return log(true,(a.pointPart||a.id)+' 전환기 '+(a.value==='N'?'정위':'반위')+' 조작 연습 완료');
   }
   if(a.type==='pointLock'){
    if(!points[a.id])return log(false,'전환기를 확인하세요.');
@@ -154,7 +157,7 @@
   return log(false,'근거가 확인되지 않은 조작입니다.');
  }
  function lockTable(s){return Object.entries(s.routes).map(([id,r])=>{const ov=overlapOf(id);return {id,signal:routes[id].signal,status:r.status,remaining:r.lock?remaining(s,r):0,total:r.lock?.seconds||0,overlap:ov?{points:ov.points,note:ov.note,clearSignals:ov.clearSignals||[]}:null};});}
- return {initial,dispatch,routes,points,signals,sources,lockTable,lockSeconds,overlapOf,lsMenu,menuVerified,menuVerifiedFor};
+ return {initial,dispatch,routes,points,pointParts,pointPartLabels,signals,sources,lockTable,lockSeconds,overlapOf,lsMenu,menuVerified,menuVerifiedFor};
  }
  const network=typeof module!=='undefined'?require('./network.js'):root.SimNetwork;
  const api=create(network.catalog['underground-seoul']);

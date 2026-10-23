@@ -1,4 +1,4 @@
-"""Scenario commands own timed interlocking journeys, not immediate number teleports."""
+"""Automatic scenario journeys use the clock; manual number relocation remains immediate."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
@@ -32,10 +32,18 @@ try:
    # Every emergency script has a reviewed spoken cue that creates motion work.
    for sid in page.evaluate('SimEmergency.list.map(s=>s.id)'):
     page.select_option('#scSelect',sid);page.click('#scStart')
-    tag=page.evaluate('id=>Object.keys(SimEmergency.MOTION[SimEmergency.list.find(s=>s.id===id).key])[0]',sid)
-    index=page.evaluate('([id,tag])=>SimEmergency.list.find(s=>s.id===id).steps.findIndex(s=>s.tag===tag)',[sid,tag])
-    page.locator(f'[data-say="{index}"]').check();page.clock.run_for(600)
-    assert page.evaluate('SimScenarioUI.motionJobs().length')>0,(sid,tag)
+    expect(page.locator('#scSteps input[data-say]')).to_have_count(0)
+    for _ in range(150):
+     run({'type':'tick','seconds':10});page.clock.run_for(600)
+     if page.evaluate('SimScenarioUI.motionJobs().length'):break
+     action=page.evaluate("id=>{const s=SimEmergency.list.find(s=>s.id===id),r=SimScenarioUI.snapshot();return s.steps.find((step,i)=>step.kind==='do'&&!r.done[i])?.act}",sid)
+     if not action:continue
+     page.select_option('#lsStationSelect',action['station'])
+     if action['type']=='mode':run({'type':'mode','value':action['value'],'source':'MMI'})
+     elif action['type']=='stop':
+      for sig in action['ids']:run({'type':'stop','id':sig,'source':'LS'})
+     elif action['type']=='route':run({'type':'route','id':action['id'],'source':'LS'})
+    assert page.evaluate('SimScenarioUI.motionJobs().length')>0,sid
     expect(page.locator('#scMotionStatus')).to_be_visible()
    if width==1440:page.locator('#scMotionStatus').screenshot(path=str(ROOT.parent/'docs/preview-v0.19.0-scenario-status.png'),style='.mmi-alarm{visibility:hidden!important}')
    page.click('#scStop');assert not page.evaluate('SimScenarioUI.motionJobs().length');assert page.evaluate('SimScenarioUI.reservedNumbers().length')==0
