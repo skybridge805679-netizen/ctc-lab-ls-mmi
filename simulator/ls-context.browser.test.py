@@ -18,7 +18,7 @@ try:
    # this test deliberately stacks several numbers in one 열번창; acknowledge the resulting 열차번호 중복 alarm pop-ups as they appear
    page.add_init_script("window.addEventListener('DOMContentLoaded',()=>setInterval(()=>{document.querySelectorAll('.mmi-alarm:not([hidden]) input[data-alarm-i]').forEach(b=>{if(!b.checked){b.checked=true;b.dispatchEvent(new Event('change',{bubbles:true}));}});document.querySelector('.mmi-alarm:not([hidden]) [data-alarm-ok]')?.click()},40))")
    page.on('response',lambda r:errors.append(f'HTTP {r.status} {r.url}') if r.status>=400 else None)
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    page.select_option('#stationSelect','geumcheon')
    def win(slot): return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
    def action(name): return page.locator(f'.ls-context-menu [data-context-action="{name}"]')

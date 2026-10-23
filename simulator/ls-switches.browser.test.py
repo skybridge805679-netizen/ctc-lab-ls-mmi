@@ -13,7 +13,7 @@ try:
  with sync_playwright() as p:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
-   page=b.new_page(viewport={'width':width,'height':1000});page.goto(f'http://127.0.0.1:{server.server_port}')
+   page=b.new_page(viewport={'width':width,'height':1000});page.goto(f'http://127.0.0.1:{server.server_port}');page.wait_for_load_state('networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    page.add_style_tag(content='#toast{display:none!important}');page.click('#pauseBtn');page.select_option('#stationSelect','seoul')
    connector=page.locator('[data-switch-connection="58"]')
    normal=connector.get_attribute('d');expect(connector).to_have_attribute('data-position','N')

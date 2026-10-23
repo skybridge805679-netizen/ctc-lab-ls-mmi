@@ -23,7 +23,7 @@ def menu(page, top, *path):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
     page.locator('#stationSelect').select_option('geumcheon')
     do({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})

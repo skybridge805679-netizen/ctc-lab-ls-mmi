@@ -27,7 +27,7 @@ def rows(page, rid):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     # 열차위치목록: 선/운행방향/구분/열차종별 + 열차번호찾기
     menu(page, '시스템 조회', '열차위치목록 조회')
     expect(rows(page, 'trainPositions')).to_have_count(12)

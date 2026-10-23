@@ -4,7 +4,7 @@
 .detached-toolbar small{color:#b7cccc;font-size:12px}
 .detached-toolbar button{padding:8px 14px;background:#bee3e3;color:#173c3d;border:1px solid #9fc5c5;border-radius:7px;cursor:pointer}
 body.mmi-detached{display:block;min-width:1100px;margin:0;background:#e6efec}
-.mmi-detached #mmiShell{margin:0;border-radius:0;min-height:calc(100vh - 64px);box-shadow:none;display:flex;flex-direction:column}
+.mmi-detached #mmiShell{margin:0;border-radius:0;min-height:100vh;box-shadow:none;display:flex;flex-direction:column}
 .mmi-detached .mmi-desktop{flex:1;min-height:360px}
 .workspace-split .workgrid{display:block}
 .workspace-split .workgrid>.mmi-panel{display:none}

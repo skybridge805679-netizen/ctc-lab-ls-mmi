@@ -33,7 +33,8 @@ class QuietHandler(SimpleHTTPRequestHandler):
 def check(page, url, screenshot=False):
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
-    page.goto(url, wait_until='networkidle')
+    page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     expect(page.locator('#stationSelect option')).to_have_count(15)
     stations = page.locator('#stationSelect option').evaluate_all('(options)=>options.map(o=>({id:o.value,label:o.textContent}))')
     for station in stations:

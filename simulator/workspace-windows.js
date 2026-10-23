@@ -25,9 +25,6 @@ function detach(){
  const base=d.createElement('base');base.href=doc.baseURI;d.head.appendChild(base);
  for(const css of doc.querySelectorAll('link[rel="stylesheet"]')){const link=d.createElement('link');link.rel='stylesheet';link.href=css.href;link.onload=resize;d.head.appendChild(link);}
  d.body.className='mmi-detached';
- const toolbar=d.createElement('header');toolbar.className='detached-toolbar';
- toolbar.innerHTML='<div><span class="live-dot"></span><b>ORPHEIA / MMI</b><small>LS와 동일한 관제 세션</small></div><nav><button type="button" data-ls-focus>LS 창으로</button><button type="button" data-restore>한 화면으로</button></nav>';
- d.body.appendChild(toolbar);toolbar.querySelector('[data-ls-focus]').onclick=()=>root.focus();toolbar.querySelector('[data-restore]').onclick=restore;
  anchor=doc.createComment('MMI return position');shell.before(anchor);d.body.appendChild(shell);
  root.SimDOM.setMMIDocument(d);
  for(const el of overlays(doc))transfer(el,d.body);
@@ -38,8 +35,35 @@ function detach(){
  poll=root.setInterval(()=>{if(next.closed)restore();},500);
  resize();next.focus();
 }
+// 열차 그래프(T/G)는 MMI의 하위 창이 아니라 독립 창이다. 같은 엔진·DOM을 입양해 쓰고, 팝업이 막히면 MMI 안 창으로 돌아간다.
+let tg=null,tgHome=null,tgPoll=null,tgClosing=false;
+function closeGraph(){
+ if(!tg||tgClosing)return;tgClosing=true;
+ const old=tg;clearInterval(tgPoll);tgPoll=null;
+ const panel=old.document.getElementById('graphPanel');
+ if(panel&&tgHome?.parentNode){delete panel.dataset.detached;panel.hidden=true;tgHome.parentNode.insertBefore(panel,tgHome);}
+ root.SimDOM.setDocument('graph',null);tgHome?.remove();tgHome=null;tg=null;
+ if(!old.closed)old.close();tgClosing=false;resize();
+}
+function openGraph(){
+ if(tg&&!tg.closed){tg.focus();return true;}
+ const panel=root.SimDOM.document.getElementById('graphPanel');if(!panel)return false;
+ const next=root.open('about:blank','orpheia-tg-'+sessionId,'popup,width=1500,height=900,resizable=yes,scrollbars=yes');
+ if(!next)return false;
+ tg=next;const d=next.document;d.title='ORPHEIA · 열차 그래프';d.documentElement.lang='ko';
+ const base=d.createElement('base');base.href=doc.baseURI;d.head.appendChild(base);
+ for(const css of doc.querySelectorAll('link[rel="stylesheet"]')){const link=d.createElement('link');link.rel='stylesheet';link.href=css.href;link.onload=resize;d.head.appendChild(link);}
+ d.body.className='tg-detached';
+ tgHome=doc.createComment('T/G return position');panel.before(tgHome);
+ panel.dataset.detached='1';d.body.appendChild(panel);panel.hidden=false;
+ root.SimDOM.setDocument('graph',d);
+ d.getElementById('onlineGraphBtn')?.click();d.getElementById('closeGraph')?.addEventListener('click',()=>root.setTimeout(closeGraph));
+ next.addEventListener('resize',resize);next.addEventListener('beforeunload',closeGraph);
+ tgPoll=root.setInterval(()=>{if(next.closed)closeGraph();},500);
+ resize();next.focus();return true;
+}
 const sessionId=Math.random().toString(36).slice(2);
-root.SimWorkspace={detach,restore,detached:()=>!!popup&&!popup.closed,focusMMI:()=>popup?.focus()};
+root.SimWorkspace={detach,restore,openGraph,closeGraph,graphDetached:()=>!!tg&&!tg.closed,detached:()=>!!popup&&!popup.closed,focusMMI:()=>popup?.focus()};
 button().onclick=detach;button().setAttribute('aria-pressed','false');
-root.addEventListener('pagehide',()=>{if(popup&&!popup.closed)popup.close();});
+root.addEventListener('pagehide',()=>{if(popup&&!popup.closed)popup.close();if(tg&&!tg.closed)tg.close();});
 })(window);

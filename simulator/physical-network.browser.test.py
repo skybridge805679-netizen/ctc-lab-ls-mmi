@@ -13,7 +13,7 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.select_option('#stationSelect','cheongnyangni')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect','cheongnyangni')
    page.evaluate('SimDiagram.getModel().trains.splice(1);SimAutoUI.set(true)')
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    # Depart at 30 s, clear at 50 s; the number then progresses through actual B codes.
@@ -32,7 +32,7 @@ try:
    page.click('#mmiLineBtn');expect(page.locator('#lnSummary')).to_contain_text('317개 회로');expect(page.locator('#lnRows')).to_contain_text('B012T')
    if width==1440:page.locator('[data-mmi-window="lineNet"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.19.4-circuits.png'))
    # Corrected 53B→53A gives both confirmed departures native contiguous resource paths.
-   page.reload(wait_until='networkidle');page.click('#pauseBtn');page.evaluate('SimAutoUI.set(false)');page.select_option('#stationSelect','anyang')
+   page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.evaluate('SimAutoUI.set(false)');page.select_option('#stationSelect','anyang')
    assert run({'type':'mode','value':'CCM'})['ok']
    for route in ['4A-B660T','4B-B660T']:
     assert page.evaluate('r=>SimNetworkTopology.localPath("anyang",r).contiguous',route)
@@ -41,7 +41,7 @@ try:
     if route=='4A-B660T' and width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.19.4-anyang.png'),style='#toast{visibility:hidden}')
     assert run({'type':'stop','id':route.split('-')[0]})['ok']
    assert page.evaluate('SimNetworkTopology.audit().inferredCompositeRoutes.length')==0
-   page.reload(wait_until='networkidle');page.click('#pauseBtn')
+   page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
    page.evaluate('''()=>{const m=SimDiagram.getModel(),t=SimTimetable.pattern({id:'G9101',from:'uiwang',to:'suwon',start:0});t.calls[0].departureRoute='4A_FT';m.trains.splice(0,m.trains.length,t);SimAutoUI.set(true);}''')
    run({'type':'tick','seconds':20})
    assert page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],20).boundary')=='external:uiwang:FT'

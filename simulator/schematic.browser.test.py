@@ -16,7 +16,7 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1000});requests=[];errors=[]
    page.on('request',lambda r:requests.append(r.url));page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    stations=page.locator('#stationSelect option').evaluate_all('(os)=>os.map(o=>o.value)')
    for station in stations:
     page.select_option('#lsStationSelect',station)

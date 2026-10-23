@@ -16,6 +16,8 @@ let application;const errors=[];
  mmi.on('pageerror',e=>errors.push(String(e)));await expect(mmi.locator('#mmiShell')).toBeVisible();
  await ls.click('#pauseBtn');assert.equal(await mmi.evaluate(()=>typeof require),'undefined');
  assert.equal(await mmi.evaluate(()=>typeof SimCore),'undefined','no duplicate engine');
+ await expect(mmi.locator('#stationSelect')).toBeHidden();   // MMI는 빈 바탕화면으로 시작하고 현장설비제어는 메뉴로 연다
+ await ls.evaluate(()=>SimMMI.open('field'));
  await mmi.selectOption('#stationSelect','anyang');await mmi.selectOption('#controlSelect','mode');
  await mmi.check('[name="mmiMode"][value="CCM"]');await mmi.locator('#mmiApply').click({position:{x:12,y:12}});
  assert.equal(await ls.evaluate(()=>SimField.state('anyang').mode),'CCM');
@@ -24,7 +26,12 @@ let application;const errors=[];
  await ls.selectOption('#lsStationSelect','suwon');await expect(mmi.locator('#stationSelect')).toHaveValue('suwon');
  await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');
  await ls.waitForFunction(()=>SimField.state('suwon').mode==='CCM');
- await ls.evaluate(()=>SimMMI.open('graph'));await expect(mmi.locator('#diaSvg')).toBeVisible();
+ // 열차 그래프는 MMI에 종속되지 않은 독립 창으로 열린다
+ await ls.evaluate(()=>SimMMI.open('graph'));await ls.waitForFunction(()=>SimWorkspace.graphDetached());
+ const graph=application.windows().find(p=>p!==ls&&p!==mmi);assert.ok(graph,'native T/G window');
+ graph.on('pageerror',e=>errors.push(String(e)));await expect(graph.locator('#diaSvg')).toBeVisible();await expect(mmi.locator('#diaSvg')).toHaveCount(0);
+ assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.getTitle().includes('그래프')).length),1);
+ await graph.close();await ls.waitForFunction(()=>!SimWorkspace.graphDetached());
  // A restored window must fit the current monitor, including small CI displays.
  await application.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('MMI'));w.unmaximize();w.setBounds({x:30,y:40,width:1200,height:800},false);});
  // Native resize delivery is asynchronous on macOS. Read after the OS reports it.

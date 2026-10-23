@@ -23,7 +23,8 @@ def menu(page, top, *path):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     menu(page, '열차스케줄', '온라인 열차그래프(O)')
     expect(page.locator('#diaSvg')).to_be_visible()

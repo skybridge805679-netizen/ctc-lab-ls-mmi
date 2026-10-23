@@ -14,7 +14,7 @@ try:
   for width in [1440,1920]:
    for order in [['4C-B660T','4A-B984T'],['4A-B984T','4C-B660T']]:
     page=browser.new_page(viewport={'width':width,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.select_option('#stationSelect','anyang')
+    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect','anyang')
     page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
     for route in order:
      signal=route.split('-')[0];page.locator(f'[data-signal="{signal}"]').click();page.locator(f'[data-route-choice="{route}"]').click()

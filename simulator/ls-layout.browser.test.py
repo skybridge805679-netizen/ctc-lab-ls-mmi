@@ -14,7 +14,7 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1000})
-   page.goto(f'http://127.0.0.1:{server.server_port}')
+   page.goto(f'http://127.0.0.1:{server.server_port}');page.wait_for_load_state('networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    stations=page.locator('#stationSelect option').evaluate_all('(es)=>es.map(e=>e.value)')
    for station in stations:
     page.select_option('#stationSelect',station)

@@ -33,7 +33,7 @@ def labels(page, top, *sub):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     # menu structure exactly as photographed
     assert labels(page, '프로그램') == ['로그재생(R)', '도구모음설정', '프로그램 환경설정']

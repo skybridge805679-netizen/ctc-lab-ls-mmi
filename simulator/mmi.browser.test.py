@@ -23,7 +23,8 @@ def menu(page, top, *path):
 def run(page, url, width, height):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     # brand: parody, never the school logo
     body = page.locator('body').inner_text()
     assert 'ORPHEIA MMI' in body and '송원' not in body and 'SONGWON' not in body.upper() and 'SWU' not in body and 'SWON' not in body

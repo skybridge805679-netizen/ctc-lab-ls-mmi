@@ -23,7 +23,7 @@ try:
             page = context.new_page(); errors = []
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.on('response', lambda r: errors.append(f'HTTP {r.status} {r.url}') if r.status >= 400 and 'orpheia-mascot' not in r.url else None)
-            page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='networkidle')
+            page.goto(f'http://127.0.0.1:{server.server_port}/', wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
             # Removed: PDF background, sheet/zoom tools, LS point buttons, decorative frame elements.
             for gone in ['#mapSheet', '#mapOverview', '#mapZoomIn', '.track-frame', '#trackSvg image', '[data-point]', '.point-hit', '[data-select-control]']:
                 expect(page.locator(gone)).to_have_count(0)
@@ -83,7 +83,7 @@ try:
             expect(page.locator('#lsStage [data-active-route="2A-6T"]')).to_have_attribute('data-route-state', 'occupied')
             page.locator('[data-sim-clear="2A-6T"]').click()
             expect(page.locator('#lsStage [data-active-route="2A-6T"]')).to_have_attribute('data-route-state', 'set')
-            page.locator('#controlSelect').select_option('stopAll'); page.locator('#mmiApply').click(); page.locator('#dialogConfirm').click()
+            page.locator('#controlSelect').select_option('stopAll'); page.locator('#mmiApply').click(); page.locator('#mmiConfirmYes').click()
             expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:

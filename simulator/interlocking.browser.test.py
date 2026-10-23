@@ -17,7 +17,7 @@ class QuietHandler(SimpleHTTPRequestHandler):
 def exercise(page, url, width):
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     page.locator('#lsStationSelect').select_option('geumcheon')
     expect(page.locator('#stateMode')).to_have_text('AUTO')
 

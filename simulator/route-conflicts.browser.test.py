@@ -14,7 +14,7 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    candidates=json.loads((ROOT.parent/'docs/route-conflict-audit-v0.19.4.json').read_text())['newlyAllowed']
    menus=page.evaluate('SimRouteMenus');plans={}
    for pair in candidates:
@@ -28,7 +28,7 @@ try:
    assert len(plans)==15,plans.keys()
    for st,plan in plans.items():
     for order in [plan['routes'],list(reversed(plan['routes']))]:
-     page.reload(wait_until='networkidle');page.click('#pauseBtn');page.select_option('#stationSelect',st)
+     page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect',st)
      page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
      for route in order:
       page.locator(f'[data-signal="{route.split("-")[0]}"]').click();page.locator(f'[data-route-choice="{route}"]').click()

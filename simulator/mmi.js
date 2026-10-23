@@ -156,7 +156,7 @@ function createWindow(id,{title,x=24,y=24,width,body,host=null,onClose=null}){
   const move=ev=>{place(w,ev.clientX-sx,ev.clientY-sy);};
   const up=()=>{bar.removeEventListener('pointermove',move);bar.removeEventListener('pointerup',up);bar.removeEventListener('pointercancel',up);fitDesktop();};
   bar.addEventListener('pointermove',move);bar.addEventListener('pointerup',up);bar.addEventListener('pointercancel',up);e.preventDefault();});
- if(host)new MutationObserver(()=>{el.hidden=host.hidden;fitDesktop();}).observe(host,{attributes:true,attributeFilter:['hidden']});
+ if(host)new MutationObserver(()=>{el.hidden=host.hidden||host.dataset.detached==='1';fitDesktop();}).observe(host,{attributes:true,attributeFilter:['hidden']});
  return w;
 }
 // modal message box (원본의 "확인" 대화상자): a shield blocks the desktop until it is acknowledged
@@ -181,12 +181,13 @@ function fitDesktop(){
  if(!desktop)return;let bottom=0;for(const w of Object.values(windows))if(!w.el.hidden)bottom=Math.max(bottom,w.el.offsetTop+w.el.offsetHeight);
  const owner=desktop.ownerDocument,split=owner!==root.SimDOM.primary;
  const chrome=split?Array.from($('mmiShell').children).filter(el=>el!==desktop).reduce((sum,el)=>sum+el.offsetHeight,0):0;
- const base=split?Math.max(360,owner.defaultView.innerHeight-64-chrome):760;
+ const base=split?Math.max(360,owner.defaultView.innerHeight-chrome):760;
  desktop.style.minHeight=Math.max(base,bottom+16)+'px';
 }
 function place(w,x=w.el.offsetLeft,y=w.el.offsetTop){if(w.docked)return;w.el.style.left=Math.max(0,Math.min(desktop.clientWidth-w.el.offsetWidth,x))+'px';w.el.style.top=Math.max(0,y)+'px';}
 function dock(id,on=true){const w=windows[id];if(!w)return;w.docked=on;w.el.classList.toggle('docked',on);w.el.querySelector('.mmi-dock').textContent=on?'창으로':'도킹';desktop.classList.toggle('has-docked',Object.values(windows).some(w=>w.docked&&!w.el.hidden));if(!on)place(w);fitDesktop();}
 function open(id){
+ if(id==='graph'&&root.SimWorkspace?.openGraph())return windows.graph;
  const w=windows[id];if(!w){return null;}
  // an already open window is only brought to the front (re-running the opener would reload its draft)
  if(w.host&&w.host.hidden){w.host.hidden=false;w.opener?.();w.el.querySelector('.mmi-win-body').scrollTop=0;}
@@ -232,14 +233,12 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link">LS 화면 ↑</button><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLineBtn">선로망</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLineBtn">선로망</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
  shell.querySelector('#mmiScenarioBtn').onclick=()=>open('scenario');
  shell.querySelector('#mmiEquipBtn').onclick=()=>open('equipment');
  shell.querySelector('#mmiCdrsBtn').onclick=()=>open('cdrs');
  shell.querySelector('#mmiLineBtn').onclick=()=>open('lineNet');
  shell.querySelector('#mmiLedgerBtn').onclick=()=>open('ledger');
- shell.querySelector('.mmi-ls-link').onclick=()=>{root.focus();$('lsDisplay').scrollIntoView({block:'start'});};
- const toMMI=doc.createElement('button');toMMI.className='text-btn';toMMI.textContent='MMI 화면 ↓';toMMI.onclick=()=>root.SimWorkspace?.detached()?root.SimWorkspace.focusMMI():shell.scrollIntoView({block:'start'});doc.querySelector('.ls-panel .panel-title').append(toMMI);
  shell.appendChild(buildMenu());
  desktop=doc.createElement('div');desktop.className='mmi-desktop';desktop.id='mmiDesktop';
  desktop.innerHTML=brand();
@@ -249,7 +248,7 @@ function init(){
  // hosted windows keep their element ids so the existing handlers and tests continue to work
  field.classList.add('mmi-field');
  createWindow('field',{title:'현장설비제어',x:18,y:14,width:560,host:field});
- windows.field.el.hidden=false;dock('field',true);
+ windows.field.docked=true;windows.field.el.classList.add('docked');
  if(graph){
   root.SimTG.init(graph);
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}

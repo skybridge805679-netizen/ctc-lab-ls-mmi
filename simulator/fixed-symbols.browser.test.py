@@ -15,7 +15,7 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1100});errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    for sid in page.locator('#stationSelect option').evaluate_all('(es)=>es.map(e=>e.value)'):
     page.select_option('#stationSelect',sid)
     expect(page.locator('[data-source-bracket]')).to_have_count({'guro':4,'noryangjin':2}.get(sid,0))

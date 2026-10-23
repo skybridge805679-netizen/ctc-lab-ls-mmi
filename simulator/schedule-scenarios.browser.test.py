@@ -24,7 +24,8 @@ def tg(page, top, *path):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
+    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     done = lambda: page.locator('#scSteps li.sc-do.done').count()
     # ------------------------------------------------------------ 경합 시나리오

@@ -21,6 +21,8 @@ try:
    mmi=new.value;mmi.on('pageerror',lambda e:errors.append(str(e)))
    expect(mmi.locator('#mmiShell')).to_be_visible();expect(page.locator('#mmiShell')).to_have_count(0)
    assert mmi.evaluate('typeof SimCore')=='undefined' # no second engine
+   expect(mmi.locator('#stationSelect')).to_be_hidden()   # MMI starts clean: no field-control window
+   page.evaluate("SimMMI.open('field')")
    mmi.select_option('#stationSelect','anyang')
    mmi.select_option('#controlSelect','mode')
    mmi.check('input[name="mmiMode"][value="CCM"]');mmi.click('#mmiApply',position={'x':12,'y':12})
@@ -57,7 +59,9 @@ try:
    mmi.locator('.mmi-top-btn').first.click();expect(mmi.locator('.mmi-menu-top.open')).to_have_count(1)
    mmi.keyboard.press('Escape');expect(mmi.locator('.mmi-menu-top.open')).to_have_count(0)
    # Graph and schedule are the original panels and share the clock/model.
-   page.evaluate('SimMMI.open("graph")');expect(mmi.locator('#graphPanel')).to_be_visible()
+   with page.expect_popup() as tg:page.evaluate('SimMMI.open("graph")')   # T/G is its own window, not part of the MMI
+   graph=tg.value;expect(graph.locator('#diaSvg')).to_be_visible();expect(mmi.locator('#diaSvg')).to_have_count(0)
+   graph.close();page.wait_for_function('!SimWorkspace.graphDetached()')
    page.evaluate('SimMMI.open("schedule")');expect(mmi.locator('#schedulePanel')).to_be_visible()
    before=page.evaluate('SimField.state("guro").clock');page.click('#skipBtn')
    assert page.evaluate('SimField.state("guro").clock')==before+10
@@ -82,7 +86,7 @@ try:
    expect(page.locator('.mmi-shield[open]')).to_be_visible();page.click('#mmiAlertOk')
    with page.expect_popup() as new:page.click('#detachMMIBtn')
    mmi=new.value
-   mmi.locator('[data-restore]').click();expect(page.locator('#mmiShell')).to_be_visible()
+   page.evaluate('SimWorkspace.restore()');expect(page.locator('#mmiShell')).to_be_visible()
    assert len(page.context.pages)==1
    # Scenario controls in MMI drive timed train movement on the other screen.
    page.reload(wait_until='networkidle');page.click('#pauseBtn')
@@ -95,7 +99,7 @@ try:
    page.evaluate('SimMMI.run({type:"tick",seconds:60})')
    expect(page.locator('[data-train-slot="5T"]')).to_contain_text(number)
    expect(mmi.locator('#eventLogBody')).to_contain_text('시나리오 열차 이동 완료')
-   mmi.locator('[data-restore]').click()
+   page.evaluate('SimWorkspace.restore()')
    # Browsers denying window.open leave the combined UI intact.
    page.evaluate('window.open=()=>null');page.click('#detachMMIBtn');expect(page.locator('#mmiShell')).to_be_visible()
    assert not errors,errors

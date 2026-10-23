@@ -14,10 +14,9 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080},reduced_motion='reduce');errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)));page.on('response',lambda r:errors.append(f'HTTP {r.status}: {r.url}') if r.status>=400 else None)
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
    expect(page.locator('.brand-icon img')).to_have_attribute('src','assets/orpheia/emblem.png')
    assert page.locator('.brand-icon img').evaluate('e=>e.complete&&e.naturalWidth>0')
-   assert 'banner.png' in page.locator('.workspace-hero').evaluate('e=>getComputedStyle(e,"::before").backgroundImage')
    expect(page.locator('#exportBtn .ui-icon')).to_have_count(1)
    page.click('#guideBtn');expect(page.locator('#guideDialog')).to_be_visible();page.locator('.guide-intro').scroll_into_view_if_needed();page.wait_for_function("document.querySelector('.guide-intro img').naturalWidth>0")
    if width==1440:page.locator('#guideDialog').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-guide.png'))
@@ -25,7 +24,7 @@ try:
    page.locator('[data-mode="CCM"]').click();expect(page.locator('#actionDialog')).to_have_class('mode-confirm');page.keyboard.press('n');expect(page.locator('#actionDialog')).not_to_be_visible()
    page.locator('#toast').evaluate('e=>e.style.visibility="hidden"');page.evaluate('window.scrollTo(0,0)')
    if width==1440:page.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-workspace.png'),style='#toast{display:none!important}')
-   for wid in ['scheduleId','entryNotice','trace','noteManage','scenario','settings','equipment','cdrs','ledger','preferredScreen','logReplay','graph','schedule']:
+   for wid in ['scheduleId','entryNotice','trace','noteManage','scenario','settings','equipment','cdrs','ledger','preferredScreen','logReplay','schedule']:
     page.evaluate("for(const id of SimMMI.windowIds())SimMMI.close(id)");page.evaluate('(id)=>SimMMI.open(id)',wid)
     win=page.locator(f'[data-mmi-window="{wid}"]');expect(win).to_be_visible();win.scroll_into_view_if_needed()
     bounds=win.bounding_box();desktop=page.locator('#mmiDesktop').bounding_box();assert bounds['x']>=desktop['x']-1 and bounds['x']+bounds['width']<=desktop['x']+desktop['width']+1,(wid,width,bounds)
