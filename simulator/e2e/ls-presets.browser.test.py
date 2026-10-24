@@ -20,12 +20,31 @@ try:
   assert page.locator('#lsStage').get_attribute('data-control-station')==''
   expect(page.locator('#resetBtn')).to_be_hidden();expect(page.locator('#drawerBtn')).to_be_hidden()
   assert page.locator('[data-point-control]').count()==0
-  page.locator('[data-train-slot="B1022T"]').dblclick();expect(page.locator('#actionDialog')).not_to_be_visible()
-  page.locator('[data-train-slot="B1022T"]').click(button='right');assert page.locator('[data-context-action="train-input"],[data-context-action="train-move"],[data-context-action="scan-current"]').count()==0;page.keyboard.press('Escape')
-  page.evaluate("SimLSUI.dispatchDirect({op:'insert',station:'uiwang',slot:'B1022T',number:'K252',direction:'down'});render()");expect(page.locator('#trackSvg')).to_contain_text('K252')
-  assert page.locator('[data-train-occupied="B1022T"]').count()==1
-  page.locator('[data-train-slot="B1022T"]').click(button='right');expect(page.locator('[data-context-action="monitor-properties"]')).to_be_visible();assert page.locator('[data-context-action="train-rename"],[data-context-action="train-delete"]').count()==0;page.keyboard.press('Escape')
-  assert page.evaluate("SimLSUI.getModel().stations.uiwang.windows.B1022T[0].number")=='K252'
+  def win(slot):return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
+  def action(name):return page.locator(f'[data-context-action="{name}"]')
+  def confirm():page.click('#dialogConfirm');expect(page.locator('#actionDialog')).not_to_be_visible();page.wait_for_function('dialogAction===null')
+  def branch(slot,name):
+   win(slot).click(button='right');action(name).hover();action(name).locator('..').locator('.ls-submenu button').first.click()
+  def entries(slot):return page.evaluate('(slot)=>SimLSUI.getModel().stations.uiwang.windows[slot]||[]',slot)
+  equipment=page.evaluate('JSON.stringify({routes:state.routes,points:state.points,occupied:state.occupied,mode:state.mode})')
+  # Monitor-only refers to field equipment, not train-number management.
+  win('B1022T').dblclick();expect(page.locator('#actionDialog')).to_be_visible();page.fill('#lsTrainNumber','K252');confirm()
+  expect(win('B1022T')).to_contain_text('K252');assert page.locator('[data-train-occupied="B1022T"]').count()==1
+  branch('B1022T','train-rename');page.fill('#lsTrainNumber','K254');confirm();assert entries('B1022T')[0]['number']=='K254'
+  branch('B1022T','train-move');page.evaluate('render()');assert page.locator('#lsStage').evaluate("e=>e.classList.contains('select-train-target')")
+  win('B1032T').click();confirm();assert entries('B1022T')==[] and entries('B1032T')[0]['number']=='K254'
+  win('B1022T').focus();page.keyboard.press('Enter');page.fill('#lsTrainNumber','K252');confirm()
+  branch('B1032T','train-swap');win('B1022T').click();confirm();assert entries('B1032T')[0]['number']=='K252' and entries('B1022T')[0]['number']=='K254'
+  branch('B1022T','train-delete');confirm();assert entries('B1022T')==[]
+  # A pending move can cross the preset boundary in either direction.
+  branch('B1032T','train-move');page.click('#previousStation')
+  main_slot=page.locator('#trackSvg [data-train-slot]').first.get_attribute('data-train-slot');win(main_slot).click();confirm();assert entries(main_slot)[0]['number']=='K252'
+  branch(main_slot,'train-move');page.click('#nextStation');win('B1022T').focus();page.keyboard.press(' ');confirm()
+  assert entries(main_slot)==[] and entries('B1022T')[0]['number']=='K252'
+  win('B1022T').focus();page.keyboard.press('Shift+F10');action('train-properties').click();expect(page.locator('.ls-properties')).to_contain_text('K252');confirm()
+  # Blank-space menu still has no field controls, scan or annotation editing.
+  page.locator('.fidelity-note').click(button='right');assert page.locator('[data-context-action="scan-current"],[data-context-action="boards"]').count()==0;page.keyboard.press('Escape')
+  assert page.evaluate('JSON.stringify({routes:state.routes,points:state.points,occupied:state.occupied,mode:state.mode})')==equipment
   page.click('#previousStation');expect(page.locator('#lsStationSelect')).to_have_value('uiwang');assert page.locator('[data-signal]').count()==main_signals
   page.click('#nextStation');expect(page.locator('#trackSvg')).to_contain_text('K252');page.click('#nextStation');expect(page.locator('#lsStationSelect')).to_have_value('suwon');page.click('#previousStation');expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon')
   # Re-applying preferred screens must keep the new preset and current selection.
@@ -37,5 +56,5 @@ try:
    assert .33<plates[0]['center']<.38 and .82<plates[1]['center']<.88,(width,plates)
    assert all(.07<r['width']<.11 for r in plates),(width,plates)
    assert plates[1]['left']-plates[0]['right']>.38,(width,plates)
-  assert not errors,errors;browser.close();print('PASS 16 LS views / 15 control stations, Uiwang–Suwon navigation, passive monitor controls and shared live train state, preferred screens and corridor resizing')
+  assert not errors,errors;browser.close();print('PASS 16 LS views / 15 control stations, Uiwang–Suwon navigation, monitor equipment restrictions and editable shared train numbers, preferred screens and corridor resizing')
 finally:server.shutdown()

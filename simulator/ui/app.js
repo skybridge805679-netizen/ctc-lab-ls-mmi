@@ -78,7 +78,7 @@ function render(){
  $('previousStation').textContent=index>0?'◀ '+controlled[index-1].name:'시점';$('previousStation').disabled=index===0;
  $('nextStation').textContent=index<controlled.length-1?controlled[index+1].name+' ▶':'종점';$('nextStation').disabled=index===controlled.length-1;
  $('clock').textContent=time(state.clock);$('stateMode').textContent=st.controlled?state.mode:'비연동';$('stateOwner').textContent=state.mode==='LOCAL'?'현장역':'관제실';$('stateRoutes').textContent=Object.keys(state.routes).length+'개 설정';$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';
- $('lsStatus').textContent=monitor?'역간 운행 감시 · 열차번호·폐색·점유 표시':'CCM → 신호기 클릭 → 진로 선택 · 우클릭: 화면 메뉴 · 열번창: 열차번호 제어';
+ $('lsStatus').textContent=monitor?'역간 운행 감시 · 열번창: 열차번호 제어 · 폐색·점유 표시':'CCM → 신호기 클릭 → 진로 선택 · 우클릭: 화면 메뉴 · 열번창: 열차번호 제어';
  $('mmiState').textContent=`현재 ${state.mode} · LS와 같은 상태 · ${Object.keys(state.routes).length}개 진로 설정`;
  $('handoverBar').hidden=monitor||!state.pending;if(state.pending)$('handoverBar').innerHTML=`<span>${state.pending} 요청 · 가상 현장 응답 대기</span><button data-handover="yes">현장 수락</button><button data-handover="no">현장 거절</button>`;
  $('completedCount').textContent=`${completed.length} / ${tasks.length} 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();window.SimDiagram?.render();window.SimMMI?.refresh();
@@ -150,7 +150,7 @@ $('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.25.3',exportedAt:new Dat
 const lockSig=()=>Object.entries(state.routes).map(([id,r])=>id+(r.lock?'L':'')).join();
 setInterval(()=>{if(window.SimRemote){try{window.SimRemote.poll();}catch(error){if(error.message==='Engine offline')return;throw error;}   // 종료 중 엔진이 먼저 멈추면 조용히 넘어간다
  paused=window.SimRemote.snapshot.clock.paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';window.SimAutoUI?.step();window.SimScenarioUI?.stepMotion();window.SimMMI.syncAll(stationStates);render();window.SimDiagram.render();return;}if(!paused&&!window.SimMMI?.replaying?.()&&!window.SimLSUI.isInteracting()&&!$('actionDialog').open&&!$('guideDialog').open){const seconds=Number($('graphSpeed').value),before=lockSig(),movingBefore=trainRunning(state);session.tick(seconds);const scenarioChanged=window.SimScenarioUI?.stepMotion(),autoChanged=window.SimAutoUI?.step();window.SimEquipment?.tick(state.clock);window.SimMMI?.syncAll(stationStates);if(lockSig()!==before||autoChanged||scenarioChanged||movingBefore||trainRunning(state))render();else for(const row of SimDOM.document.querySelectorAll('[data-lock-row]')){const r=state.routes[row.dataset.lockRow];if(r?.lock){const left=Math.max(0,Math.ceil(r.lock.until-state.clock));row.querySelector('[data-lock-remaining]').textContent=left;row.querySelector('.lock-timer i').style.width=Math.round((r.lock.seconds-left)/r.lock.seconds*100)+'%';}}window.SimDiagram.render();$('clock').textContent=time(state.clock);$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';}},1000);
-window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates,readonly:!!window.SimLSPresets.get(selectedView).monitor}),run,render,openAction,toast,selectStation});
+window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates,monitor:!!window.SimLSPresets.get(selectedView).monitor}),run,render,openAction,toast,selectStation});
 fields();render();taskView();
 
 window.SimField={ // 교육용 설비 상태 설정(고장·TTB)이 역 상태에 접근하는 통로

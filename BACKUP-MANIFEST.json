@@ -1,6 +1,6 @@
 {
-  "version": "0.25.3",
-  "backupDate": "2026-10-23",
+  "version": "0.25.4",
+  "backupDate": "2026-10-24",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
     {
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 43876,
-      "sha256": "de128a5d5615b73dcb73a790645b04ed4f81dfcf89b91539c86d3bd6a0f9d9e7"
+      "bytes": 44336,
+      "sha256": "7b960cc476efcbbb94221d92915434d50d0fb872dc60a21a224a17b36d5463f5"
     },
     {
       "path": "README.md",
-      "bytes": 16503,
-      "sha256": "a91201de8adc577f32105f6330068033ed05d5115ef7577a418e1c2324bae217"
+      "bytes": 16932,
+      "sha256": "6b3c5b370f0f77eea45c6d85ef0bee161531450882923eeeafa549e485093c2b"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -174,6 +174,11 @@
       "sha256": "233cede628a77c2e6e8e9cb5e1302521dc88edca01f46a15227a777b9ad56842"
     },
     {
+      "path": "archive/CTC-LAB-v0.25.4.zip",
+      "bytes": 9988805,
+      "sha256": "37fcd138ee6d7acebf66bb66240dee2503483a01c7e795f5bfd0c8539a28db97"
+    },
+    {
       "path": "archive/CTC-LAB-v0.3.zip",
       "bytes": 59222,
       "sha256": "53201b52f258f30aa3c335ab67e230ac1afe6b2a0379fa5fca70e9e9388dd55a"
@@ -245,8 +250,8 @@
     },
     {
       "path": "desktop/engine-smoke.cjs",
-      "bytes": 7695,
-      "sha256": "d4a40ff2a4700935687808c23a61f22fb5f24bd8dc0425e01caf69cac49235fd"
+      "bytes": 7730,
+      "sha256": "e8a5151164bea0a282817be9663786f15c7662cdb0109f4c23e1cd9446ca17bc"
     },
     {
       "path": "desktop/install-electron.cjs",
@@ -260,8 +265,8 @@
     },
     {
       "path": "desktop/ls-windows-smoke.cjs",
-      "bytes": 5055,
-      "sha256": "a1ad44a98feded7622b67cd64e956ef4ff27a2677da090a75f80d5de216a1d6b"
+      "bytes": 6362,
+      "sha256": "4e6e9b5a713ac35b0f945ae617313e315b73a7fa3c2603d5e3e48c091b56aad7"
     },
     {
       "path": "desktop/main.cjs",
@@ -285,8 +290,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 4621,
-      "sha256": "9905085424fe30bbb3d8c093376e507c406d823b89d334b92d95248a2d3c0bc2"
+      "bytes": 4828,
+      "sha256": "a91619e23e898c7f1d1526ca15026e202a664d3948d7148bbce77c047c5a3e1e"
     },
     {
       "path": "desktop/resources/icon.ico",
@@ -2141,17 +2146,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "5135d2c63718fe7bd737fe9fcfafae48cd4cc3b4d2f8dd8714493b55d72b7564"
+      "sha256": "3453428a23f90820ea8b0fabb189220a656f795995b5dc6a9eb667214c6deaaf"
     },
     {
       "path": "package.json",
       "bytes": 2185,
-      "sha256": "d0b79eb008fa3725ad2dbe5f177d216c3d469ad38f2b80ddc6c690aa1f111fea"
+      "sha256": "92bc43545c479cd244e497049d5b49d769599a81c24096dd0f50a2f81eecb548"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 9389,
-      "sha256": "8ea008e18cab2889e083d941758c6b8fd048c30d4115297e91bbbc4af207030b"
+      "bytes": 9504,
+      "sha256": "fce7c6b7a0f33a88a64be5183b58ba40896f6827c23adb238e62446b9ac27240"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2410,8 +2415,8 @@
     },
     {
       "path": "simulator/e2e/ls-presets.browser.test.py",
-      "bytes": 4658,
-      "sha256": "38df1fc70633586ab5e50fe8a0a5df934d82ebefbef47464fbaf0f4da37de17d"
+      "bytes": 6452,
+      "sha256": "e3b0040dd36f1cde2cd56d3b4190fcad49fa9ab054f62d7cee9a63068a1a4591"
     },
     {
       "path": "simulator/e2e/ls-switches.browser.test.py",
@@ -2875,8 +2880,8 @@
     },
     {
       "path": "simulator/ui/app.js",
-      "bytes": 32429,
-      "sha256": "5156eb6ff57d917a5d70077af987c965ff40cb8789186d970ee08c4d1db4a58b"
+      "bytes": 32590,
+      "sha256": "734f396074dc03746b3b4d4adedc41666ba21ff7e348d56e874f801b3ba0713a"
     },
     {
       "path": "simulator/ui/autocontrol-ui.js",
@@ -2915,8 +2920,8 @@
     },
     {
       "path": "simulator/ui/ls-context.js",
-      "bytes": 20340,
-      "sha256": "fff9e67f1bbb3ceaa2b780a17dcc0a16d3ecbfca44b04df27a0440e61c6f3e37"
+      "bytes": 20032,
+      "sha256": "bc09241c3fb46eb82564b8800fc0204da01fbdd33c34293595a13a1f6ccc29cd"
     },
     {
       "path": "simulator/ui/ls-corridor-source.js",

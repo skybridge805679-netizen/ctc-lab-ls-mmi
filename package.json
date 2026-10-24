@@ -1,7 +1,7 @@
 {
   "name": "orpheia-ctc-lab",
   "productName": "ORPHEIA CTC LAB",
-  "version": "0.25.3",
+  "version": "0.25.4",
   "description": "오르페이아 철도관제 LS·MMI 데스크톱 실습",
   "private": true,
   "author": "CTC LAB",
