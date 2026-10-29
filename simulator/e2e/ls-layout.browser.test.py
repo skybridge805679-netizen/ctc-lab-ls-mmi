@@ -15,9 +15,9 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1000})
    page.goto(f'http://127.0.0.1:{server.server_port}');page.wait_for_load_state('networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
-   stations=page.locator('#lsStationSelect option').evaluate_all('(es)=>es.map(e=>e.value)')
+   stations=page.evaluate('SimLSPresets.list().map(v=>v.id)')
    for station in stations:
-    page.select_option('#lsStationSelect',station)
+    page.evaluate('id=>selectStation(id)',station)
     for reverse in [False,True]:
      if reverse:
       page.evaluate('''id=>{const preset=SimLSPresets.get(id),st=SimNetwork.catalog[preset.station],C=SimCore.forStation(preset.station),s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});for(const id of Object.keys(C.points))C.dispatch(s,{type:'point',id,value:'R'});const svg=document.querySelector('#trackSvg'),aspect=svg.viewBox.baseVal.width/svg.viewBox.baseVal.height;const v=SimLS.render(st,SimWiring.data[preset.station],C,s,{aspect,preset:id});svg.setAttribute('viewBox',`0 0 ${v.width} ${v.height}`);svg.innerHTML=v.svg;}''',station)
@@ -33,6 +33,6 @@ try:
       }return {overlaps,clipped};}''')
      assert result=={'overlaps':[],'clipped':[]},(width,station,reverse,result)
      expect(page.locator('#trackSvg .point-tag rect:not([fill="transparent"]), #trackSvg .bed-outer, #trackSvg .wing-outer')).to_have_count(0)
-   page.close();print(f'PASS {width}px: every text label at all 16 LS views is separate and inside the canvas in N/R states')
+   page.close();print(f'PASS {width}px: every text label at all 18 LS views is separate and inside the canvas in N/R states')
   browser.close()
 finally:server.shutdown();server.server_close()

@@ -249,8 +249,8 @@
       "path": "references/route-menus/README.md",
       "original_name": "README.md",
       "source": "Claude branch 27c6fe2: transcription, draft or user answer as labelled in the file",
-      "bytes": 1678,
-      "sha256": "0a6910c1e50e64a2a31c05ac928ed1a6cbfb57ca302156470606bd82f56438fe"
+      "bytes": 1891,
+      "sha256": "b1cc4ad09fd7ba246c8246c0fc6a40a529adcd016dcd97112b07168abc3904ea"
     },
     {
       "path": "references/route-menus/answers/yongsan-2026-10-21.txt",
@@ -418,6 +418,30 @@
       "source": "Derived original PPT slide 18 geometry; original attachments preserved",
       "bytes": 5424,
       "sha256": "93e5d97dd3db7129b1dfcfb620e88fbd7e3e71664c52723149024df5b4eda6dc"
+    },
+    {
+      "path": "references/route-menus/answers/yongsan-suwon-2026-10-29.txt",
+      "source": "사용자 확인 진로 목록 또는 원본 PPT의 파생 전사 자료",
+      "bytes": 5063,
+      "sha256": "7edfafdeffa552857e9e8bab75a3e880c4425702541600f1ecda8729208de78a"
+    },
+    {
+      "path": "references/transcriptions/corridor-layout-13.json",
+      "source": "사용자 확인 진로 목록 또는 원본 PPT의 파생 전사 자료",
+      "bytes": 2168,
+      "sha256": "df7fd87a2292b55f266a0b4dbe1f5e08481fd4f224bad701b7cafb971150daef"
+    },
+    {
+      "path": "references/transcriptions/corridor-layout-16.json",
+      "source": "사용자 확인 진로 목록 또는 원본 PPT의 파생 전사 자료",
+      "bytes": 2508,
+      "sha256": "6dbc431cd5f4d3ce29b2bc1c24986745f522a620d17313d414de0ac6cb01d14d"
+    },
+    {
+      "path": "references/transcriptions/corridor-layout-18.json",
+      "source": "사용자 확인 진로 목록 또는 원본 PPT의 파생 전사 자료",
+      "bytes": 5417,
+      "sha256": "3381296ad288043ad595ad1330f7d67267ab4a0bb682ddc5316a49a14c3cda6e"
     }
   ],
   "superseded_attachments": [

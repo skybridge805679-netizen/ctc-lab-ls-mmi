@@ -11,7 +11,7 @@ function confirm(title,body,a){closeMenu();host.openAction(title,body,()=>({type
 function editTrain(slot,uid){
  cancelPending();
  const station=ctx().station,t=rows(station,slot).find(t=>t.uid===uid);
- confirm(t?'열차번호 수정':'열차번호 입력',`<p>${esc(root.SimNetwork.catalog[station].name)} · ${esc(slot)}</p><label class="field-label" for="lsTrainNumber">열차번호</label><input id="lsTrainNumber" required pattern="[A-Za-z]{0,2}[0-9]{1,6}" maxlength="8" autocomplete="off" value="${esc(t?.number||'')}" placeholder="K1234"><label class="field-label" for="lsTrainDirection">운행방향</label><select id="lsTrainDirection"><option value="up">상행 ◀</option><option value="down">하행 ▶</option></select>`,()=>({op:t?'rename':'insert',station,slot,uid,number:$('lsTrainNumber').value,direction:$('lsTrainDirection').value}));
+ confirm(t?'열차번호 수정':'열차번호 입력',`<p>${esc(ctx().viewName||root.SimNetwork.catalog[station].name)} · ${esc(slot)}</p><label class="field-label" for="lsTrainNumber">열차번호</label><input id="lsTrainNumber" required pattern="[A-Za-z]{0,2}[0-9]{1,6}" maxlength="8" autocomplete="off" value="${esc(t?.number||'')}" placeholder="K1234"><label class="field-label" for="lsTrainDirection">운행방향</label><select id="lsTrainDirection"><option value="up">상행 ◀</option><option value="down">하행 ▶</option></select>`,()=>({op:t?'rename':'insert',station,slot,uid,number:$('lsTrainNumber').value,direction:$('lsTrainDirection').value}));
  $('lsTrainDirection').value=t?.direction||'up';$('lsTrainNumber').focus();$('lsTrainNumber').select();
  $('lsTrainNumber').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('dialogConfirm').click();}};
 }
@@ -37,7 +37,7 @@ function numberMenu(slot){
 }
 function properties(t,slot){
  closeMenu();const schedule=root.SimDiagram.getModel().trains.find(x=>x.id===t.number);
- host.openAction('열차 속성 조회',`<dl class="ls-properties"><dt>열차번호</dt><dd>${esc(t.number)}</dd><dt>위치</dt><dd>${esc(ctx().monitor?'의왕~수원':root.SimNetwork.catalog[ctx().station].name)} · ${esc(slot)}</dd><dt>운행방향</dt><dd>${t.direction==='up'?'상행':'하행'}</dd><dt>열차종류</dt><dd>${esc(schedule?.kind||'수동 등록')}</dd><dt>스케줄</dt><dd>${schedule?(schedule.cancelled?'운휴':'등록됨'):'등록된 스케줄 없음'}</dd></dl><p>수동 열차번호 표시 · 모의 점유 상태와 별개입니다.</p>`,null,'닫기');
+ host.openAction('열차 속성 조회',`<dl class="ls-properties"><dt>열차번호</dt><dd>${esc(t.number)}</dd><dt>위치</dt><dd>${esc(ctx().viewName||root.SimNetwork.catalog[ctx().station].name)} · ${esc(slot)}</dd><dt>운행방향</dt><dd>${t.direction==='up'?'상행':'하행'}</dd><dt>열차종류</dt><dd>${esc(schedule?.kind||'수동 등록')}</dd><dt>스케줄</dt><dd>${schedule?(schedule.cancelled?'운휴':'등록됨'):'등록된 스케줄 없음'}</dd></dl><p>수동 열차번호 표시 · 모의 점유 상태와 별개입니다.</p>`,null,'닫기');
 }
 function svgPoint(e,clamp=true){const svg=$('trackSvg'),p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse());return clamp?{x:Math.max(8,Math.min(svg.viewBox.baseVal.width-188,p.x)),y:Math.max(8,Math.min(svg.viewBox.baseVal.height-68,p.y))}:{x:p.x,y:p.y};}
 function editBoard(kind,point,id){

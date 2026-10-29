@@ -15,11 +15,11 @@ try:
    pages=[browser.new_page(viewport={'width':width,'height':height}) for _ in range(2)]
    for page in pages:
     page.on('pageerror',lambda e:errors.append(str(e)));page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.evaluate("document.body.classList.add('workspace-split')")
-   stations=pages[0].locator('#lsStationSelect option').evaluate_all('es=>es.map(e=>e.value)')
+   stations=pages[0].evaluate('SimLSPresets.list().map(v=>v.id)')
    for west,east in zip(stations,stations[1:]):
     data=[]
     for page,station,side in zip(pages,[west,east],['right','left']):
-     page.select_option('#lsStationSelect',station);page.wait_for_timeout(80)
+     page.evaluate('id=>selectStation(id)',station);page.wait_for_timeout(80)
      data.append(page.locator('#trackSvg').evaluate('''(svg,side)=>{const m=svg.getScreenCTM(),box=svg.getBoundingClientRect();return Object.fromEntries([...svg.querySelectorAll(`[data-seam-side="${side}"]`)].map(g=>{const path=g.querySelector('.seam-rail'),p=path.getPointAtLength(path.getTotalLength()).matrixTransform(m);return [g.dataset.seamTrunk,{x:p.x,y:p.y,edge:side==='left'?0:innerWidth,box:[box.left,box.right]}]}));}''',side))
     common=set(data[0])&set(data[1]);assert common,(west,east)
     for portset in data:

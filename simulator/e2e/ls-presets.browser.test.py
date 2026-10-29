@@ -57,5 +57,21 @@ try:
    assert .33<plates[0]['center']<.38 and .82<plates[1]['center']<.88,(width,plates)
    assert all(.07<r['width']<.11 for r in plates),(width,plates)
    assert plates[1]['left']-plates[0]['right']>.38,(width,plates)
-  assert not errors,errors;browser.close();print('PASS 16 LS views / 15 control stations, Uiwang–Suwon navigation, monitor equipment restrictions and editable shared train numbers, preferred screens and corridor resizing')
+  # All three windows are viewports of existing circuit state, navigated by source arrows.
+  for host,monitor,nxt,plate in [('anyang','anyang-geumjeong','geumjeong','명학'),('gunpo','gunpo-uiwang','uiwang','당정'),('uiwang','uiwang-suwon','suwon','화서')]:
+   page.evaluate('id=>selectStation(id)',host)
+   assert page.locator(f'#stationTabs [data-view="{monitor}"]').count()==0
+   before=page.evaluate('JSON.stringify(stationStates)')
+   page.locator(f'[data-nav-view="{monitor}"]').focus();page.keyboard.press('Enter')
+   expect(page.locator('#lsStage')).to_have_attribute('data-preset',monitor);expect(page.locator('#lsStage')).to_contain_text(plate)
+   assert page.locator('#lsStage [data-mode],#lsStage [data-point-control],#lsStage [data-signal],#lsStage [data-stop-all]').count()==0
+   assert page.evaluate('JSON.stringify(stationStates)')==before
+   slot=page.locator('#trackSvg [data-train-slot]').first.get_attribute('data-train-slot')
+   win(slot).dblclick();expect(page.locator('#dialogBody')).to_contain_text(page.evaluate('SimLSPresets.get(selectedView).name'));page.fill('#lsTrainNumber','K261');confirm()
+   win(slot).click(button='right');action('train-properties').click();expect(page.locator('.ls-properties')).to_contain_text(page.evaluate('SimLSPresets.get(selectedView).name'));confirm()
+   model=page.evaluate('JSON.stringify(SimLSUI.getModel())')
+   page.locator(f'[data-nav-view="{nxt}"]').click();page.locator(f'[data-nav-view="{monitor}"]').click()
+   expect(win(slot)).to_contain_text('K261');assert page.evaluate('JSON.stringify(SimLSUI.getModel())')==model
+   page.locator(f'[data-nav-view="{host}"]').click();expect(page.locator('#lsStage')).to_have_attribute('data-preset',host)
+  assert not errors,errors;browser.close();print('PASS 18 LS viewports / 15 control stations, Uiwang–Suwon navigation, monitor equipment restrictions and editable shared train numbers, preferred screens and corridor resizing')
 finally:server.shutdown()

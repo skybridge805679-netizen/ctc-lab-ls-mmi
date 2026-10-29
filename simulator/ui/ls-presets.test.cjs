@@ -36,3 +36,27 @@ test('Anyang~Geumjeong and Gunpo~Uiwang monitors take their circuits out of the 
   assert.ok(monitor.svg.includes('data-nav-view="'+station+'"'),'yellow arrow back to '+station);
  }
 });
+
+test('view boundaries partition canonical circuit identities, train windows and block indicators without altering the network',()=>{
+ const source=require('./ls-corridor-source'),Line=require('../engine/line'),Ops=require('../engine/ls-operations'),TW=require('../engine/train-windows');
+ const ops=Ops.create(Object.fromEntries(Object.entries(TW.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),model=ops.initial();
+ const networkBefore=JSON.stringify(N.catalog),graphBefore=JSON.stringify(Line.graph);
+ for(const spec of V.CORRIDORS){
+  const c=C.forStation(spec.host),state=c.initial(),render=p=>LS.render(N.catalog[spec.host],W[spec.host],c,state,{preset:p,aspect:16/9,occupied:new Set(Object.keys(Line.circuitOccupancy(model)))});
+  for(const a of ['data-train-slot','data-block-id'])assert.deepEqual([...attrs(render(spec.host),a),...attrs(render(spec.id),a)].sort(),attrs(render(''),a).sort(),spec.id+' '+a);
+  const all=attrs(render(''),'data-track-circuit'),visible=[...attrs(render(spec.host),'data-track-circuit'),...attrs(render(spec.id),'data-track-circuit')];
+  assert.deepEqual(visible.sort(),all.filter(code=>!source[spec.slide].handoff.includes(code)).sort(),spec.id+' circuit coverage');
+  const next=C.forStation(spec.next),nextView=LS.render(N.catalog[spec.next],W[spec.next],next,next.initial(),{preset:spec.next});
+  for(const code of source[spec.slide].handoff){assert.equal(V.circuitView(spec.host,code),spec.next);assert(nextView.svg.includes('data-circuit-label="'+code+'"'),'handoff remains visible '+code);}
+  const slots=attrs(render(spec.id),'data-train-slot');assert(slots.length);
+  const slot=slots[0],number='K'+spec.slide;
+  assert(ops.dispatch(model,{op:'insert',station:spec.host,slot,number,direction:'down'}).ok);
+  assert.deepEqual(Line.circuitOccupancy(model)[slot],[number]);
+  const before=structuredClone(state),row=model.stations[spec.host].windows[slot][0];
+  for(const preset of [spec.id,spec.host,spec.next,spec.host,spec.id]){const view=V.get(preset),cc=C.forStation(view.station);LS.render(N.catalog[view.station],W[view.station],cc,view.station===spec.host?state:cc.initial(),{preset,aspect:16/9});}
+  assert.strictEqual(model.stations[spec.host].windows[slot][0],row);assert.deepEqual(state,before);
+  assert(render(spec.id).svg.includes('data-train-occupied="'+slot+'"'));
+  assert(!Object.hasOwn(model.stations,spec.id),'a viewport never owns a separate engine state');
+ }
+ assert.equal(JSON.stringify(N.catalog),networkBefore);assert.equal(JSON.stringify(Line.graph),graphBefore);
+});

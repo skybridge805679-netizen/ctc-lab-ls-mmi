@@ -27,5 +27,12 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-ls-windows-'));let a
  await expect.poll(()=>primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1022T?.[0]?.number)).toBe('K254');
  await corridor.locator('[data-train-slot="B1022T"]').click({button:'right'});const move=corridor.locator('[data-context-action="train-move"]');await move.hover();await move.locator('..').locator('.ls-submenu button').first().click();await corridor.locator('[data-train-slot="B1032T"]').click();await corridor.click('#dialogConfirm');await corridor.waitForFunction(()=>SimLSUI.getModel().stations.uiwang.windows.B1032T?.[0]?.number==='K254');
  await expect.poll(()=>primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1032T?.[0]?.number)).toBe('K254');assert.equal(await primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1022T?.length||0),0);await corridor.close();
+ for(const [host,view,slot]of [['anyang','anyang-geumjeong','B988T'],['gunpo','gunpo-uiwang','B1006T']]){
+  const page=await additional(view);await page.waitForFunction(v=>document.querySelector('#lsStage').dataset.preset===v,view);
+  assert.equal(await page.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await page.locator('#lsStage [data-mode],#lsStage [data-point-control],#lsStage [data-stop-all]').count(),0);
+  await page.locator(`[data-train-slot="${slot}"]`).dblclick();await expect(page.locator('#dialogBody')).toContainText(view==='anyang-geumjeong'?'안양~금정':'군포~의왕');await page.fill('#lsTrainNumber','K261');await page.click('#dialogConfirm');
+  await expect.poll(()=>primary.evaluate(([host,slot])=>SimRemote.snapshot.ls.stations[host].windows[slot]?.[0]?.number,[host,slot])).toBe('K261');
+  await page.locator(`[data-nav-view="${host}"]`).click();await page.locator(`[data-nav-view="${view}"]`).click();await expect(page.locator(`[data-train-slot="${slot}"]`)).toContainText('K261');await page.close();
+ }
  assert.deepEqual(errors,[]);console.log('PASS multiple independent LS station windows share one authoritative engine and the primary MMI; closure and station selection stay local');await app.close();app=null;
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
