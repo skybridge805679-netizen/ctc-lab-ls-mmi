@@ -5,7 +5,7 @@ import json, math, re, subprocess
 from pathlib import Path
 from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
-stations = json.loads(subprocess.check_output(['node', '-e', "console.log(JSON.stringify(require('./network.js').stations.filter(s=>s.controlled)))"], cwd=ROOT))
+stations = json.loads(subprocess.check_output(['node', '-e', "console.log(JSON.stringify(require('./engine/network.js').stations.filter(s=>s.controlled)))"], cwd=ROOT))
 images = {p:Image.open(ROOT/f'assets/line-map/page-{p}.jpg').convert('RGB') for p in (2,3,4)}
 checked = 0
 for st in stations:

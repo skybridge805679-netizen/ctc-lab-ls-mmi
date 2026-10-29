@@ -2,10 +2,10 @@
 // Usage: node tools/build-route-menus.cjs [file ...]   (default: references/route-menus/ls-route-menus-transcribed.txt)
 // Every listed route must exist in the simulator's derived routes, otherwise the build fails.
 const fs=require('fs'),path=require('path'),Core=require('../simulator/engine/core.js');
-const files=process.argv.slice(2).length?process.argv.slice(2):[path.join(__dirname,'../references/route-menus/ls-route-menus-transcribed.txt'),path.join(__dirname,'../references/route-menus/answers/yongsan-2026-10-21.txt')];
+const files=process.argv.slice(2).length?process.argv.slice(2):[path.join(__dirname,'../references/route-menus/ls-route-menus-transcribed.txt'),path.join(__dirname,'../references/route-menus/answers/yongsan-suwon-2026-10-29.txt')];
 const menus={};
 for(const file of files){let st=null;
- for(const l of fs.readFileSync(file,'utf8').split('\n').filter(Boolean)){
+ for(const l of fs.readFileSync(file,'utf8').split('\n').filter(l=>l&&!l.startsWith('#'))){
   if(!/ - /.test(l)){st=l.trim();menus[st]=menus[st]||{};continue;}
   for(const g of l.split(/\s+(?=\d+[A-Z]?\s-\s)/)){const [sig,rest]=g.split(' - ');
    for(const r of rest.split(',').map(s=>s.trim())){const m=r.match(/^RT_(\w+?)_(\w+)$/);

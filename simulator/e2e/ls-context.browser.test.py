@@ -79,14 +79,14 @@ try:
    background(); action('restart').click(); assert snapshot()==before; assert page.evaluate('JSON.stringify(SimLSUI.getModel())')==display
    page.evaluate('()=>{window.printCalls=0;window.print=()=>window.printCalls++}'); background(); action('print').click(); assert page.evaluate('printCalls')==1
    background(); action('overview').hover(); action('overview-all').click()
-   expect(page.locator('[data-overview-station]')).to_have_count(16)
+   expect(page.locator('[data-overview-station]')).to_have_count(18)
    expect(page.locator('[data-overview-station="geumcheon"] [data-train-slot="B967T"] text')).to_have_text('<K1234')
    assert page.locator('[data-overview-station="geumcheon"] [data-ls-board]').count()==5
    page.locator('[data-overview-station="anyang"]').click(); expect(page.locator('#stationSelect')).to_have_value('anyang'); assert page.evaluate('JSON.stringify({routes:stationStates.geumcheon.routes,points:stationStates.geumcheon.points,occupied:stationStates.geumcheon.occupied})')==before
    # Every station has visible windows; placement must not cover rails, signals, labels or platforms.
    total=0
-   for station in page.locator('#lsStationSelect option').evaluate_all('(os)=>os.map(o=>o.value)'):
-    page.select_option('#lsStationSelect',station); total+=page.locator('#trackSvg [data-train-slot]').count()
+   for station in page.evaluate('SimLSPresets.list().map(v=>v.id)'):   # 역간 감시 화면 포함 전 화면
+    page.evaluate('id=>selectStation(id)',station); total+=page.locator('#trackSvg [data-train-slot]').count()
     overlaps=page.evaluate("""()=>{const svg=document.querySelector('#trackSvg'),bs=[...svg.querySelectorAll('.signal .sig-name,.signal .lamp,.annotation,.inter-station .plate,.platform,[data-source-symbol] path')].map(e=>e.getBBox());return [...svg.querySelectorAll('[data-train-slot] > rect')].filter(e=>{const a=e.getBBox();return bs.some(b=>a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y)}).map(e=>e.parentNode.dataset.trainSlot)}""")
     assert not overlaps,(station,overlaps)
     checks=page.evaluate('''()=>{const lanes={};for(const g of document.querySelectorAll('#trackSvg [data-train-slot]')){const y=+g.dataset.windowRailY,b=g.querySelector('rect').getBBox();if(g.dataset.windowSide==='inline'){if(!(b.y<y&&b.y+b.height>y))return false;}else{const k=y.toFixed(0)+g.dataset.windowSide;if(k in lanes&&Math.abs(lanes[k]-b.y)>.1)return false;lanes[k]=b.y;}}return true}''')

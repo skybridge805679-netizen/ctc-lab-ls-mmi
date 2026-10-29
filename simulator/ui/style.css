@@ -163,3 +163,8 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 
 .sc-motion-status>div{display:grid;grid-template-columns:84px minmax(0,1fr);gap:4px 12px;padding:9px 0;border-bottom:1px solid #bfd8d2}.sc-motion-status>div:last-child{border-bottom:0}.sc-motion-status span{overflow-wrap:anywhere}.sc-motion-status small{grid-column:2;margin-left:0}
 .ls-svg [data-point-control]{cursor:pointer}.ls-svg [data-point-control]:hover .annotation,.ls-svg [data-point-control]:focus-visible .annotation{fill:#bee3e3;text-decoration:underline}.ls-svg [data-point-control]:focus-visible{outline:none}
+/* 원본 LS 상단 모서리의 노란 화살표(이웃 화면 이동) */
+.ls-svg .nb-arrow{cursor:pointer}.ls-svg .nb-arrow-shape{fill:#f4f000;stroke:#7a7400;stroke-width:1}
+.ls-svg .nb-arrow-dir,.ls-svg .nb-arrow .nb-tag{fill:#111;stroke:none;font-size:13px;font-weight:700;letter-spacing:1px}
+.ls-svg .nb-arrow:hover .nb-arrow-shape,.ls-svg .nb-arrow:focus .nb-arrow-shape{fill:#fffb6a}
+.ls-svg .nb-arrow:focus{outline:none}.ls-svg .nb-arrow:focus .nb-arrow-shape{stroke:#173b40;stroke-width:2}

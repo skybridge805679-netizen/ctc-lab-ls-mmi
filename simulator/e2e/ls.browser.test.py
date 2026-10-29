@@ -38,7 +38,8 @@ try:
                 expect(stage.locator('[data-signal]')).to_have_count(expected)
                 assert stage.locator('.bed-inner path').count() >= 2
                 # Jurisdiction (intermediate) stations are drawn from the original strips, with their plates.
-                inter = page.evaluate('(id)=>SimNetwork.catalog[id].map.view.intermediate', station)
+                # 역간 감시 화면(안양~금정·군포~의왕·의왕~수원)으로 옮긴 중간역은 역 화면에 그리지 않는다
+                inter = page.evaluate('(id)=>{const c=SimLSPresets.CORRIDORS.find(c=>c.host===id),moved=c?SimLSPresets.get(c.id).plates:[];return SimNetwork.catalog[id].map.view.intermediate.filter(n=>!moved.includes(n))}', station)
                 expect(stage.locator('[data-inter-station]')).to_have_count(len(inter))
                 for name in inter:
                     expect(stage.locator(f'[data-inter-station="{name}"]')).to_have_count(1)

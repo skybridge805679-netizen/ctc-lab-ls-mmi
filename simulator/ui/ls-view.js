@@ -36,7 +36,7 @@ function wingOf(st,def){
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
-function layout(def,wing,aspect){
+function layout(def,wing,aspect,top=108){   // top: 원본 노란 화살표 자리
  const xs=[],ys=[];
  for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);}
  for(const signal of def.signals)ys.push(signal[3]);
@@ -54,7 +54,7 @@ function layout(def,wing,aspect){
  const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
  const pitch=Math.min(...pitches,80);
  const sx=(WIDTH-2*PADDING)/(maxX-minX),targetH=Number.isFinite(aspect)&&aspect>0?Math.max(420,WIDTH/aspect):null;
- const top=80,bottom=64,sy=targetH?Math.max(48/pitch,(targetH-top-bottom)/Math.max(1,maxY-minY)):Math.max(sx,80/pitch);
+ const bottom=64,sy=targetH?Math.max(48/pitch,(targetH-top-bottom)/Math.max(1,maxY-minY)):Math.max(sx,80/pitch);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
  const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy]);
@@ -69,8 +69,9 @@ function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+ga
 function render(st,def,core,model,neighbours={}){
  const prepared=presets.prepare(st,def,sceneOf(st),wingOf(st,def),neighbours.preset),{data,wing}=prepared;def=prepared.def;
  if(prepared.corridor)model={...model,routes:{},approach:{},scenarioMotions:[]};
- const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor);
- const L=layout(def,wing,neighbours.aspect),T=L.pt;
+ const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor,prepared.slide);
+ const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 노란 화살표 자리만큼 위를 비운다
+,T=L.pt;
  const plateGap=prepared.corridor?128:94;
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
@@ -364,9 +365,12 @@ function render(st,def,core,model,neighbours={}){
   if(group){const R=model.points[group]==='R',locked=model.blockedPoints.includes(group)||Object.keys(model.routes).some(id=>(core.routes[id].pointLocks||[]).includes(group)||core.overlapOf(id)?.points[group]);annotations+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-control="${item[2]}" data-point-group="${group}" role="button" tabindex="0" aria-label="선로전환기 ${item[2]}"><rect x="${label.x-18}" y="${label.y-11}" width="36" height="22" fill="transparent"/>${label.svg}<title>SW_${item[2]} · ${R?'반위':'정위'} · 쌍동 A/B 동시 전환${locked?' · 쇄정':''}</title></g>`;if(overlapPoints.has(group))annotations+=`<circle class="overlap-ring" data-overlap-point="${group}" cx="${label.x}" cy="${label.y}" r="18"/>`;}else annotations+=label.svg;
  }
  for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
- const edgeY=24;
- if(neighbours.left)plates+=`<text class="nb-tag" x="12" y="${edgeY}" text-anchor="start">◀ ${esc(neighbours.left)}</text>`;
- if(neighbours.right)plates+=`<text class="nb-tag" x="${WIDTH-12}" y="${edgeY}" text-anchor="end">${esc(neighbours.right)} ▶</text>`;
+ // 원본 LS의 노란 화살표: 위 글자는 방향(지하청량리/수원), 아래 글자는 눌렀을 때 열리는 이웃 화면.
+ const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?12:WIDTH-12,dx=L?1:-1,body=12,head=26,len=140,cy=28;
+  const pts=[[0,0],[head,-head/2],[head,-body/2],[len,-body/2],[len,body/2],[head,body/2],[head,head/2]].map(([px,py])=>[x0+dx*px,cy+py].join(',')).join(' '),tx=x0+dx*(head+(len-head)/2);
+  return `<g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g>`;};
+ const around=presets.neighbours?.(neighbours.preset||st.id)||{};
+ plates+=arrow(neighbours.left===undefined?around.left:neighbours.left,'left')+arrow(neighbours.right===undefined?around.right:neighbours.right,'right');
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
  const ports=seams.ports(st,def,data).map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
  return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2))}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};

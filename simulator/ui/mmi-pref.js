@@ -13,7 +13,7 @@ function apply(){
  const el=$('lsStationSelect');if(!el)return;const cur=el.value,list=cfg[mon]||[];
  const opt=s=>`<option value="${s.id}">${esc(label(s.id))}</option>`;
  const pref=list.map(id=>stations.find(s=>s.id===id)).filter(Boolean);
- el.innerHTML=(pref.length?`<optgroup label="운영자 선호화면 (모니터 ${mon})">${pref.map(opt).join('')}</optgroup><optgroup label="전체 LS 화면">`:'')+stations.map(opt).join('')+(pref.length?'</optgroup>':'');
+ el.innerHTML=(pref.length?`<optgroup label="운영자 선호화면 (모니터 ${mon})">${pref.map(opt).join('')}</optgroup><optgroup label="전체 LS 화면">`:'')+stations.filter(s=>!s.monitor||s.id===cur).map(opt).join('')+(pref.length?'</optgroup>':'');   // 역간 감시 화면은 노란 화살표로 연다(선호화면에 넣은 경우만 목록에 보임)
  el.value=cur;
 }
 function draw(){

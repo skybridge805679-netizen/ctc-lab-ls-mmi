@@ -14,7 +14,7 @@ try:
   page=b.new_page(viewport={'width':1440,'height':1000});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(f'http://127.0.0.1:{s.server_port}',wait_until='networkidle');page.click('#pauseBtn')
   stations=page.locator('#lsStationSelect option').evaluate_all('es=>es.map(e=>e.value)')
-  assert len(stations)==16
+  assert len(stations)==15   # 역간 감시 화면 3개는 노란 화살표로만 연다
   for width,height in [(1920,1080),(1440,1000),(960,720),(640,480),(360,280),(1280,450)]:
    page.set_viewport_size({'width':width,'height':height})
    page.wait_for_function('Math.abs(Number(document.querySelector(".ls-viewport").style.zoom)-SimViewport.fit(innerWidth,innerHeight).scale)<.00001')

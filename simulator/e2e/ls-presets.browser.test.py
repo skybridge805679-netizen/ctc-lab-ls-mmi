@@ -13,7 +13,8 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=browser.new_page(viewport={'width':1920,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
   assert page.locator('#stationSelect option').count()==15
-  assert page.locator('#lsStationSelect option').count()==16
+  assert page.locator('#lsStationSelect option').count()==15   # 역간 감시 화면은 하단 목록에 없다
+  assert page.locator('#stationTabs [data-view]').count()==15
   page.select_option('#lsStationSelect','uiwang');expect(page.locator('#lsStage')).not_to_contain_text('성균관대');main_signals=page.locator('[data-signal]').count();assert main_signals>0
   page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm');page.click('#nextStation')
   expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon');expect(page.locator('#stationSelect')).to_have_value('uiwang');expect(page.locator('#lsStage')).to_contain_text('성균관대');expect(page.locator('#lsStage')).to_contain_text('화서');assert page.locator('#lsStage [data-mode],#lsStage [data-stop-all],#lsStage [data-equipment]').count()==0

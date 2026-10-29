@@ -15,7 +15,7 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.clock.install();page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
-   page.select_option('#stationSelect','yongsan')
+   page.evaluate("SimMMI.open('field')");page.select_option('#stationSelect','yongsan')
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    for a in [{'type':'mode','value':'CCM'},{'type':'route','id':'2A-5T'},{'type':'occupy','id':'2A-5T','seconds':20}]:assert run(a)['ok']
    path=page.locator('[data-train-run="2A-5T"]');start=path.get_attribute('d')

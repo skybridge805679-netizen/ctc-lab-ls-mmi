@@ -9,7 +9,7 @@ for(const b of g.boundaries)assert(g.edges.some(e=>e.a===b.node&&e.b===b.id&&e.k
 assert.equal(g.boundaries.length,7);
 assert.equal(G.audit().inferredCompositeRoutes.length,0);for(const s of N.stations.filter(s=>s.controlled))for(const route of Object.keys(s.routes))assert(G.localPath(s.id,route).contiguous,s.id+' '+route);
 assert.deepEqual(W.data.anyang.links.find(p=>p[0]==='53'),['53','2T',852,'3T',872]);
-console.log('PASS source-backed graph: 317 canonical circuits, all 46 continuous chains, 7 explicit depot boundaries, 658 native routes and no invented gap codes');
+console.log('PASS source-backed graph: 317 canonical circuits, all 46 continuous chains, 7 explicit depot boundaries, 710 native routes and no invented gap codes');
 const ops=Ops.create(Object.fromEntries(Object.entries(TW.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),ls=ops.initial();
 ops.dispatch(ls,{op:'insert',station:'anyang',slot:'B988T',number:'K4001',direction:'down'});
 assert(!L.blockedExits(ls).anyang?.B984T,'a distant occupied circuit does not close an empty entry circuit');
