@@ -1,0 +1,3454 @@
+{
+  "version": "0.26.2",
+  "date": "2026-10-29",
+  "source": "references/diagrams/배선도(관제교육장).pptx",
+  "sha256": "7d1760358158bd4103bac9388635ff6bec49e93a6eb6c3f2a2f3207d4ff66cc0",
+  "stations": [
+    {
+      "id": "cheongnyangni",
+      "slide": 2,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "3A-A1T",
+            "3A-MT",
+            "21-1T",
+            "21-2T",
+            "22-A1T",
+            "22-MT",
+            "23-MT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [],
+          "routeLocks": [
+            "1A-1T",
+            "21-1T",
+            "23-AT",
+            "23-MT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2A-2T",
+            "2A-1T",
+            "4A-Y1T",
+            "4A-B002T",
+            "4A-B001T",
+            "4B-B001T",
+            "51-1T",
+            "52-Y1T",
+            "52-B002T",
+            "52-B001T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2A-2T",
+            "4A-Y1T",
+            "4A-B002T",
+            "4B-B001T",
+            "4B-Y1T",
+            "4B-B002T",
+            "51-1T",
+            "51-2T",
+            "52-Y1T",
+            "52-B002T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "dongmyo",
+      "slide": 3,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "1B-1T",
+            "3A-B015T",
+            "21-2T",
+            "21-1T",
+            "23-B015T",
+            "24-B014T",
+            "24-B015T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "1B-1T",
+            "21-1T",
+            "24-B014T",
+            "24-B015T",
+            "24-CT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "3A-B015T",
+            "3A-DT",
+            "21-2T",
+            "22-2T",
+            "23-B015T",
+            "23-DT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "jonggak",
+      "slide": 4,
+      "groups": [
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2A-2T",
+            "4A-BT",
+            "4A-B046T",
+            "51-2T",
+            "52-1T",
+            "52-2T",
+            "53-BT",
+            "53-B046T",
+            "54-B045T",
+            "54-BT",
+            "54-B046T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2A-2T",
+            "2A-1T",
+            "4A-BT",
+            "4A-B046T",
+            "4A-B045T",
+            "51-2T",
+            "51-1T",
+            "52-1T",
+            "53-BT",
+            "53-B046T",
+            "53-B045T",
+            "54-B045T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "underground-seoul",
+      "slide": 5,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "1A-2T",
+            "3A-B065T",
+            "3A-B070T",
+            "21-2T",
+            "22-B065T",
+            "22-B070T",
+            "23-B070T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "3A-B065T",
+            "21-2T",
+            "21-1T",
+            "22-B065T",
+            "23-B070T",
+            "23-B065T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51B",
+            "51A"
+          ],
+          "routeLocks": [
+            "4A-B072T",
+            "4A-MT",
+            "51-2T",
+            "51-1T",
+            "52-B072T",
+            "52-MT",
+            "53-MT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [],
+          "routeLocks": [
+            "2A-2T",
+            "51-2T",
+            "53-B067T",
+            "53-MT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "seoul",
+      "slide": 6,
+      "groups": [
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "2A-5T",
+            "2A-4T",
+            "2A-3T",
+            "4B-B602T",
+            "4B-B601T",
+            "4C-B602T",
+            "4C-B601T",
+            "4D-B601T",
+            "4D-B602T",
+            "4E-B601T",
+            "4E-B602T",
+            "4F-B601T",
+            "4F-B602T",
+            "51-7T",
+            "51-6T",
+            "51-5T",
+            "51-4T",
+            "51-3T",
+            "52-4T",
+            "52-3T",
+            "52-7T",
+            "52-6T",
+            "52-5T",
+            "55-B602T",
+            "55-B601T",
+            "56-B602T",
+            "56-B601T",
+            "57-B601T",
+            "57-B602T",
+            "58-B601T",
+            "58-B602T",
+            "59-B601T",
+            "59-B602T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "2A-5T",
+            "2A-4T",
+            "2A-3T",
+            "4B-B602T",
+            "4B-B601T",
+            "4C-B602T",
+            "4C-B601T",
+            "4D-B601T",
+            "4E-B601T",
+            "4F-B601T",
+            "51-7T",
+            "51-6T",
+            "51-5T",
+            "51-4T",
+            "51-3T",
+            "52-4T",
+            "52-3T",
+            "55-B602T",
+            "55-B601T",
+            "56-B602T",
+            "56-B601T",
+            "57-B601T",
+            "58-B601T",
+            "59-B601T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53A",
+            "53B"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "2A-5T",
+            "4B-B602T",
+            "4C-B602T",
+            "4D-B601T",
+            "4D-B602T",
+            "4E-B601T",
+            "4E-B602T",
+            "4F-B601T",
+            "4F-B602T",
+            "51-7T",
+            "51-6T",
+            "51-5T",
+            "52-4T",
+            "52-3T",
+            "52-7T",
+            "52-6T",
+            "52-5T",
+            "55-B602T",
+            "56-B602T",
+            "57-B601T",
+            "57-B602T",
+            "58-B601T",
+            "58-B602T",
+            "59-B601T",
+            "59-B602T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [
+            "54A",
+            "54B"
+          ],
+          "routeLocks": [
+            "2B-2T",
+            "2B-3T",
+            "2B-4T",
+            "2A-4T",
+            "2A-3T",
+            "4B-B901T",
+            "4B-B602T",
+            "4B-B601T",
+            "4C-B602T",
+            "4C-B601T",
+            "4C-B901T",
+            "51-4T",
+            "51-3T",
+            "52-4T",
+            "52-3T",
+            "54-B901T",
+            "55-B901T",
+            "55-B602T",
+            "55-B601T",
+            "56-B602T",
+            "56-B601T",
+            "56-B901T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [
+            "55A",
+            "55B"
+          ],
+          "routeLocks": [
+            "2B-2T",
+            "4A-BT",
+            "4A-B902T",
+            "4B-BT",
+            "4B-B902T",
+            "4C-BT",
+            "4C-B902T",
+            "53-1T",
+            "53-2T",
+            "53-3T",
+            "53-4T",
+            "54-B901T",
+            "54-BT",
+            "54-B902T",
+            "55-BT",
+            "55-B902T",
+            "56-BT",
+            "56-B902T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "56",
+          "parts": [],
+          "routeLocks": [
+            "2B-2T",
+            "4B-BT",
+            "4B-B902T",
+            "4C-BT",
+            "4C-B902T",
+            "53-2T",
+            "53-3T",
+            "53-4T",
+            "54-B901T",
+            "54-BT",
+            "54-B902T",
+            "55-BT",
+            "55-B902T",
+            "56-BT",
+            "56-B902T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "57",
+          "parts": [],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "2A-5T",
+            "4D-B601T",
+            "4D-B602T",
+            "4E-B601T",
+            "4E-B602T",
+            "4F-B601T",
+            "4F-B602T",
+            "51-7T",
+            "51-6T",
+            "51-5T",
+            "52-7T",
+            "52-6T",
+            "52-5T",
+            "57-B601T",
+            "57-B602T",
+            "58-B601T",
+            "58-B602T",
+            "59-B601T",
+            "59-B602T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "58",
+          "parts": [
+            "59A",
+            "59B"
+          ],
+          "routeLocks": [
+            "2B-4T",
+            "2A-4T",
+            "4B-BT",
+            "4B-B902T",
+            "4C-B602T",
+            "4C-B601T",
+            "4C-B901T",
+            "4C-BT",
+            "4C-B902T",
+            "51-4T",
+            "52-4T",
+            "53-3T",
+            "53-4T",
+            "55-BT",
+            "55-B902T",
+            "56-B602T",
+            "56-B601T",
+            "56-B901T",
+            "56-BT",
+            "56-B902T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "59",
+          "parts": [
+            "58A",
+            "58B"
+          ],
+          "routeLocks": [
+            "2B-3T",
+            "2B-4T",
+            "2A-4T",
+            "2A-3T",
+            "4B-B901T",
+            "4B-BT",
+            "4B-B902T",
+            "4B-B602T",
+            "4B-B601T",
+            "4C-B602T",
+            "4C-B601T",
+            "4C-B901T",
+            "51-4T",
+            "51-3T",
+            "52-4T",
+            "52-3T",
+            "53-3T",
+            "55-B901T",
+            "55-BT",
+            "55-B902T",
+            "55-B602T",
+            "55-B601T",
+            "56-B602T",
+            "56-B601T",
+            "56-B901T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "60",
+          "parts": [],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "4E-B601T",
+            "4E-B602T",
+            "4F-B601T",
+            "4F-B602T",
+            "51-7T",
+            "51-6T",
+            "52-7T",
+            "52-6T",
+            "58-B601T",
+            "58-B602T",
+            "59-B601T",
+            "59-B602T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "yongsan",
+      "slide": 7,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "1B-5T",
+            "1B-6T",
+            "1B-2T",
+            "1B-1T",
+            "3A-AT",
+            "3A-B605T",
+            "3B-AT",
+            "3B-B605T",
+            "3B-B608T",
+            "3C-AT",
+            "3C-B605T",
+            "3C-B608T",
+            "3D-AT",
+            "3D-B605T",
+            "3D-B608T",
+            "3E-B608T",
+            "3E-AT",
+            "3E-B605T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "23-AT",
+            "23-B605T",
+            "24-AT",
+            "24-B605T",
+            "24-B608T",
+            "25-AT",
+            "25-B605T",
+            "25-B608T",
+            "26-AT",
+            "26-B605T",
+            "26-B608T",
+            "27-B608T",
+            "27-AT",
+            "27-B605T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [],
+          "routeLocks": [
+            "3A-AT",
+            "3A-B605T",
+            "3B-AT",
+            "3B-B605T",
+            "3C-AT",
+            "3C-B605T",
+            "3D-AT",
+            "3D-B605T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "23-AT",
+            "23-B605T",
+            "24-AT",
+            "24-B605T",
+            "25-AT",
+            "25-B605T",
+            "26-AT",
+            "26-B605T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "1B-5T",
+            "1B-6T",
+            "1B-2T",
+            "1B-1T",
+            "3B-B608T",
+            "3C-B608T",
+            "3D-B608T",
+            "3E-B915T",
+            "3E-B608T",
+            "3E-AT",
+            "3E-B605T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B608T",
+            "25-B608T",
+            "26-B608T",
+            "27-B915T",
+            "27-B608T",
+            "27-AT",
+            "27-B605T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24A",
+            "24B"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "1B-5T",
+            "1B-6T",
+            "3B-AT",
+            "3B-B605T",
+            "3B-B608T",
+            "3C-AT",
+            "3C-B605T",
+            "3C-B608T",
+            "3D-AT",
+            "3D-B605T",
+            "3D-B608T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-3T",
+            "24-AT",
+            "24-B605T",
+            "24-B608T",
+            "25-AT",
+            "25-B605T",
+            "25-B608T",
+            "26-AT",
+            "26-B605T",
+            "26-B608T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [
+            "25A",
+            "25B"
+          ],
+          "routeLocks": [
+            "3A-AT",
+            "3A-B605T",
+            "3A-CT",
+            "3B-CT",
+            "21-7T",
+            "22-6T",
+            "22-7T",
+            "23-AT",
+            "23-B605T",
+            "23-CT",
+            "24-CT"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "26",
+          "parts": [
+            "26A",
+            "26B"
+          ],
+          "routeLocks": [
+            "1B-4T",
+            "1B-5T",
+            "1B-6T",
+            "3B-CT",
+            "3B-AT",
+            "3B-B605T",
+            "3B-B608T",
+            "3C-AT",
+            "3C-B605T",
+            "3C-B608T",
+            "3D-AT",
+            "3D-B605T",
+            "3D-B608T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "22-6T",
+            "24-CT",
+            "24-AT",
+            "24-B605T",
+            "24-B608T",
+            "25-AT",
+            "25-B605T",
+            "25-B608T",
+            "26-AT",
+            "26-B605T",
+            "26-B608T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "27",
+          "parts": [
+            "27B",
+            "27A"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "1B-2T",
+            "1B-1T",
+            "3E-B915T",
+            "3E-B608T",
+            "3E-AT",
+            "3E-B605T",
+            "21-2T",
+            "21-1T",
+            "27-B914T",
+            "27-B915T",
+            "27-B608T",
+            "27-AT",
+            "27-B605T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "28",
+          "parts": [],
+          "routeLocks": [
+            "1B-4T",
+            "1B-5T",
+            "3C-AT",
+            "3C-B605T",
+            "3C-B608T",
+            "3D-AT",
+            "3D-B605T",
+            "3D-B608T",
+            "21-4T",
+            "21-5T",
+            "25-AT",
+            "25-B605T",
+            "25-B608T",
+            "26-AT",
+            "26-B605T",
+            "26-B608T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51B",
+            "51A"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-3T",
+            "2A-4T",
+            "2A-5T",
+            "2A-6T",
+            "4B-BT",
+            "4B-B610T",
+            "4B-B607T",
+            "4C-BT",
+            "4C-B610T",
+            "4C-B607T",
+            "4D-BT",
+            "4D-B610T",
+            "4D-B607T",
+            "4E-BT",
+            "4E-B610T",
+            "4E-B607T",
+            "4F-B607T",
+            "4F-BT",
+            "4F-B610T",
+            "51-3T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "51-7T",
+            "52-BT",
+            "52-B610T",
+            "52-B607T",
+            "53-BT",
+            "53-B610T",
+            "53-B607T",
+            "54-BT",
+            "54-B610T",
+            "54-B607T",
+            "55-BT",
+            "55-B610T",
+            "55-B607T",
+            "56-B607T",
+            "56-BT",
+            "56-B610T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [],
+          "routeLocks": [
+            "2A-3T",
+            "2A-4T",
+            "2A-5T",
+            "2A-6T",
+            "4B-BT",
+            "4B-B610T",
+            "4B-B607T",
+            "4C-BT",
+            "4C-B610T",
+            "4C-B607T",
+            "4D-BT",
+            "4D-B610T",
+            "4D-B607T",
+            "4E-BT",
+            "4E-B610T",
+            "4E-B607T",
+            "4F-BT",
+            "4F-B610T",
+            "51-3T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "51-7T",
+            "52-BT",
+            "52-B610T",
+            "52-B607T",
+            "53-BT",
+            "53-B610T",
+            "53-B607T",
+            "54-BT",
+            "54-B610T",
+            "54-B607T",
+            "55-BT",
+            "55-B610T",
+            "55-B607T",
+            "56-BT",
+            "56-B610T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [],
+          "routeLocks": [
+            "2A-4T",
+            "2A-5T",
+            "2A-6T",
+            "4C-BT",
+            "4C-B610T",
+            "4C-B607T",
+            "4D-BT",
+            "4D-B610T",
+            "4D-B607T",
+            "4E-BT",
+            "4E-B610T",
+            "4E-B607T",
+            "4F-BT",
+            "4F-B610T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "51-7T",
+            "53-BT",
+            "53-B610T",
+            "53-B607T",
+            "54-BT",
+            "54-B610T",
+            "54-B607T",
+            "55-BT",
+            "55-B610T",
+            "55-B607T",
+            "56-BT",
+            "56-B610T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "4D-BT",
+            "4D-B610T",
+            "4D-B607T",
+            "4E-BT",
+            "4E-B610T",
+            "4E-B607T",
+            "4F-BT",
+            "4F-B610T",
+            "51-5T",
+            "51-6T",
+            "51-7T",
+            "54-BT",
+            "54-B610T",
+            "54-B607T",
+            "55-BT",
+            "55-B610T",
+            "55-B607T",
+            "56-BT",
+            "56-B610T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [
+            "55A",
+            "55B"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "4E-BT",
+            "4E-B610T",
+            "4E-B607T",
+            "4F-B607T",
+            "4F-BT",
+            "4F-B610T",
+            "51-6T",
+            "51-7T",
+            "55-BT",
+            "55-B610T",
+            "55-B607T",
+            "56-B607T",
+            "56-BT",
+            "56-B610T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "noryangjin",
+      "slide": 8,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "1A-2T",
+            "3B-B927T",
+            "3B-B926T",
+            "21-1T",
+            "21-2T",
+            "22-B927T",
+            "22-XT",
+            "22-B926T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2B-2T",
+            "4A-B928T",
+            "52-1T",
+            "52-2T",
+            "53-CT",
+            "53-B928T",
+            "54-B929T",
+            "54-CT",
+            "54-B928T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52B",
+            "52A"
+          ],
+          "routeLocks": [
+            "2A-4T",
+            "4B-B614T",
+            "51-3T",
+            "51-4T",
+            "55-B615T1T",
+            "55-DT",
+            "55-B614T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "yeongdeungpo",
+      "slide": 9,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "1B-6T",
+            "1B-5T",
+            "1B-3T",
+            "1B-4T",
+            "3A-B941T",
+            "3B-B940T",
+            "3B-B941T",
+            "3C-B940T",
+            "3C-B941T",
+            "22-6T",
+            "22-5T",
+            "22-3T",
+            "22-4T",
+            "23-7T",
+            "23-6T",
+            "23-5T",
+            "23-3T",
+            "23-4T",
+            "24-B940T",
+            "24-B941T",
+            "25-B940T",
+            "25-B941T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [],
+          "routeLocks": [
+            "1B-6T",
+            "1B-5T",
+            "1B-3T",
+            "1B-4T",
+            "3B-B940T",
+            "3B-B941T",
+            "3C-B940T",
+            "3C-B941T",
+            "22-6T",
+            "22-5T",
+            "22-3T",
+            "22-4T",
+            "23-6T",
+            "23-5T",
+            "23-3T",
+            "23-4T",
+            "24-B940T",
+            "24-B941T",
+            "25-B940T",
+            "25-B941T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "3B-B619T2T",
+            "3C-B619T2T",
+            "21-3T",
+            "21-4T",
+            "21-2T",
+            "21-1T",
+            "24-B619T2T",
+            "25-B619T2T",
+            "26-B620T",
+            "26-B619T2T",
+            "27-B620T",
+            "27-B619T2T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24B",
+            "24A"
+          ],
+          "routeLocks": [
+            "1B-5T",
+            "1B-3T",
+            "1B-4T",
+            "3B-B619T2T",
+            "3B-B940T",
+            "3B-B941T",
+            "3C-B619T2T",
+            "3C-B940T",
+            "3C-B941T",
+            "21-3T",
+            "21-4T",
+            "22-5T",
+            "22-3T",
+            "22-4T",
+            "23-5T",
+            "23-3T",
+            "23-4T",
+            "24-B619T2T",
+            "24-B940T",
+            "24-B941T",
+            "25-B619T2T",
+            "25-B940T",
+            "25-B941T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "21-2T",
+            "21-1T",
+            "26-B620T",
+            "26-B619T2T",
+            "27-B620T",
+            "27-B619T2T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "26",
+          "parts": [],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "3B-B619T2T",
+            "3B-B940T",
+            "3B-B941T",
+            "3C-B619T2T",
+            "3C-B940T",
+            "3C-B941T",
+            "21-3T",
+            "21-4T",
+            "22-3T",
+            "22-4T",
+            "23-3T",
+            "23-4T",
+            "24-B619T2T",
+            "24-B940T",
+            "24-B941T",
+            "25-B619T2T",
+            "25-B940T",
+            "25-B941T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51B",
+            "51A"
+          ],
+          "routeLocks": [
+            "2A-7T",
+            "2A-6T",
+            "2A-5T",
+            "2A-4T",
+            "4C-B942T",
+            "4C-B943T",
+            "4D-B942T",
+            "4D-B943T",
+            "4E-B942T",
+            "4E-B943T",
+            "51-7T",
+            "51-6T",
+            "51-5T",
+            "51-4T",
+            "55-B942T",
+            "55-YT",
+            "55-B943T",
+            "56-B942T",
+            "56-YT",
+            "56-B943T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2B-3T",
+            "2B-4T",
+            "2B-2T",
+            "2B-1T",
+            "4A-B622T",
+            "4A-B621T",
+            "4B-B622T",
+            "4B-B621T",
+            "4C-B621T",
+            "52-2T",
+            "52-1T",
+            "53-DT",
+            "53-B622T",
+            "53-B621T",
+            "54-B621T",
+            "55-B621T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53A",
+            "53B"
+          ],
+          "routeLocks": [
+            "2B-3T",
+            "2B-4T",
+            "4A-B622T",
+            "4B-B622T",
+            "4C-B621T",
+            "4C-B622T",
+            "52-2T",
+            "52-1T",
+            "52-3T",
+            "52-4T",
+            "53-DT",
+            "53-B622T",
+            "54-B621T",
+            "54-DT",
+            "54-B622T",
+            "55-B621T",
+            "55-DT",
+            "55-B622T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [],
+          "routeLocks": [
+            "2A-6T",
+            "2A-5T",
+            "2A-4T",
+            "4C-B942T",
+            "4C-B943T",
+            "4D-B942T",
+            "4D-B943T",
+            "4E-B942T",
+            "4E-B943T",
+            "51-6T",
+            "51-5T",
+            "51-4T",
+            "55-B942T",
+            "55-YT",
+            "55-B943T",
+            "56-B942T",
+            "56-YT",
+            "56-B943T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [],
+          "routeLocks": [
+            "2B-3T",
+            "2B-4T",
+            "4C-B621T",
+            "4C-B622T",
+            "52-3T",
+            "52-4T",
+            "54-B621T",
+            "54-DT",
+            "54-B622T",
+            "55-B621T",
+            "55-DT",
+            "55-B622T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "56",
+          "parts": [
+            "56A",
+            "56B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2A-4T",
+            "2B-4T",
+            "4C-B621T",
+            "4C-B622T",
+            "4C-B942T",
+            "4C-B943T",
+            "4D-B942T",
+            "4D-B943T",
+            "51-5T",
+            "51-4T",
+            "52-4T",
+            "55-B621T",
+            "55-DT",
+            "55-B622T",
+            "55-B942T",
+            "55-YT",
+            "55-B943T",
+            "56-B942T",
+            "56-YT",
+            "56-B943T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "57",
+          "parts": [],
+          "routeLocks": [
+            "2B-2T",
+            "2B-1T",
+            "4A-B622T",
+            "4A-B621T",
+            "4B-B622T",
+            "4B-B621T",
+            "52-2T",
+            "52-1T",
+            "53-DT",
+            "53-B622T",
+            "53-B621T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "guro",
+      "slide": 10,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "3A-AT",
+            "3A-B949T",
+            "3B-B949T",
+            "3B-AT",
+            "3C-B949T",
+            "3C-AT",
+            "21-4T",
+            "21-5T",
+            "21-3T",
+            "22-5T",
+            "22-4T",
+            "22-3T",
+            "23-AT",
+            "23-B949T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22B",
+            "22A"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "3A-B949T",
+            "3B-B949T",
+            "3B-AT",
+            "3B-B948T",
+            "3C-B948T",
+            "3C-B949T",
+            "3C-AT",
+            "21-4T",
+            "21-5T",
+            "21-3T",
+            "22-4T",
+            "22-3T",
+            "23-B949T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23A",
+            "23B"
+          ],
+          "routeLocks": [
+            "3A-AT",
+            "3A-B949T",
+            "3B-B949T",
+            "3B-AT",
+            "21-4T",
+            "21-5T",
+            "22-5T",
+            "22-4T",
+            "23-AT",
+            "23-B949T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24A",
+            "24B"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "3B-B949T",
+            "3B-AT",
+            "3B-B948T",
+            "3C-B948T",
+            "3C-B949T",
+            "3C-AT",
+            "21-4T",
+            "21-3T",
+            "22-4T",
+            "22-3T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2B-2T",
+            "2B-1T",
+            "2B-5T",
+            "4B-B629T",
+            "53-2T",
+            "53-1T",
+            "53-5T",
+            "56-Y1T",
+            "56-B629T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52B",
+            "52A"
+          ],
+          "routeLocks": [
+            "2B-2T",
+            "2B-1T",
+            "4B-B630T",
+            "4B-B629T",
+            "53-2T",
+            "53-1T",
+            "56-B630T",
+            "56-Y1T",
+            "56-B629T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53A",
+            "53B"
+          ],
+          "routeLocks": [
+            "4A-F1T",
+            "51-4T",
+            "52-3T",
+            "52-4T",
+            "54-F1T",
+            "55-F2T",
+            "55-F1T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [
+            "54A",
+            "54B"
+          ],
+          "routeLocks": [
+            "4A-F1T",
+            "4A-F2T",
+            "51-4T",
+            "51-3T",
+            "52-3T",
+            "54-F1T",
+            "54-F2T",
+            "55-F2T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [],
+          "routeLocks": [
+            "4A-F1T",
+            "4A-F2T",
+            "4A-B950T",
+            "51-3T",
+            "52-3T",
+            "54-F1T",
+            "54-F2T",
+            "54-B950T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "geumcheon",
+      "slide": 11,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "3A-B963T",
+            "3A-B639T",
+            "3B-B963T",
+            "3B-B639T",
+            "3C-B639T",
+            "3D-B639T",
+            "21-5T",
+            "21-6T",
+            "22-B963T",
+            "22-B639T",
+            "23-B963T",
+            "23-B639T",
+            "24-B639T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "3A-B963T",
+            "3B-B963T",
+            "3C-B639T",
+            "3C-B963T",
+            "3D-B639T",
+            "3D-B963T",
+            "21-5T",
+            "21-6T",
+            "21-4T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "22-B963T",
+            "23-B963T",
+            "24-B639T",
+            "24-B963T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "1B-2T",
+            "1B-1T",
+            "3C-B639T",
+            "3C-B963T",
+            "3C-B642T",
+            "3D-B642T",
+            "3D-B639T",
+            "3D-B963T",
+            "21-4T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B642T",
+            "24-B639T",
+            "24-B963T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24B",
+            "24A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-3T",
+            "1B-4T",
+            "1B-2T",
+            "1B-1T",
+            "3C-B642T",
+            "3D-B966T",
+            "3D-B642T",
+            "3D-B639T",
+            "3D-B963T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B966T",
+            "24-B642T",
+            "24-B639T",
+            "24-B963T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [
+            "25A",
+            "25B"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-4T",
+            "3C-B639T",
+            "3C-B963T",
+            "3C-B642T",
+            "21-4T",
+            "21-3T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "26",
+          "parts": [
+            "26A",
+            "26B"
+          ],
+          "routeLocks": [
+            "3A-26BT",
+            "3A-B963T",
+            "3A-B639T",
+            "3B-B963T",
+            "3B-B639T",
+            "21-5T",
+            "21-6T",
+            "22-26BT",
+            "22-B963T",
+            "22-B639T",
+            "23-B963T",
+            "23-B639T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "27",
+          "parts": [],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-2T",
+            "1B-1T",
+            "3D-B966T",
+            "3D-B642T",
+            "3D-B639T",
+            "3D-B963T",
+            "21-2T",
+            "21-1T",
+            "24-B966T",
+            "24-B642T",
+            "24-B639T",
+            "24-B963T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "52B",
+            "52A"
+          ],
+          "routeLocks": [
+            "4A-B968T",
+            "4A-B644T",
+            "4B-B968T",
+            "4B-B644T",
+            "4C-B644T",
+            "4C-B968T",
+            "51-54T1T",
+            "51-2T",
+            "51-1T",
+            "51-3T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "53-B968T",
+            "53-B644T",
+            "54-B968T",
+            "54-B644T",
+            "55-B644T",
+            "55-B968T",
+            "56-B644T",
+            "56-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "4A-B968T",
+            "4A-B644T",
+            "4B-B968T",
+            "4B-B644T",
+            "4C-B644T",
+            "4C-B968T",
+            "51-54T1T",
+            "51-2T",
+            "51-1T",
+            "51-3T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "53-B968T",
+            "53-B644T",
+            "54-B968T",
+            "54-B644T",
+            "55-B644T",
+            "55-B968T",
+            "56-B644T",
+            "56-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53A",
+            "53B"
+          ],
+          "routeLocks": [
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "4B-B644T",
+            "4C-B644T",
+            "4C-B968T",
+            "51-3T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "54-B644T",
+            "55-B641T",
+            "55-B644T",
+            "55-B968T",
+            "56-B641T",
+            "56-B644T",
+            "56-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [],
+          "routeLocks": [
+            "4A-B968T",
+            "4A-B644T",
+            "4B-B968T",
+            "51-2T",
+            "51-1T",
+            "52-2T",
+            "52-1T",
+            "53-54T1T",
+            "53-B968T",
+            "53-B644T",
+            "54-54T1T",
+            "54-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [
+            "55A",
+            "55B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "55-B641T",
+            "55-B644T",
+            "55-B968T",
+            "56-B965T",
+            "56-B641T",
+            "56-B644T",
+            "56-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "56",
+          "parts": [],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-5T",
+            "2B-6T",
+            "51-5T",
+            "51-6T",
+            "56-B965T",
+            "56-B641T",
+            "56-B644T",
+            "56-B968T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "57",
+          "parts": [
+            "57A",
+            "57B"
+          ],
+          "routeLocks": [
+            "4B-B968T",
+            "4B-B644T",
+            "4C-B644T",
+            "4C-B968T",
+            "51-2T",
+            "51-3T",
+            "52-2T",
+            "54-54T1T",
+            "54-B968T",
+            "54-B644T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "anyang",
+      "slide": 12,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "3A-B655T",
+            "3B-B655T",
+            "3C-B655T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "23-BT",
+            "23-B655T",
+            "24-B658T",
+            "24-BT",
+            "24-B655T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "3A-B981T",
+            "3A-B655T",
+            "3B-B981T",
+            "3B-B655T",
+            "3C-B655T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "23-B981T",
+            "23-BT",
+            "23-B655T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B982T",
+            "24-B658T",
+            "24-BT",
+            "24-B655T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24A",
+            "24B"
+          ],
+          "routeLocks": [
+            "3A-CT",
+            "3A-B981T",
+            "3A-B655T",
+            "3B-B981T",
+            "3B-B655T",
+            "21-5T",
+            "21-6T",
+            "22-6T",
+            "23-CT",
+            "23-B981T",
+            "23-BT",
+            "23-B655T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-2T",
+            "1B-1T",
+            "21-2T",
+            "21-1T",
+            "24-B982T",
+            "24-B658T",
+            "24-BT",
+            "24-B655T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "4A-B660T",
+            "4B-B660T",
+            "4C-B660T",
+            "51-3T",
+            "51-2T",
+            "51-1T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "53-ET",
+            "53-B660T",
+            "54-ET",
+            "54-B660T",
+            "55-B657T",
+            "55-ET",
+            "55-B660T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "51-4T",
+            "51-5T",
+            "51-6T",
+            "55-B983T",
+            "55-B657T",
+            "55-ET",
+            "55-B660T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53B",
+            "53A"
+          ],
+          "routeLocks": [
+            "4A-B984T",
+            "4A-B660T",
+            "4B-B984T",
+            "4B-B660T",
+            "4C-B660T",
+            "51-3T",
+            "51-2T",
+            "51-1T",
+            "52-2T",
+            "52-1T",
+            "53-DT",
+            "53-B984T",
+            "53-ET",
+            "53-B660T",
+            "54-DT",
+            "54-B984T",
+            "54-ET",
+            "54-B660T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-5T",
+            "2B-6T",
+            "51-5T",
+            "51-6T",
+            "55-B983T",
+            "55-B657T",
+            "55-ET",
+            "55-B660T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [],
+          "routeLocks": [
+            "4A-B984T",
+            "4A-B660T",
+            "4B-B984T",
+            "4B-B660T",
+            "51-2T",
+            "51-1T",
+            "52-2T",
+            "52-1T",
+            "53-DT",
+            "53-B984T",
+            "53-ET",
+            "53-B660T",
+            "54-DT",
+            "54-B984T",
+            "54-ET",
+            "54-B660T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "geumjeong",
+      "slide": 14,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "21-1T",
+            "22-CT",
+            "22-B994T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [],
+          "routeLocks": [
+            "3A-B993T",
+            "3B-B993T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [],
+          "routeLocks": [
+            "4A-B996T",
+            "4B-B996T",
+            "51-B996T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [],
+          "routeLocks": [
+            "2A-3T",
+            "2A-4T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "gunpo",
+      "slide": 15,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21A",
+            "21B"
+          ],
+          "routeLocks": [
+            "3A-B999T",
+            "3A-B673T",
+            "3B-B673T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22B",
+            "22A"
+          ],
+          "routeLocks": [
+            "1A-1T",
+            "1B-2T",
+            "1B-1T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "51A",
+            "51B"
+          ],
+          "routeLocks": [
+            "2B-3T",
+            "2B-4T",
+            "4A-B680T",
+            "4B-B680T",
+            "51-2T",
+            "51-1T",
+            "51-3T",
+            "51-4T",
+            "52-DT",
+            "52-B680T",
+            "53-DT",
+            "53-B680T",
+            "54-B675T",
+            "54-DT",
+            "54-B680T",
+            "55-B675T",
+            "55-DT",
+            "55-B680T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2A-4T",
+            "2B-3T",
+            "2B-4T",
+            "51-3T",
+            "51-4T",
+            "54-B675T",
+            "54-DT",
+            "54-B680T",
+            "55-B1001T",
+            "55-B675T",
+            "55-DT",
+            "55-B680T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53B",
+            "53A"
+          ],
+          "routeLocks": [
+            "4A-B1002T",
+            "4A-B680T",
+            "4B-B680T",
+            "51-2T",
+            "51-1T",
+            "52-B1002T",
+            "52-DT",
+            "52-B680T",
+            "53-DT",
+            "53-B680T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "uiwang",
+      "slide": 17,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "3A-B1011T",
+            "3A-B685T",
+            "3B-B1011T",
+            "3B-B685T",
+            "3C-B685T",
+            "3C-B1011T",
+            "3D-B685T",
+            "3D-B1011T",
+            "3E-B685T",
+            "3E-B1011T",
+            "21-5T",
+            "21-6T",
+            "21-4T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "22-AT",
+            "22-B1011T",
+            "22-B685T",
+            "23-AT",
+            "23-B1011T",
+            "23-B685T",
+            "24-B685T",
+            "24-AT",
+            "24-B1011T",
+            "25-B685T",
+            "25-AT",
+            "25-B1011T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "3A-B1011T",
+            "3A-B685T",
+            "3B-B1011T",
+            "3B-B685T",
+            "3C-B685T",
+            "3C-B1011T",
+            "3D-B685T",
+            "3D-B1011T",
+            "3E-B685T",
+            "3E-B1011T",
+            "21-5T",
+            "21-6T",
+            "21-4T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "22-AT",
+            "22-B1011T",
+            "22-B685T",
+            "23-AT",
+            "23-B1011T",
+            "23-B685T",
+            "24-B685T",
+            "24-AT",
+            "24-B1011T",
+            "25-B685T",
+            "25-AT",
+            "25-B1011T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23A",
+            "23B"
+          ],
+          "routeLocks": [
+            "3A-ET",
+            "3A-B1011T",
+            "3A-B685T",
+            "3B-B1011T",
+            "3B-B685T",
+            "3B-ET",
+            "21-5T",
+            "21-6T",
+            "22-ET",
+            "22-AT",
+            "22-B1011T",
+            "22-B685T",
+            "23-AT",
+            "23-B1011T",
+            "23-B685T",
+            "23-ET"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24B",
+            "24A"
+          ],
+          "routeLocks": [
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "3C-B685T",
+            "3C-B1011T",
+            "3D-B690T",
+            "3D-B685T",
+            "3D-B1011T",
+            "3E-B690T",
+            "3E-B685T",
+            "3E-B1011T",
+            "21-4T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B690T",
+            "24-B685T",
+            "24-AT",
+            "24-B1011T",
+            "25-B690T",
+            "25-B685T",
+            "25-AT",
+            "25-B1011T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [
+            "25B",
+            "25A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "3D-B1012T",
+            "3D-B690T",
+            "3D-B685T",
+            "3D-B1011T",
+            "3E-B1012T",
+            "3E-B690T",
+            "3E-B685T",
+            "3E-B1011T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "24-B1012T",
+            "24-B690T",
+            "24-B685T",
+            "24-AT",
+            "24-B1011T",
+            "25-B1012T",
+            "25-B690T",
+            "25-B685T",
+            "25-AT",
+            "25-B1011T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "26",
+          "parts": [
+            "26B",
+            "26A"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-2T",
+            "1B-1T",
+            "1C-1T",
+            "3D-B1012T",
+            "3D-B690T",
+            "3D-B685T",
+            "3D-B1011T",
+            "3E-GT",
+            "3E-B1012T",
+            "3E-B690T",
+            "3E-B685T",
+            "3E-B1011T",
+            "21-2T",
+            "21-1T",
+            "24-B1012T",
+            "24-B690T",
+            "24-B685T",
+            "24-AT",
+            "24-B1011T",
+            "25-GT",
+            "25-B1012T",
+            "25-B690T",
+            "25-B685T",
+            "25-AT",
+            "25-B1011T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "27",
+          "parts": [
+            "27B",
+            "27A"
+          ],
+          "routeLocks": [
+            "3A-ET",
+            "3A-B1011T",
+            "3A-B685T",
+            "3B-B1011T",
+            "3B-B685T",
+            "3B-ET",
+            "21-5T",
+            "21-6T",
+            "22-ET",
+            "22-AT",
+            "22-B1011T",
+            "22-B685T",
+            "23-AT",
+            "23-B1011T",
+            "23-B685T",
+            "23-ET"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "51",
+          "parts": [
+            "52A",
+            "52B"
+          ],
+          "routeLocks": [
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "4A-B692T",
+            "4B-B692T",
+            "4C-B692T",
+            "53-B692T",
+            "54-B692T",
+            "55-B687T",
+            "55-B692T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "52",
+          "parts": [
+            "51B",
+            "51A"
+          ],
+          "routeLocks": [
+            "4A-B1014T",
+            "4A-B692T",
+            "4B-B1014T",
+            "4B-B692T",
+            "4C-B692T",
+            "51-2T",
+            "51-1T",
+            "53-CT",
+            "53-B1014T",
+            "53-B692T",
+            "54-CT",
+            "54-B1014T",
+            "54-B692T",
+            "55-B692T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "53",
+          "parts": [
+            "53B",
+            "53A"
+          ],
+          "routeLocks": [
+            "4A-FT",
+            "4A-B1014T",
+            "4A-B692T",
+            "4B-B1014T",
+            "4B-B692T",
+            "51-2T",
+            "51-1T",
+            "52-1T",
+            "53-FT",
+            "53-CT",
+            "53-B1014T",
+            "53-B692T",
+            "54-CT",
+            "54-B1014T",
+            "54-B692T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "54",
+          "parts": [
+            "54A",
+            "54B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-4T",
+            "2B-5T",
+            "2B-6T",
+            "55-B1013T",
+            "55-B687T",
+            "55-B692T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "55",
+          "parts": [
+            "55A",
+            "55B"
+          ],
+          "routeLocks": [
+            "2A-5T",
+            "2A-6T",
+            "2B-5T",
+            "2B-6T",
+            "55-55BT",
+            "55-B1013T",
+            "55-B687T",
+            "55-B692T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    },
+    {
+      "id": "suwon",
+      "slide": 19,
+      "groups": [
+        {
+          "id": "21",
+          "parts": [
+            "21B",
+            "21A"
+          ],
+          "routeLocks": [
+            "3A-B1035T",
+            "3A-B709T",
+            "3B-B1035T",
+            "3B-B709T",
+            "3C-B1035T",
+            "3C-B709T",
+            "3D-B709T",
+            "3D-B1035T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B709T",
+            "3F-B1035T",
+            "3G-B709T",
+            "3G-B1035T",
+            "22-5T",
+            "22-6T",
+            "22-7T",
+            "22-4T",
+            "22-3T",
+            "22-2T",
+            "22-1T",
+            "23-AT",
+            "23-B1035T",
+            "23-B709T",
+            "24-AT",
+            "24-B1035T",
+            "24-B709T",
+            "25-AT",
+            "25-B1035T",
+            "25-B709T",
+            "26-B709T",
+            "26-AT",
+            "26-B1035T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "22",
+          "parts": [
+            "22A",
+            "22B"
+          ],
+          "routeLocks": [
+            "1A-3T",
+            "1A-2T",
+            "1A-1T",
+            "1A-4T",
+            "1A-5T",
+            "1A-6T",
+            "1A-7T",
+            "1B-4T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "1B-5T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B714T",
+            "3B-B1036T",
+            "3C-B714T",
+            "3C-B1036T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3E-B1036T",
+            "3E-B714T",
+            "3F-B1036T",
+            "3F-B714T",
+            "3G-B1036T",
+            "3G-B714T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T",
+            "25-B714T",
+            "25-XT",
+            "25-B1036T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "27-XT",
+            "27-B1036T",
+            "27-B714T",
+            "28-XT",
+            "28-B1036T",
+            "28-B714T",
+            "29-XT",
+            "29-B1036T",
+            "29-B714T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "23",
+          "parts": [
+            "23B",
+            "23A"
+          ],
+          "routeLocks": [
+            "1A-4T",
+            "1A-5T",
+            "1A-6T",
+            "1A-7T",
+            "1B-4T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "1B-5T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B709T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B709T",
+            "3B-B714T",
+            "3B-B1036T",
+            "3C-B709T",
+            "3C-B714T",
+            "3C-B1036T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3D-B709T",
+            "3D-B1035T",
+            "3E-B714T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "3G-B714T",
+            "3G-B709T",
+            "3G-B1035T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "22-4T",
+            "22-3T",
+            "22-2T",
+            "22-1T",
+            "23-B709T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-B709T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T",
+            "25-B709T",
+            "25-B714T",
+            "25-XT",
+            "25-B1036T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "26-B709T",
+            "26-AT",
+            "26-B1035T",
+            "27-B714T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T",
+            "29-B714T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "24",
+          "parts": [
+            "24A",
+            "24B"
+          ],
+          "routeLocks": [
+            "1A-4T",
+            "1A-5T",
+            "1A-6T",
+            "1A-7T",
+            "1B-4T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "1B-5T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B709T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B709T",
+            "3B-B714T",
+            "3B-B1036T",
+            "3C-B709T",
+            "3C-B714T",
+            "3C-B1036T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3D-B709T",
+            "3D-B1035T",
+            "3E-B714T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "3G-B714T",
+            "3G-B709T",
+            "3G-B1035T",
+            "21-4T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "22-4T",
+            "22-3T",
+            "22-2T",
+            "22-1T",
+            "23-B709T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-B709T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T",
+            "25-B709T",
+            "25-B714T",
+            "25-XT",
+            "25-B1036T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "26-B709T",
+            "26-AT",
+            "26-B1035T",
+            "27-B714T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T",
+            "29-B714T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "25",
+          "parts": [
+            "25B",
+            "25A"
+          ],
+          "routeLocks": [
+            "1A-3T",
+            "1A-2T",
+            "1A-1T",
+            "1A-4T",
+            "1B-4T",
+            "1B-3T",
+            "1B-2T",
+            "1B-1T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3E-B1036T",
+            "3E-B714T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B1036T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "3G-B1036T",
+            "3G-B714T",
+            "3G-B709T",
+            "3G-B1035T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "21-4T",
+            "22-3T",
+            "22-2T",
+            "22-1T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "27-XT",
+            "27-B1036T",
+            "27-B714T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-XT",
+            "28-B1036T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T",
+            "29-XT",
+            "29-B1036T",
+            "29-B714T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "26",
+          "parts": [
+            "26A",
+            "26B"
+          ],
+          "routeLocks": [
+            "1A-5T",
+            "1A-6T",
+            "1A-7T",
+            "1B-5T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B1035T",
+            "3A-B709T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B1035T",
+            "3B-B709T",
+            "3B-B714T",
+            "3B-B1036T",
+            "3C-B1035T",
+            "3C-B709T",
+            "3C-B714T",
+            "3C-B1036T",
+            "3D-B709T",
+            "3D-B1035T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "22-5T",
+            "22-6T",
+            "22-7T",
+            "22-4T",
+            "23-AT",
+            "23-B1035T",
+            "23-B709T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-AT",
+            "24-B1035T",
+            "24-B709T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T",
+            "25-AT",
+            "25-B1035T",
+            "25-B709T",
+            "25-B714T",
+            "25-XT",
+            "25-B1036T",
+            "26-B709T",
+            "26-AT",
+            "26-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "27",
+          "parts": [],
+          "routeLocks": [
+            "1A-3T",
+            "1A-2T",
+            "1A-1T",
+            "1B-1T",
+            "3E-B1036T",
+            "3F-B1036T",
+            "3G-B1036T",
+            "3G-B714T",
+            "3G-B709T",
+            "3G-B1035T",
+            "21-3T",
+            "21-2T",
+            "21-1T",
+            "22-1T",
+            "27-XT",
+            "27-B1036T",
+            "28-XT",
+            "28-B1036T",
+            "29-XT",
+            "29-B1036T",
+            "29-B714T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "28",
+          "parts": [
+            "28B",
+            "28A"
+          ],
+          "routeLocks": [
+            "1A-3T",
+            "1A-4T",
+            "1B-4T",
+            "1B-3T",
+            "1B-2T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3E-B1036T",
+            "3E-B714T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "21-3T",
+            "21-4T",
+            "22-3T",
+            "22-2T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "27-XT",
+            "27-B1036T",
+            "27-B714T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "29",
+          "parts": [],
+          "routeLocks": [
+            "1A-3T",
+            "1B-3T",
+            "1B-2T",
+            "3E-B1036T",
+            "3E-B714T",
+            "3E-B709T",
+            "3E-B1035T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "21-3T",
+            "22-3T",
+            "22-2T",
+            "27-XT",
+            "27-B1036T",
+            "27-B714T",
+            "27-B709T",
+            "27-AT",
+            "27-B1035T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "30",
+          "parts": [],
+          "routeLocks": [
+            "1A-4T",
+            "1B-4T",
+            "3D-B714T",
+            "3D-B1036T",
+            "3D-B709T",
+            "3D-B1035T",
+            "21-4T",
+            "22-4T",
+            "26-B714T",
+            "26-XT",
+            "26-B1036T",
+            "26-B709T",
+            "26-AT",
+            "26-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "31",
+          "parts": [],
+          "routeLocks": [
+            "1A-5T",
+            "1A-6T",
+            "1A-7T",
+            "1B-5T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B1035T",
+            "3A-B709T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B1035T",
+            "3B-B709T",
+            "3B-B714T",
+            "3B-B1036T",
+            "3C-B1035T",
+            "3C-B709T",
+            "3C-B714T",
+            "3C-B1036T",
+            "21-5T",
+            "21-6T",
+            "21-7T",
+            "22-5T",
+            "22-6T",
+            "22-7T",
+            "23-AT",
+            "23-B1035T",
+            "23-B709T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-AT",
+            "24-B1035T",
+            "24-B709T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T",
+            "25-AT",
+            "25-B1035T",
+            "25-B709T",
+            "25-B714T",
+            "25-XT",
+            "25-B1036T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "32",
+          "parts": [
+            "32A",
+            "32B"
+          ],
+          "routeLocks": [
+            "1A-2T",
+            "1A-1T",
+            "1B-2T",
+            "1B-1T",
+            "3F-B1036T",
+            "3F-B714T",
+            "3F-B709T",
+            "3F-B1035T",
+            "3G-B1036T",
+            "3G-B714T",
+            "3G-B709T",
+            "3G-B1035T",
+            "21-2T",
+            "21-1T",
+            "22-2T",
+            "22-1T",
+            "28-XT",
+            "28-B1036T",
+            "28-B714T",
+            "28-B709T",
+            "28-AT",
+            "28-B1035T",
+            "29-XT",
+            "29-B1036T",
+            "29-B714T",
+            "29-B709T",
+            "29-AT",
+            "29-B1035T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        },
+        {
+          "id": "33",
+          "parts": [],
+          "routeLocks": [
+            "1A-6T",
+            "1A-7T",
+            "1B-6T",
+            "1B-7T",
+            "3A-B1035T",
+            "3A-B709T",
+            "3A-B714T",
+            "3A-B1036T",
+            "3B-B1035T",
+            "3B-B709T",
+            "3B-B714T",
+            "3B-B1036T",
+            "21-6T",
+            "21-7T",
+            "22-6T",
+            "22-7T",
+            "23-AT",
+            "23-B1035T",
+            "23-B709T",
+            "23-B714T",
+            "23-XT",
+            "23-B1036T",
+            "24-AT",
+            "24-B1035T",
+            "24-B709T",
+            "24-B714T",
+            "24-XT",
+            "24-B1036T"
+          ],
+          "normalReverseVerified": true,
+          "manualLockAndFaultVerified": true
+        }
+      ]
+    }
+  ],
+  "restoredCircuits": [
+    "B998T",
+    "B997T",
+    "B1033T"
+  ],
+  "blocks": 274,
+  "numberGaps": 0,
+  "issues": [],
+  "switchGroups": 119,
+  "pairedControls": 176,
+  "canonicalCircuits": 320
+}

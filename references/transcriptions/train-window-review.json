@@ -183,9 +183,9 @@
     },
     "14:1680,480": {
       "code": "B997T",
-      "fraction": 0.9,
+      "fraction": 0.1647,
       "side": "below",
-      "anchorCode": "B995T"
+      "anchorCode": "B997T"
     },
     "15:40,408": {
       "code": "B673T",
@@ -254,9 +254,9 @@
     },
     "19:32,479": {
       "code": "B1033T",
-      "fraction": 0.5,
+      "fraction": 0.5544,
       "side": "below",
-      "anchorCode": "B1035T"
+      "anchorCode": "B1033T"
     }
   }
 }

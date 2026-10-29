@@ -25,8 +25,8 @@ function sceneOf(st){
    const [x,row,w,label]=c;if(Math.abs(row-y)>6||x+w<=left||x>=right){next.push(c);continue;}
    if(x<left)next.push([x,row,left-x,label]);if(x+w>right)next.push([right,row,x+w-right,label]);
   }
-  const w=(right-left)/codes.length;
-  codes.forEach((label,i)=>next.push([left+i*w,y,w-2,label]));cells=next;
+  const weights=strip.widths||codes.map(()=>1),total=weights.reduce((a,b)=>a+b,0);let x=left;
+  codes.forEach((label,i)=>{const w=(right-left)*weights[i]/total;next.push([x,y,w-2,label]);x+=w;});cells=next;
  }
  return {...data,cells:cells.filter(c=>c[2]>=2)};
 }

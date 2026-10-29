@@ -284,22 +284,22 @@
       "path": "references/transcriptions/intermediate-circuits.json",
       "original_name": "intermediate-circuits.json",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 17819,
-      "sha256": "8b48885eee97a9d929a82210c1b745d900aa18b5d5e84e58c89a24225ed9d9dd"
+      "bytes": 18451,
+      "sha256": "1f76d93309448a088213d0adea29ed7941c8e2d27c0ab456f9628b4fb9da263d"
     },
     {
       "path": "references/transcriptions/train-window-review.json",
       "original_name": "train-window-review.json",
       "source": "Derived placement inventory reviewed against user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 4919,
-      "sha256": "169e7bced867adfd106bfa57cdf71254d16399863a104358bc728cc7d915349b"
+      "bytes": 4925,
+      "sha256": "6f71c106931af74ba89def0fb78ef7b43e264dca325efaf46f59ae6e61d63657"
     },
     {
       "path": "references/transcriptions/train-windows.json",
       "original_name": "train-windows.json",
       "source": "Derived placement inventory reviewed against user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 101568,
-      "sha256": "2e4ee57a4e3ce3e9694b0935a68d7eadbed266b0bce4943a1f1ce5e8ecd1b044"
+      "bytes": 101574,
+      "sha256": "308b3a28275e336dd8e0acaa7a14d5c95c8f62c7e0db4602213bcb1e7ff66318"
     },
     {
       "path": "references/route-menus/evidence/mmi-photos-2026-10-21.txt",
@@ -409,8 +409,8 @@
       "path": "references/transcriptions/block-signals.json",
       "original_name": "block-signals.json",
       "note": "Derived transcription from the unchanged user-provided PPT.",
-      "bytes": 128704,
-      "sha256": "ad1b3439ad09ebfca8503ad5a0b32895e62ffc851528bea27db79f01f8b784c6"
+      "bytes": 129019,
+      "sha256": "e242d4af6e4f7652d138c4dc9bb2ee2fbe8d6e5441a0aa308d1eb30d6c90a735"
     },
     {
       "path": "references/transcriptions/corridor-layout.json",
@@ -442,6 +442,12 @@
       "source": "사용자 확인 진로 목록 또는 원본 PPT의 파생 전사 자료",
       "bytes": 5417,
       "sha256": "3381296ad288043ad595ad1330f7d67267ab4a0bb682ddc5316a49a14c3cda6e"
+    },
+    {
+      "path": "references/transcriptions/switch-survey.json",
+      "source": "원본 PPT 및 배선도에서 대조한 파생 전사 자료",
+      "bytes": 29733,
+      "sha256": "4c950a0934d6fc395f5b8918fec06fbf2f08c324355d8dcbc0a6ea7f5489d14b"
     }
   ],
   "superseded_attachments": [

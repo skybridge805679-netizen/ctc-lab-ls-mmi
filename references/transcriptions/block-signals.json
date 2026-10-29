@@ -1,7 +1,7 @@
 {
   "source": "references/diagrams/배선도(관제교육장).pptx",
   "sha256": "7d1760358158bd4103bac9388635ff6bec49e93a6eb6c3f2a2f3207d4ff66cc0",
-  "notes": "PPT slides 2–19 black numbered block indicators, reviewed against source symbols and circuit captions. PDF omits these digits. code is the source adjacent circuit; anchorCode handles source-edition differences. These are display identifiers, not new interlocking permissions.",
+  "notes": "PPT slides 2–19 black numbered block indicators, reviewed against source symbols and circuit captions. PDF omits these digits. code is the source adjacent circuit; anchorCode handles source-edition differences. These are display identifiers, not new interlocking permissions. 2026-10-29 re-audit: exact signed source fractions retain bodies straddling circuit boundaries; B618T2T marker 5 follows the upper stepped track; B997T/B998T/B1033T are real PPT circuits restored to both scene and shared graph.",
   "indicators": [
     {
       "id": "ppt-2-1598-484",
@@ -1782,9 +1782,9 @@
         15
       ],
       "sourceCell": [
-        1052,
+        1116,
         482,
-        58,
+        154,
         18
       ],
       "ocrNumber": "",
@@ -1793,7 +1793,7 @@
       "code": "B903T",
       "anchorCode": "B903T",
       "side": "below",
-      "fraction": 0.06,
+      "fraction": -0.1688,
       "stem": "right",
       "reviewed": true
     },
@@ -2432,18 +2432,18 @@
         15
       ],
       "sourceCell": [
-        1478,
-        539,
-        120,
-        18
+        1647,
+        399,
+        258,
+        17
       ],
       "ocrNumber": "",
       "ocrCode": "B618T1T",
       "number": 5,
-      "code": "B618T1T",
-      "anchorCode": "B618T1T",
-      "side": "above",
-      "fraction": 0.94,
+      "code": "B618T2T",
+      "anchorCode": "B618T2T",
+      "side": "below",
+      "fraction": 0.9089,
       "stem": "right",
       "reviewed": true
     },
@@ -2729,7 +2729,7 @@
       "code": "B615T2T",
       "anchorCode": "B615T2T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9748,
       "stem": "right",
       "reviewed": true
     },
@@ -2885,7 +2885,7 @@
       "code": "B938T",
       "anchorCode": "B938T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0552,
       "stem": "left",
       "reviewed": true
     },
@@ -3914,9 +3914,9 @@
         13
       ],
       "sourceCell": [
-        1432,
+        1608,
         304,
-        171,
+        148,
         15
       ],
       "ocrNumber": "5",
@@ -3925,7 +3925,7 @@
       "code": "B972T",
       "anchorCode": "B972T",
       "side": "above",
-      "fraction": 0.15,
+      "fraction": -0.0676,
       "stem": "left",
       "reviewed": true
     },
@@ -4018,9 +4018,9 @@
         13
       ],
       "sourceCell": [
-        1424,
+        1608,
         350,
-        179,
+        148,
         16
       ],
       "ocrNumber": "5",
@@ -4029,7 +4029,7 @@
       "code": "B648T",
       "anchorCode": "B648T",
       "side": "below",
-      "fraction": 0.15,
+      "fraction": -0.0676,
       "stem": "left",
       "reviewed": true
     },
@@ -4382,9 +4382,9 @@
         13
       ],
       "sourceCell": [
-        0,
+        112,
         355,
-        107,
+        102,
         16
       ],
       "ocrNumber": "",
@@ -4393,7 +4393,7 @@
       "code": "B654T",
       "anchorCode": "B654T",
       "side": "below",
-      "fraction": 0.15,
+      "fraction": -0.1029,
       "stem": "left",
       "reviewed": true
     },
@@ -4419,7 +4419,7 @@
       "code": "B656T",
       "anchorCode": "B656T",
       "side": "below",
-      "fraction": 0.85,
+      "fraction": 0.014,
       "stem": "left",
       "reviewed": true
     },
@@ -4781,9 +4781,9 @@
       "ocrCode": "B998T",
       "number": 2,
       "code": "B998T",
-      "anchorCode": "B996T",
+      "anchorCode": "B998T",
       "side": "above",
-      "fraction": 0.94,
+      "fraction": 0.1185,
       "stem": "left",
       "reviewed": true
     },
@@ -4809,7 +4809,7 @@
       "code": "B670T",
       "anchorCode": "B670T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0504,
       "stem": "left",
       "reviewed": true
     },
@@ -4861,7 +4861,7 @@
       "code": "B674T",
       "anchorCode": "B674T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0301,
       "stem": "left",
       "reviewed": true
     },
@@ -4887,7 +4887,7 @@
       "code": "B676T",
       "anchorCode": "B676T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0435,
       "stem": "left",
       "reviewed": true
     },
@@ -4913,7 +4913,7 @@
       "code": "B669T",
       "anchorCode": "B669T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.966,
       "stem": "right",
       "reviewed": true
     },
@@ -4939,7 +4939,7 @@
       "code": "B671T",
       "anchorCode": "B671T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9694,
       "stem": "left",
       "reviewed": true
     },
@@ -4965,7 +4965,7 @@
       "code": "B667T",
       "anchorCode": "B667T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9696,
       "stem": "right",
       "reviewed": true
     },
@@ -4991,7 +4991,7 @@
       "code": "B665T",
       "anchorCode": "B665T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.959,
       "stem": "right",
       "reviewed": true
     },
@@ -5041,9 +5041,9 @@
       "ocrCode": "B997T",
       "number": 2,
       "code": "B997T",
-      "anchorCode": "B995T",
+      "anchorCode": "B997T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9335,
       "stem": "left",
       "reviewed": true
     },
@@ -5069,7 +5069,7 @@
       "code": "B995T",
       "anchorCode": "B995T",
       "side": "below",
-      "fraction": 0.4,
+      "fraction": 0.8934,
       "stem": "right",
       "reviewed": true
     },
@@ -5353,7 +5353,7 @@
       "ocrCode": "B1033T",
       "number": 11,
       "code": "B1033T",
-      "anchorCode": "B1035T",
+      "anchorCode": "B1033T",
       "side": "below",
       "fraction": 0.9014,
       "stem": "right",
@@ -5381,7 +5381,7 @@
       "code": "B986T",
       "anchorCode": "B986T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0402,
       "stem": "left",
       "reviewed": true
     },
@@ -5407,7 +5407,7 @@
       "code": "B988T",
       "anchorCode": "B988T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0261,
       "stem": "left",
       "reviewed": true
     },
@@ -5433,7 +5433,7 @@
       "code": "B990T",
       "anchorCode": "B990T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0276,
       "stem": "left",
       "reviewed": true
     },
@@ -5485,7 +5485,7 @@
       "code": "B662T",
       "anchorCode": "B662T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0459,
       "stem": "left",
       "reviewed": true
     },
@@ -5537,7 +5537,7 @@
       "code": "B666T",
       "anchorCode": "B666T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0411,
       "stem": "left",
       "reviewed": true
     },
@@ -5563,7 +5563,7 @@
       "code": "B659T",
       "anchorCode": "B659T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9672,
       "stem": "right",
       "reviewed": true
     },
@@ -5589,7 +5589,7 @@
       "code": "B663T",
       "anchorCode": "B663T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9621,
       "stem": "right",
       "reviewed": true
     },
@@ -5641,7 +5641,7 @@
       "code": "B987T",
       "anchorCode": "B987T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9685,
       "stem": "right",
       "reviewed": true
     },
@@ -5667,7 +5667,7 @@
       "code": "B985T",
       "anchorCode": "B985T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9721,
       "stem": "right",
       "reviewed": true
     },
@@ -5693,7 +5693,7 @@
       "code": "B989T",
       "anchorCode": "B989T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9597,
       "stem": "right",
       "reviewed": true
     },
@@ -5719,7 +5719,7 @@
       "code": "B1004T",
       "anchorCode": "B1004T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0464,
       "stem": "left",
       "reviewed": true
     },
@@ -5745,7 +5745,7 @@
       "code": "B1008T",
       "anchorCode": "B1008T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0425,
       "stem": "left",
       "reviewed": true
     },
@@ -5771,7 +5771,7 @@
       "code": "B1010T",
       "anchorCode": "B1010T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0284,
       "stem": "left",
       "reviewed": true
     },
@@ -5797,7 +5797,7 @@
       "code": "B1006T",
       "anchorCode": "B1006T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0394,
       "stem": "left",
       "reviewed": true
     },
@@ -5823,7 +5823,7 @@
       "code": "B682T",
       "anchorCode": "B682T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0407,
       "stem": "left",
       "reviewed": true
     },
@@ -5875,7 +5875,7 @@
       "code": "B686T",
       "anchorCode": "B686T",
       "side": "above",
-      "fraction": 0.06,
+      "fraction": 0.0425,
       "stem": "left",
       "reviewed": true
     },
@@ -5927,7 +5927,7 @@
       "code": "B683T",
       "anchorCode": "B683T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9489,
       "stem": "right",
       "reviewed": true
     },
@@ -5953,7 +5953,7 @@
       "code": "B681T",
       "anchorCode": "B681T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9598,
       "stem": "right",
       "reviewed": true
     },
@@ -5979,7 +5979,7 @@
       "code": "B677T",
       "anchorCode": "B677T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9631,
       "stem": "right",
       "reviewed": true
     },
@@ -6031,7 +6031,7 @@
       "code": "B1005T",
       "anchorCode": "B1005T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9649,
       "stem": "right",
       "reviewed": true
     },
@@ -6057,7 +6057,7 @@
       "code": "B1007T",
       "anchorCode": "B1007T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9552,
       "stem": "right",
       "reviewed": true
     },
@@ -6083,7 +6083,7 @@
       "code": "B1009T",
       "anchorCode": "B1009T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9557,
       "stem": "right",
       "reviewed": true
     },
@@ -6109,7 +6109,7 @@
       "code": "B1003T",
       "anchorCode": "B1003T",
       "side": "below",
-      "fraction": 0.94,
+      "fraction": 0.9631,
       "stem": "right",
       "reviewed": true
     },

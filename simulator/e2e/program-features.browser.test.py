@@ -21,11 +21,14 @@ try:
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    controls=page.locator('[data-point-control]').evaluate_all('es=>es.map(e=>e.dataset.pointControl)');assert controls,station
    for part in controls:
-    before=page.evaluate('([st,part])=>{const C=SimCore.forStation(st);return SimField.state(st).points[C.pointParts[part]||part]}',[station,part])
-    page.locator(f'[data-point-control="{part}"]').first.click();expect(page.locator('#actionDialog')).to_contain_text('SW_'+part);page.click('#dialogConfirm')
-    try:page.wait_for_function('([st,part,value])=>{const C=SimCore.forStation(st);return SimField.state(st).points[C.pointParts[part]||part]===value}',arg=[station,part,'N' if before=='R' else 'R'],timeout=3000)
-    except Exception:
-     print(station,part,before,page.evaluate('id=>SimField.state(id).logs.slice(0,4)',station),page.locator('#toast').inner_text());raise
+    for value in ['R','N']:
+     page.locator(f'[data-point-control="{part}"]').first.click();expect(page.locator('#actionDialog')).to_contain_text('SW_'+part);page.click('#dialogConfirm')
+     try:page.wait_for_function('([st,part,value])=>{const C=SimCore.forStation(st);return SimField.state(st).points[C.pointParts[part]||part]===value}',arg=[station,part,value],timeout=3000)
+     except Exception:
+      print(station,part,value,page.evaluate('id=>SimField.state(id).logs.slice(0,4)',station),page.locator('#toast').inner_text());raise
+     group=page.evaluate('([st,part])=>SimCore.forStation(st).pointParts[part]||part',[station,part])
+     shapes=page.locator(f'[data-switch-geometry="{group}"]');assert shapes.count()>0,(station,part,'missing blades')
+     assert shapes.evaluate_all('(es,value)=>es.every(e=>e.dataset.position===value)',value),(station,part,value)
    if station=='geumcheon':page.screenshot(path='/tmp/v240-switch-parts.png')
   page.evaluate("SimMMI.open('graph')");page.wait_for_selector('#tgStatus');table=page.evaluate('SimDiagram.getModel()');t=table['trains'][0];station=t['calls'][0]['station'];old=t['calls'][0]['departure']
   page.evaluate('([id,st])=>{const m=SimDiagram.getModel();SimTimetable.delay(m,id,st,2);SimDiagram.render()}',[t['id'],station]);page.locator('.tg-tool[title*="실행 취소"]').click();page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old
@@ -35,5 +38,5 @@ try:
   with page.expect_file_chooser() as chooser:page.evaluate('SimTimetableFiles.open()')
   chooser.value.set_files({'name':'timetable.json','mimeType':'application/json','buffer':json.dumps({'timetable':table}).encode()});page.wait_for_selector('#mmiConfirmYes');page.click('#mmiConfirmYes');page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old
   page.evaluate("SimMMI.close('graph');SimMMI.open('scenario')");page.select_option('#scSelect','em-03');page.click('#scStart');expect(page.locator('#scSteps input')).to_have_count(0);page.evaluate("SimMMI.run({type:'tick',seconds:600})");assert page.evaluate('SimScenarioUI.snapshot().done.filter(Boolean).length')>0;assert page.evaluate('SimScenarioUI.motionJobs().length')>0
-  assert not errors,errors;browser.close();print('PASS every displayed switch control across all 15 stations, timed unchecked scenarios, timetable JSON open/save and undo/redo')
+  assert not errors,errors;browser.close();print('PASS both N/R positions and physical blades of every displayed switch control across all 15 stations, timed unchecked scenarios, timetable JSON open/save and undo/redo')
 finally:server.shutdown()

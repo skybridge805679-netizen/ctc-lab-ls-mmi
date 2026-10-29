@@ -4398,8 +4398,8 @@
       "candidate": "B997T",
       "code": "B997T",
       "side": "below",
-      "fraction": 0.9,
-      "anchorCode": "B995T",
+      "fraction": 0.1647,
+      "anchorCode": "B997T",
       "slot": "B997T",
       "reviewed": true
     },
@@ -5280,8 +5280,8 @@
       "candidate": "B1033T",
       "code": "B1033T",
       "side": "below",
-      "fraction": 0.5,
-      "anchorCode": "B1035T",
+      "fraction": 0.5544,
+      "anchorCode": "B1033T",
       "slot": "B1033T",
       "reviewed": true
     },

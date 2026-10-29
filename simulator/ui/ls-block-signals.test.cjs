@@ -22,3 +22,10 @@ test('source block numbers remain independent of circuit suffixes and circuit nu
  assert.equal(get('uiwang','B1016T'),11);assert.equal(get('uiwang','B1034T'),2);assert.equal(get('uiwang','B1031T'),10);
  assert.equal(get('suwon','B1033T'),11);
 });
+
+test('every source block uses its own restored circuit and the measured signed source position',()=>{
+ const V=require('./ls-presets'),Line=require('../engine/line');
+ for(const r of source.indicators){assert.equal(r.code,r.anchorCode,r.id+' must not borrow a neighboring circuit');assert.ok(Line.graph.circuits[/^B\d+T/.exec(r.code)[0]],r.code+' canonical circuit missing');const [x,,w]=r.sourceSymbol,[cx,,cw]=r.sourceCell;assert.ok(Math.abs(r.fraction-(x+w/2-cx)/cw)<.0001,r.id+' source fraction');}
+ for(const view of V.list()){const st=N.catalog[view.station],core=C.forStation(st.id),v=LS.render(st,W[st.id],core,core.initial(),{preset:view.id});for(const code of ['B998T','B997T','B1033T'])if(source.indicators.some(r=>r.station===st.id&&r.code===code))assert(v.svg.includes('data-circuit-label="'+code+'"'),view.id+' '+code);}
+ assert.equal(inventory.noryangjin.find(r=>r.id==='ppt-8-1863-472').code,'B618T2T');assert.equal(inventory.noryangjin.find(r=>r.id==='ppt-8-1863-472').side,'below');
+});

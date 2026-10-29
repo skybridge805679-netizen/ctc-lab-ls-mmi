@@ -17,3 +17,5 @@ assert.equal(count,276);assert.equal(inline,71);
 const sources=JSON.parse(fs.readFileSync(path.join(__dirname,'../assets/stations/SOURCES.json')));
 for(const im of sources.images){const b=fs.readFileSync(path.join(__dirname,'../assets/stations',im.path));assert.equal(crypto.createHash('sha256').update(b).digest('hex'),im.sha256);}
 console.log('PASS 276 PPT train windows / 71 on-rail windows across 15 stations, unique identities and original media hashes');
+// Restored circuits retain their original train-number slot identities, with no neighboring anchor.
+for(const [station,code]of [['geumjeong','B997T'],['suwon','B1033T']]){const w=D[station].find(w=>w.code===code);assert.equal(w.anchorCode,code);const source=raw.windows.find(r=>r.station===station&&r.code===code),[x,,width]=source.sourceWindow,[cx,,cw]=source.sourceCell;assert(Math.abs(w.fraction-(x+width/2-cx)/cw)<.0001);assert(require('../engine/line').graph.circuits[code]);}

@@ -11,7 +11,7 @@ for(const st of N.stations.filter(s=>s.controlled)){
   assert(rev.states.filter(s=>s.id===id).every(s=>s.position==='R'&&s.connected));count++;
  }
 }
-assert.equal(count,118);console.log('PASS all 118 switch groups change physical gap/connection geometry for N/R');
+assert.equal(count,119);console.log('PASS all 119 switch groups change physical gap/connection geometry for N/R');
 {
  const C=Core.forStation('seoul'),state=C.initial();C.dispatch(state,{type:'mode',value:'CCM'});
  const normal=scene('seoul',state),n58=normal.connectors.find(c=>c.id==='58');

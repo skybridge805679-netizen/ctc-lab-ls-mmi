@@ -10,7 +10,7 @@ function build(st,def,cells,T,visibleOnly=false){
   if(cell){x=cell.x+cell.width*item.fraction;y=cell.y;}
   else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[x,y]=T(p);x+=rail[3]===code?20:-20;}
   else {if(visibleOnly)return null;throw new Error(st.id+' block number anchor missing: '+code);}
-  x=Math.max(74,Math.min(1526,x));y+=item.side==='above'?-17:17;
+  x=Math.max(22,Math.min(1578,x));y+=item.side==='above'?-17:17;
   return {...item,x,y,box:[x-22,y-10,x+22,y+10]};
  }).filter(Boolean);
 }

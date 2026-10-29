@@ -111,7 +111,7 @@ function render(st,def,core,model,neighbours={}){
   let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
   if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*90;}
   if(c.id==='depot-lead'){
-   const a=def.rails.find(r=>r[0]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
+   const a=def.rails.find(r=>r[4]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
    const right=T([Math.max(a[0],b[0]),a[1]])[0];y=(T(a)[1]+T(b)[1])/2;x=right+32+w/2;
   }
   const preferred=y,direction=anchor?.side||1;for(const offset of [0,...Array.from({length:10},(_,i)=>(i+1)*14*direction),...Array.from({length:10},(_,i)=>-(i+1)*14*direction)]){const next=preferred+offset,box=[x-w/2,next-h/2,x+w/2,next+h/2];if(box[1]<8||captionBlockers.some(other=>intersects(box,other,6)))continue;y=next;break;}
@@ -348,12 +348,12 @@ function render(st,def,core,model,neighbours={}){
  // Switch identifiers and source A/B part identifiers use the same placement solver.
  for(const [id,pos]of Object.entries(prepared.corridor?{}:core.points)){
   if(Object.values(core.pointParts||{}).includes(id)){pointSymbols+=`<g data-point-label="${id}" data-paired-switch="true"></g>`;continue;}
-  const anchor=pointAnchors[id]||T(toLocal(pos.x,pos.y)),R=model.points[id]==='R',locked=model.blockedPoints.includes(id);
+  const anchor=pointAnchors[id]||T(toLocal(pos.x,pos.y)),R=model.points[id]==='R',manualLock=model.blockedPoints.includes(id),locked=manualLock||overlapPoints.has(id)||Object.keys(model.routes).some(route=>(core.routes[route].pointLocks||[]).includes(id));
   const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>T(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
   const scissors=switches.connectors.find(c=>c.id===id&&c.kind==='scissors');
   const preferred=scissors?[scissors.endpoints[0][0]+(scissors.endpoints[1][0]-scissors.endpoints[0][0])*.25,scissors.endpoints[0][1]+(scissors.endpoints[0][1]<scissors.endpoints[1][1]?-24:24)]:surveyed||[anchor[0],anchor[1]-13];
   const label=takeLabel(id,anchor,'point',id,preferred);
-  pointSymbols+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-label="${id}" data-point-control="${id}" role="button" tabindex="0" aria-label="선로전환기 ${id}"><rect x="${label.x-18}" y="${label.y-11}" width="36" height="22" fill="transparent"/>${label.svg}<title>${id} · ${R?'반위':'정위'}${locked?' · 수동 쇄정':''}</title></g>`;
+  pointSymbols+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-label="${id}" data-point-control="${id}" role="button" tabindex="0" aria-label="선로전환기 ${id}"><rect x="${label.x-18}" y="${label.y-11}" width="36" height="22" fill="transparent"/>${label.svg}<title>${id} · ${R?'반위':'정위'}${locked?(manualLock?' · 수동 쇄정':' · 진로 쇄정'):''}</title></g>`;
   if(overlapPoints.has(id))pointSymbols+=`<circle class="overlap-ring" data-overlap-point="${id}" cx="${label.x}" cy="${label.y}" r="18"/>`;
  }
  const xs=def.rails.flatMap(r=>r[1].map(p=>p[0])),lo=Math.min(...xs),hi=Math.max(...xs);
@@ -373,7 +373,7 @@ function render(st,def,core,model,neighbours={}){
  plates+=arrow(neighbours.left===undefined?around.left:neighbours.left,'left')+arrow(neighbours.right===undefined?around.right:neighbours.right,'right');
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
  const ports=seams.ports(st,def,data).map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
- return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2))}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

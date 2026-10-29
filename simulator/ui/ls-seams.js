@@ -19,13 +19,16 @@ function ports(st,def,scene){
  }
  return out;
 }
-function render(ports,T,height,width,inset=0){
+function render(ports,T,height,width,inset=0,obstacles=[]){
  const paths=[],labels=[];
  for(const port of ports){const [x,y]=T([port.x,port.y]),edge=port.side==='left'?-inset:width+inset,toY=y;
   const d=`M${x} ${y}L${edge} ${toY}`;
   // Clear the edge underlay without adding a junction or a change in direction.
   paths.push(`<g class="seam-link ${port.state||'clear'}" data-track-state="${port.state||'clear'}" data-seam-side="${port.side}" data-seam-trunk="${port.trunk}" data-seam-code="${port.code}" data-seam-y="${toY}"><title>${port.name} · 화면 연결 · ${port.code}</title><path class="seam-clearance" d="${d}"/><path class="seam-rail" d="${d}"/></g>`);
-  labels.push(`<text class="seam-name" x="${port.side==='left'?6:width-6}" y="${toY-18}" text-anchor="${port.side==='left'?'start':'end'}">${port.name}</text>`);
+  const labelWidth=port.name.includes(' · ')?104:48,lx=port.side==='left'?6:width-6-labelWidth;
+  let labelY=toY-18;
+  for(const dy of [-18,34,-36,50,-54,66,-72,82,-90,98,-108,114]){const yy=toY+dy,box=[lx,yy-14,lx+labelWidth,yy+3];if(yy<18||yy>height-8||obstacles.some(b=>box[0]<b[2]+3&&box[2]>b[0]-3&&box[1]<b[3]+3&&box[3]>b[1]-3))continue;labelY=yy;obstacles.push(box);break;}
+  labels.push(`<text class="seam-name" x="${port.side==='left'?6:width-6}" y="${labelY}" text-anchor="${port.side==='left'?'start':'end'}">${port.name}</text>`);
  }
  return `<g class="screen-continuations" aria-label="본선 화면 연결">${paths.join('')}${labels.join('')}</g>`;
 }
