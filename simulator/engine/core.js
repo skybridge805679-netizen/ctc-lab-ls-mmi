@@ -10,14 +10,15 @@
  const lsMenu=sig=>{const list=MENUS?.[config.id]?.[sig];return list?list.map(d=>sig+'-'+d).filter(id=>routes[id]):Object.keys(routes).filter(id=>routes[id].signal===sig);};
  const menuVerified=!!MENUS?.[config.id]&&Object.keys(signals).every(sig=>MENUS[config.id][sig]);
  const menuVerifiedFor=sig=>!!MENUS?.[config.id]?.[sig];
- const overlapOf=id=>IL.rulesFor(config.id,id);
+ // A rule-derived overlap is already given when an exit route from the destination track is set: the overrun then follows that route.
+ const overlapOf=(id,s)=>{const ov=IL.rulesFor(config.id,id);if(!ov||!s||!ov.derived)return ov;return Object.keys(s.routes||{}).some(o=>o!==id&&ov.exits.includes(routes[o]?.signal))?null:ov;};
  const lockSeconds=signal=>IL.approach.seconds[signals[signal]?.kind]||0;
  const remaining=(s,r)=>Math.max(0,Math.ceil(r.lock.until-s.clock));
  function overlapBlocker(s,id,skip){
-  const requested=overlapOf(id),candidate=routes[id];
+  const requested=overlapOf(id,s),candidate=routes[id];
   for(const other of Object.keys(s.routes)){
    if(other===skip)continue;
-   const active=routes[other],existing=overlapOf(other);
+   const active=routes[other],existing=overlapOf(other,s);
    for(const [pid,pos]of Object.entries(requested?.points||{})){
     if((active.pointLocks||[]).includes(pid)&&active.pointPositions[pid]!==pos)return other;
     if(existing?.points[pid]&&existing.points[pid]!==pos)return other;
@@ -94,7 +95,7 @@
     return other.signal===r.signal||(other.resources||[]).some(t=>(r.resources||[]).includes(t))||pointConflict;
    });
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');
-   const ov=overlapOf(a.id);
+   const ov=overlapOf(a.id,s);
    if(ov?.clearSignals){const open=Object.keys(s.routes).find(id=>ov.clearSignals.includes(routes[id].signal));if(open)return log(false,'오버랩 구간의 '+routes[open].signal+' 신호를 먼저 해정하세요. ('+ov.note+')');}
    const ob=overlapBlocker(s,a.id);if(ob)return log(false,'오버랩 쇄정 전환기가 '+ob+' 진로와 충돌합니다.');
    for(const [pid,pos] of Object.entries(ov?.points||{}))if(s.blockedPoints.includes(pid)&&s.points[pid]!==pos)return log(false,'오버랩 전환기 '+pid+'이 수동 쇄정되어 있습니다.');
@@ -109,7 +110,7 @@
    let waiting=Math.max(0,...ids.filter(id=>s.routes[id]?.lock).map(id=>remaining(s,s.routes[id])));
    for(const id of ids){if(s.routes[id].lock)continue;const sig=routes[id].signal,seconds=lockSeconds(sig);s.signals[sig]='STOP';s.routes[id].control='single';
     if(s.routes[id].occupied)s.routes[id].status='LOCKED';
-    else if(s.approach[sig]&&seconds){s.routes[id].status='APPROACH_LOCK';s.routes[id].lock={start:s.clock,seconds,until:s.clock+seconds};waiting=Math.max(waiting,seconds);}
+    else if((s.approach[sig]||IL.approachTrain(config.id,sig,s))&&seconds){s.routes[id].status='APPROACH_LOCK';s.routes[id].lock={start:s.clock,seconds,until:s.clock+seconds};waiting=Math.max(waiting,seconds);}
     else delete s.routes[id];}
    if(waiting)return log(true,'신호 정지 · 접근 열차가 있어 접근쇄정 '+waiting+'초 후 진로 해정');
    if(ids.some(id=>s.routes[id]?.occupied))return log(true,'신호 정지 · 점유 구간의 진로 쇄정 유지');
@@ -121,7 +122,7 @@
    if((s.faults?.points||[]).includes(a.id))return log(false,'고장 상태의 선로전환기는 전환할 수 없습니다.');
    const using=Object.keys(s.routes).find(id=>(routes[id].pointLocks||[]).includes(a.id));
    if(using)return log(false,s.routes[using].lock?'접근쇄정 중 · 남은 '+remaining(s,s.routes[using])+'초 후 조작하세요.':'이 전환기를 사용하는 진로를 먼저 해정하세요.');
-   const ovUse=Object.keys(s.routes).find(id=>overlapOf(id)?.points[a.id]);
+   const ovUse=Object.keys(s.routes).find(id=>overlapOf(id,s)?.points[a.id]);
    if(ovUse)return log(false,ovUse+' 진로의 오버랩 쇄정 전환기입니다. 진로를 해정한 뒤 조작하세요.');
    s.points[a.id]=a.value;return log(true,(a.pointPart||a.id)+' 전환기 '+(a.value==='N'?'정위':'반위')+' 조작 연습 완료');
   }
@@ -156,7 +157,7 @@
   if(a.type==='inspectSignal'&&signals[a.id])return log(true,a.id+' '+signals[a.id].kind+' 위치 확인 · 진로목록 검증 보류');
   return log(false,'근거가 확인되지 않은 조작입니다.');
  }
- function lockTable(s){return Object.entries(s.routes).map(([id,r])=>{const ov=overlapOf(id);return {id,signal:routes[id].signal,status:r.status,remaining:r.lock?remaining(s,r):0,total:r.lock?.seconds||0,overlap:ov?{points:ov.points,note:ov.note,clearSignals:ov.clearSignals||[]}:null};});}
+ function lockTable(s){return Object.entries(s.routes).map(([id,r])=>{const ov=overlapOf(id,s);return {id,signal:routes[id].signal,status:r.status,remaining:r.lock?remaining(s,r):0,total:r.lock?.seconds||0,overlap:ov?{points:ov.points,note:ov.note,clearSignals:ov.clearSignals||[]}:null};});}
  return {initial,dispatch,routes,points,pointParts,pointPartLabels,signals,sources,lockTable,lockSeconds,overlapOf,lsMenu,menuVerified,menuVerifiedFor};
  }
  const network=typeof module!=='undefined'?require('./network.js'):root.SimNetwork;

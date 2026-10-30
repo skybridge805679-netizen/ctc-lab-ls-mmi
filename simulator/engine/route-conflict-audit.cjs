@@ -10,19 +10,21 @@ function audit(){
   for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
    const a={...C.routes[ids[i]],id:ids[i]},b={...C.routes[ids[j]],id:ids[j]},sharedTracks=a.resources.filter(t=>b.resources.includes(t)),points=a.pointLocks.filter(p=>b.pointLocks.includes(p));
    const sharedNormal=points.length>0&&points.every(p=>a.pointPositions[p]==='N'&&b.pointPositions[p]==='N');
-   const overlapConflict=[[a,b],[b,a]].some(([x,y])=>{
-    const rule=IL.rulesFor(st.id,x.id);return rule?.clearSignals?.includes(y.signal)||Object.entries(rule?.points||{}).some(([p,v])=>y.pointLocks.includes(p)&&y.pointPositions[p]!==v);
-   });
-   const blocked=a.signal===b.signal||sharedTracks.length>0||points.some(p=>!(a.pointPositions[p]==='N'&&b.pointPositions[p]==='N'))||overlapConflict;
+   // a rule-derived overlap is already given by an exit route that was set first (출발 먼저 → 장내), so the decision depends on the order
+   const ruleHits=(x,y,ySetFirst)=>{const rule=IL.rulesFor(st.id,x.id);if(!rule||rule.derived&&ySetFirst&&rule.exits.includes(y.signal))return false;
+    return rule.clearSignals?.includes(y.signal)||Object.entries(rule.points||{}).some(([p,v])=>y.pointLocks.includes(p)&&y.pointPositions[p]!==v);};
+   const base=a.signal===b.signal||sharedTracks.length>0||points.some(p=>!(a.pointPositions[p]==='N'&&b.pointPositions[p]==='N'));
+   const blockedWhen=(first,second)=>base||ruleHits(first,second,false)||ruleHits(second,first,true);
+   const blocked=blockedWhen(a,b)&&blockedWhen(b,a);
    const outcomes=[];
    for(const [first,second] of [[a,b],[b,a]]){
     const label=`${st.id}: ${first.id} → ${second.id}`,s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});
     assert(C.dispatch(s,{type:'route',id:first.id}).ok,label+' first route');
     const before=JSON.stringify([s.routes,s.points,s.signals]);
     const result=C.dispatch(s,{type:'route',id:second.id});outcomes.push(result.ok);report.totals.orders++;
-    assert.equal(result.ok,!blocked,label+' track/point/overlap decision');
+    assert.equal(result.ok,!blockedWhen(first,second),label+' track/point/overlap decision');
     if(!result.ok){assert.equal(JSON.stringify([s.routes,s.points,s.signals]),before,label+' rejected route must not mutate field');continue;}
-    for(const route of [first,second])for(const [p,v]of Object.entries({...route.pointPositions,...IL.rulesFor(st.id,route.id)?.points}))assert.equal(s.points[p],v,label+' point '+p);
+    for(const route of [first,second]){const rule=IL.rulesFor(st.id,route.id),given=rule?.derived&&route===second&&rule.exits.includes(first.signal);for(const [p,v]of Object.entries({...route.pointPositions,...(given?{}:rule?.points)}))if(route===second||!(p in second.pointPositions))assert.equal(s.points[p],v,label+' point '+p);}
     if(!sharedNormal)continue;
     assert(C.dispatch(s,{type:'occupy',id:first.id}).ok,label+' first entry');
     assert.equal(s.signals[second.signal],'GO',label+' independent signal');
@@ -36,7 +38,8 @@ function audit(){
     for(const p of points)assert(C.dispatch(s,{type:'point',id:p,value:'R'}).ok,label+' switch released after last passage');
     report.totals.lifecycleOrders++;
    }
-   assert.equal(outcomes[0],outcomes[1],`${st.id} command order symmetry`);
+   if(outcomes[0]!==outcomes[1]){report.totals.orderDependent=(report.totals.orderDependent||0)+1;(report.orderDependent??=[]).push({station:st.id,allowed:outcomes[0]?[a.id,b.id]:[b.id,a.id]});}
+   else assert.equal(blockedWhen(a,b),blockedWhen(b,a),`${st.id} command order symmetry`);
    stat.pairs++;report.totals.pairs++;
    const kind=outcomes[0]?'allowed':'blocked';stat[kind]++;report.totals[kind]++;
    if(outcomes[0]&&sharedNormal){stat.sharedNormalPairs++;report.totals.sharedNormalPairs++;

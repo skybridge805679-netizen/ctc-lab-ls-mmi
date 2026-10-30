@@ -8,7 +8,7 @@ function at(rail,x){const poly=rail[1];for(let i=1;i<poly.length;i++){const a=po
 function towards(a,b,distance,limit=.44){const length=Math.hypot(b[0]-a[0],b[1]-a[1]);const t=Math.min(limit,distance/(length||1));return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
 function build(st,def,core,model,T){
  const rails=new Map(def.rails.map(r=>[r[0],r])),cuts=[],connectors=[],states=[],glyphMasks=[];
- const locked=new Set(Object.keys(model.routes).flatMap(id=>[...(core.routes[id].pointLocks||[]),...Object.keys(core.overlapOf(id)?.points||{})]));
+ const locked=new Set(Object.keys(model.routes).flatMap(id=>[...(core.routes[id].pointLocks||[]),...Object.keys(core.overlapOf(id,model)?.points||{})]));
  const flags=id=>({id,position:model.points[id]||'N',locked:locked.has(id)||model.blockedPoints.includes(id)});
  const cut=(id,a,b)=>cuts.push({id,points:[a,b]});
  const mainGap=(id,rail,anchor,direction)=>{
