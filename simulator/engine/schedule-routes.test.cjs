@@ -8,7 +8,7 @@ test('sample trains carry the routes read from the real MMI photos',()=>{
  assert.equal(at('yeongdeungpo').arrivalRoute,'1B_6T');assert.equal(at('yeongdeungpo').departureRoute,'4E_B942T');
  assert.equal(at('geumcheon').arrivalRoute,'1A_2T');assert.equal(at('geumcheon').departureRoute,'4B_B968T');
  const up=model.trains.find(t=>t.id==='K1002'),u=s=>up.calls.find(c=>c.station===s);
- assert.equal(u('uiwang').arrivalRoute,'2B_6T');assert.equal(u('uiwang').departureRoute,'3B_B1011T');assert.equal(u('suwon').departureRoute,'3C_B1035T');
+ assert.equal(u('uiwang').arrivalRoute,'2A_6T');assert.equal(u('uiwang').departureRoute,'3A_B1011T');assert.equal(u('geumjeong').departureRoute,'3A_B993T');assert.equal(u('suwon').departureRoute,'3C_B1035T');
 });
 test('first call is 시발 without an arrival route, last is 종착 without a departure route, jurisdiction stops have no routes',()=>{
  const c=T.initial().trains[0].calls;
@@ -43,4 +43,11 @@ console.log(n+' schedule-route tests passed');
  assert(T.copy(model,source.id,'C3001',4000,{from:'dongmyo',to:'guro',kind:'KTX',service:'부정기',flags:['회송']}).ok);
  const t=model.trains.at(-1);assert.equal(t.calls[0].station,'dongmyo');assert.equal(t.calls.at(-1).station,'guro');assert.equal(t.calls[0].departure,4000);assert(t.calls.every(c=>!c.cancelled));assert.equal(t.calls[0].stopType,'시발');assert.equal(t.calls.at(-1).departureRoute,'');assert.equal(t.service,'부정기');assert.deepEqual(t.flags,['회송']);assert(source.cancelled);
  console.log('PASS range copy is atomic, clears source cancellation and applies service/flags');
+}
+{
+ // 열차는 도착한 선로에서 출발한다: 출발 진로의 신호기는 도착 진로의 도착 선로 위에 서 있어야 한다.
+ const assert=require('node:assert/strict'),T=require('./timetable.js'),W=require('./wiring.js').data,bad=[];
+ for(const t of T.initial().trains)for(const c of t.plan){if(!c.arrivalRoute||!c.departureRoute)continue;const track=c.arrivalRoute.split('_')[1],sig=W[c.station].signals.find(s=>s[0]===c.departureRoute.split('_')[0]);if(!sig||sig[1]!==track)bad.push(c.station+' '+c.arrivalRoute+' '+c.departureRoute);}
+ assert.deepEqual([...new Set(bad)],[]);
+ console.log('PASS every scheduled stop departs from the track it arrived on (Uiwang/Geumjeong confirmed on the LS 2026-10-30)');
 }

@@ -10,8 +10,9 @@ const OBSERVED={
   noryangjin:{arr:'1A_1T',dep:'4A_B928T'},yeongdeungpo:{arr:'1B_6T',dep:'4E_B942T'},guro:{arr:'1B_3T',dep:'4A_B950T'},geumcheon:{arr:'1A_2T',dep:'4B_B968T'}
  },
  up:{
-  suwon:{dep:'3C_B1035T'},uiwang:{arr:'2B_6T',dep:'3B_B1011T'},gunpo:{arr:'2A_4T',dep:'3A_B999T'},
-  geumjeong:{arr:'2A_4T',dep:'3B_B993T'},anyang:{arr:'2A_5T',dep:'3B_B981T'},geumcheon:{arr:'2A_5T',dep:'3B_B963T'}
+  // 의왕·금정은 사용자가 LS에서 진로를 직접 설정해 확인했다(2026-10-30): 2A로 도착한 선로의 3A로 출발한다.
+  suwon:{dep:'3C_B1035T'},uiwang:{arr:'2A_6T',dep:'3A_B1011T'},gunpo:{arr:'2A_4T',dep:'3A_B999T'},
+  geumjeong:{arr:'2A_4T',dep:'3A_B993T'},anyang:{arr:'2A_5T',dep:'3B_B981T'},geumcheon:{arr:'2A_5T',dep:'3B_B963T'}
  }
 };
 const core=()=>typeof module!=='undefined'?require('./core.js'):root.SimCore;
