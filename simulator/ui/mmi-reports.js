@@ -46,11 +46,8 @@ const dayOf=row=>row.time.slice(0,10).replaceAll('/','-');
 // ---- report definitions: conditions (html) + run(read) -> {cols,rows}
 // built lazily: the station names come from SimMMI, which loads after this file
 const buildReports=()=>({
- trainPositions:{title:'열차위치목록 조회',cond:`${line}<label>운행방향<select id="trainPositionsDir">${dirOptions}</select></label><label>구분<select id="trainPositionsState"><option value="">전체</option><option>운행중</option><option>운행대기</option><option>운행완료</option></select></label><label>열차종별<select id="trainPositionsKind">${kindOptions}</select></label><label>열차번호<input id="trainPositionsFind" maxlength="6" placeholder="K1131"></label><button type="button" class="sched-btn" id="trainPositionsFindBtn">열차번호찾기</button>`,auto:true,
-  run(v){const t=now();return {cols:['열차번호','방향','열차종별','구분','현재 위치','계획 출발','계획 도착'],rows:model().trains.filter(x=>(v.dir==='all'||x.direction===v.dir)&&(!v.kind||x.kind===v.kind)).map(x=>{
-   const p=T.position(x,t),state=x.cancelled?'운휴':p?'운행중':t<x.calls[0].arrival?'운행대기':'운행완료';
-   return {state,row:[x.id,dirText(x.direction),x.kind,state,p?(p.nextStation?`${name(p.station)}→${name(p.nextStation)}`:name(p.station)):'',T.clock(x.calls[0].departure),T.clock(x.calls.at(-1).arrival)]};
-  }).filter(r=>!v.state||r.state===v.state).map(r=>r.row)};},
+ trainPositions:{title:'열차위치목록 조회',width:1100,note:'열차 위치는 실제 운행·열번 표시·시간표 추정을 구분합니다. 운행 회로가 확인되지 않으면 빈칸으로 남깁니다.',cond:`${line}<label>운행방향<select id="trainPositionsDir">${dirOptions}</select></label><label>구분<select id="trainPositionsState"><option value="">전체</option><option>운행중</option><option>운행대기</option><option>운행완료</option><option>위치 미확인</option></select></label><label>열차종별<select id="trainPositionsKind">${kindOptions}</select></label><label>열차번호<input id="trainPositionsFind" maxlength="6" placeholder="K1131"></label><button type="button" class="sched-btn" id="trainPositionsFindBtn">열차번호찾기</button>`,auto:true,
+  run(v){return {cols:['열차번호','방향','열차종별','구분','현재 위치','계획 출발','계획 도착','점유역','점유 열번창','운행 궤도회로','위치 근거'],rows:root.SimTrainStatusUI.list(now()).filter(r=>(v.dir==='all'||r.direction===v.dir)&&(!v.kind||r.kind===v.kind)&&(!v.state||r.state===v.state)).map(r=>[r.id,dirText(r.direction),r.kind,r.state,root.SimTrainStatusUI.location(r),r.first?T.clock(r.first.departure):'',r.last?T.clock(r.last.arrival):'',[...new Set(r.locations.map(b=>name(b.station)))].join(' / '),r.locations.map(b=>b.slot).join(' / '),r.circuits.join(' / '),r.basis])};},
   read:id=>({dir:$(id+'Dir').value,state:$(id+'State').value,kind:$(id+'Kind').value})},
  stationActual:{title:'역실적 조회',cond:`${date('stationActual')}<label>표시시간<input type="time" id="stationActualFrom" value="08:00"> ~ <input type="time" id="stationActualTo" value="14:00"></label>${line}<label>위치<select id="stationActualDir">${dirOptions}</select></label><label>역<select id="stationActualStation">${stationOptions(false)}</select></label>`,
   run(v){const hm=x=>+x.slice(0,2)*3600+ +x.slice(3,5)*60-28800,from=v.from?hm(v.from):-Infinity,to=v.to?hm(v.to)+59:Infinity;
@@ -105,13 +102,13 @@ function init(api){
    $(id+'Body').innerHTML=last.rows.length?last.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr class="empty"><td colspan="${last.cols.length||1}">조회된 내용이 없습니다</td></tr>`;
    $(id+'Count').textContent=`총 ${last.rows.length}건`;
   };
-  const w=mmi().createWindow(id,{title:def.title,x:90+k*16,y:60+k*16,width:760,body:`<div class="rpt"><fieldset class="rpt-cond"><legend>검색조건</legend>${def.cond}</fieldset><div class="idm-table rpt-table"><table><thead id="${id}Head"></thead><tbody id="${id}Body"><tr class="empty"><td>검색조건을 입력하고 [검색]을 누르세요.</td></tr></tbody></table></div><div class="idm-note">${esc(NOTE)} <span id="${id}Count"></span></div><div class="idm-buttons"><button type="button" class="sched-btn primary" id="${id}Search">검색</button><button type="button" class="sched-btn" id="${id}Print">인쇄</button><button type="button" class="sched-btn" id="${id}Close">닫기</button></div></div>`});
+  const w=mmi().createWindow(id,{title:def.title,x:90+k*16,y:60+k*16,width:def.width||760,body:`<div class="rpt"><fieldset class="rpt-cond"><legend>검색조건</legend>${def.cond}</fieldset><div class="idm-table rpt-table"><table><thead id="${id}Head"></thead><tbody id="${id}Body"><tr class="empty"><td>검색조건을 입력하고 [검색]을 누르세요.</td></tr></tbody></table></div><div class="idm-note">${esc(def.note||NOTE)} <span id="${id}Count"></span></div><div class="idm-buttons"><button type="button" class="sched-btn primary" id="${id}Search">검색</button><button type="button" class="sched-btn" id="${id}Print">인쇄</button><button type="button" class="sched-btn" id="${id}Close">닫기</button></div></div>`});
   $(id+'Search').onclick=draw;
   $(id+'Print').onclick=()=>{if(!last.rows.length){mmi().alertBox('인쇄할 검색 결과가 없습니다.');return;}printTable(def.title,last.cols,last.rows);mmi().log('event',`${def.title} 인쇄`);};
   $(id+'Close').onclick=()=>mmi().close(id);
   def.setup?.(id);
   if(id==='trainPositions'){$('trainPositionsFindBtn').onclick=()=>{const n=$('trainPositionsFind').value.trim().toUpperCase(),row=[...$('trainPositionsBody').rows].find(r=>r.cells[0]?.textContent===n);if(!row){mmi().alertBox(`${n||'열차번호'} 열차를 목록에서 찾을 수 없습니다.`);return;}row.scrollIntoView({block:'center'});row.classList.add('sel');setTimeout(()=>row.classList.remove('sel'),1500);};}
-  if(def.auto)w.opener=draw;
+  if(def.auto){w.opener=draw;setInterval(()=>{if(!w.el.hidden){const selected=$(id+'Body').querySelector('tr.sel')?.cells[0]?.textContent;draw();if(selected)for(const row of $(id+'Body').rows)if(row.cells[0]?.textContent===selected)row.classList.add('sel');}},1000);}
  });
 }
 root.SimMMIReports={init};

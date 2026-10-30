@@ -116,7 +116,7 @@ function initEntry(){
 
 // ---------------------------------------------------------------- [CF003_1] 열차위치추적
 let trackTimer=null,tracking=null;
-const running=dir=>model().trains.filter(t=>(dir==='all'||t.direction===dir)&&T.position(t,clock()));
+const running=dir=>root.SimTrainStatusUI.list(clock()).filter(t=>(dir==='all'||t.direction===dir)&&t.state==='운행중');
 // numbers typed by hand on the LS (열차번호제어) are not in the timetable but can still be traced (실기1 p.51)
 function manualStation(number){
  const lsm=root.SimLSUI?.getModel?.();if(!lsm)return null;
@@ -130,12 +130,12 @@ function badge(text){
 }
 function nearestControlled(order){return controlled().reduce((best,s)=>Math.abs(s.order-order)<Math.abs(best.order-order)?s:best);}
 function traceStep(){
- const train=model().trains.find(t=>t.id===tracking),pos=train&&T.position(train,clock());
- let stationId=pos?nearestControlled(pos.order).id:manualStation(tracking);
+ const row=root.SimTrainStatusUI.list(clock()).find(t=>t.id===tracking);
+ let stationId=row?.locations[0]?.station||(Number.isFinite(row?.order)?nearestControlled(row.order).id:null);
  if(!stationId){$('traceMsg').textContent=`>> ${tracking} 열차번호를 LS 화면에서 찾을 수 없어 추적을 종료합니다.`;traceStop();return;}
  if(host.context().station!==stationId)host.selectStation(stationId);
  badge(`▶ 열차추적중 ${tracking}`);
- $('traceMsg').textContent=`>> ${tracking} 추적 중 · ${mmi().stationInfo(stationId).name} LS 화면`;
+ $('traceMsg').textContent=`>> ${tracking} 추적 중 · ${mmi().stationInfo(stationId).name} LS 화면 · ${row.direction==='up'?'상행':'하행'} · ${row.basis}`;
 }
 function traceStop(){clearInterval(trackTimer);trackTimer=null;tracking=null;badge('');if($('traceStart')){$('traceStart').disabled=false;$('traceStop').disabled=true;}}
 function initTrace(){

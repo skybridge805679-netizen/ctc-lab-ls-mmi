@@ -100,11 +100,11 @@ function init(api){
  label();drawTroubles();if(enabled)step();
 }
 function position(train,now){
- if(root.SimRemote)return root.SimRemote.snapshot.auto.positions[train.id]||root.SimTimetable.position(train,now);
+ if(root.SimRemote)return root.SimRemote.snapshot.auto.positions[train.id]??null;
  if(root.SimScenarioUI?.reservedNumbers().includes(train.id))return root.SimScenarioUI.position(train);
  if(!enabled)return root.SimTimetable.position(train,now);
  const tr=transit.get(train.id);if(tr){const a=root.SimNetwork.catalog[tr.from],b=root.SimNetwork.catalog[tr.h.station],fraction=tr.codes.length<2?1:tr.index/(tr.codes.length-1);return {station:a.id,nextStation:b.id,order:a.order+(b.order-a.order)*fraction,status:'역간 운행',actual:true,circuit:tr.codes[tr.index]};}
  return engine.position(train,now);
 }
-root.SimAutoUI={init,step,transits:()=>root.SimRemote?root.SimRemote.snapshot.auto.transits:[...transit.values()].map(tr=>({...tr})),enabled:()=>enabled,position,set};
+root.SimAutoUI={init,step,transits:()=>root.SimRemote?root.SimRemote.snapshot.auto.transits:[...transit.values()].map(tr=>({...tr})),enabled:()=>root.SimRemote?root.SimRemote.snapshot.auto.enabled:enabled,actuals:()=>engine.actuals(),position,set};
 })(window);

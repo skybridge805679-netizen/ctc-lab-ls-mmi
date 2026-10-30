@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let host,ops,model,menu,dialog,pending=null,lastFocus=null,drag=null,menuOpenedAt=0;
+let host,ops,model,menu,dialog,pending=null,lastFocus=null,drag=null,menuOpenedAt=0,overviewTimer=null;
 const ctx=()=>host.context(),norm=s=>s.replaceAll(' · ','');
 const rows=(station,slot)=>ops.entries(model,station,slot);
 function closeMenu(){if(menu){const old=menu;menu=null;old.remove();}if(lastFocus?.isConnected)lastFocus.focus?.({preventScroll:true});}
@@ -36,8 +36,7 @@ function numberMenu(slot){
  ];
 }
 function properties(t,slot){
- closeMenu();const schedule=root.SimDiagram.getModel().trains.find(x=>x.id===t.number);
- host.openAction('열차 속성 조회',`<dl class="ls-properties"><dt>열차번호</dt><dd>${esc(t.number)}</dd><dt>위치</dt><dd>${esc(ctx().viewName||root.SimNetwork.catalog[ctx().station].name)} · ${esc(slot)}</dd><dt>운행방향</dt><dd>${t.direction==='up'?'상행':'하행'}</dd><dt>열차종류</dt><dd>${esc(schedule?.kind||'수동 등록')}</dd><dt>스케줄</dt><dd>${schedule?(schedule.cancelled?'운휴':'등록됨'):'등록된 스케줄 없음'}</dd></dl><p>수동 열차번호 표시 · 모의 점유 상태와 별개입니다.</p>`,null,'닫기');
+ closeMenu();root.SimTrainStatusUI.properties(host,t.number,ctx().state.clock);
 }
 function svgPoint(e,clamp=true){const svg=$('trackSvg'),p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse());return clamp?{x:Math.max(8,Math.min(svg.viewBox.baseVal.width-188,p.x)),y:Math.max(8,Math.min(svg.viewBox.baseVal.height-68,p.y))}:{x:p.x,y:p.y};}
 function editBoard(kind,point,id){
@@ -53,12 +52,16 @@ function boardMenu(id){const station=ctx().station,b=model.stations[station].boa
  ];}
 function deleteBoard(id){confirm('표지판 삭제','표지판을 삭제하시겠습니까?',{op:'boardDelete',station:ctx().station,id});}
 function scan(scope){cancelPending();closeMenu();host.openAction('베이스스캔',`<p>설정과 열차번호를 유지하고 상태를 재수신합니다.</p><select id="lsScope"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>`,()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));$('lsScope').value=scope;}
-function overview(ids){
- cancelPending();closeMenu();dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-grid">'+root.SimLSPresets.list().filter(v=>ids.includes(v.station)).map(view=>{
-  const id=view.station,st=root.SimNetwork.catalog[id],C=root.SimCore.forStation(id),s=ctx().stationStates[id],v=root.SimLS.render(st,root.SimWiring.data[id],C,s,{preset:view.id,occupied:new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(s,t.uid))).map(([slot])=>slot))}),count=Object.values(model.stations[id].windows).flat().length;
+function refreshOverview(){
+ for(const button of dialog.querySelectorAll('[data-overview-station]')){
+  const view=root.SimLSPresets.get(button.dataset.overviewStation),id=view.station,st=root.SimNetwork.catalog[id],C=root.SimCore.forStation(id),s=ctx().stationStates[id],v=root.SimLS.render(st,root.SimWiring.data[id],C,s,{preset:view.id,occupied:new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(s,t.uid))).map(([slot])=>slot))}),count=Object.values(model.stations[id].windows).flat().length;
   const svg=v.svg.replace(/ id="/g,' id="ov-').replace(/url\(#/g,'url(#ov-').replace(/ tabindex="0"/g,'').replace(/data-signal="/g,'data-overview-signal="');
-  return `<button class="ls-overview-station" data-overview-station="${view.id}" data-overview-control-station="${id}"><b>${esc(view.name)} · ${s.mode} · ${Object.keys(s.routes).length}개 진로 · 열차번호 ${count}개</b><svg class="ls-svg" data-monitor="${!!view.monitor}" viewBox="0 0 ${v.width} ${v.height}">${svg}</svg></button>`;
- }).join('')+'</div>';$('lsOverviewClose').onclick=()=>dialog.close();dialog.querySelectorAll('[data-overview-station]').forEach(b=>b.onclick=()=>{dialog.close();host.selectStation(b.dataset.overviewStation);});dialog.showModal();dialog.querySelectorAll('[data-overview-station]').forEach(b=>decorate(b.querySelector('svg'),b.dataset.overviewControlStation,true));
+  button.innerHTML=`<b>${esc(view.name)} · ${s.mode} · ${Object.keys(s.routes).length}개 진로 · 열차번호 ${count}개</b><svg class="ls-svg" data-monitor="${!!view.monitor}" viewBox="0 0 ${v.width} ${v.height}">${svg}</svg>`;decorate(button.querySelector('svg'),id,true);
+ }
+}
+function overview(ids){
+ cancelPending();closeMenu();clearInterval(overviewTimer);dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-grid">'+root.SimLSPresets.list().filter(v=>ids.includes(v.station)).map(v=>`<button class="ls-overview-station" data-overview-station="${v.id}" data-overview-control-station="${v.station}"></button>`).join('')+'</div>';
+ $('lsOverviewClose').onclick=()=>dialog.close();dialog.querySelectorAll('[data-overview-station]').forEach(b=>b.onclick=()=>{dialog.close();host.selectStation(b.dataset.overviewStation);});refreshOverview();dialog.showModal();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
 }
 function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id);return [
  {label:'현재역 베이스스캔',id:'scan-current',action:()=>scan('current')},

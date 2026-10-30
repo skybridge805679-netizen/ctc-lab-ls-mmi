@@ -454,6 +454,18 @@
       "original_name": "assessment-timing.json",
       "bytes": 9488,
       "sha256": "23d2e0b909d9d134f29f0b4980089b4f9b62d1dd70c988102a630dba83870842"
+    },
+    {
+      "path": "references/extracted/구술(관제)_열차운행계획,운용및 실무.txt",
+      "original_name": "구술(관제)_열차운행계획,운용및 실무.txt",
+      "bytes": 7065,
+      "sha256": "ef1f607a5e1f0b152a2681d33604f7bc62f0c5334503bd48f544fab6f8f854d2"
+    },
+    {
+      "path": "references/transcriptions/oral-functions-audit.json",
+      "original_name": "oral-functions-audit.json",
+      "bytes": 14925,
+      "sha256": "1088709a08cd7e0652d7346af93e98d8b03f111462f668ecf4577418c7bd8892"
     }
   ],
   "superseded_attachments": [
