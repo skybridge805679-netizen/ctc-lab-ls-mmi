@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>SimDOM.document.getElementById(id);
- const KM_PER_ROW=4.9,model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,marks:false,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0]?.id||'',trainOptionKey='';
+ const KM_PER_ROW=4.9,model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,marks:false,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4',dash:'4 3',dot:'1.5 2.5',dashdot:'9 3 2 3',long:'12 6'};let lastLayout=null,context=null,selected=model.trains[0]?.id||'',trainOptionKey='';
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
@@ -47,7 +47,7 @@
    if(options_.kinds&&!options_.kinds.has(train.kind))continue;
    const points=calls=>calls.flatMap(c=>[[c.arrival,N.catalog[c.station].order],[c.departure,N.catalog[c.station].order]]).map(([time,order])=>[x(time),y(order)]);
    const path=pts=>pts.map(([px,py],i)=>`${i?'L':'M'}${px.toFixed(2)} ${py.toFixed(2)}`).join(' ');
-   const style=options_.styles[train.kind]||{},ink=train.cancelled?'#94a3a0':(style.color||'#1b2a78'),pts=points(train.calls);
+   const style=options_.styles[options_.styleKey?options_.styleKey(train):train.kind]||{},ink=train.cancelled?'#94a3a0':(style.color||'#1b2a78'),pts=points(train.calls);
    if(options_.plan)svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
    let currentPath=path(pts);if(!train.cancelled&&train.calls.some(c=>c.cancelled)){currentPath='';for(let i=0;i<train.calls.length;i++){const c=train.calls[i],n=train.calls[i+1];if(!c.cancelled)currentPath+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(n&&!c.cancelled&&!n.cancelled)currentPath+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(n.arrival),y(N.catalog[n.station].order)]]);}}
    svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':(DASH[style.dash]??'2 3')}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 연계열번 ${escape(train.relatedTrain||'없음')}</title>`:''}</path>`;

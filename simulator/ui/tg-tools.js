@@ -10,6 +10,16 @@ const doc=SimDOM.document,$=id=>doc.getElementById(id),D=()=>root.SimDiagram,T=(
 const SPANS=[10,15,30,60,120,180,360,720],ROWS=[12,16,20,26,32,44];
 const KINDS=['전동열차','일반열차','회송열차','KTX'];
 const FAV='orpheia.tg.favorite';
+// [TRN_PROPERTY] rows as photographed: [category, colour, line]
+const STYLE_CATS=[['KTX','#2b3a8f','dashdot'],['KTX-산천','#1f5c1f','dash'],['새마을','#1530d8','dot'],['무궁화','#c8281e','default'],['누리로','#5a5a14','long'],['ITX-청춘','#c8281e','dashdot'],['통근','#b8a51a','dashdot'],
+ ['혼합','#5a3a8a','dashdot'],['건설새마을','#1a3ad8','dashdot'],['건설무궁화','#1a3ad8','dashdot'],['화물','#1a1a1a','dashdot'],['근거리','#1a1a1a','dashdot'],['건설화물','#1a1a1a','dashdot'],['공사','#6a2a8a','dot'],
+ ['단행','#6a3a8a','dash'],['시운전','#6a3a8a','long'],['모터카','#5a3a7a','default'],['KTX회송','#c8281e','dashdot'],['KTX-산천회송','#a0603a','dashdot'],['새마을회송','#1a3ad8','dashdot'],['무궁화회송','#1a3ad8','default'],
+ ['누리로회송','#1a5a5a','default'],['ITX-청춘회송','#c8c8c0','default'],['통근회송','#c8b01a','default'],['전동(일반)','#1a5a1a','dot'],['전동(회송)','#c8281e','dash'],['전동(직통)','#1a5a1a','long']];
+const LINES=[['default',''],['solid','──────────'],['dash','- - - - - - - -'],['dot','··················'],['dashdot','— · — · — · —'],['long','——  ——  ——']];
+// this simulator's train kinds mapped onto those categories
+function styleCategory(t){const f=t.flags||[],back=f.includes('회송');
+ if(t.kind==='KTX')return back?'KTX회송':'KTX';if(t.kind==='무궁화호'||t.kind==='일반열차')return back?'무궁화회송':'무궁화';if(t.kind==='화물')return '화물';
+ if(t.kind==='회송열차'||back)return '전동(회송)';return f.includes('직통')?'전동(직통)':'전동(일반)';}
 let copied=null,mode='tooltip',area=null,crossPt=null,graph=null,notes=null;
 const status=text=>{$('tgStatus').textContent=text;};
 const selectedTrain=()=>$('graphTrain').value;
@@ -34,7 +44,7 @@ const MENUS=[
   {label:'확대/축소',items:[{label:'시간축 확대',key:'+',run:'timeIn'},{label:'시간축 축소',key:'-',run:'timeOut'},{label:'역축 확대',key:'*',run:'stationIn'},{label:'역축 축소',key:'/',run:'stationOut'}]},
   {label:'다이얼로그',items:[{label:'역축/시간축 설정',run:'axisDialog'},{label:'열차정보보기옵션',run:'viewDialog'}]},
   {label:'보이기/감추기',items:[{label:'계획선',run:'t:plan',check:'plan'},{label:'열차번호',run:'t:numbers',check:'numbers'},{label:'현재위치',run:'t:position',check:'position'}]},
-  {label:'열차별 색상 및 선속성',run:'styleDialog'}]},
+  {label:'열차색상 및 라인속성 설정',run:'styleDialog'}]},
  {label:'화면설정(D)',items:[
   {label:'화면모드설정',items:[{label:'툴팁보기',run:'m:tooltip',mode:'tooltip'},{label:'십자선보기',run:'m:cross',mode:'cross'},{label:'돋보기',run:'m:magnify',mode:'magnify'},{label:'영역확대',run:'m:area',mode:'area'}]},
   {label:'열차검색',run:'findDialog'}]},
@@ -116,12 +126,18 @@ const ACTIONS={
   },420);
   $('vwPlan').checked=D().getOption('plan');$('vwNumbers').checked=D().getOption('numbers');$('vwPosition').checked=D().getOption('position');$('vwDir').value=$('graphDirection').value;
   const kinds=D().getOption('kinds');for(const i of doc.querySelectorAll('input[name="vwKind"]'))i.checked=!kinds||kinds.has(i.value);},
- styleDialog(){dialog('tgStyle','열차별 색상 및 선속성',`<div class="pat-dlg">${KINDS.map(k=>`<label><span>${k}</span><input type="color" data-sty-color="${k}" value="#1b2a78"><select data-sty-dash="${k}"><option value="dotted">점선</option><option value="solid">실선</option><option value="dashed">파선</option></select></label>`).join('')}<div><button type="button" class="sched-btn primary" id="stOk">확인</button> <button type="button" class="sched-btn" id="stReset">초기값</button> <button type="button" class="sched-btn" id="stClose">닫기</button></div></div>`,()=>{
-   const read=()=>Object.fromEntries(KINDS.map(k=>[k,{color:doc.querySelector(`[data-sty-color="${k}"]`).value,dash:doc.querySelector(`[data-sty-dash="${k}"]`).value}]));
-   $('stOk').onclick=()=>{D().setOption('styles',read());status('열차별 색상 및 선속성을 적용했습니다.');};
-   $('stReset').onclick=()=>{for(const k of KINDS){doc.querySelector(`[data-sty-color="${k}"]`).value='#1b2a78';doc.querySelector(`[data-sty-dash="${k}"]`).value='dotted';}D().setOption('styles',{});status('열차별 색상 및 선속성을 초기값으로 되돌렸습니다.');};
+ // [TRN_PROPERTY] 열차색상 및 라인속성 설정 (photo 2026-10-30): 27 train categories, each with a colour and a line style.
+ // The values below are the ones on the photo; [확인] applies them, [초기값] puts the photographed values back in the boxes.
+ styleDialog(){dialog('tgStyle','[TRN_PROPERTY] 열차색상 및 라인속성 설정',`<div class="tp-dlg"><div class="tp-cap">열차색상 및 라인속성 설정</div><div class="tp-grid">${STYLE_CATS.map(([k])=>`<div class="tp-row"><input type="color" data-sty-color="${k}" aria-label="${k} 색상"><span class="tp-name">${k}</span><select data-sty-dash="${k}" aria-label="${k} 라인속성">${LINES.map(([v,g])=>`<option value="${v}">${g}</option>`).join('')}</select></div>`).join('')}</div>
+<div class="tp-btns"><button type="button" class="sched-btn" id="stReset">초기값</button><button type="button" class="sched-btn primary" id="stOk">확인</button><button type="button" class="sched-btn" id="stClose">닫기</button></div></div>`,()=>{
+   const read=()=>Object.fromEntries(STYLE_CATS.map(([k])=>[k,{color:doc.querySelector(`[data-sty-color="${k}"]`).value,dash:doc.querySelector(`[data-sty-dash="${k}"]`).value}]));
+   const fill=values=>{for(const [k,c,d] of STYLE_CATS){doc.querySelector(`[data-sty-color="${k}"]`).value=values?.[k]?.color||c;doc.querySelector(`[data-sty-dash="${k}"]`).value=values?.[k]?.dash??d;}};
+   $('stOk').onclick=()=>{D().setOptions({styleKey:styleCategory,styles:read()});status('열차색상 및 라인속성을 적용했습니다.');closeDialog('tgStyle');};
+   $('stReset').onclick=()=>{fill(null);status('초기값을 불러왔습니다. [확인]을 누르면 적용됩니다.');};
    $('stClose').onclick=()=>closeDialog('tgStyle');
-  });},
+   dialogs.fillStyle=fill;
+  },760);
+  dialogs.fillStyle(D().getOption('styleKey')?D().getOption('styles'):null);},
  findDialog(){dialog('tgFind','열차검색',`<div class="pat-dlg"><label><span>열차번호</span><input id="fdNumber" list="fdList" maxlength="6" autocomplete="off"><datalist id="fdList"></datalist></label><div><button type="button" class="sched-btn primary" id="fdGo">검색</button> <button type="button" class="sched-btn" id="fdClose">닫기</button></div></div>`,()=>{
    $('fdClose').onclick=()=>closeDialog('tgFind');
    $('fdGo').onclick=()=>{

@@ -52,7 +52,7 @@ def run(page, url):
     expect(page.locator('#tgStatus')).to_have_text('준비')
     # menus: photographed 편집(E) plus the textbook's Dia 보기 / 화면설정 / 즐겨찾기 structure
     assert tg_labels(page, '편집(E)') == ['실행 취소 Ctrl+Z', '다시 실행 Ctrl+Shift+Z', '열차복사(C) Ctrl+C', '붙여놓기(V) Ctrl+V', '열차생성(A) Ctrl+A', '열차정보수정(F5) F5', '노트편집(N) Ctrl+N']
-    assert tg_labels(page, 'Dia 보기') == ['확대/축소', '다이얼로그', '보이기/감추기', '열차별 색상 및 선속성']
+    assert tg_labels(page, 'Dia 보기') == ['확대/축소', '다이얼로그', '보이기/감추기', '열차색상 및 라인속성 설정']
     assert tg_labels(page, 'Dia 보기', '확대/축소') == ['시간축 확대 +', '시간축 축소 -', '역축 확대 *', '역축 축소 /']
     assert tg_labels(page, 'Dia 보기', '다이얼로그') == ['역축/시간축 설정', '열차정보보기옵션']
     assert tg_labels(page, '화면설정') == ['화면모드설정', '열차검색']
@@ -150,14 +150,19 @@ def run(page, url):
     assert page.locator('#graphDirection').input_value() == 'down'
     tg(page, 'Dia 보기', '다이얼로그', '열차정보보기옵션')
     page.locator('#vwNumbers').check(); page.locator('#vwPlan').check(); page.locator('#vwDir').select_option('all'); page.locator('#vwApply').click()
-    # 열차별 색상 및 선속성
-    tg(page, 'Dia 보기', '열차별 색상 및 선속성')
-    page.locator('[data-sty-color="전동열차"]').fill('#ff0000'); page.locator('[data-sty-dash="전동열차"]').select_option('solid'); page.locator('#stOk').click()
+    # [TRN_PROPERTY] 열차색상 및 라인속성 설정 (열차속성 icon): 27 categories with the photographed values
+    page.locator('.tg-tool[title="열차속성"]').click()
+    expect(page.locator('[data-mmi-window="tgStyle"] .mmi-title-text')).to_have_text('[TRN_PROPERTY] 열차색상 및 라인속성 설정')
+    assert page.locator('[data-sty-color]').count() == 27
+    assert page.locator('[data-sty-dash="KTX"]').input_value() == 'dashdot' and page.locator('[data-sty-dash="전동(일반)"]').input_value() == 'dot'
+    page.locator('[data-sty-color="전동(일반)"]').fill('#ff0000'); page.locator('[data-sty-dash="전동(일반)"]').select_option('solid'); page.locator('#stOk').click()
     path = page.locator('[data-dia-train="K1131"]').first
     assert path.get_attribute('stroke') == '#ff0000' and path.get_attribute('stroke-dasharray') in ('', None)
-    page.locator('#stReset').click()
-    assert page.locator('[data-dia-train="K1131"]').first.get_attribute('stroke') == '#1b2a78'
-    page.locator('#stClose').click()
+    tg(page, 'Dia 보기', '열차색상 및 라인속성 설정')
+    assert page.locator('[data-sty-color="전동(일반)"]').input_value() == '#ff0000'
+    page.locator('#stReset').click(); page.locator('#stOk').click()
+    path = page.locator('[data-dia-train="K1131"]').first
+    assert path.get_attribute('stroke') == '#1a5a1a' and path.get_attribute('stroke-dasharray') == '1.5 2.5'
     # 즐겨찾기 설정 / 가기
     page.locator('#graphSpan').select_option('30'); tg(page, '즐겨찾기', '즐겨찾기설정')
     page.locator('#graphSpan').select_option('360'); tg(page, '즐겨찾기', '즐겨찾기가기')
