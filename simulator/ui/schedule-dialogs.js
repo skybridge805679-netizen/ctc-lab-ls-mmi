@@ -130,15 +130,16 @@ function openPatternLoad({container=null,onPick}={}){
  win(id,'[PTN_LOAD]열차패턴선택',`<div class="ptn-load"><div class="ptn-l">
 <fieldset><legend>열차패턴리스트</legend><div class="sched-calls ptn-list" data-pl="list"></div></fieldset>
 <fieldset><legend>경유역 정보</legend><div class="sched-calls ptn-calls" data-pl="calls"></div></fieldset></div>
-<div class="ptn-r"><fieldset><legend>열차패턴 검색조건</legend><label><span>노선선택</span><select><option>경부선</option></select></label><label><span>열차종별</span><select data-pl="kind"><option value="">전체</option>${kinds}</select></label>
-<div class="ptn-dir"><span>열차방향</span><label><input type="radio" name="${id}Dir" value="up">상행</label><label><input type="radio" name="${id}Dir" value="down">하행</label><label><input type="radio" name="${id}Dir" value="all" checked>모두</label></div>
+<div class="ptn-r"><fieldset><legend>열차패턴 검색조건</legend><label><span>노선선택</span><select><option>경부선</option></select></label><label><span>열차종별</span><select data-pl="kind"><option value="">전체</option>${KINDS.map(k=>`<option ${k==='KTX'?'selected':''}>${k}</option>`).join('')}</select></label>
+<div class="ptn-dir"><span>열차방향</span><label><input type="radio" name="${id}Dir" value="up">상행</label><label><input type="radio" name="${id}Dir" value="down" checked>하행</label><label><input type="radio" name="${id}Dir" value="all">모두</label></div>
 <button type="button" class="sched-btn" data-pl="find">열차패턴조회</button></fieldset>
 <fieldset><legend>적용패턴 역정보</legend><label><span>출 발 역</span><select data-pl="from" aria-label="출발역"></select></label><label><span>종 착 역</span><select data-pl="to" aria-label="종착역"></select></label></fieldset>
 <div class="ptn-btns end"><button type="button" class="sched-btn primary" data-pl="ok">확인</button><button type="button" class="sched-btn" data-pl="cancel">취소</button></div></div></div>`,{x:150,y:50,width:1060,container},()=>{
   const list=()=>{
-   const dir=q(id,`input[name="${id}Dir"]:checked`).value,rows=P.search(patternList(),{kind:q(id,'[data-pl=kind]').value,direction:dir});
+   // the list stays empty until [열차패턴조회] (photo 2026-10-30)
+   const dir=q(id,`input[name="${id}Dir"]:checked`).value,rows=st.queried?P.search(patternList(),{kind:q(id,'[data-pl=kind]').value,direction:dir}):[];
    if(!rows.some(p=>p.id===st.sel)){st.sel=null;st.calls=null;}
-   q(id,'[data-pl=list]').innerHTML=`<table><thead><tr><th>순서</th><th>열차패턴명</th><th>등록자</th><th>등록일자</th><th>수정자</th><th>수정일자</th><th>선택된 패턴 ID</th></tr></thead><tbody>${rows.map((p,i)=>`<tr data-pl-id="${p.id}" class="${p.id===st.sel?'sel':''}"><td>${String(i+1).padStart(2,'0')}</td><td title="${esc(p.name)}">${esc(p.name)}</td><td>${esc(p.registrar)}</td><td>${esc(p.registeredAt)}</td><td>${esc(p.modifier)}</td><td>${esc(p.modifiedAt)}</td><td>${p.id}</td></tr>`).join('')||'<tr class="empty"><td colspan="7">조회된 패턴이 없습니다.</td></tr>'}</tbody></table>`;
+   q(id,'[data-pl=list]').innerHTML=`<table><thead><tr><th>순서</th><th>열차패턴명</th><th>등록자</th><th>등록일자</th><th>수정자</th><th>수정일자</th><th>선택된 패턴 ID</th></tr></thead><tbody>${rows.map((p,i)=>`<tr data-pl-id="${p.id}" class="${p.id===st.sel?'sel':''}"><td>${String(i+1).padStart(2,'0')}</td><td title="${esc(p.name)}">${esc(p.name)}</td><td>${esc(p.registrar)}</td><td>${esc(p.registeredAt)}</td><td>${esc(p.modifier)}</td><td>${esc(p.modifiedAt)}</td><td>${p.id}</td></tr>`).join('')||(st.queried?'<tr class="empty"><td colspan="7">조회된 패턴이 없습니다.</td></tr>':'')}</tbody></table>`;
    calls();
   };
   // 경유역 정보는 고칠 수 있다: edits change only what is applied, the stored pattern stays as it is
@@ -148,7 +149,7 @@ function openPatternLoad({container=null,onPick}={}){
    const from=q(id,'[data-pl=from]'),to=q(id,'[data-pl=to]');from.innerHTML=stations;to.innerHTML=stations;
    if(c.length){from.value=c[0].station;to.value=c.at(-1).station;}
   };
-  q(id,'[data-pl=find]').onclick=list;
+  q(id,'[data-pl=find]').onclick=()=>{st.queried=true;list();};st.list=list;
   q(id,'[data-pl=list]').onclick=e=>{const tr=e.target.closest('[data-pl-id]');if(!tr)return;st.sel=tr.dataset.plId;st.calls=structuredClone(patternList().find(p=>p.id===st.sel).calls);list();};
   q(id,'[data-pl=calls]').onchange=once(e=>{
    const el=e.target.closest('[data-pl-field]');if(!el)return;const x=st.calls[+el.dataset.plRow],f=el.dataset.plField;
@@ -166,6 +167,7 @@ function openPatternLoad({container=null,onPick}={}){
   };
   list();
  });
+ st.queried=false;st.sel=null;st.calls=null;st.list();
  return made[id];
 }
 
@@ -241,7 +243,7 @@ function addApply(from,to,start){
  add.train={...(add.train||{}),direction:N.catalog[to].order>N.catalog[from].order?'down':'up',calls};
  doc.getElementById('taDir').value=add.train.direction;addTable();return true;
 }
-function openAdd({pattern,from,to},container){
+function openAdd({pattern,from,to,start=-28800,train=null},container){
  const opts=pattern.calls.map(x=>`<option value="${x.station}">${esc(name(x.station))}</option>`).join('');
  win('trnAdd','[TRN_ADD] 온라인 열차 스케줄 추가',`<div class="trn-dlg"><div class="trn-cap">온라인 열차 스케줄 추가</div><div class="trn-body">${detailHtml('ta',false)}
 <fieldset class="trn-calls"><legend>온라인 역스케줄 상세정보</legend><div class="sched-calls" id="taCalls"></div></fieldset></div>
@@ -261,10 +263,18 @@ function openAdd({pattern,from,to},container){
    alert(result.message);
   };
  });
- add.pattern=pattern;add.train={id:'',direction:pattern.direction,kind:pattern.kind,service:'정기',flags:[],carCount:null,relatedTrain:''};
+ add.pattern=pattern;add.train={id:'',direction:pattern.direction,kind:train?.kind||pattern.kind,service:train?.service||'정기',flags:[],carCount:null,relatedTrain:''};
  doc.getElementById('taFrom').innerHTML=opts;doc.getElementById('taTo').innerHTML=opts;doc.getElementById('taId').value='';
- addApply(from,to,-28800);fillDetail('ta',{...add.train,carCount:''},{edit:false});
+ addApply(from,to,start);fillDetail('ta',{...add.train,carCount:''},{edit:false});
  return made.trnAdd;
+}
+// T/G Ctrl+C then Ctrl+V (photo 2026-10-30): [TRN_ADD] opens filled with the copied train's stations, times and routes;
+// only 열차번호 is left empty
+function openCopy(id,container){
+ const t=D().getModel().trains.find(x=>x.id===id);if(!t){alert('복사한 열차를 찾을 수 없습니다.');return null;}
+ const base=t.calls[0].departure;
+ const pattern={name:t.id,direction:t.direction,kind:t.kind,calls:t.calls.map((c,i)=>({station:c.station,arrive:i?c.arrival-base:0,dwell:i&&i<t.calls.length-1?c.departure-c.arrival:0,arrivalRoute:c.arrivalRoute||'',departureRoute:c.departureRoute||''}))};
+ return openAdd({pattern,from:t.calls[0].station,to:t.calls.at(-1).station,start:base,train:t},container);
 }
 
 // ---------------------------------------------------------------- 온라인 열차 스케줄 수정 (계획정보 · 실적정보)
@@ -350,6 +360,6 @@ function openPrint(train){
 
 // the MMI menu entry 열차운행패턴 관리(P) opens the real window instead of a placeholder
 function init(){buildPatternManager();}
-root.SimScheduleDialogs={init,openPatternManager,openPatternLoad,openAdd,openEdit,openActual,openPrint,actualOf,patterns:patternList,reportHtml,
+root.SimScheduleDialogs={init,openPatternManager,openPatternLoad,openAdd,openCopy,openEdit,openActual,openPrint,actualOf,patterns:patternList,reportHtml,
  resetPatterns(){patterns=P.seed();savePatterns();}};
 })(window);

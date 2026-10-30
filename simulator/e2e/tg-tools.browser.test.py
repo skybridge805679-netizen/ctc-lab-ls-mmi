@@ -37,6 +37,8 @@ def tg_labels(page, top, *sub):
 
 
 def plot_point(page, fx, fy):
+    # bring the plot under the sticky top bar out of the way before computing screen points
+    page.evaluate("document.getElementById('diaSvg').scrollIntoView({block:'center'})")
     box = page.locator('#diaSvg').bounding_box()
     return box['x'] + box['width'] * fx, box['y'] + box['height'] * fy
 
@@ -73,20 +75,33 @@ def run(page, url):
     assert page.locator('.tg-info').inner_text().count('시') >= 4
     assert page.locator('#graphTrain').input_value() == 'K1131'
     assert page.locator('[data-dia-mark="K1131"]').count() == 66
-    # ... then F5 opens 열차 스케줄 수정 and Ctrl+C the copy window
+    # ... then F5 opens 열차 스케줄 수정; Ctrl+C shows nothing, Ctrl+V opens [TRN_ADD] filled with the copied train
     page.keyboard.press('F5')
     expect(page.locator('[data-mmi-window="trnEdit"]')).to_be_visible()
     expect(page.locator('#teId')).to_have_value('K1131')
     page.locator('#teCancel').click()
     page.locator('.tg-menubar').click(); page.keyboard.press('Control+c')
-    expect(page.locator('input[name="scheduleMode"][value="copy"]')).to_be_checked()
-    expect(page.locator('#scheduleList')).to_have_value('K1131')
-    page.locator('[data-mmi-window="schedule"] .mmi-close').click()
+    expect(page.locator('#tgStatus')).to_contain_text('K1131')
+    expect(page.locator('[data-mmi-window="trnAdd"]')).to_have_count(0)
+    page.keyboard.press('Control+v')
+    expect(page.locator('[data-mmi-window="trnAdd"]')).to_be_visible()
+    expect(page.locator('#taCalls tbody tr')).to_have_count(33)
+    assert page.locator('#taId').input_value() == ''
+    src = page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='K1131')")
+    assert page.locator('#taStart').input_value() == page.evaluate("s=>SimTimetable.clock(s)", src['calls'][0]['departure'])
+    assert page.locator('#taEnd').input_value() == page.evaluate("s=>SimTimetable.clock(s)", src['calls'][-1]['arrival'])
+    page.locator('#taStart').fill('13:00:00'); page.locator('#taStart').dispatch_event('change')
+    page.locator('#taId').fill('C1131'); page.locator('#taOk').click()
+    expect(page.locator('.mmi-alert')).to_contain_text('생성 완료'); page.locator('#mmiAlertOk').click()
+    copy = page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='C1131')")
+    assert copy['calls'][0]['departure'] == 5 * 3600   # 13:00
+    assert copy['calls'][-1]['arrival'] - copy['calls'][0]['departure'] == src['calls'][-1]['arrival'] - src['calls'][0]['departure']
+    assert [c['departureRoute'] for c in copy['calls'][:-1]] == [c['departureRoute'] for c in src['calls'][:-1]]
     # 십자선보기: left click draws the cross with "(hh시 mm분 , km)"
     page.locator('.tg-tool[title="십자선보기"]').click()
     assert page.locator('[data-dia-mark]').count() == 0
-    x, y = plot_point(page, .4, .5)
-    page.mouse.click(x, y)
+    box = page.locator('#diaSvg').bounding_box()
+    page.locator('#diaSvg').click(position={'x': box['width'] * .4, 'y': box['height'] * .5})
     expect(page.locator('#diaCross')).to_have_count(1)
     assert re.fullmatch(r'\(\d\d시 \d\d분 , \d+\.\d{3}Km \)', page.locator('#diaCrossLabel').text_content()), page.locator('#diaCrossLabel').text_content()
     page.locator('.tg-tool[title="십자선보기"]').click()
@@ -104,12 +119,12 @@ def run(page, url):
     assert page.locator('#graphSpan').input_value() not in ('360',)
     assert page.locator('#graphFrom').input_value() != 'cheongnyangni' or page.locator('#graphTo').input_value() != 'suwon'
     page.locator('.tg-tool[title="영역확대"]').click()
-    # 이전화면 / 다음화면 walk back and forth through the viewed ranges
-    zoomed = page.locator('#graphSpan').input_value()
-    page.locator('.tg-tool[title="이전화면"]').click()
-    assert page.locator('#graphSpan').input_value() != zoomed
+    # 이전화면 / 다음화면 move the graph one screen left / right
+    page.locator('#graphSpan').select_option('60'); page.locator('#graphStart').fill('10:00'); page.locator('#graphStart').dispatch_event('change')
     page.locator('.tg-tool[title="다음화면"]').click()
-    assert page.locator('#graphSpan').input_value() == zoomed
+    assert page.locator('#graphStart').input_value() == '11:00'
+    page.locator('.tg-tool[title="이전화면"]').click(); page.locator('.tg-tool[title="이전화면"]').click()
+    assert page.locator('#graphStart').input_value() == '09:00'
     # Dia 보기: time axis zoom, station axis zoom
     page.locator('#graphSpan').select_option('360'); page.locator('#graphFrom').select_option('cheongnyangni'); page.locator('#graphTo').select_option('suwon')
     tg(page, 'Dia 보기', '확대/축소', '시간축 확대')
@@ -164,7 +179,9 @@ def run(page, url):
     # 열차생성: [PTN_LOAD] -> [TRN_ADD]; 시발시각 with 시간설정 동기화 moves every row
     page.locator('.tg-tool[title="열차생성"]').click()
     load = page.locator('[data-mmi-window="ptnLoadTg"]')
-    load.locator('input[value="down"]').check(); load.locator('[data-pl=find]').click()
+    expect(load.locator('[data-pl-id]')).to_have_count(0)
+    assert load.locator('[data-pl=kind]').input_value() == 'KTX' and load.locator('input[value="down"]').is_checked()
+    load.locator('[data-pl=find]').click()
     assert load.locator('[data-pl-id]').count() == 2
     load.locator('[data-pl-id="0120202"]').click()
     expect(load.locator('[data-pl=calls] tbody tr')).to_have_count(23)
@@ -190,15 +207,13 @@ def run(page, url):
     assert page.locator('#teEnd').input_value() == '10:34:00'
     page.locator('#teOk').click(); expect(page.locator('.mmi-alert')).to_contain_text('편집 적용 완료'); page.locator('#mmiAlertOk').click()
     assert page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='A0101').calls.at(-1).arrival") == page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='A0101').plan.at(-1).arrival") + 60
-    # 복사 / 붙여넣기 open the copy window for the selected train
+    # 복사 / 붙여넣기 icons: the same as Ctrl+C / Ctrl+V
     page.locator('#graphTrain').select_option('K1133')
     page.locator('.tg-tool[title="복사"]').click()
-    expect(page.locator('input[name="scheduleMode"][value="copy"]')).to_be_checked()
-    expect(page.locator('#scheduleList')).to_have_value('K1133')
-    page.locator('[data-mmi-window="schedule"] .mmi-close').click()
+    expect(page.locator('#tgStatus')).to_contain_text('K1133')
     page.locator('.tg-tool[title="붙여넣기"]').click()
-    expect(page.locator('#scheduleList')).to_have_value('K1133')
-    page.locator('[data-mmi-window="schedule"] .mmi-close').click()
+    expect(page.locator('#taCalls tbody tr').first).to_contain_text('지하청량리')
+    page.locator('#taCancel').click()
     # dark label column / header like the real T/G
     assert page.locator('#diaSvg > rect').first.get_attribute('fill') == '#1e1e1e'
     assert not errors, errors

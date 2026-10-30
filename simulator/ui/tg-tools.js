@@ -66,20 +66,22 @@ function applyMode(){
 }
 function setMode(m){mode=mode===m?'':m;crossPt=null;applyMode();status(mode?`${{tooltip:'툴팁보기',cross:'십자선보기',magnify:'돋보기',area:'영역확대'}[mode]} · ${{tooltip:'열차를 선택하면 기본정보가 표시됩니다.',cross:'그래프를 클릭하면 시간과 위치가 표시됩니다.',magnify:'확대할 곳을 클릭하세요.',area:'확대할 영역을 끌어서 지정하세요.'}[mode]}`:'화면모드 해제');}
 const ACTIONS={
- help(){root.SimMMI.alertBox('툴팁보기로 열차선을 클릭해 선택한 뒤 F5: 열차 스케줄 수정 · Ctrl+C: 열차 복사 · Ctrl+A / [열차생성]: 열차패턴선택 → 스케줄 추가 · 경합은 십자선보기로 시각과 위치를 읽어 확인합니다 · 이전화면/다음화면: 보던 화면 범위로 이동.');},
+ help(){root.SimMMI.alertBox('툴팁보기로 열차선을 클릭해 선택한 뒤 F5: 열차 스케줄 수정 · Ctrl+C 후 Ctrl+V: 그 열차로 채운 스케줄 추가 · Ctrl+A / [열차생성]: 열차패턴선택 → 스케줄 추가 · 경합은 십자선보기로 시각과 위치를 읽어 확인합니다 · 이전화면/다음화면: 그래프를 한 화면씩 좌우로 이동.');},
  openDialog(){dialog('tgOpen','[OPN] 온라인 열차스케줄 열기',`<div class="pat-dlg"><fieldset><legend>조건선택</legend><label><span>노선선택</span><select id="opnLine"><option>경부선</option></select></label></fieldset><div><button type="button" class="sched-btn primary" id="opnOk">확인</button> <button type="button" class="sched-btn" id="opnCancel">취소</button></div></div>`,()=>{
    $('opnCancel').onclick=()=>closeDialog('tgOpen');
    $('opnOk').onclick=()=>{closeDialog('tgOpen');$('graphDirection').value='all';$('graphFrom').value=N().stations[0].id;$('graphTo').value=N().stations.at(-1).id;fire('graphFrom');status(`${$('opnLine').value} 온라인 열차스케줄을 열었습니다. (${D().getModel().trains.length}개 열차)`);};
   },320);},
  open(){root.SimTimetableFiles.open();},save(){root.SimTimetableFiles.save();},undo(){root.SimTimetableFiles.undo();},redo(){root.SimTimetableFiles.redo();},
- back(){goView(-1);},forward(){goView(1);},
+ // 이전화면 / 다음화면 move the graph one screen to the left (earlier) / right (later)
+ back(){pan(-1);},forward(){pan(1);},
  print(){
   const f=doc.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';doc.body.appendChild(f);
   const d=f.contentDocument;d.open();d.write(`<!doctype html><meta charset="utf-8"><title>온라인 열차그래프</title><style>body{margin:0}svg{width:100%;height:auto}</style>${$('diaSvg').outerHTML}`);d.close();
   try{f.contentWindow.focus();f.contentWindow.print();}catch{}setTimeout(()=>f.remove(),1500);status('인쇄 대화상자를 열었습니다.');
  },
- copy(){if(!selectedTrain())return;copied=selectedTrain();root.SimScheduleUI.open('copy',copied);status(`${copied} 열차 복사 · 복사구간과 열차번호·시작시간을 정해 편집적용하세요.`);},
- paste(){if(!copied){status('복사한 열차가 없습니다.');return;}root.SimScheduleUI.open('copy',copied);status(`${copied} 붙여넣기 · 열차 복사 창`);},
+ // Ctrl+C only remembers the train (no window); Ctrl+V opens [TRN_ADD] filled with it
+ copy(){if(!selectedTrain())return;copied=selectedTrain();status(`${copied} 열차를 복사했습니다. 붙여넣기(Ctrl+V)로 스케줄 추가 창을 엽니다.`);},
+ paste(){if(!copied){status('복사한 열차가 없습니다.');return;}if(root.SimScheduleDialogs.openCopy(copied,$('graphPanel')))status(`${copied} 붙여넣기 · 열차번호를 입력하고 확인하세요.`);},
  create(){root.SimScheduleDialogs.openPatternLoad({container:$('graphPanel'),onPick:pick=>{root.SimScheduleDialogs.openAdd(pick,$('graphPanel'));status(`${pick.pattern.name} 패턴 적용 · 열차번호와 시발시각을 입력하세요.`);}});status('열차생성 · 열차패턴을 선택하세요.');},
  edit(){if(notes?.selected()&&notes.edit()){status('선택한 노트를 수정합니다.');return;}if(root.SimScheduleDialogs.openEdit(selectedTrain(),$('graphPanel')))status(`${selectedTrain()} 열차 스케줄 수정`);},
  note(){notes?notes.open():status('노트편집을 사용할 수 없습니다.');},
@@ -135,18 +137,10 @@ const ACTIONS={
 };
 function toggle(key,btn){const on=!D().getOption(key);D().setOption(key,on);btn?.setAttribute('aria-checked',String(on));}
 function applyFav(f){$('graphFrom').value=f.from;$('graphTo').value=f.to;$('graphStart').value=f.start;ensureOption($('graphSpan'),f.span,`${f.span}분`);$('graphSpan').value=f.span;ensureOption($('graphRow'),f.row,f.row);$('graphRow').value=f.row;fire('graphFrom');}
-// 이전화면 / 다음화면: the ranges the operator looked at, newest last
-const views={list:[],at:-1,lock:false};
-const viewOf=()=>({from:$('graphFrom').value,to:$('graphTo').value,start:$('graphStart').value,span:$('graphSpan').value,row:$('graphRow').value,dir:$('graphDirection').value});
-function remember(){
- if(views.lock)return;const v=viewOf(),cur=views.list[views.at];if(cur&&JSON.stringify(cur)===JSON.stringify(v))return;
- views.list=views.list.slice(0,views.at+1);views.list.push(v);if(views.list.length>50)views.list.shift();views.at=views.list.length-1;
-}
-function goView(step){
- const i=views.at+step;if(i<0||i>=views.list.length){status(step<0?'이전 화면이 없습니다.':'다음 화면이 없습니다.');return;}
- views.at=i;const v=views.list[i];views.lock=true;
- $('graphFrom').value=v.from;$('graphTo').value=v.to;$('graphStart').value=v.start;ensureOption($('graphSpan'),v.span,`${v.span}분`);$('graphSpan').value=v.span;ensureOption($('graphRow'),v.row,v.row);$('graphRow').value=v.row;$('graphDirection').value=v.dir;
- fire('graphFrom');views.lock=false;status(step<0?'이전 화면으로 이동했습니다.':'다음 화면으로 이동했습니다.');
+function pan(dir){
+ const span=Number($('graphSpan').value)*60,from=toSec($('graphStart').value),to=Math.max(-8*3600,Math.min(16*3600-span,from+dir*span));
+ if(to===from){status(dir<0?'더 이전 화면이 없습니다.':'더 다음 화면이 없습니다.');return;}
+ $('graphStart').value=hhmm(to);fire('graphStart');status(`${dir<0?'이전화면':'다음화면'} · ${hhmm(to)}부터 ${span/60}분`);
 }
 function run(name,btn){if(name.startsWith('m:'))return setMode(name.slice(2));return ACTIONS[name]?.(btn);}
 
@@ -242,9 +236,8 @@ function init(panel){
  });
  graph.tabIndex=-1;
  bindPlot();
- for(const id of ['graphFrom','graphTo','graphStart','graphSpan','graphRow','graphDirection'])$(id).addEventListener('change',remember);
  const fav=store.get();if(fav)applyFav(fav);
- remember();
+
  applyMode();
 }
 root.SimTG={init,actions:ACTIONS,setNotes:n=>{notes=n;}};

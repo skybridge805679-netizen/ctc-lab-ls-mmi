@@ -10,6 +10,8 @@ def pick_pattern(page, pattern='0129103'):
     # [열차운행패턴선택] -> [PTN_LOAD]: pick the pattern, keep its whole stretch, 확인
     page.locator('#schedulePatternOpen').click()
     win = page.locator('[data-mmi-window="ptnLoad"]')
+    expect(win.locator('[data-pl-id]')).to_have_count(0)   # empty until 열차패턴조회 (KTX · 하행 preset)
+    win.locator('[data-pl=find]').click()
     win.locator(f'[data-pl-id="{pattern}"]').click()
     win.locator('[data-pl=ok]').click()
 
