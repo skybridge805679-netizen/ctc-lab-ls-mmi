@@ -99,12 +99,15 @@ function installMenu(){
   {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
   {type:'separator'},
   {label:'실습 세션 저장…',accelerator:'CmdOrCtrl+Shift+S',click:()=>sessionFile(false)},
-  {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>graph?.isFocused()?script('SimTimetableFiles.open()'):sessionFile(true)},
-  {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script(graph?.isFocused()?'SimTimetableFiles.save()':'document.getElementById("exportBtn").click()')},
+  {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>sessionFile(true)},
+  {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script('document.getElementById("exportBtn").click()')},
+  // T/G 파일 메뉴는 원본처럼 [OPN] 열기 · 인쇄만 두고, 시간표 JSON 파일은 여기서 다룬다
+  {label:'시간표 JSON 열기…',click:()=>script('SimTimetableFiles.open()')},
+  {label:'시간표 JSON 저장…',click:()=>script('SimTimetableFiles.save()')},
   {role:'togglefullscreen',label:'전체 화면'}
  ]};
  const menu=[...(process.platform==='darwin'?[{label:app.name,submenu:[{role:'about',label:'ORPHEIA 정보'},{type:'separator'},{role:'hide',label:'숨기기'},{role:'hideOthers',label:'다른 앱 숨기기'},{type:'separator'},{role:'quit',label:'종료'}]}]:[]),workspace,
-  {label:'편집',submenu:[{label:'실행 취소',accelerator:'CmdOrCtrl+Z',click:()=>editHistory(false)},{label:'다시 실행',accelerator:'CmdOrCtrl+Shift+Z',click:()=>editHistory(true)},{type:'separator'},{role:'cut',label:'잘라내기'},{role:'copy',label:'복사'},{role:'paste',label:'붙여넣기'},{role:'selectAll',label:'모두 선택'}]},
+  {label:'편집',submenu:[{label:'실행 취소',accelerator:'CmdOrCtrl+Z',click:()=>editHistory(false)},{label:'다시 실행',accelerator:'CmdOrCtrl+Shift+Z',click:()=>editHistory(true)},{type:'separator'},{role:'cut',label:'잘라내기'},{label:'복사',accelerator:'CmdOrCtrl+C',click:()=>editKey('copy','copy')},{label:'붙여넣기',accelerator:'CmdOrCtrl+V',click:()=>editKey('paste','paste')},{label:'모두 선택',accelerator:'CmdOrCtrl+A',click:()=>editKey('selectAll','create')}]},
   {label:'창',submenu:[{role:'minimize',label:'최소화'},...(process.platform==='darwin'?[{role:'front',label:'모두 앞으로'}]:[{role:'quit',label:'프로그램 종료'}])]}
  ];
  if(!app.isPackaged)menu.push({label:'개발',submenu:[{role:'toggleDevTools'}]});
@@ -117,4 +120,6 @@ async function sessionFile(open){
  engine.request({type:open?'session:open':'session:save',file},0,response=>{if(response.error)dialog.showErrorBox('실습 세션 파일 오류',response.error);else if(open)ls?.reload();});
 }
 
+// On the T/G, Ctrl+C / Ctrl+V / Ctrl+A are 열차복사 / 붙여넣기 / 열차생성 (photographed 편집(E) menu); elsewhere they stay text edits.
+async function editKey(role,action){const win=BrowserWindow.getFocusedWindow();if(!win)return;const where=await win.webContents.executeJavaScript('(()=>{const a=document.activeElement;return a?.closest("input,textarea,select,[contenteditable=true]")?"input":a?.closest("#graphPanel")?"tg":""})()').catch(()=>'');if(where==='tg')script(`SimTG.actions.${action}()`);else win.webContents[role]();}
 async function editHistory(redo){const win=BrowserWindow.getFocusedWindow();if(!win)return;const input=await win.webContents.executeJavaScript('!!document.activeElement?.closest("input,textarea,[contenteditable=true]")');if(win===graph&&!input)script('SimTimetableFiles.'+(redo?'redo':'undo')+'()');else win.webContents[redo?'redo':'undo']();}

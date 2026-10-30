@@ -28,7 +28,7 @@ function conflictScenario(p){
    ctx=>{const t=train(ctx,id);if(!t)return '';const k=diff(t);if(k<0)return '';if(t.calls[k].station!==nearest)return `수정이 ${nm(t.calls[k].station)}역에서 시작했습니다. 경합지에서 가장 가까운 앞쪽 해소역에서 해소하세요. (해소역: ${T.RESOLVE_STATIONS.map(nm).join('·')})`;return '';}),
   doStep('편집적용 후 운영자 선호화면에서 해소역 L/S 선택',ctx=>ctx.ui.station===nearest,'MMI 시스템관리 → 제어화면관리 → 운영자선호화면 설정, 또는 LS의 역 선택'),
   doStep('해소역 도착진로·출발진로 수정 후 편집적용',ctx=>{const a=at(ctx);return !!a&&a.c.arrivalRoute!==a.b.arrivalRoute&&a.c.departureRoute!==a.b.departureRoute;},'열차스케줄관리(수정) → 해소역의 도착진로·출발진로 → 편집적용'),
-  doStep('경합 해소 확인 (다른 열차와의 3차 경합 없음)',ctx=>{const t=train(ctx,id);return !!t&&T.conflicts(ctx.model).filter(involves).length===0&&diff(t)>=0;},'그래프에서 경합 표시를 켜 남은 경합이 없는지 확인',
+  doStep('경합 해소 확인 (다른 열차와의 3차 경합 없음)',ctx=>{const t=train(ctx,id);return !!t&&T.conflicts(ctx.model).filter(involves).length===0&&diff(t)>=0;},'그래프에서 십자선보기로 다른 열차와 겹치는 곳이 남지 않았는지 확인',
    ctx=>{const left=T.conflicts(ctx.model).filter(involves);return left.length?`경합이 ${left.length}건 남아 있습니다 (${nm(left[0].station)}역 부근부터). 3차 경합이 생기지 않았는지 확인하세요.`:'';}),
   say('1차 경합 해소하였습니다. 이상입니다!')];
  return {id:'sch-conflict',group:'schedule',title:'경합 해소 (경합 시나리오)',source:'경합 시나리오.hwpx',station:'yongsan',stations:[],cast:[],autos:{},
@@ -53,7 +53,7 @@ function createScenario(p){
  const steps=[
   doStep('열차스케줄 → 온라인열차스케줄관리 → 열차스케줄관리(생성)',ctx=>ctx.ui.scheduleOpen&&ctx.ui.scheduleMode==='create','MMI 열차스케줄 → 온라인열차스케줄관리 → 생성'),
   doStep('열차운행패턴선택 창 열기',ctx=>ctx.ui.patternOpen||made(ctx),'열차운행패턴선택 버튼'),
-  doStep(`패턴으로 ${p.id}열차 생성 (${p.dir==='down'?'하행':'상행'}, ${nm(p.from)}~${nm(p.to)}, 시작 ${T.clock(p.start)}) 후 편집적용`,made,'노선 경부선 → 열차종별 전동열차 → 운행방향 → 패턴 → 운행구간 → 선택패턴적용 → 생성일자 오늘 → 임시열차번호 → 시작시각 → 편집적용',
+  doStep(`패턴으로 ${p.id}열차 생성 (${p.dir==='down'?'하행':'상행'}, ${nm(p.from)}~${nm(p.to)}, 시작 ${T.clock(p.start)}) 후 편집적용`,made,'임시열차번호·시작시간 입력 → [열차운행패턴선택] → 열차방향 → 열차패턴조회 → 전동 패턴 선택 → 출발역·종착역 → 확인 → 편집적용',
    ctx=>{const t=t0(ctx);if(!t)return '';const w=[];if(t.direction!==p.dir)w.push('운행방향');if(t.calls[0].station!==p.from||t.calls.at(-1).station!==p.to)w.push('운행구간');if(t.calls[0].departure!==p.start)w.push(`시작시각(${T.clock(p.start)} 정각)`);return w.length?`${p.id}열차가 만들어졌지만 ${w.join('·')}이(가) 문제와 다릅니다. 열차스케줄관리(수정)에서 시각을 고치거나 삭제 후 다시 생성하세요.`:'';}),
   doStep(`열차스케줄관리(수정)에서 ${p.id}열차 검색`,ctx=>ctx.ui.scheduleOpen&&ctx.ui.scheduleMode==='edit'&&ctx.ui.scheduleSelected===p.id,'경부선, 오늘, 모두 → 온라인 열차번호 검색 → 확인'),
   doStep(`연계열차 ${p.related||'(없음)'}, 차량수 ${p.carCount}량, 열차등급 ${p.kind}, 운행구분 ${p.service}, 기능열차 ${p.flag} 로 수정 후 편집적용`,props,'선택열차정보에서 값을 바꾸고 편집적용 (분할합병은 이 시뮬레이터에서 지원하지 않습니다)',

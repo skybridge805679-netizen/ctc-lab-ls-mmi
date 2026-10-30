@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const N=root.SimNetwork,T=root.SimTimetable,$=id=>SimDOM.document.getElementById(id);
- const model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0]?.id||'',trainOptionKey='';
+ const KM_PER_ROW=4.9,model=T.initial(),subscribers=new Set();let notified=0;const renderHooks=new Set();const options_={conflicts:false,notes:[],selectedNote:'',tooltips:true,marks:false,plan:true,numbers:true,position:true,kinds:null,styles:{}},DASH={solid:'',dotted:'2 3',dashed:'8 4'};let lastLayout=null,context=null,selected=model.trains[0]?.id||'',trainOptionKey='';
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const options=N.stations.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
  function message(text){$('graphMessage').textContent=text;}
@@ -24,7 +24,7 @@
   const info=id=>window.SimMMI?.stationInfo?.(id)||{name:N.catalog[id].name,code:N.catalog[id].code};
   const sod=t=>8*3600+t,day=T.clock(0)&&model.serviceDate?new Date(model.serviceDate+'T00:00:00'):new Date();
   let svg=`<defs><clipPath id="diaClip"><rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}"/></clipPath></defs><rect width="${width}" height="${height}" fill="#1e1e1e"/><rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}" fill="#f5f7fb"/>`;
-  svg+=`<text x="10" y="20" font-size="13" font-weight="700" fill="#fff">${day.getFullYear()}년 ${day.getMonth()+1}월 ${day.getDate()}일 (${'일월화수목금토'[day.getDay()]}요일)</text><text x="${left+plotW/2}" y="24" text-anchor="middle" font-size="19" font-weight="700" fill="#ff6a1f" letter-spacing="8">경 부 선</text><text x="${left+plotW+8}" y="24" font-size="10" fill="#7ed39a">역 순서</text>`;
+  svg+=`<text x="10" y="20" font-size="13" font-weight="700" fill="#fff">${day.getFullYear()}년 ${day.getMonth()+1}월 ${day.getDate()}일 (${'일월화수목금토'[day.getDay()]}요일)</text><text x="${left+plotW/2}" y="24" text-anchor="middle" font-size="19" font-weight="700" fill="#ff6a1f" letter-spacing="8">경 부 선</text>`;
   const minor=span<=3600?60:span<=21600?300:600;
   for(let t=Math.ceil(start/minor)*minor;t<=start+span;t+=minor){
    const s=sod(t),hour=s%3600===0,half=s%1800===0,px=x(t).toFixed(1),mm=String(Math.floor((s%3600)/60)).padStart(2,'0');
@@ -36,7 +36,8 @@
    svg+=`<line x1="${left}" y1="${ry}" x2="${left+plotW}" y2="${ry}" stroke="${st.controlled?'#c3c7d0':'#e0e2e8'}" ${st.controlled?'':'stroke-dasharray="1 3"'}/>`;
    svg+=`<text x="10" y="${ry+4}" font-size="11" fill="#fff" pointer-events="none">${escape(i.code&&i.code!=='—'?i.code:'')}</text>`;
    svg+=`<text ${st.controlled?`data-dia-station="${st.id}" tabindex="0" role="button" aria-label="${escape(i.name)} LS 열기"`:`data-dia-stop="${st.id}"`} x="${left-8}" y="${ry+4}" text-anchor="end" fill="#ff6a1f" font-size="12" font-weight="${st.controlled?700:500}">${escape(i.name)}</text>`;
-   svg+=`<text x="${left+plotW+8}" y="${ry+4}" font-size="10.5" fill="#7ed39a" pointer-events="none">${st.order+1}</text>`;
+   // right-hand scale as on the real T/G: an even 4.9 km per station row (0.0 … 156.8), not measured kilometre posts
+   svg+=`<line x1="${left+plotW}" y1="${ry}" x2="${left+plotW+6}" y2="${ry}" stroke="#7ed39a"/><text data-dia-km="${st.id}" x="${left+plotW+10}" y="${ry+4}" font-size="10.5" fill="#7ed39a" pointer-events="none">${(st.order*KM_PER_ROW).toFixed(1)}</text>`;
   }
   svg+=`<rect x="${left}" y="${plotTop}" width="${plotW}" height="${plotH}" fill="none" stroke="#b8541f" stroke-width="2"/>`;
   svg+='<g clip-path="url(#diaClip)">';
@@ -56,6 +57,8 @@
    let best=null;for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1);if(len>12&&Math.max(x1,x2)>left&&Math.min(x1,x2)<left+plotW&&(!best||len>best.len))best={len,x1,y1,x2,y2};}
    if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
     svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
+   // 툴팁보기로 선택한 열차: every station point is marked with a red dot (photo 2026-10-30)
+   if(options_.marks&&selected===train.id)for(const [px,py] of pts)svg+=`<circle data-dia-mark="${train.id}" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#e0201b" pointer-events="none"/>`;
    const pos=(root.SimAutoUI?.position||T.position)(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;
   }
   if(options_.conflicts)for(const c of T.conflicts(model)){
@@ -97,5 +100,5 @@
   $('diaSvg').onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-dia-station]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
   $('graphExport').onclick=()=>{const data={schemaVersion:1,kind:'CTC LAB training timetable',sampleSchedule:true,clock:context.clock(),...model};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-dia.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  }
- root.SimDiagram={onRender:fn=>{renderHooks.add(fn);return ()=>renderHooks.delete(fn);},setNotes:(list,selected='')=>{options_.notes=list;options_.selectedNote=selected;render();},clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
+ root.SimDiagram={KM_PER_ROW,onRender:fn=>{renderHooks.add(fn);return ()=>renderHooks.delete(fn);},setNotes:(list,selected='')=>{options_.notes=list;options_.selectedNote=selected;render();},clock:()=>context?context.clock():0,layout:()=>lastLayout,setOption:(k,v)=>{options_[k]=v;render();},setOptions:o=>{Object.assign(options_,o);render();},selected:()=>selected,getOption:k=>options_[k],init,render,getModel:()=>model,subscribe:fn=>{subscribers.add(fn);return ()=>subscribers.delete(fn);},selectTrain};
 })(window);

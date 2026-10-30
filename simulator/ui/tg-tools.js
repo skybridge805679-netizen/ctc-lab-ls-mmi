@@ -3,7 +3,9 @@
 // T/G window chrome and functions after the real photos (menu names, 편집(E) shortcuts, tooltips of five icons) and the
 // 실기1 textbook (5장 4절, p.130-151): 화면모드(툴팁보기·십자선보기·돋보기·영역확대), Dia 보기(확대/축소, 역축/시간축 설정,
 // 열차정보보기옵션, 열차별 색상 및 선속성), 즐겨찾기(F9), 열차검색, 편집(복사·붙여넣기·생성·수정·노트). The icons whose functions were
-// never seen stay disabled. Kilometre-post values are not in the sources, so the crosshair shows time and station only.
+// The 18 left icons, their order and names come from the operator (2026-10-30). 툴팁보기 + click selects a train (red dots, green
+// box); F5 then opens 열차 스케줄 수정 and Ctrl+C 열차 복사. Conflicts are not drawn: the controller reads them with 십자선보기, whose
+// label is "(hh시 mm분 , km)" on the even 4.9 km-per-row scale shown at the right edge.
 const doc=SimDOM.document,$=id=>doc.getElementById(id),D=()=>root.SimDiagram,T=()=>root.SimTimetable,N=()=>root.SimNetwork;
 const SPANS=[10,15,30,60,120,180,360,720],ROWS=[12,16,20,26,32,44];
 const KINDS=['전동열차','일반열차','회송열차','KTX'];
@@ -15,20 +17,19 @@ const info=id=>root.SimMMI?.stationInfo(id)??{name:id,code:''};
 const store={get(){try{return JSON.parse(localStorage.getItem(FAV)||'null');}catch{return null;}},set(v){try{localStorage.setItem(FAV,JSON.stringify(v));}catch{}}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-// the icons in the order photographed (top to bottom)
+// the icons top to bottom, as named by the operator
 const TOOLS=[
- {g:'📂',tip:'시간표 JSON 열기',run:'open'},
- {g:'⎘',tip:'열차복사(C)',run:'copy'},{g:'📋',tip:'붙여놓기(V)',run:'paste'},{g:'NEW',tip:'열차생성(A)',run:'create'},{g:'✎',tip:'열차정보수정(F5)',run:'edit'},
- {g:'📁',tip:'(기능명 미확인)'},{g:'UNDO',tip:'편집 실행 취소 (Ctrl+Z)',run:'undo'},{g:'REDO',tip:'편집 다시 실행 (Ctrl+Shift+Z)',run:'redo'},{g:'☰',tip:'(기능명 미확인)'},
- {g:'📁✔',tip:'(기능명 미확인)'},{g:'📁🔍',tip:'(기능명 미확인)'},
- {g:'ZOOM◯',tip:'확대영역설정',run:'axisDialog'},{g:'▭',tip:'툴팁 보기',run:'m:tooltip'},{g:'┼',tip:'십자선보기',run:'m:cross'},
- {g:'ZOOM',tip:'영역 확대',run:'m:area'},{g:'🔍',tip:'돋보기',run:'m:magnify'},
- {g:'💾',tip:'시간표 JSON 저장',run:'save'},{g:'💾',tip:'(기능명 미확인)'}
+ {g:'📂',tip:'열기',run:'openDialog'},{g:'⎘',tip:'복사',run:'copy'},{g:'📋',tip:'붙여넣기',run:'paste'},{g:'NEW',tip:'열차생성',run:'create'},{g:'✎',tip:'열차수정',run:'edit'},
+ {g:'🖨',tip:'인쇄',run:'print'},{g:'UNDO',tip:'이전화면',run:'back'},{g:'DO',tip:'다음화면',run:'forward'},{g:'☰',tip:'열차속성',run:'styleDialog'},
+ {g:'📁✔',tip:'열차보기옵션',run:'viewDialog'},{g:'📁🔍',tip:'열차검색',run:'findDialog'},
+ {g:'ZOOM◯',tip:'확대영역설정',run:'axisDialog'},{g:'▭',tip:'툴팁보기',run:'m:tooltip'},{g:'┼',tip:'십자선보기',run:'m:cross'},
+ {g:'ZOOM',tip:'영역확대',run:'m:area'},{g:'🔍',tip:'돋보기',run:'m:magnify'},
+ {g:'★',tip:'즐겨찾기 설정',run:'favSet'},{g:'☆',tip:'즐겨찾기 가기',run:'favGo'}
 ];
 const MENUS=[
- {label:'파일(F)',items:[{label:'열기(O)',run:'open'},{label:'저장(S)',run:'save'},{label:'인쇄(P)',run:'print'}]},
+ {label:'파일(F)',items:[{label:'열기(O)',run:'openDialog'},{label:'인쇄(P)',run:'print'}]},
  {label:'편집(E)',items:[{label:'실행 취소',key:'Ctrl+Z',run:'undo'},{label:'다시 실행',key:'Ctrl+Shift+Z',run:'redo'},{label:'열차복사(C)',key:'Ctrl+C',run:'copy'},{label:'붙여놓기(V)',key:'Ctrl+V',run:'paste'},{label:'열차생성(A)',key:'Ctrl+A',run:'create'},{label:'열차정보수정(F5)',key:'F5',run:'edit'},{label:'노트편집(N)',key:'Ctrl+N',run:'note'}]},
- {label:'보기(V)',items:[{label:'현재시각으로(F9)',key:'F9',run:'jumpNow'},{label:'경합 표시 (교육용)',run:'t:conflicts',check:'conflicts',off:true},{label:'경합해소 실습 (교육용)',run:'drill'}]},
+ {label:'보기(V)',items:[{label:'현재시각으로(F9)',key:'F9',run:'jumpNow'}]},
  {label:'Dia 보기(V)',items:[
   {label:'확대/축소',items:[{label:'시간축 확대',key:'+',run:'timeIn'},{label:'시간축 축소',key:'-',run:'timeOut'},{label:'역축 확대',key:'*',run:'stationIn'},{label:'역축 축소',key:'/',run:'stationOut'}]},
   {label:'다이얼로그',items:[{label:'역축/시간축 설정',run:'axisDialog'},{label:'열차정보보기옵션',run:'viewDialog'}]},
@@ -60,22 +61,27 @@ function applyMode(){
  for(const b of doc.querySelectorAll('.tg-tool[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));
  for(const b of doc.querySelectorAll('[data-tg-mode]'))b.setAttribute('aria-checked',String(b.dataset.tgMode===mode));
  $('diaSvg').classList.toggle('tg-selecting',mode==='area');
- D().setOption('tooltips',mode==='tooltip');
+ D().setOptions(mode==='tooltip'?{tooltips:true}:{tooltips:false,marks:false});
  clearOverlays();
 }
 function setMode(m){mode=mode===m?'':m;crossPt=null;applyMode();status(mode?`${{tooltip:'툴팁보기',cross:'십자선보기',magnify:'돋보기',area:'영역확대'}[mode]} · ${{tooltip:'열차를 선택하면 기본정보가 표시됩니다.',cross:'그래프를 클릭하면 시간과 위치가 표시됩니다.',magnify:'확대할 곳을 클릭하세요.',area:'확대할 영역을 끌어서 지정하세요.'}[mode]}`:'화면모드 해제');}
 const ACTIONS={
- help(){root.SimMMI.alertBox('열차 선택: 그래프 열차선 클릭 · 검색: Ctrl+F · 복사/붙이기: Ctrl+C/V · 수정: F5 · 실행 취소/다시 실행: Ctrl+Z / Ctrl+Shift+Z · 파일 메뉴: 시간표 JSON 열기/저장 · 인쇄: PDF 또는 프린터.');},
+ help(){root.SimMMI.alertBox('툴팁보기로 열차선을 클릭해 선택한 뒤 F5: 열차 스케줄 수정 · Ctrl+C: 열차 복사 · Ctrl+A / [열차생성]: 열차패턴선택 → 스케줄 추가 · 경합은 십자선보기로 시각과 위치를 읽어 확인합니다 · 이전화면/다음화면: 보던 화면 범위로 이동.');},
+ openDialog(){dialog('tgOpen','[OPN] 온라인 열차스케줄 열기',`<div class="pat-dlg"><fieldset><legend>조건선택</legend><label><span>노선선택</span><select id="opnLine"><option>경부선</option></select></label></fieldset><div><button type="button" class="sched-btn primary" id="opnOk">확인</button> <button type="button" class="sched-btn" id="opnCancel">취소</button></div></div>`,()=>{
+   $('opnCancel').onclick=()=>closeDialog('tgOpen');
+   $('opnOk').onclick=()=>{closeDialog('tgOpen');$('graphDirection').value='all';$('graphFrom').value=N().stations[0].id;$('graphTo').value=N().stations.at(-1).id;fire('graphFrom');status(`${$('opnLine').value} 온라인 열차스케줄을 열었습니다. (${D().getModel().trains.length}개 열차)`);};
+  },320);},
  open(){root.SimTimetableFiles.open();},save(){root.SimTimetableFiles.save();},undo(){root.SimTimetableFiles.undo();},redo(){root.SimTimetableFiles.redo();},
+ back(){goView(-1);},forward(){goView(1);},
  print(){
   const f=doc.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';doc.body.appendChild(f);
   const d=f.contentDocument;d.open();d.write(`<!doctype html><meta charset="utf-8"><title>온라인 열차그래프</title><style>body{margin:0}svg{width:100%;height:auto}</style>${$('diaSvg').outerHTML}`);d.close();
   try{f.contentWindow.focus();f.contentWindow.print();}catch{}setTimeout(()=>f.remove(),1500);status('인쇄 대화상자를 열었습니다.');
  },
- copy(){if(!selectedTrain())return;copied=selectedTrain();status(`${copied} 열차를 복사했습니다. (붙여놓기를 해야 열차가 생성됩니다)`);},
- paste(){if(!copied){status('복사한 열차가 없습니다.');return;}root.SimScheduleUI.open('copy',copied);status(`${copied} 붙여넣기 · 열차스케줄 추가 창`);},
- create(){root.SimScheduleUI.open('create');$('schedulePatternOpen').click();status('열차생성 · 패턴을 선택하세요.');},
- edit(){if(notes?.selected()&&notes.edit()){status('선택한 노트를 수정합니다.');return;}root.SimScheduleUI.open('edit',selectedTrain());status(`${selectedTrain()} 열차정보수정`);},
+ copy(){if(!selectedTrain())return;copied=selectedTrain();root.SimScheduleUI.open('copy',copied);status(`${copied} 열차 복사 · 복사구간과 열차번호·시작시간을 정해 편집적용하세요.`);},
+ paste(){if(!copied){status('복사한 열차가 없습니다.');return;}root.SimScheduleUI.open('copy',copied);status(`${copied} 붙여넣기 · 열차 복사 창`);},
+ create(){root.SimScheduleDialogs.openPatternLoad({container:$('graphPanel'),onPick:pick=>{root.SimScheduleDialogs.openAdd(pick,$('graphPanel'));status(`${pick.pattern.name} 패턴 적용 · 열차번호와 시발시각을 입력하세요.`);}});status('열차생성 · 열차패턴을 선택하세요.');},
+ edit(){if(notes?.selected()&&notes.edit()){status('선택한 노트를 수정합니다.');return;}if(root.SimScheduleDialogs.openEdit(selectedTrain(),$('graphPanel')))status(`${selectedTrain()} 열차 스케줄 수정`);},
  note(){notes?notes.open():status('노트편집을 사용할 수 없습니다.');},
  jumpNow(){const L=D().layout();$('graphStart').value=hhmm(Math.max(-8*3600,D().clock()-Number($('graphSpan').value)*60/6));fire('graphStart');status('현재 시각으로 이동했습니다.');},
  timeIn(){const v=step(SPANS,Number($('graphSpan').value),-1);ensureOption($('graphSpan'),v,`${v}분`);$('graphSpan').value=String(v);fire('graphSpan');status(`시간축 확대 · ${v}분`);},
@@ -125,10 +131,23 @@ const ACTIONS={
   });$('fdList').innerHTML=D().getModel().trains.map(t=>`<option value="${esc(t.id)}">`).join('');},
  favSet(){store.set({from:$('graphFrom').value,to:$('graphTo').value,start:$('graphStart').value,span:$('graphSpan').value,row:$('graphRow').value});status('즐겨찾기를 설정했습니다. 다음 실행 때도 이 화면으로 열립니다.');},
  favGo(){const f=store.get();if(!f){status('저장된 즐겨찾기가 없습니다.');return;}applyFav(f);status('즐겨찾기로 이동했습니다.');},
- drill(){root.SimMMI.open('conflictDrill');},'t:conflicts'(b){toggle('conflicts',b);},'t:plan'(b){toggle('plan',b);},'t:numbers'(b){toggle('numbers',b);},'t:position'(b){toggle('position',b);}
+ 't:plan'(b){toggle('plan',b);},'t:numbers'(b){toggle('numbers',b);},'t:position'(b){toggle('position',b);}
 };
 function toggle(key,btn){const on=!D().getOption(key);D().setOption(key,on);btn?.setAttribute('aria-checked',String(on));}
 function applyFav(f){$('graphFrom').value=f.from;$('graphTo').value=f.to;$('graphStart').value=f.start;ensureOption($('graphSpan'),f.span,`${f.span}분`);$('graphSpan').value=f.span;ensureOption($('graphRow'),f.row,f.row);$('graphRow').value=f.row;fire('graphFrom');}
+// 이전화면 / 다음화면: the ranges the operator looked at, newest last
+const views={list:[],at:-1,lock:false};
+const viewOf=()=>({from:$('graphFrom').value,to:$('graphTo').value,start:$('graphStart').value,span:$('graphSpan').value,row:$('graphRow').value,dir:$('graphDirection').value});
+function remember(){
+ if(views.lock)return;const v=viewOf(),cur=views.list[views.at];if(cur&&JSON.stringify(cur)===JSON.stringify(v))return;
+ views.list=views.list.slice(0,views.at+1);views.list.push(v);if(views.list.length>50)views.list.shift();views.at=views.list.length-1;
+}
+function goView(step){
+ const i=views.at+step;if(i<0||i>=views.list.length){status(step<0?'이전 화면이 없습니다.':'다음 화면이 없습니다.');return;}
+ views.at=i;const v=views.list[i];views.lock=true;
+ $('graphFrom').value=v.from;$('graphTo').value=v.to;$('graphStart').value=v.start;ensureOption($('graphSpan'),v.span,`${v.span}분`);$('graphSpan').value=v.span;ensureOption($('graphRow'),v.row,v.row);$('graphRow').value=v.row;$('graphDirection').value=v.dir;
+ fire('graphFrom');views.lock=false;status(step<0?'이전 화면으로 이동했습니다.':'다음 화면으로 이동했습니다.');
+}
 function run(name,btn){if(name.startsWith('m:'))return setMode(name.slice(2));return ACTIONS[name]?.(btn);}
 
 // ---------------------------------------------------------------- plot interaction
@@ -138,12 +157,14 @@ function toData(e){
  if(p.x<L.left||p.x>L.left+L.plotW||p.y<L.plotTop||p.y>L.plotTop+L.plotH)return null;
  return {x:p.x,y:p.y,t:L.start+(p.x-L.left)/L.plotW*L.span,o:L.from+(p.y-L.top)/L.row};
 }
+const KM=()=>D().KM_PER_ROW||4.9;
+const crossLabel=d=>{const s=((8*3600+Math.round(d.t))%86400+86400)%86400;return `(${String(Math.floor(s/3600)).padStart(2,'0')}시 ${String(Math.floor(s%3600/60)).padStart(2,'0')}분 , ${(Math.max(0,d.o)*KM()).toFixed(3)}Km )`;};
 const stationAt=o=>{const names=N().stations;return names[Math.max(0,Math.min(names.length-1,Math.round(o)))];};
 function clearOverlays(){$('diaCross')?.remove();doc.querySelector('.tg-lens')?.remove();doc.querySelector('.tg-info')?.remove();}
 function drawOverlay(){
  const svg=$('diaSvg'),L=D().layout();svg.querySelector('#diaCross')?.remove();if(!L)return;
  let g='';
- if(mode==='cross'&&crossPt)g+=`<line x1="${L.left}" y1="${crossPt.y}" x2="${L.left+L.plotW}" y2="${crossPt.y}" stroke="#d6251f" stroke-dasharray="4 3"/><line x1="${crossPt.x}" y1="${L.plotTop}" x2="${crossPt.x}" y2="${L.plotTop+L.plotH}" stroke="#d6251f" stroke-dasharray="4 3"/>`;
+ if(mode==='cross'&&crossPt){const right=crossPt.x>L.left+L.plotW-170;g+=`<line x1="${L.left}" y1="${crossPt.y}" x2="${L.left+L.plotW}" y2="${crossPt.y}" stroke="#111" stroke-width=".8"/><line x1="${crossPt.x}" y1="${L.plotTop}" x2="${crossPt.x}" y2="${L.plotTop+L.plotH}" stroke="#111" stroke-width=".8"/><text id="diaCrossLabel" x="${crossPt.x+(right?-6:6)}" y="${crossPt.y-5}" text-anchor="${right?'end':'start'}" font-size="11" font-weight="700" fill="#111">${crossLabel(crossPt)}</text>`;}
  if(area){const x1=L.left+(Math.min(area.t1,area.t2)-L.start)/L.span*L.plotW,x2=L.left+(Math.max(area.t1,area.t2)-L.start)/L.span*L.plotW,y1=L.top+(Math.min(area.o1,area.o2)-L.from)*L.row,y2=L.top+(Math.max(area.o1,area.o2)-L.from)*L.row;g+=`<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="rgba(49,106,197,.18)" stroke="#316ac5" stroke-dasharray="4 3"/>`;}
  if(g)svg.insertAdjacentHTML('beforeend',`<g id="diaCross" pointer-events="none">${g}</g>`);
 }
@@ -159,7 +180,8 @@ function showInfo(train,e){
  doc.querySelector('.tg-info')?.remove();
  const t=D().getModel().trains.find(x=>x.id===train);if(!t)return;
  const box=doc.createElement('div');box.className='tg-info';
- box.innerHTML=`<b>${esc(t.id)}</b> · ${esc(t.kind)} · ${t.direction==='down'?'하행':'상행'}${t.cancelled?' · 운휴':''}<br>시발 ${esc(info(t.calls[0].station).name)} ${T().clock(t.calls[0].departure)}<br>종착 ${esc(info(t.calls.at(-1).station).name)} ${T().clock(t.calls.at(-1).arrival)}<br>연계열번 ${esc(t.relatedTrain||'—')}`;
+ const hms=s=>{const v=T().clock(s);return `${v.slice(0,2)}시 ${v.slice(3,5)}분 ${v.slice(6,8)}`;};
+ box.innerHTML=`열차번호 : ${esc(t.id)}(${t.direction==='down'?'하행':'상행'})<br>열차종류 : ${esc(t.kind)}<br>시발종착 : ${esc(info(t.calls[0].station).name)}발 -&gt;${esc(info(t.calls.at(-1).station).name)}<br>출발시각 : ${hms(t.calls[0].departure)}<br>도착시각 : ${hms(t.calls.at(-1).arrival)}<br>연계열선 : ${esc(t.relatedTrain||'없음')}`;
  const host=doc.querySelector('.tg-body'),r=host.getBoundingClientRect();box.style.left=Math.min(e.clientX-r.left+12,r.width-230)+'px';box.style.top=(e.clientY-r.top+12)+'px';host.appendChild(box);
 }
 function showLens(d,e){
@@ -180,9 +202,9 @@ function bindPlot(){
  svg.addEventListener('pointerup',()=>{if(drag){drag=null;if(area&&Math.abs(area.t1-area.t2)<30&&Math.abs(area.o1-area.o2)<.3)area=null;if(area)zoomArea();else status('영역을 지정하지 못했습니다.');drawOverlay();}});
  svg.addEventListener('click',e=>{
   const d=toData(e);
-  if(mode==='cross'&&d){crossPt=d;status(`${T().clock(d.t)} · ${info(stationAt(d.o).id).name}`);drawOverlay();}
+  if(mode==='cross'&&d){crossPt=d;status(`${crossLabel(d)} · ${info(stationAt(d.o).id).name} 부근`);drawOverlay();}
   else if(mode==='magnify'&&d)showLens(d,e);
-  else if(mode==='tooltip'){const tr=e.target.closest('[data-dia-train]');if(tr)showInfo(tr.dataset.diaTrain,e);else doc.querySelector('.tg-info')?.remove();}
+  else if(mode==='tooltip'){const tr=e.target.closest('[data-dia-train],[data-dia-select]');if(tr){const id=tr.dataset.diaTrain||tr.dataset.diaSelect;D().setOption('marks',true);D().selectTrain(id);showInfo(id,e);status(`${id} 선택 · F5 열차 스케줄 수정 · Ctrl+C 열차 복사`);graph.focus({preventScroll:true});}else{doc.querySelector('.tg-info')?.remove();D().setOption('marks',false);}}
  });
  new MutationObserver(()=>{if(!svg.querySelector('#diaCross')&&(area||crossPt))drawOverlay();}).observe(svg,{childList:true});
 }
@@ -215,12 +237,14 @@ function init(panel){
   if(e.target.closest('input,select,textarea'))return;
   const k=e.key,lk=k.toLowerCase();
   const modifier=e.ctrlKey||e.metaKey;if(modifier&&lk==='z'){e.preventDefault();ACTIONS[e.shiftKey?'redo':'undo']();return;}
-  const map=modifier?{c:'copy',v:'paste',a:'create',n:'note',r:'edit'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
+  const map=modifier?{c:'copy',v:'paste',a:'create',n:'note',r:'edit',o:'openDialog',p:'print'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
   const name=map[modifier?lk:k];if(name){e.preventDefault();ACTIONS[name]();}
  });
  graph.tabIndex=-1;
  bindPlot();
+ for(const id of ['graphFrom','graphTo','graphStart','graphSpan','graphRow','graphDirection'])$(id).addEventListener('change',remember);
  const fav=store.get();if(fav)applyFav(fav);
+ remember();
  applyMode();
 }
 root.SimTG={init,actions:ACTIONS,setNotes:n=>{notes=n;}};

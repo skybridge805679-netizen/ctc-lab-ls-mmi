@@ -1,4 +1,5 @@
 """T/G chrome and functions (photos + 실기1 5장): menus, modes, Dia 보기, favourites, search (Chromium)."""
+import re
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -19,19 +20,19 @@ def open_graph(page):
 
 
 def tg(page, top, *path):
-    page.locator('.tg-menu', has_text=top).click()
+    page.locator('.tg-menu').filter(has_text=re.compile('^' + re.escape(top))).click()
     for name in path[:-1]:
         page.locator('.tg-has-sub > button', has_text=name).first.click()
     page.locator('.tg-list [data-tg-run]', has_text=path[-1]).first.click()
 
 
 def tg_labels(page, top, *sub):
-    page.locator('.tg-menu', has_text=top).click()
+    page.locator('.tg-menu').filter(has_text=re.compile('^' + re.escape(top))).click()
     for name in sub:
         page.locator('.tg-has-sub > button', has_text=name).first.click()
     lst = page.locator('.tg-top.open > .tg-list') if not sub else page.locator('.tg-has-sub.open > .tg-list').last
     out = [' '.join(t.replace('▸', '').split()) for t in lst.locator(':scope > li > button').all_inner_texts()]
-    page.keyboard.press('Escape'); page.locator('.tg-menu', has_text=top).click()
+    page.keyboard.press('Escape'); page.locator('.tg-menu').filter(has_text=re.compile('^' + re.escape(top))).click()
     return out
 
 
@@ -55,22 +56,39 @@ def run(page, url):
     assert tg_labels(page, '화면설정') == ['화면모드설정', '열차검색']
     assert tg_labels(page, '화면설정', '화면모드설정') == ['툴팁보기', '십자선보기', '돋보기', '영역확대']
     assert tg_labels(page, '즐겨찾기') == ['즐겨찾기설정', '즐겨찾기가기']
+    assert tg_labels(page, '파일(F)') == ['열기(O)', '인쇄(P)']
+    assert tg_labels(page, '보기(V)') == ['현재시각으로(F9) F9']
     page.keyboard.press('Escape')
-    for tip in ['확대영역설정', '툴팁 보기', '십자선보기', '영역 확대', '돋보기']:
-        assert page.locator(f'.tg-tool[title="{tip}"]').count() == 1, tip
-    assert page.locator('.tg-tool').count() == 18
-    # 툴팁보기 (default mode): selecting a train shows its basic information
-    page.locator('#graphTrain').select_option('K1131')
+    # the 18 left icons in the order the operator named them
+    assert page.locator('.tg-tool').evaluate_all('b=>b.map(x=>x.title)') == ['열기', '복사', '붙여넣기', '열차생성', '열차수정', '인쇄', '이전화면', '다음화면', '열차속성', '열차보기옵션', '열차검색', '확대영역설정', '툴팁보기', '십자선보기', '영역확대', '돋보기', '즐겨찾기 설정', '즐겨찾기 가기']
+    assert page.locator('.tg-tool[disabled]').count() == 0
+    # right-hand scale: 4.9 per station row, 0.0 ... 156.8
+    assert page.locator('[data-dia-km="cheongnyangni"]').text_content() == '0.0' and page.locator('[data-dia-km="suwon"]').text_content() == '156.8'
+    # 툴팁보기 (default mode): clicking a train selects it (red dots) and shows the green box
     cx, cy = plot_point(page, .5, .5)
     page.locator('[data-dia-train="K1131"]').first.dispatch_event('click', {'clientX': cx, 'clientY': cy, 'bubbles': True})
-    expect(page.locator('.tg-info')).to_contain_text('K1131')
-    expect(page.locator('.tg-info')).to_contain_text('연계열번')
-    # 십자선보기: left click shows time and station
+    expect(page.locator('.tg-info')).to_contain_text('열차번호 : K1131(하행)')
+    expect(page.locator('.tg-info')).to_contain_text('시발종착 : 지하청량리발 ->수원')
+    expect(page.locator('.tg-info')).to_contain_text('연계열선 : 없음')
+    assert page.locator('.tg-info').inner_text().count('시') >= 4
+    assert page.locator('#graphTrain').input_value() == 'K1131'
+    assert page.locator('[data-dia-mark="K1131"]').count() == 66
+    # ... then F5 opens 열차 스케줄 수정 and Ctrl+C the copy window
+    page.keyboard.press('F5')
+    expect(page.locator('[data-mmi-window="trnEdit"]')).to_be_visible()
+    expect(page.locator('#teId')).to_have_value('K1131')
+    page.locator('#teCancel').click()
+    page.locator('.tg-menubar').click(); page.keyboard.press('Control+c')
+    expect(page.locator('input[name="scheduleMode"][value="copy"]')).to_be_checked()
+    expect(page.locator('#scheduleList')).to_have_value('K1131')
+    page.locator('[data-mmi-window="schedule"] .mmi-close').click()
+    # 십자선보기: left click draws the cross with "(hh시 mm분 , km)"
     page.locator('.tg-tool[title="십자선보기"]').click()
+    assert page.locator('[data-dia-mark]').count() == 0
     x, y = plot_point(page, .4, .5)
     page.mouse.click(x, y)
     expect(page.locator('#diaCross')).to_have_count(1)
-    assert ' · ' in page.locator('#tgStatus').inner_text() and ':' in page.locator('#tgStatus').inner_text()
+    assert re.fullmatch(r'\(\d\d시 \d\d분 , \d+\.\d{3}Km \)', page.locator('#diaCrossLabel').text_content()), page.locator('#diaCrossLabel').text_content()
     page.locator('.tg-tool[title="십자선보기"]').click()
     expect(page.locator('#diaCross')).to_have_count(0)
     # 돋보기: click -> magnified box
@@ -80,12 +98,18 @@ def run(page, url):
     page.locator('.tg-tool[title="돋보기"]').click()
     expect(page.locator('.tg-lens')).to_have_count(0)
     # 영역확대: dragging an area enlarges it at once
-    page.locator('.tg-tool[title="영역 확대"]').click()
+    page.locator('.tg-tool[title="영역확대"]').click()
     sx, sy = plot_point(page, .25, .3)
     page.mouse.move(sx, sy); page.mouse.down(); page.mouse.move(sx + 120, sy + 90, steps=6); page.mouse.up()
     assert page.locator('#graphSpan').input_value() not in ('360',)
     assert page.locator('#graphFrom').input_value() != 'cheongnyangni' or page.locator('#graphTo').input_value() != 'suwon'
-    page.locator('.tg-tool[title="영역 확대"]').click()
+    page.locator('.tg-tool[title="영역확대"]').click()
+    # 이전화면 / 다음화면 walk back and forth through the viewed ranges
+    zoomed = page.locator('#graphSpan').input_value()
+    page.locator('.tg-tool[title="이전화면"]').click()
+    assert page.locator('#graphSpan').input_value() != zoomed
+    page.locator('.tg-tool[title="다음화면"]').click()
+    assert page.locator('#graphSpan').input_value() == zoomed
     # Dia 보기: time axis zoom, station axis zoom
     page.locator('#graphSpan').select_option('360'); page.locator('#graphFrom').select_option('cheongnyangni'); page.locator('#graphTo').select_option('suwon')
     tg(page, 'Dia 보기', '확대/축소', '시간축 확대')
@@ -132,21 +156,48 @@ def run(page, url):
     page.locator('#fdNumber').fill('Z9999'); page.locator('#fdGo').click(); expect(page.locator('.mmi-alert')).to_contain_text('찾을 수 없습니다'); page.locator('#mmiAlertOk').click()
     page.locator('#fdNumber').fill('K1135'); page.locator('#fdGo').click()
     assert page.locator('#graphTrain').input_value() == 'K1135'
-    # 편집: copy -> paste, 열차생성 (opens the pattern dialog), 열차정보수정
+    # [OPN] 온라인 열차스케줄 열기 (파일 > 열기): 노선선택 경부선 -> the whole line
+    tg(page, '파일(F)', '열기(O)')
+    expect(page.locator('[data-mmi-window="tgOpen"] .mmi-title-text')).to_have_text('[OPN] 온라인 열차스케줄 열기')
+    page.locator('#opnOk').click()
+    assert page.locator('#graphFrom').input_value() == 'cheongnyangni' and page.locator('#graphTo').input_value() == 'suwon'
+    # 열차생성: [PTN_LOAD] -> [TRN_ADD]; 시발시각 with 시간설정 동기화 moves every row
+    page.locator('.tg-tool[title="열차생성"]').click()
+    load = page.locator('[data-mmi-window="ptnLoadTg"]')
+    load.locator('input[value="down"]').check(); load.locator('[data-pl=find]').click()
+    assert load.locator('[data-pl-id]').count() == 2
+    load.locator('[data-pl-id="0120202"]').click()
+    expect(load.locator('[data-pl=calls] tbody tr')).to_have_count(23)
+    load.locator('[aria-label="영등포 정차시간"]').fill('00:03:00'); load.locator('[aria-label="영등포 정차시간"]').dispatch_event('change')
+    load.locator('[data-pl=from]').select_option('yongsan')
+    load.locator('[data-pl=ok]').click()
+    add = page.locator('[data-mmi-window="trnAdd"]')
+    expect(add.locator('.mmi-title-text')).to_have_text('[TRN_ADD] 온라인 열차 스케줄 추가')
+    expect(add.locator('#taCalls tbody tr')).to_have_count(21)
+    assert page.locator('#taStart').input_value() == '00:00:00'
+    page.locator('#taStart').fill('10:00:00'); page.locator('#taStart').dispatch_event('change')
+    assert page.locator('#taEnd').input_value() == '10:33:00'   # 용산 00:03:30 -> 수원 00:36:30 (영등포 dwell edited alone)
+    page.locator('#taOk').click(); expect(page.locator('.mmi-alert')).to_contain_text('열차번호'); page.locator('#mmiAlertOk').click()
+    page.locator('#taId').fill('A0101'); page.locator('#taKind').select_option('무궁화호'); page.locator('#taOk').click()
+    expect(page.locator('.mmi-alert')).to_contain_text('생성 완료'); page.locator('#mmiAlertOk').click()
+    made = page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='A0101')")
+    assert made['kind'] == '무궁화호' and made['calls'][0]['station'] == 'yongsan' and len(made['calls']) == 21
+    # 열차수정 (F5 window): 계획정보 edit with 동기화 + 실적정보 table
+    page.locator('.tg-tool[title="열차수정"]').click()
+    expect(page.locator('#teId')).to_have_value('A0101')
+    expect(page.locator('#teActual tbody tr')).to_have_count(21)
+    page.locator('#teCalls [aria-label="노량진 출발시간"]').fill('10:03:00'); page.locator('#teCalls [aria-label="노량진 출발시간"]').dispatch_event('change')
+    assert page.locator('#teEnd').input_value() == '10:34:00'
+    page.locator('#teOk').click(); expect(page.locator('.mmi-alert')).to_contain_text('편집 적용 완료'); page.locator('#mmiAlertOk').click()
+    assert page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='A0101').calls.at(-1).arrival") == page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='A0101').plan.at(-1).arrival") + 60
+    # 복사 / 붙여넣기 open the copy window for the selected train
     page.locator('#graphTrain').select_option('K1133')
-    page.locator('.tg-tool[title="열차복사(C)"]').click()
-    expect(page.locator('#tgStatus')).to_contain_text('K1133')
-    page.locator('.tg-tool[title="붙여놓기(V)"]').click()
+    page.locator('.tg-tool[title="복사"]').click()
     expect(page.locator('input[name="scheduleMode"][value="copy"]')).to_be_checked()
     expect(page.locator('#scheduleList')).to_have_value('K1133')
     page.locator('[data-mmi-window="schedule"] .mmi-close').click()
-    page.locator('.tg-tool[title="열차생성(A)"]').click()
-    expect(page.locator('input[name="scheduleMode"][value="create"]')).to_be_checked()
-    expect(page.locator('#patApply')).to_be_visible()
-    page.locator('#patClose').click(); page.locator('[data-mmi-window="schedule"] .mmi-close').click()
-    page.locator('.tg-tool[title="열차정보수정(F5)"]').click()
-    expect(page.locator('input[name="scheduleMode"][value="edit"]')).to_be_checked()
-    expect(page.locator('#scheduleSelected')).to_have_value('K1133')
+    page.locator('.tg-tool[title="붙여넣기"]').click()
+    expect(page.locator('#scheduleList')).to_have_value('K1133')
     page.locator('[data-mmi-window="schedule"] .mmi-close').click()
     # dark label column / header like the real T/G
     assert page.locator('#diaSvg > rect').first.get_attribute('fill') == '#1e1e1e'

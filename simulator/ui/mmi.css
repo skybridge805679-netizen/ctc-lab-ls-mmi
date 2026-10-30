@@ -202,7 +202,7 @@
 .tg-list [aria-checked="true"]::before{content:'✓';margin-right:6px}
 .tg-list [aria-checked="false"]::before{content:'';display:inline-block;width:.9em;margin-right:6px}
 .tg-list button span{flex:1}
-.tg-info{position:absolute;z-index:20;min-width:190px;padding:6px 10px;background:#fffbe0;border:1px solid #8a7f40;box-shadow:2px 2px 6px rgba(0,0,0,.3);font-size:12px;line-height:1.5;color:#111;pointer-events:none}
+.tg-info{position:absolute;z-index:20;min-width:190px;padding:6px 10px;background:#2f6d16;border:1px solid #1f4a0e;box-shadow:2px 2px 6px rgba(0,0,0,.3);font-size:12px;line-height:1.5;color:#fff;pointer-events:none}
 .tg-lens{position:absolute;z-index:20;width:300px;height:200px;border:2px solid #316ac5;background:#f5f7fb;box-shadow:2px 2px 8px rgba(0,0,0,.4);pointer-events:none;overflow:hidden}
 .tg-lens svg{display:block}
 
@@ -236,3 +236,26 @@
 .sc-lines{display:flex;flex-direction:column;gap:1px}.sc-lines>b{margin-bottom:2px}.sc-lines>span{white-space:pre-wrap;font-size:11.5px}
 .sc-variants{margin:6px 0;font-size:11.5px}.sc-variants pre{max-height:220px;overflow:auto;white-space:pre-wrap;background:#fff;border:1px solid #9a9a96;padding:6px}
 .sc-speech{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-left:2px solid #bee3e3;background:#edf7f5}.sc-speech>.sc-mark{flex:none;color:#347c79}.sc-speech .sc-lines{flex:1}
+/* [MA007_01] [PTN_LOAD] [TRN_ADD] 스케줄 수정 · [CA028_03] · 출력 미리보기 */
+.ptn-mgr,.ptn-load{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:10px;padding:8px 10px;font-size:12px}
+.ptn-load{grid-template-columns:minmax(0,1fr) 270px}
+.ptn-mgr fieldset,.ptn-load fieldset,.trn-dlg fieldset{border:1px solid #b9c6be;padding:6px 8px;margin:0 0 6px;min-width:0}
+.ptn-grid{height:430px}.ptn-listbox .sched-calls{height:250px}.ptn-list{height:180px}.ptn-calls{height:250px}
+.ptn-side label,.ptn-r label,.act-dlg label{display:flex;gap:8px;align-items:center;margin:3px 0}.ptn-side label>span,.ptn-r label>span{min-width:62px}
+.ptn-side input,.ptn-side select,.ptn-r select{flex:1;min-width:0}
+.ptn-dir{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0}.ptn-dir>span{min-width:62px}
+.ptn-meta{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}.ptn-meta input{width:130px}
+.ptn-btns{display:flex;gap:6px;align-items:center}.ptn-btns.end{justify-content:flex-end}.ptn-state{color:#2d6a4f;margin-left:8px}
+.sched-calls tr.sel td,.sched-calls tr[data-pm-id]:focus td{background:#0a2b9e;color:#fff}
+.sched-calls tr[data-pm-id],.sched-calls tr[data-pl-id],.sched-calls tr[data-sc-row]{cursor:pointer}
+.sched-calls select{font-size:12px;max-width:120px}
+.trn-dlg{padding:6px 10px;font-size:12px}.trn-cap{font-weight:700;margin:0 0 4px}
+.trn-body{display:grid;grid-template-columns:230px minmax(0,1fr);gap:10px}
+.trn-detail label{display:grid;grid-template-columns:70px 1fr;gap:6px;align-items:center;margin:3px 0}.trn-detail input,.trn-detail select{min-width:0}
+.trn-flags{display:grid;gap:3px;margin-top:6px;padding-left:70px}
+.trn-calls .sched-calls{height:560px}.trn-calls .trn-half{height:262px}.trn-sub{background:#7d8590;color:#fff;font-weight:700;padding:2px 6px;margin-top:4px}
+.trn-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}.trn-foot>span{display:flex;gap:6px}
+.trn-calls input{width:72px}
+.act-dlg input{flex:1}.act-dlg label>span{min-width:62px}
+.rp-tools{display:flex;gap:6px;padding:6px 8px;background:#e7e7e3;border-bottom:1px solid #bbb}.rp-sheet{max-height:640px;overflow:auto;background:#8d8d8d;padding:12px}
+.sched-calls td.sc-sel{outline:2px solid #0a2b9e;outline-offset:-2px}

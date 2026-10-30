@@ -31,8 +31,8 @@ try:
      assert shapes.evaluate_all('(es,value)=>es.every(e=>e.dataset.position===value)',value),(station,part,value)
    if station=='geumcheon':page.screenshot(path='/tmp/v240-switch-parts.png')
   page.evaluate("SimMMI.open('graph')");page.wait_for_selector('#tgStatus');table=page.evaluate('SimDiagram.getModel()');t=table['trains'][0];station=t['calls'][0]['station'];old=t['calls'][0]['departure']
-  page.evaluate('([id,st])=>{const m=SimDiagram.getModel();SimTimetable.delay(m,id,st,2);SimDiagram.render()}',[t['id'],station]);page.locator('.tg-tool[title*="실행 취소"]').click();page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old
-  page.locator('.tg-tool[title*="다시 실행"]').click();page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old+120
+  page.evaluate('([id,st])=>{const m=SimDiagram.getModel();SimTimetable.delay(m,id,st,2);SimDiagram.render()}',[t['id'],station]);page.evaluate('SimTG.actions.undo()');page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old
+  page.evaluate('SimTG.actions.redo()');page.click('#mmiAlertOk');assert page.evaluate('id=>SimDiagram.getModel().trains.find(t=>t.id===id).calls[0].departure',t['id'])==old+120
   with page.expect_download() as download:page.evaluate('SimTimetableFiles.save()')
   assert download.value.suggested_filename.endswith('.json')
   with page.expect_file_chooser() as chooser:page.evaluate('SimTimetableFiles.open()')

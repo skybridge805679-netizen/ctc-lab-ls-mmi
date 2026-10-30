@@ -28,7 +28,7 @@ def run(page, url):
     page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     page.locator('.mmi-top-btn', has_text='열차스케줄').click(); page.locator('.mmi-menu-list [data-mmi-open="graph"]').first.click()
-    tg(page, '보기(V)', '경합해소 실습')
+    page.locator('#mmiDrillBtn').click()
     expect(page.locator('[data-mmi-window="conflictDrill"]')).to_be_visible()
     expect(page.locator('#drillRows tr.empty')).to_have_count(1)
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('출제된 문제가 없습니다')
@@ -40,11 +40,9 @@ def run(page, url):
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('경합이')
     # Close the floating drill before reaching the graph menu underneath it.
     page.locator('[data-mmi-window="conflictDrill"] .mmi-close').click()
-    # 경합 표시 toggles the red markers on the T/G
-    tg(page, '보기(V)', '경합 표시')
-    assert page.locator('[data-dia-conflict]').count() >= 1
-    tg(page, '보기(V)', '경합 표시')
+    # the real T/G draws no conflict markers; the controller finds them with 십자선보기
     assert page.locator('[data-dia-conflict]').count() == 0
+    assert '경합 표시' not in ' '.join(page.locator('.tg-menubar .tg-list [data-tg-run]').all_text_contents())
     page.evaluate("SimMMI.open('conflictDrill')")
     # edit B0000 at 용산 (a 해소역, but not the nearest one) -> conflict gone, principle violated
     def edit_at(station_id, delta, change_routes):

@@ -45,7 +45,7 @@ function uiState(){
  return {graphOpen:open('graphPanel'),graphTrain:$('graphTrain')?.value||'',
   tgMode:doc.querySelector('.tg-tool[data-mode][aria-pressed="true"]')?.dataset.mode||doc.querySelector('[data-tg-mode][aria-checked="true"]')?.dataset.tgMode||'',
   station:$('stationSelect')?.value||'',scheduleOpen:open('schedulePanel'),scheduleMode:doc.querySelector('input[name="scheduleMode"]:checked')?.value||'',
-  scheduleSelected:$('scheduleSelected')?.value||'',patternOpen:!!doc.querySelector('[data-mmi-window="patternSelect"]:not([hidden])')};
+  scheduleSelected:$('scheduleSelected')?.value||'',patternOpen:!!doc.querySelector('[data-mmi-window="ptnLoad"]:not([hidden]),[data-mmi-window="ptnLoadTg"]:not([hidden])')};
 }
 const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:root.SimLSUI.getModel(),ui:uiState()});
 function render(){

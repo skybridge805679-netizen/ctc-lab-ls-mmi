@@ -67,7 +67,7 @@ def run(page, url):
     expect(page.locator('#ntRows')).to_contain_text('선로 보수 (수정)')
     # selecting the drawn note and 열차정보수정(F5) edits the note
     page.locator('[data-dia-note]').first.dispatch_event('click', {'bubbles': True})
-    page.locator('.tg-tool[title="열차정보수정(F5)"]').click()
+    page.locator('.tg-tool[title="열차수정"]').click()
     expect(page.locator('[data-mmi-window="noteEdit"] .mmi-title-text')).to_contain_text('노트수정')
     page.locator('#neCancel').click()
     # search conditions

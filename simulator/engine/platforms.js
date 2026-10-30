@@ -3,7 +3,7 @@
 const heights={high:{label:'고상홈',colour:'황색',css:'orange'},low:{label:'저상홈',colour:'청색',css:'cyan'}};
 const trainHeights={unknown:'미확인',high:'고상홈 대응',low:'저상홈 대응',both:'고상·저상홈 대응',none:'승하차 없음'};
 // 열차등급에서 정하는 기본값: 광역전철(전동열차)은 고상홈, 일반열차·KTX는 저상홈, 회송은 승하차가 없다. 시간표에 boardingHeight가 기록돼 있으면 그 값이 우선한다.
-const KIND_HEIGHT={'전동열차':'high','일반열차':'low','KTX':'low','회송열차':'none'};
+const KIND_HEIGHT={'전동열차':'high','일반열차':'low','무궁화호':'low','KTX':'low','회송열차':'none','화물':'none'};
 function boardingOf(train){const own=train?.boardingHeight;return own&&own!=='unknown'?own:KIND_HEIGHT[train?.kind]||'unknown';}
 function describe(kind){const height={o:'high',c:'low',platform:'high','platform-cyan':'low',high:'high',low:'low'}[kind];return height?{height,...heights[height]}:null;}
 function assess(height,boardingHeight='unknown',operation='stop'){

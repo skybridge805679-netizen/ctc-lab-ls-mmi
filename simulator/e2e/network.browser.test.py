@@ -6,6 +6,14 @@ from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright, expect
 
+def pick_pattern(page, pattern='0129103'):
+    # [열차운행패턴선택] -> [PTN_LOAD]: pick the pattern, keep its whole stretch, 확인
+    page.locator('#schedulePatternOpen').click()
+    win = page.locator('[data-mmi-window="ptnLoad"]')
+    win.locator(f'[data-pl-id="{pattern}"]').click()
+    win.locator('[data-pl=ok]').click()
+
+
 def open_menu(page, top, *path):
     """Open an MMI window through the real menu bar: top menu, then each submenu entry."""
     page.locator('.mmi-top-btn', has_text=top).click()
@@ -143,12 +151,10 @@ def check(page, url, screenshot=False):
     expect(page.locator('#scheduleTo option')).to_have_count(33)
     expect(page.locator('#scheduleList option')).to_have_count(12)
     mode('create')
-    page.locator('#schedulePatternOpen').click()
-    page.locator('#patApply').click()
+    pick_pattern(page)
     expect(page.locator('#scheduleCalls tbody tr')).to_have_count(33)
-    expect(page.locator('#scheduleCalls tbody tr').nth(1)).to_contain_text('정차')
-    expect(page.locator('#scheduleCalls tbody tr').nth(0)).to_contain_text('시발')
-    expect(page.locator('#scheduleCalls tbody tr').nth(32)).to_contain_text('종착')
+    expect(page.locator('#scheduleCalls tbody tr').nth(0)).to_contain_text('청량리')
+    expect(page.locator('#scheduleCalls tbody tr').nth(32)).to_contain_text('수원')
     expect(page.locator('#graphTrain option')).to_have_count(12)
     page.locator('#scheduleNumber').fill('K1131')
     page.locator('#scheduleApply').click()
@@ -222,8 +228,7 @@ def check(page, url, screenshot=False):
     expect(page.locator('.mmi-alert')).to_contain_text('다시 조회')
     ok_box()
     mode('create')
-    page.locator('#schedulePatternOpen').click()
-    page.locator('#patApply').click()
+    pick_pattern(page)
     page.locator('#scheduleNumber').fill('K2001')
     page.locator('#scheduleApply').click()
     expect(page.locator('.mmi-alert')).to_contain_text('중복')

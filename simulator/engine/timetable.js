@@ -2,7 +2,7 @@
  'use strict';
  const N=typeof module!=='undefined'?require('./network.js'):root.SimNetwork;
  const R=typeof module!=='undefined'?require('./schedule-routes.js'):root.SimScheduleRoutes;
- const ROUTE=/^$|^\d{1,2}[A-Z]?_[A-Z0-9]{1,12}$/,STOPS=['시발','정차','통과','종착'],KINDS=['전동열차','일반열차','회송열차','KTX'],FLAGS=['입고','출고','주박','회차','회송','영업','직통'];
+ const ROUTE=/^$|^\d{1,2}[A-Z]?_[A-Z0-9]{1,12}$/,STOPS=['시발','정차','통과','종착'],KINDS=['전동열차','일반열차','회송열차','KTX','무궁화호','화물'],FLAGS=['입고','출고','주박','회차','회송','영업','직통'];
  const clock=seconds=>{const value=8*3600+Math.round(seconds);return `${String(Math.floor(value/3600)%24).padStart(2,'0')}:${String(Math.floor(value%3600/60)).padStart(2,'0')}:${String(value%60).padStart(2,'0')}`;};
  function initial(){
   const trains=[];
