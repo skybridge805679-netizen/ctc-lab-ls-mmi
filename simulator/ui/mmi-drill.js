@@ -33,6 +33,7 @@ function viable(leader){
  return T.conflicts(m).filter(involves).length===0?first:null;
 }
 // builds the exercise on the current timetable; shared by the drill window and the 경합 시나리오 (which lets the operator find the train by search)
+let assessmentKey=null;
 function createProblem({select=true}={}){
  if(root.SimRemote){const r=root.SimRemote.command({type:'drill:create',options:{select}});if(r.ok){baseline=r.baseline;start={station:r.first.station,leader:r.leader};if(select)D().selectTrain(ID);D().render();}return r;}
  if(problemTrain())return {ok:false,message:baseline?'이미 출제된 문제가 있습니다. 채점하거나 [초기화] 후 다시 출제하세요.':`현재 시간표에 ${ID} 열차가 이미 있습니다. 다른 번호로 바꾸거나 삭제한 뒤 출제하세요.`};
@@ -46,7 +47,7 @@ function createProblem({select=true}={}){
  const m2=model();m2.trains.find(t=>t.id===ID).plan=made.plan;
  baseline=structuredClone(problemTrain().calls);start={station:first.station,leader:leader.id};
  if(select)D().selectTrain(ID);D().render();
- mmi().log('event','경합해소 실습 출제');
+ if(select){assessmentKey='drill:'+Date.now();root.SimAssessmentUI?.beginTask(assessmentKey,'열차운행계획 · 경합 해소','plan');}mmi().log('event','경합해소 실습 출제');
  return {ok:true,leader:leader.id,first,nearest:T.nearestResolveStation(first.station,'down'),baseline};
 }
 function generate(){
@@ -77,9 +78,9 @@ function grade(){
  list();
  if(parts.length){say(parts.join(' '));mmi().log('event','경합해소 실습 채점 · 보완 필요');return;}
  say(`합격: ${name(nearest)}역에서 시각(${T.clock(cur.departure)})과 진로(${cur.arrivalRoute||'—'} / ${cur.departureRoute||'—'})를 수정해 경합을 해소했습니다. 다른 열차와의 3차 경합도 없습니다.`);
- mmi().log('event','경합해소 실습 채점 · 합격');
+ if(assessmentKey)root.SimAssessmentUI?.complete(assessmentKey);mmi().log('event','경합해소 실습 채점 · 합격');
 }
-function reset(){if(root.SimRemote){root.SimRemote.command({type:'drill:reset'});baseline=null;start=null;D().render();list();say('초기화했습니다.');return;}if(problemTrain())T.remove(model(),ID);baseline=null;start=null;D().render();list();say('초기화했습니다.');}
+function reset(){if(root.SimRemote){root.SimRemote.command({type:'drill:reset'});baseline=null;start=null;D().render();list();say('초기화했습니다.');return;}if(assessmentKey)root.SimAssessmentUI?.cancel(assessmentKey);assessmentKey=null;if(problemTrain())T.remove(model(),ID);baseline=null;start=null;D().render();list();say('초기화했습니다.');}
 function init(){
  const win=mmi().createWindow('conflictDrill',{title:'경합해소 실습 (교육용)',x:140,y:80,width:620,body:`<div class="rpt drill"><ol class="drill-steps"><li>[문제 출제]로 경합 상황을 만듭니다. (임시열차 B0000이 앞 열차를 따라잡습니다)</li><li>열차스케줄 → 온라인 열차그래프에서 열차를 검색하고, 십자선보기·돋보기로 경합 구간을 찾습니다.</li><li>“○○열차와 ○○열차가 ○○역~○○역 구간에서 경합, ○○역에서 해소하겠습니다.”</li><li>열차스케줄 관리(수정)에서 해소역의 시각을 +2분 늦추고(다른 열차와의 3차 경합 주의), 도착진로·출발진로를 수정한 뒤 편집적용합니다.</li><li>※ 경합해소는 경합지에서 가장 가까운 앞쪽 해소역에서 합니다. 해소역: 용산·영등포·금천구청·안양·군포·의왕</li></ol>
 <div class="idm-table rpt-table"><table><thead><tr><th>경합 종류</th><th>열차</th><th>역</th><th>시각</th></tr></thead><tbody id="drillRows"></tbody></table></div>

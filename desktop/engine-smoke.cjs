@@ -28,10 +28,11 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
   assert.ok(Math.abs(metrics.x-metrics.y)<.00001,JSON.stringify(metrics));assert.ok(metrics.left>=-1&&metrics.right<=metrics.w+1&&metrics.top>=0&&metrics.bottom<=metrics.h+1,JSON.stringify(metrics));assert.ok(metrics.header,JSON.stringify(metrics));
  }
  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('LS')).setBounds({width:1440,height:1000}));
+ const timerBeforeStall=await ls.evaluate(()=>SimRemote.snapshot.assessment.session.remaining);
  const before=await ls.evaluate(()=>{SimRemote.command({type:'clock',paused:false});return SimRemote.snapshot.states.yongsan.clock;});
  // Block the renderer deliberately: only the independent process can advance time.
  await ls.evaluate(()=>{const until=performance.now()+2200;while(performance.now()<until){};});
- await ls.evaluate(()=>SimRemote.poll());assert.ok(await ls.evaluate(clock=>SimRemote.snapshot.states.yongsan.clock>clock,before));
+ await ls.evaluate(()=>SimRemote.poll());assert.ok(await ls.evaluate(before=>SimRemote.snapshot.assessment.session.remaining<before,timerBeforeStall));assert.ok(await ls.evaluate(clock=>SimRemote.snapshot.states.yongsan.clock>clock,before));
  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('LS')).close());
  assert.equal(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.getTitle().includes('LS')).isVisible()),false);
  await ls.reload({waitUntil:'load'});await ls.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
@@ -43,6 +44,6 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  const disk=require('./session-store.cjs').read(path.join(profile,'engine-session.orpheia'));assert.equal(disk.format,'ORPHEIA-SESSION');assert.equal(disk.timetable.trains.find(x=>x.id===edited).kind,'회송열차');
  app=await _electron.launch({executablePath,args,env:{...process.env,ORPHEIA_TEST_USER_DATA:profile},timeout:60000});
  const reopened=await app.firstWindow();reopened.on('pageerror',e=>errors.push(String(e)));await reopened.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
- assert.notEqual(await reopened.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await reopened.evaluate(()=>SimRemote.snapshot.clock.paused),true);await expect(reopened.locator('[data-train-slot="5T"]')).toContainText(t);assert.equal(await reopened.evaluate(id=>SimRemote.snapshot.timetable.trains.find(x=>x.id===id).kind,edited),'회송열차');assert.ok(await reopened.evaluate(()=>SimEquipment.isFault('yongsan','N2')));assert.deepEqual(errors,[]);
+ assert.notEqual(await reopened.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await reopened.evaluate(()=>SimRemote.snapshot.clock.paused),true);assert.equal(await reopened.evaluate(()=>SimRemote.snapshot.assessment.session.startedAt),disk.assessment.session.startedAt);assert.equal(await reopened.evaluate(()=>SimRemote.snapshot.assessment.session.remaining),disk.assessment.session.limitSeconds-(disk.states[disk.selected].clock-disk.assessment.session.startedAt));await expect(reopened.locator('[data-train-slot="5T"]')).toContainText(t);assert.equal(await reopened.evaluate(id=>SimRemote.snapshot.timetable.trains.find(x=>x.id===id).kind,edited),'회송열차');assert.ok(await reopened.evaluate(()=>SimEquipment.isFault('yongsan','N2')));assert.deepEqual(errors,[]);
  console.log('PASS durable native restart restores train numbers, timetable, equipment and scenario into a new paused engine');await app.close();app=null;
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});

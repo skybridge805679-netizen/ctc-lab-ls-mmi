@@ -43,7 +43,7 @@ function evaluate(){
  if(isEm(run.sc)){EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),lsm);}
  else{fireBeats();runQueue();}
  if(motion.step())SC().advance(run,ctx());
- if(run.done.every(Boolean)&&!motion.busy()&&!run.queue.length&&!run.passed){run.passed=true;mmi().log('event','실기 시나리오 합격 · '+run.sc.title);}
+ if(run.done.every(Boolean)&&!motion.busy()&&!run.queue.length&&!run.passed){run.passed=true;const t=host.assessment?.().task,late=t?.key===run.assessmentKey&&t.overtime>0;mmi().log('event',(late?'실기 시나리오 절차 완료 · 시간초과 · ':'실기 시나리오 합격 · ')+run.sc.title);}
 }
 function intercept(){return null;}
 function manualNumberAction(a){if(['move','swap','delete'].includes(a.op)){motion.cancel(a.uid);if(a.targetUid)motion.cancel(a.targetUid);}}

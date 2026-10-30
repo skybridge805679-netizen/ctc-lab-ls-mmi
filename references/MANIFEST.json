@@ -448,6 +448,12 @@
       "source": "원본 PPT 및 배선도에서 대조한 파생 전사 자료",
       "bytes": 29733,
       "sha256": "4c950a0934d6fc395f5b8918fec06fbf2f08c324355d8dcbc0a6ea7f5489d14b"
+    },
+    {
+      "path": "references/transcriptions/assessment-timing.json",
+      "original_name": "assessment-timing.json",
+      "bytes": 9488,
+      "sha256": "23d2e0b909d9d134f29f0b4980089b4f9b62d1dd70c988102a630dba83870842"
     }
   ],
   "superseded_attachments": [

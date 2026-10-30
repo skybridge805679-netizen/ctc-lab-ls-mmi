@@ -1,0 +1,190 @@
+{
+  "source": "references/manuals/실무5_최종판_실전대본중심.pdf",
+  "sha256": "0c4a543e2dabc5b263a71c6b32be349ec642b3cec32dab1924b454ff106a4558",
+  "totalSeconds": 3600,
+  "pages": [
+    2,
+    10,
+    202
+  ],
+  "quote": "실기시험은 60분입니다.",
+  "subjectLimits": null,
+  "subjectLimitFinding": "열차운행계획·시스템운용 및 실무·운행선 관리의 독립 시간 배분은 자료에서 확인되지 않음. 4과목을 임의로 15분씩 나누지 않는다.",
+  "emergency": {
+    "em-01": {
+      "minutes": [
+        6
+      ],
+      "source": "references/scenarios/emergency/01.선로침수시, 시청역 하선(상선 열차 진입 중).hwp",
+      "sha256": "cbe87302537ad98344fc4d405bd745674ef1aa7b35fd410b856f95368fa593f5",
+      "extracted": "references/extracted/emergency/01.선로침수시, 시청역 하선(상선 열차 진입 중).txt",
+      "header": " 01-1\n01. 선로침수 시 조치요령(시청역 하선, 6분),    선로침수(ID: 01514)__241122"
+    },
+    "em-02": {
+      "minutes": [
+        12
+      ],
+      "source": "references/scenarios/emergency/02.열차충돌시, 동묘앞역 상선(회송, 구원연결,  단선지령식 지시)_.hwp",
+      "sha256": "f3e30bbb223e048ac627a0b7cded9f6c742c43d3faeacb51f84130743ae22c92",
+      "extracted": "references/extracted/emergency/02.열차충돌시, 동묘앞역 상선(회송, 구원연결,  단선지령식 지시)_.txt",
+      "header": "02. 열차충돌 시 조치요령(동묘앞역, 상선, 12분),  ID: 01513_241122\n❒ 상 황 : 동묘앞역 K0602열차를 후속 K0604열차가 충돌사고 발생하였다.  "
+    },
+    "em-03": {
+      "minutes": [
+        12
+      ],
+      "source": "references/scenarios/emergency/03.열차충돌시, 석수역 상선(구원지시, 운행선변경, 회송).hwp",
+      "sha256": "bc197db7e42d681221744b49f266716331e6df80d7a757202a0ae93cd646fe3a",
+      "extracted": "references/extracted/emergency/03.열차충돌시, 석수역 상선(구원지시, 운행선변경, 회송).txt",
+      "header": "03. 열차충돌 시 조치요령(석수역, 상선, 12분),     ID: 01136_241122\n❒ 상 황 : 석수역 K0450열차를 후속 K0452열차가 충돌사고 발생하였다.  "
+    },
+    "em-04": {
+      "minutes": [
+        6
+      ],
+      "source": "references/scenarios/emergency/04.사상사고시 (금정 하선, 사상자 차량하부) .운행선 변경, 회송운행.hwp",
+      "sha256": "aaff0a8378a36d7d6ac2990fac6f8c2e9e5602c9bdbeec6fe42a24863f16bd1a",
+      "extracted": "references/extracted/emergency/04.사상사고시 (금정 하선, 사상자 차량하부) .운행선 변경, 회송운행.txt",
+      "header": "04. 사상사고 시 조치 요령(금정역 하선, 6분),       (ID 01515)_241122\n❒ 상  황 : 금정역 진입(명학→금정역 운행) 중 K0809열차에서 사상사고 발생하였다."
+    },
+    "em-05-1": {
+      "minutes": [
+        6,
+        7
+      ],
+      "source": "references/scenarios/emergency/05-1.차량고장 시(가, 디역 상선) 운행선변경,구원없음.hwp",
+      "sha256": "4403d9f31fc1bbfab6258e0caaed5cca5e7f3e25fb8e499f0ed5ee3e9f492587",
+      "extracted": "references/extracted/emergency/05-1.차량고장 시(가, 디역 상선) 운행선변경,구원없음.txt",
+      "header": "05-1. 차량고장 시 조치요령(가산디지털역, 상선, 6분_7분),\n (운행선 변경, 정상복구 운행)_240801"
+    },
+    "em-05": {
+      "minutes": [
+        9
+      ],
+      "source": "references/scenarios/emergency/05.차량고장 시(가, 디역 상선) 구원, 운행선변경.hwp",
+      "sha256": "b80db13c9ad33d5fe11b4e14076fbc0c121d6fd667cc3516392568513c97b505",
+      "extracted": "references/extracted/emergency/05.차량고장 시(가, 디역 상선) 구원, 운행선변경.txt",
+      "header": "05. 차량고장 시 조치요령(가산디지털역, 상선, 9분), (ID: 01520),       241122\n❒ 상황 : 가산디지털역 K1208열차 출발 시 차량고장(비상제동 체결 완해 불능) 발생  "
+    },
+    "em-06-1": {
+      "minutes": [
+        9,
+        11
+      ],
+      "source": "references/scenarios/emergency/06-1.열차화재(역간정차,운행선변경 지시).hwp",
+      "sha256": "f21f3648af7e6c7fa91d572a03c71f7afdf09f1b8e037fc63298b67130906c1d",
+      "extracted": "references/extracted/emergency/06-1.열차화재(역간정차,운행선변경 지시).txt",
+      "header": "06-1. 열차화재 시 조치요령(석수역, 상선, 9분_11분), 석수역 화재 상선(01512), 241122\n❒ 상 황 : 석수역 진입 중 K0452열차 객실화재사고 발생 (운행선 변경, 구원)"
+    },
+    "em-06-2": {
+      "minutes": [
+        6
+      ],
+      "source": "references/scenarios/emergency/06-2.열차화재(자력회송, 운행선변경 지시).hwp",
+      "sha256": "53662e080e5a10ba4525b2769701f35394b2c4e39a06e3d35f1229e8289a0ef9",
+      "extracted": "references/extracted/emergency/06-2.열차화재(자력회송, 운행선변경 지시).txt",
+      "header": "06-2. 열차화재 시 조치요령(석수역, 상선, 6분),                  240801\n❒ 상 황 : 석수역 진입 중 K0452열차 객실화재사고 발생(자력회송, 운행선변경 지시)"
+    },
+    "em-06": {
+      "minutes": [
+        9
+      ],
+      "source": "references/scenarios/emergency/06.열차화재(구원연결, 운행선변경 지시).hwp",
+      "sha256": "5fe13aa45f3b4384e09814ca2822c9860d5dcc4d3ca50ee7aab19f8564b18e6f",
+      "extracted": "references/extracted/emergency/06.열차화재(구원연결, 운행선변경 지시).txt",
+      "header": "06. 열차화재 시 조치요령(석수역, 상선, 9분), 석수역 화재 상선(01512), 241122\n❒ 상 황 : 석수역 진입 중 K0452열차 객실화재사고 발생 (운행선 변경, 구원)"
+    }
+  },
+  "notAssessmentLimits": {
+    "approachLock": [
+      90,
+      30
+    ],
+    "trainDelaySeconds": 120
+  },
+  "searchedPDFs": [
+    {
+      "file": "references/diagrams/1.전체노선.pdf",
+      "pages": 4
+    },
+    {
+      "file": "references/manuals/(실기1)관제시스템운용및실습.pdf",
+      "pages": 286
+    },
+    {
+      "file": "references/manuals/(실기2)운행선관리및실습.pdf",
+      "pages": 120
+    },
+    {
+      "file": "references/manuals/(실기3)열차운행계획및실습.pdf",
+      "pages": 146
+    },
+    {
+      "file": "references/manuals/(실기4)비상시조치.pdf",
+      "pages": 210
+    },
+    {
+      "file": "references/manuals/small철도교통관제자격증명 시험설비 운영 매뉴얼.pdf",
+      "pages": 88
+    },
+    {
+      "file": "references/manuals/실무5_최종판_실전대본중심.pdf",
+      "pages": 398
+    },
+    {
+      "file": "references/textbooks/(학과1)관제관련규정.pdf",
+      "pages": 230
+    },
+    {
+      "file": "references/textbooks/(학과3)비상시조치등(20240430).pdf",
+      "pages": 250
+    },
+    {
+      "file": "references/textbooks/교통관제운영_01_001-114.pdf",
+      "pages": 114
+    },
+    {
+      "file": "references/textbooks/교통관제운영_02_115-228.pdf",
+      "pages": 114
+    },
+    {
+      "file": "references/textbooks/교통관제운영_03_229-342.pdf",
+      "pages": 114
+    },
+    {
+      "file": "references/textbooks/교통관제운영_04_343-454.pdf",
+      "pages": 112
+    }
+  ],
+  "basis": "사용자 제공 교재·원본 대본의 연습 기준. 현행 자격시험 공고의 과목별 시간 배분으로 확대 해석하지 않음.",
+  "scenarios": {
+    "geumcheon-6": {
+      "minutes": [
+        4.5
+      ],
+      "source": "references/scenarios/금천구청역 부본선(6번)대피.hwp",
+      "sha256": "7f66a670a153e5b8686d90ed10638d39e086907c8ed7c7bd4d2e4035e3318405",
+      "quote": "금천구청역 부본선(6번) 대피(4분30초)"
+    }
+  },
+  "searchedScenarioDocuments": [
+    "references/scenarios/경합 시나리오.hwpx",
+    "references/scenarios/구술(관제)_열차운행계획,운용및 실무.hwp",
+    "references/scenarios/금천구청역 부본(1번)대피.hwp",
+    "references/scenarios/금천구청역 부본선(6번)대피.hwp",
+    "references/scenarios/스케줄생성 시나리오.hwpx",
+    "references/scenarios/영등포역 부본선(1번)대피.hwp",
+    "references/scenarios/용산역 부본선(5,6번)대피.hwp",
+    "references/scenarios/용산역 부본선(하,4번선)대피.hwp",
+    "references/scenarios/emergency/01.선로침수시, 시청역 하선(상선 열차 진입 중).hwp",
+    "references/scenarios/emergency/02.열차충돌시, 동묘앞역 상선(회송, 구원연결,  단선지령식 지시)_.hwp",
+    "references/scenarios/emergency/03.열차충돌시, 석수역 상선(구원지시, 운행선변경, 회송).hwp",
+    "references/scenarios/emergency/04.사상사고시 (금정 하선, 사상자 차량하부) .운행선 변경, 회송운행.hwp",
+    "references/scenarios/emergency/05-1.차량고장 시(가, 디역 상선) 운행선변경,구원없음.hwp",
+    "references/scenarios/emergency/05.차량고장 시(가, 디역 상선) 구원, 운행선변경.hwp",
+    "references/scenarios/emergency/06-1.열차화재(역간정차,운행선변경 지시).hwp",
+    "references/scenarios/emergency/06-2.열차화재(자력회송, 운행선변경 지시).hwp",
+    "references/scenarios/emergency/06.열차화재(구원연결, 운행선변경 지시).hwp",
+    "references/scenarios/emergency/비상시조치(상황변경시대응).hwp"
+  ]
+}
