@@ -210,7 +210,7 @@ function render(st,def,core,model,neighbours={}){
 
  for(const p of platformBoxes){
   const info=platformInfo.describe(p.kind);
-  platforms+=`<rect data-platform-height="${info.height}" role="button" tabindex="0" aria-label="${info.label} 승강장 정보" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} · ${info.label} · 승강장 정보 보기</title></rect>`;
+  platforms+=`<rect data-platform-height="${info.height}" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} 승강장 · ${info.label}</title></rect>`;
   occupiedBoxes.push([p.x-3,p.y-3,p.right+3,p.y+p.height+3]);
  }
  for(const points of paths)rails+=`<path d="${dpath(points)}"/>`;

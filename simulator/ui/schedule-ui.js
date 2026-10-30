@@ -8,7 +8,7 @@
  const radio=name=>SimDOM.document.querySelector(`input[name="${name}"]:checked`)?.value;
  const mode=()=>radio('scheduleMode'),selectedId=()=>$('scheduleList').value;
  const stationName=id=>N.catalog[id].name;
- const attributes=()=>({boardingHeight:$('scheduleBoardingHeight').value,kind:$('scheduleKind').value,carCount:Number($('scheduleCars').value),relatedTrain:$('scheduleRelated').value.trim().toUpperCase(),service:$('scheduleService').value,flags:[...SimDOM.document.querySelectorAll('input[name="scheduleFlag"]:checked')].map(i=>i.value)});
+ const attributes=()=>({kind:$('scheduleKind').value,carCount:Number($('scheduleCars').value),relatedTrain:$('scheduleRelated').value.trim().toUpperCase(),service:$('scheduleService').value,flags:[...SimDOM.document.querySelectorAll('input[name="scheduleFlag"]:checked')].map(i=>i.value)});
  const key=()=>[draft?.calls[0]?.station,draft?.calls.at(-1)?.station,$('scheduleStart').value].join('|');
  function message(text){$('scheduleMessage').textContent=text;}
  // modal 확인 box; failures and completions are both announced like on the real MMI
@@ -66,12 +66,11 @@
   $('schedulePatternOpen').disabled=!create;
   for(const el of SimDOM.document.querySelectorAll('[name="scheduleEditType"],#scheduleEditTo,#scheduleSuspend,#scheduleResume,[name="scheduleCancelType"],#scheduleCancelFrom,#scheduleCancelTo'))el.disabled=create;
   if(create){
-   $('scheduleBoardingHeight').value='unknown';
-   draft=null;$('scheduleBoardingHeight').value='unknown';$('scheduleNumber').value='A0000';$('scheduleStart').value='09:00:00';
+   draft=null;$('scheduleNumber').value='A0000';$('scheduleStart').value='09:00:00';
   }else if(source){
    draft=structuredClone(source);
    if(m==='edit')$('scheduleNumber').value=source.id;
-   $('scheduleBoardingHeight').value=source.boardingHeight||'unknown';$('scheduleKind').value=source.kind;$('scheduleCars').value=source.carCount??10;$('scheduleRelated').value=source.relatedTrain??'';$('scheduleService').value=source.service??'정기';
+   $('scheduleKind').value=source.kind;$('scheduleCars').value=source.carCount??10;$('scheduleRelated').value=source.relatedTrain??'';$('scheduleService').value=source.service??'정기';
    for(const box of SimDOM.document.querySelectorAll('input[name="scheduleFlag"]'))box.checked=(source.flags??[]).includes(box.value);
    if(m==='copy'){$('scheduleFrom').value=source.calls[0].station;$('scheduleTo').value=source.calls.at(-1).station;$('scheduleNumber').value='C'+source.id.slice(1);$('scheduleStart').value=T.clock(source.calls[0].departure);}
   }else draft=null;

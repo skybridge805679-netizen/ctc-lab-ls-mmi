@@ -29,7 +29,11 @@ function estimate(stationId,direction){
  const platform=arr&&C.routes[arr].destination;
  departures.sort((a,b)=>Number(C.routes[b].geometryRails?.[0]===platform)-Number(C.routes[a].geometryRails?.[0]===platform)||Object.values(C.routes[a].pointPositions).filter(v=>v==='R').length-Object.values(C.routes[b].pointPositions).filter(v=>v==='R').length||nat(a,b));
  const dep=departures[0];
- return {arr:arr&&name(arr),dep:dep&&name(dep)};
+ // The train departs from the track it arrived on: if the preferred departure starts elsewhere, arrive on that track.
+ // (Yeongdeungpo up: 2B_2T would stop an EMU at the low-platform general line and then leave from 7T via 3A.)
+ const from=dep&&C.routes[dep].geometryRails?.[0],onTrack=from&&arrivals.find(id=>C.routes[id].destination===from);
+ const stop=arr&&from&&C.routes[arr].destination!==from&&onTrack?onTrack:arr;
+ return {arr:stop&&name(stop),dep:dep&&name(dep)};
 }
 // stopType: 시발 / 정차 / 종착 as shown in the "정차구분" column.
 function routesFor(stationId,direction,first,last){
