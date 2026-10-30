@@ -8,6 +8,7 @@ const fixedSymbols=typeof module!=='undefined'?require('./fixed-symbols.js'):roo
 const seams=typeof module!=='undefined'?require('./ls-seams'):root.SimLSSeams;
 const blockView=typeof module!=='undefined'?require('./ls-block-signals'):root.SimLSBlockSignals;
 const presets=typeof module!=='undefined'?require('./ls-presets'):root.SimLSPresets;
+const platformInfo=typeof module!=='undefined'?require('../engine/platforms'):root.SimPlatforms;
 const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
@@ -208,7 +209,8 @@ function render(st,def,core,model,neighbours={}){
  }
 
  for(const p of platformBoxes){
-  platforms+=`<rect class="platform ${p.kind==='c'?'cyan':'orange'}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"/>`;
+  const info=platformInfo.describe(p.kind);
+  platforms+=`<rect data-platform-height="${info.height}" role="button" tabindex="0" aria-label="${info.label} 승강장 정보" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} · ${info.label} · 승강장 정보 보기</title></rect>`;
   occupiedBoxes.push([p.x-3,p.y-3,p.right+3,p.y+p.height+3]);
  }
  for(const points of paths)rails+=`<path d="${dpath(points)}"/>`;

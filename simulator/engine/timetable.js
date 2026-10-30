@@ -48,6 +48,7 @@
   if(!/^[A-Z][0-9]{3,5}$/.test(train.id)||!Array.isArray(train.calls)||train.calls.length<2)return false;
   if(!Number.isInteger(train.carCount??10)||(train.carCount??10)<1||(train.carCount??10)>20)return false;
   if(!KINDS.includes(train.kind))return false;
+  if(train.boardingHeight!==undefined&&!['unknown','high','low','both'].includes(train.boardingHeight))return false;
   if(train.service!==undefined&&!['정기','부정기'].includes(train.service))return false;
   if(train.flags!==undefined&&(!Array.isArray(train.flags)||train.flags.some(f=>!FLAGS.includes(f))))return false;
   if(train.relatedTrain&&(!/^[A-Z][0-9]{3,5}$/.test(train.relatedTrain)||train.relatedTrain===train.id))return false;
@@ -65,13 +66,13 @@
   }
   return true;
  }
- function pattern({id,from,to,start,kind='전동열차',carCount=10,relatedTrain=''}){
+ function pattern({id,from,to,start,kind='전동열차',carCount=10,relatedTrain='',boardingHeight='unknown'}){
   const a=N.catalog[from]?.order,b=N.catalog[to]?.order;
   if(a===undefined||b===undefined||a===b||!Number.isInteger(start))return null;
   const direction=b>a?'down':'up',stations=N.stations.slice(Math.min(a,b),Math.max(a,b)+1);
   if(direction==='up')stations.reverse();
   const calls=stations.map((station,i)=>({station:station.id,arrival:start+i*150-(i?30:0),departure:start+i*150,track:'',...R.routesFor(station.id,direction,i===0,i===stations.length-1)}));
-  return {id,direction,kind,service:'정기',flags:[],carCount,relatedTrain,cancelled:false,calls};
+  return {id,direction,kind,service:'정기',flags:[],carCount,relatedTrain,boardingHeight,cancelled:false,calls};
  }
  function create(model,draft){
   if(!draft||!valid(draft)||model.trains.some(t=>t.id===draft.id))return {ok:false,message:'열차번호 중복, 역 순서, 시각(동일 운행일), 차량수 및 속성을 확인하세요.'};
@@ -87,6 +88,7 @@
   if(draft.calls.some((c,i)=>c.arrival!==train.calls[i].arrival||c.departure!==train.calls[i].departure))flags.push('time');
   if(draft.calls.some((c,i)=>(c.arrivalRoute??'')!==(train.calls[i].arrivalRoute??'')||(c.departureRoute??'')!==(train.calls[i].departureRoute??'')||(c.track??'')!==(train.calls[i].track??'')))flags.push('route');
   if(draft.kind!==train.kind)flags.push('kind');
+  if((draft.boardingHeight||'unknown')!==(train.boardingHeight||'unknown'))flags.push('boardingHeight');
   if((draft.relatedTrain??'')!==(train.relatedTrain??''))flags.push('related');
   if(draft.calls.some((c,i)=>(c.cancelled??false)!==(train.calls[i].cancelled??false)))flags.push('cancel');
   const plan=train.plan;Object.assign(train,structuredClone(draft));train.plan=plan;train.direction=N.catalog[train.calls[0].station].order<N.catalog[train.calls.at(-1).station].order?'down':'up';if(train.cancelled)train.calls.forEach(c=>{c.cancelled=true;});model.changes.push({type:'update',id,flags});return {ok:true,message:id+' 편집 적용 완료'};
@@ -100,7 +102,7 @@
   draft.id=id;draft.cancelled=false;delete draft.plan;
   draft.calls=draft.calls.map(c=>({...c,arrival:c.arrival+offset,departure:c.departure+offset,cancelled:false}));
   if(first>0){draft.calls[0].stopType='시발';draft.calls[0].arrivalRoute='';}if(last<source.calls.length-1){draft.calls.at(-1).stopType='종착';draft.calls.at(-1).departureRoute='';}
-  for(const key of ['kind','carCount','relatedTrain','service','flags'])if(attributes[key]!==undefined)draft[key]=attributes[key];
+  for(const key of ['kind','carCount','relatedTrain','service','flags','boardingHeight'])if(attributes[key]!==undefined)draft[key]=attributes[key];
   const result=create(model,draft);if(result.ok){model.changes.at(-1).type='copy';model.changes.at(-1).sourceId=sourceId;result.message=id+' 스케줄 복사 완료';}return result;
  }
  // 경합 검지 (실기3 4장, p.64-70): 같은 방향 열차끼리의 추월경합, 도착/출발 운전시격 경합, 같은 도착선 동시 점유(플랫폼 할당 경합).

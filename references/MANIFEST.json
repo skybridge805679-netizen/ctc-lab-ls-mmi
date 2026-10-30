@@ -466,6 +466,12 @@
       "original_name": "oral-functions-audit.json",
       "bytes": 14925,
       "sha256": "1088709a08cd7e0652d7346af93e98d8b03f111462f668ecf4577418c7bd8892"
+    },
+    {
+      "path": "references/transcriptions/platform-heights.json",
+      "original_name": "platform-heights.json",
+      "bytes": 975,
+      "sha256": "f357ea168d313af8c6741dda50405ef75ef3436c7f84f5f4ce567da49873d596"
     }
   ],
   "superseded_attachments": [
