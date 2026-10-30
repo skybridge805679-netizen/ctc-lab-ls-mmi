@@ -5,6 +5,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright, expect
+import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 
 def pick_pattern(page, pattern='0129103'):
     # [열차운행패턴선택] -> [PTN_LOAD]: pick the pattern, keep its whole stretch, 확인

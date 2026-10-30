@@ -37,7 +37,8 @@ def exercise(page, url, width):
     expect(row).to_be_visible()
     expect(row.locator('.chip.set')).to_have_text('설정')
     expect(row.locator('.overlap-note')).to_contain_text('26')
-    expect(page.locator('[data-overlap-point="26"]')).to_have_count(1)
+    # 26 is a crossover group restored with both ends (26A·26B, v0.26.2): the overlap ring marks each end
+    expect(page.locator('[data-overlap-point="26"]')).to_have_count(2)
     expect(page.locator('[data-point-label="26"]')).to_have_count(1)
 
     # No approaching train: stop releases immediately.

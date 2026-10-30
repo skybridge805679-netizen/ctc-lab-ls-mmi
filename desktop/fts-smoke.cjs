@@ -1,4 +1,6 @@
 'use strict';
+// docs/ previews are refreshed only with UPDATE_DOCS_PREVIEWS=1; otherwise screenshots go to the temp folder
+const preview=name=>process.env.UPDATE_DOCS_PREVIEWS==='1'?path.join(__dirname,'../docs',name):path.join(require('os').tmpdir(),name);
 const {_electron}=require('playwright'),{expect}=require('@playwright/test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-fts-'));let app;
 async function launch(){const packed=process.env.ORPHEIA_PACKAGED_EXECUTABLE,executablePath=packed?path.resolve(packed):require('electron'),args=packed?['--orpheia-smoke-test']:[path.join(__dirname,'..'),'--orpheia-smoke-test'];if(process.env.ORPHEIA_TEST_NO_SANDBOX==='1')args.unshift('--no-sandbox');app=await _electron.launch({executablePath,args,env:{...process.env,ORPHEIA_TEST_USER_DATA:profile},timeout:60000});const ls=await app.firstWindow();await ls.waitForFunction(()=>window.SimRemote&&window.SimWorkspace?.detached());return ls;}
@@ -15,8 +17,8 @@ async function launch(){const packed=process.env.ORPHEIA_PACKAGED_EXECUTABLE,exe
  await mmi.click('#mmiFtsBtn');await mmi.locator('[data-mmi-window="fts"] [data-fts-page="monitor"]').first().click();await expect(mmi.locator('[data-manual="베이스스캔 구술"]')).toBeVisible();
  if(process.env.ORPHEIA_CAPTURE_FTS==='1'){
   await app.evaluate(({BrowserWindow})=>{for(const w of BrowserWindow.getAllWindows())w.setBounds({x:0,y:0,width:1700,height:1030});});
-  await ls.evaluate(()=>SimMMI.close('ftsProblem'));await mmi.waitForTimeout(500);await mmi.screenshot({path:path.join(__dirname,'../docs/preview-v0.30.0-fts-monitor.png')});
-  await mmi.click('#mShow');await mmi.waitForTimeout(200);await mmi.screenshot({path:path.join(__dirname,'../docs/preview-v0.30.0-fts-problem.png')});await ls.evaluate(()=>SimMMI.close('ftsProblem'));
+  await ls.evaluate(()=>SimMMI.close('ftsProblem'));await mmi.waitForTimeout(500);await mmi.screenshot({path:preview('preview-v0.30.0-fts-monitor.png')});
+  await mmi.click('#mShow');await mmi.waitForTimeout(200);await mmi.screenshot({path:preview('preview-v0.30.0-fts-problem.png')});await ls.evaluate(()=>SimMMI.close('ftsProblem'));
  }
  await mmi.locator('[data-manual="베이스스캔 구술"]').click();await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.finished);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.history[0].got),300);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.clock.paused),true);await expect(mmi.locator('.fts-result')).toContainText('300/300');assert.deepEqual(errors,[]);
  await app.close();app=null;ls=await launch();assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.session.id),id);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.history[0].got),300);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.clock.paused),true);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.ftsLibrary.scenarios[0].name),'독립 엔진 FTS 실습');

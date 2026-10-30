@@ -5,6 +5,7 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright,expect
+import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 ROOT=Path(__file__).resolve().parent.parent
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -44,7 +45,8 @@ try:
    page.click('#mmiTrainApply');confirm();expect(win('B965T').locator('text')).to_have_text('>K1133');assert entries('geumcheon','B965T')[0]['uid']==uid
    page.select_option('#mmiTrainOp','move');page.select_option('#mmiTrainTargetStation','anyang');page.select_option('#mmiTrainTargetSlot','1T');page.click('#mmiTrainApply');confirm();assert not entries('geumcheon','B965T');assert entries('anyang','1T')[0]['uid']==uid
    page.select_option('#mmiTrainStation','anyang');expect(page.locator('#stationSelect')).to_have_value('anyang');expect(win('1T').locator('text')).to_have_text('>K1133')
-   page.select_option('#mmiTrainSlot','1T');page.click('#mmiTrainProperty');expect(page.locator('#graphTrain')).to_have_value('K1133')
+   page.select_option('#mmiTrainSlot','1T');page.click('#mmiTrainProperty');expect(page.locator('#dialogTitle')).to_contain_text('열차 속성 조회');expect(page.locator('#dialogBody')).to_contain_text('K1133');page.locator('#actionDialog [value="cancel"]').click()
+   page.evaluate("SimMMI.open('graph')")   # 열차 속성 is the shared LS/MMI property view since v0.27.1; the graph is opened from the menu
    expect(page.locator('[data-mmi-window="graph"]')).to_have_class(__import__('re').compile('docked'))
    page.locator('[data-dia-station="geumcheon"]').click();expect(page.locator('#stationSelect')).to_have_value('geumcheon');expect(page.locator('#mmiTrainStation')).to_have_value('geumcheon')
    assert page.evaluate('JSON.stringify(stationStates.geumcheon.routes)')==core

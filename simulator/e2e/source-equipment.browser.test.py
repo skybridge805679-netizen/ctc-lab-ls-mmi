@@ -5,6 +5,7 @@ from pathlib import Path
 from threading import Thread
 import json
 from playwright.sync_api import sync_playwright,expect
+import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 ROOT=Path(__file__).resolve().parent.parent
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*a):pass

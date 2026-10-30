@@ -4,6 +4,7 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright,expect
+import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 ROOT=Path(__file__).resolve().parent.parent
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -15,6 +16,8 @@ try:
    page=b.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.click('#mmiScenarioBtn')
    page.select_option('#scSelect','yongsan-5');page.click('#scStart');number=page.input_value('#scTrain')
+   # starting a scenario starts the exam clock (v0.27.0), so pause again for the frozen-motion check
+   if '일시정지' in page.inner_text('#pauseBtn'):page.click('#pauseBtn')
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    for a in [{'type':'mode','value':'CCM','source':'MMI'},{'type':'stop','id':'2A','source':'LS'},{'type':'tick','seconds':90},{'type':'route','id':'2A-5T','source':'LS'}]:assert run(a)['ok']
    page.clock.run_for(600)

@@ -4,6 +4,7 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright,expect
+import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 ROOT=Path(__file__).resolve().parent.parent
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -29,7 +30,7 @@ try:
    run({'type':'tick','seconds':10});assert page.evaluate('SimLine.journeys.get("K1131")')=='B006T'
    run({'type':'tick','seconds':110});assert page.evaluate('SimField.state("dongmyo").approach["1B"]')
    page.select_option('#stationSelect','dongmyo');expect(page.locator('[data-train-occupied="B012T"]')).to_have_count(1)
-   page.click('#mmiLineBtn');expect(page.locator('#lnSummary')).to_contain_text('317개 회로');expect(page.locator('#lnRows')).to_contain_text('B012T')
+   page.click('#mmiLineBtn');expect(page.locator('#lnSummary')).to_contain_text('320개 회로');expect(page.locator('#lnRows')).to_contain_text('B012T')
    if width==1440:page.locator('[data-mmi-window="lineNet"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.19.4-circuits.png'))
    # Corrected 53B→53A gives both confirmed departures native contiguous resource paths.
    page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.evaluate('SimAutoUI.set(false)');page.select_option('#stationSelect','anyang')
