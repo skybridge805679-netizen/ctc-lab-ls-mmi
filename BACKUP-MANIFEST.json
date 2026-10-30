@@ -1,5 +1,5 @@
 {
-  "version": "0.30.0",
+  "version": "0.31.1",
   "backupDate": "2026-10-30",
   "scope": "루트·archive·docs·simulator·tools. references는 references/MANIFEST.json 참조",
   "files": [
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 53539,
-      "sha256": "d31849fe0b388c737bf5445e61d5d29af2bb04896679ed85f5dba68f9f1ae812"
+      "bytes": 54639,
+      "sha256": "e2a8b730e41ebb60c0d42ec036942f697c55d910f5c121d7310aeb0c8e949ca4"
     },
     {
       "path": "README.md",
-      "bytes": 20989,
-      "sha256": "99d0f812d2f8c10bc64df617eefb0bd693239e0bddba007413bbda233aeb4a53"
+      "bytes": 21402,
+      "sha256": "4a4d0802ab4fb2346ab35c998632f8a647d93e5d6e2c67f36b7a10bc1bef1df9"
     },
     {
       "path": "archive/CTC-LAB-v0.1.zip",
@@ -214,6 +214,11 @@
       "sha256": "1c791d2ca4d922b5a2b0a0832f25976bbde7885c0541333b20c7b1e9e4c27d21"
     },
     {
+      "path": "archive/CTC-LAB-v0.31.1.zip",
+      "bytes": 11961865,
+      "sha256": "2a31ebb4c55b741aec30bfc09a9daa90d5e7ffad5da247543f125c9252508c00"
+    },
+    {
       "path": "archive/CTC-LAB-v0.4.zip",
       "bytes": 63377,
       "sha256": "6d428ace01a588663a87ce57851c416442106e9e9e6006084c14198232c6b9bb"
@@ -325,8 +330,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 9609,
-      "sha256": "569e073f719db28f081df5084c8c5391e41bce27e864ba04b24dfe7a9e0e0b83"
+      "bytes": 10281,
+      "sha256": "32dc8396002942f6631baa977bf327e926de51a1cd1e0095641654ef89741457"
     },
     {
       "path": "desktop/resources/icon.ico",
@@ -1869,6 +1874,11 @@
       "sha256": "9194fdcfc7c5fa00a56d25fb466de39c0a6c62dd5bd65589095e6067c07cc019"
     },
     {
+      "path": "docs/preview-v0.31.1-briefing.png",
+      "bytes": 531294,
+      "sha256": "a65c86e90ad9ff50e264c10d60012efdc075633e54a119daf6c31b75ebfa5115"
+    },
+    {
       "path": "docs/preview-v0.5-diagram.png",
       "bytes": 132631,
       "sha256": "99f2e7f79e0222125bdc6e423b004262c5bacf182da59631b1508dfadcc974af"
@@ -2224,6 +2234,16 @@
       "sha256": "55cf6dde5f055b0ed1dde0e575507a9013da77af6c31fe46bab99370e7ea4773"
     },
     {
+      "path": "docs/v0.31.0-접근쇄정·오버랩규칙.md",
+      "bytes": 3606,
+      "sha256": "88dcbd3a6ac4e2417040c5a901f53b190cf5f6d1c1c436fb497d8429a1b2b865"
+    },
+    {
+      "path": "docs/v0.31.1-문제발생화면.md",
+      "bytes": 2590,
+      "sha256": "42f7ef723d440d7293db1cfc26580fd52ffda1aea977784b5a8ce77ca2dc0a74"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -2316,17 +2336,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "bb285e45356cf7522c9d5bf08604d13a0e9620f4196e71bf49f1bb365655c9dd"
+      "sha256": "5b6e6ba8a45ed427dfce3b0af687e76280207cd52d4ec0a60fb4503367e4b280"
     },
     {
       "path": "package.json",
       "bytes": 2215,
-      "sha256": "618cf396f29c35f292c6763566f5b9be8d53a3b5ff727c85e4086ec139a2283b"
+      "sha256": "1912fc95ea88af34948521dbca372ca3cdf19b1393cc9387f0f9af4d0cf63a31"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 10837,
-      "sha256": "a928be10eba510b0cad10f0d183a5ae35bfb763e830e3bea7d7e1082da5d6936"
+      "bytes": 11023,
+      "sha256": "19d883857872608ab659579dfe7528b5720f3fc7c9aa7b17bb7a90667a6689f3"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2360,18 +2380,23 @@
     },
     {
       "path": "simulator/assets/orpheia/MANIFEST.json",
-      "bytes": 2105,
-      "sha256": "0be08e01c783a9d28a2d73630239d23abf4c2987dc40e8fc0951ab4c6cc124d5"
+      "bytes": 2863,
+      "sha256": "79f3b714a2f0388842c98b071e997803850866f9f59cc6b6f8ab169ac8631cab"
     },
     {
       "path": "simulator/assets/orpheia/README.md",
-      "bytes": 1338,
-      "sha256": "63ed5b0fa8dd892ea4525f965bac6c431d6672a3bde3cad3e4c0ebcce8887956"
+      "bytes": 1666,
+      "sha256": "03bbd3a510e59c87cb717e547bbaea3df6a3bc27e183c9f9bb94395c3fda0865"
     },
     {
       "path": "simulator/assets/orpheia/banner.png",
       "bytes": 1895681,
       "sha256": "4a08432849589958256e1e48c544158798b631bc1ec9473a0aa5ceb7292f56bb"
+    },
+    {
+      "path": "simulator/assets/orpheia/briefing.png",
+      "bytes": 1972251,
+      "sha256": "892d60ea1b22877f75c559c4a2f59c1f22f07519180853e95560d8972cc9cccd"
     },
     {
       "path": "simulator/assets/orpheia/emblem.png",
@@ -2542,6 +2567,11 @@
       "path": "simulator/e2e/fixed-symbols.browser.test.py",
       "bytes": 3934,
       "sha256": "4224cfeb7eddd62f7d2978cc9e084019090692da0d9d8895ea281a15c2255a3f"
+    },
+    {
+      "path": "simulator/e2e/fts-briefing.browser.test.py",
+      "bytes": 4155,
+      "sha256": "3a91198deaca3914e7554bdd41d008f09d37ecd460133609fc71977f0dce60b6"
     },
     {
       "path": "simulator/e2e/fts-editors.browser.test.py",
@@ -2810,8 +2840,8 @@
     },
     {
       "path": "simulator/engine/core.js",
-      "bytes": 15428,
-      "sha256": "584cea8395ec8a68dca859b861d44b0f30958847202288de940997f4439dffda"
+      "bytes": 15755,
+      "sha256": "54e1866aef61a2ec190d60bcfabf90fbde94369d30537ab9c9bd3b36f65eebf0"
     },
     {
       "path": "simulator/engine/core.test.cjs",
@@ -2864,9 +2894,14 @@
       "sha256": "b59c0233c734b29dce31fa59019e99a8d1c89fa2f359a0946bba88491f02b37a"
     },
     {
+      "path": "simulator/engine/interlocking-rules.test.cjs",
+      "bytes": 2763,
+      "sha256": "df8b28c8d66ddf0a1660daa2fc0773197b44fec692a6e053adb4cb48030aca81"
+    },
+    {
       "path": "simulator/engine/interlocking.js",
-      "bytes": 1714,
-      "sha256": "e673fc33f8d923b329c75e5a14e90fdef0a230ca6b3a90278b34132001e2ad62"
+      "bytes": 6537,
+      "sha256": "736ca77f56fd734687eedcbebca2fa6a7a4bbd88572bd46756282b1b9cedb7d2"
     },
     {
       "path": "simulator/engine/interlocking.test.cjs",
@@ -2975,13 +3010,13 @@
     },
     {
       "path": "simulator/engine/route-conflict-audit.cjs",
-      "bytes": 4052,
-      "sha256": "dea741a03e423c8a1996453ef5525aa8236a4b354e4020de718135c38b6c7ca1"
+      "bytes": 4764,
+      "sha256": "90e20625349a3d980bf5622f1d6a24d2b22fb63936ab6509ae7e12ad3a5eae04"
     },
     {
       "path": "simulator/engine/route-conflicts.test.cjs",
-      "bytes": 665,
-      "sha256": "aa0a2268280cea7ce684fcc3400578821af7d2d99d34c9f0ae01417848bbfd68"
+      "bytes": 929,
+      "sha256": "fb923d65d66ec0013760f805617b9ed64930e68117fec5f05df8c483335f71c0"
     },
     {
       "path": "simulator/engine/route-menus.js",
@@ -3155,8 +3190,8 @@
     },
     {
       "path": "simulator/ui/app.js",
-      "bytes": 34573,
-      "sha256": "a07e7b13442a3f74018747d6cca704ed2fcb75cdf6b3b07aa840b5cc02cbec81"
+      "bytes": 34601,
+      "sha256": "7553720a10423df65e322b45ce988f90b232b27155965c67ca81770c264150f7"
     },
     {
       "path": "simulator/ui/assessment-ui.js",
@@ -3190,13 +3225,13 @@
     },
     {
       "path": "simulator/ui/fts.css",
-      "bytes": 9276,
-      "sha256": "af7c03a83828e98917a58be618016dc427c962b4f9fe387008e9ffaa4eb6fc5f"
+      "bytes": 13401,
+      "sha256": "965caff930d35ad9d06767ace0b51814be20bed46a2cf2d8aa61b34fb4109fab"
     },
     {
       "path": "simulator/ui/fts.js",
-      "bytes": 64948,
-      "sha256": "a2a1658ed7bff2c81070514266ad11e34ed519077b268d1962f80b6ead895c35"
+      "bytes": 66682,
+      "sha256": "0c388366f83b2ff997e5b7ece11932166b88ad236e76d9661d18429678e3fa06"
     },
     {
       "path": "simulator/ui/ls-block-signals.js",
@@ -3240,8 +3275,8 @@
     },
     {
       "path": "simulator/ui/ls-switches.js",
-      "bytes": 5473,
-      "sha256": "0293a8476b45fac43f8ecf6d1ac803367211476f6823185fa91cc67df55716f5"
+      "bytes": 5479,
+      "sha256": "1f24f86f6d24955432f7ae42d4f06c25f0389f25da4767d636819900e5d46989"
     },
     {
       "path": "simulator/ui/ls-switches.test.cjs",
@@ -3250,8 +3285,8 @@
     },
     {
       "path": "simulator/ui/ls-view.js",
-      "bytes": 36196,
-      "sha256": "a6e444acebfea32360d9d8f7a28820853dc08da66ec58038e0da0d25ae62cfd6"
+      "bytes": 36208,
+      "sha256": "e85261d93f2d4c3a561f4a8577f415fcf3894734ba4320352bf4e8b85cae5312"
     },
     {
       "path": "simulator/ui/ls-view.test.cjs",

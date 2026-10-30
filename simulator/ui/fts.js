@@ -421,7 +421,7 @@ ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLi
 
 // ---------------------------------------------------------------- 교육생 "문제 발생" 화면
 function showProblem(){
- if(!M().windowIds().includes('ftsProblem'))M().createWindow('ftsProblem',{title:'문제 발생',x:120,y:20,width:980,body:'<div id="ftsProblemBody" class="fts-problem"></div>'});
+ if(!M().windowIds().includes('ftsProblem'))M().createWindow('ftsProblem',{title:'문제 발생',x:230,y:20,width:1060,body:'<div id="ftsProblemBody" class="fts-problem"></div>'});
  M().open('ftsProblem');renderProblem();
 }
 function renderProblem(){
@@ -430,10 +430,17 @@ function renderProblem(){
  const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem);
  const elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0,remaining=Math.max(0,(p?.limit||0)-elapsed);
  const signature=JSON.stringify([session.current,item.status,item.error,session.finished,session.showActions,session.notice]);if(problemSignature===signature){if($('pbElapsed'))$('pbElapsed').textContent=clockText(elapsed);if($('pbRemaining'))$('pbRemaining').textContent=clockText(remaining);return;}problemSignature=signature;
- box.innerHTML=`<div class="fts-pb-time"><span>남은 시간</span><b id="pbRemaining">${clockText(remaining)}</b><span>제한시간</span><b>${clockText(p?.limit)}</b><span>경과시간</span><b id="pbElapsed">${clockText(elapsed)}</b></div><h2>${session.finished?'교육 종료':item.status==='대기'?'다음 문제 대기':'문제 발생'}</h2>
-<div class="fts-pb-cap">문제 명칭</div><div class="fts-pb-box">${esc(item.status==='대기'&&!session.finished?'':p?.name)}</div>
-<div class="fts-pb-cap">상황</div><div class="fts-pb-box">${esc(item.status==='대기'?'':p?.situation||'').replace(/\n/g,'<br>')}${session.notice?`<br>${esc(session.notice)}`:''}</div>
-${session.showActions?`<div class="fts-pb-cap">조치사항</div><div class="fts-pb-box">${esc(item.status==='대기'?'':p?.actions||'').replace(/\n/g,'<br>')}</div>`:''}`;
+ const waiting=item.status==='대기'&&!session.finished,title=session.finished?'교육 종료':waiting?'다음 문제 대기':item.error?'진행 확인 필요':'문제 발생',status=session.finished?'finished':item.error?'error':waiting?'waiting':'active';
+ const text=value=>esc(value||'');
+ const section=(key,number,label,content,empty)=>`<section class="fts-briefing-section fts-briefing-${key}" aria-labelledby="pb-${key}-label"><div class="fts-pb-cap" id="pb-${key}-label"><span aria-hidden="true">${number}</span>${label}</div><div class="fts-pb-box" data-problem-section="${key}">${content?text(content):`<span class="fts-pb-empty">${empty}</span>`}</div></section>`;
+ box.dataset.status=status;
+ box.innerHTML=`<div class="fts-pb-time" aria-label="문제 시간"><div class="fts-pb-clock primary"><span>남은 시간</span><b id="pbRemaining">${clockText(remaining)}</b></div><div class="fts-pb-clock"><span>제한시간</span><b>${clockText(p?.limit)}</b></div><div class="fts-pb-clock"><span>경과시간</span><b id="pbElapsed">${clockText(elapsed)}</b></div></div>
+<header class="fts-briefing-hero"><div class="fts-briefing-heading"><small>ORPHEIA · SCENARIO BRIEFING</small><h2>${title}</h2><div class="fts-briefing-meta"><span>${esc(p?.subject||'관제 실습')}</span><span>문제 ${Math.min(session.current+1,session.items.length)} / ${session.items.length}</span></div><p>${session.finished?'교육 기록에서 결과와 조치 내용을 확인하세요.':waiting?'다음 문제의 발생조건을 기다리고 있습니다.':'제시된 내용을 확인하고 LS·MMI에서 조치하세요.'}</p></div><div class="fts-briefing-art" aria-hidden="true"><img src="assets/orpheia/briefing.png" alt="" width="1312" height="1199"></div></header>
+<div class="fts-briefing-content">${section('name','01','문제명칭',waiting?'':p?.name,waiting?'문제 발생 대기 중입니다.':'별도로 제시된 문제명칭이 없습니다.')}
+${section('situation','02','상황',waiting?'':p?.situation,waiting?'상황 발생을 기다리고 있습니다.':'별도로 제시된 상황이 없습니다.')}
+${session.notice&&!waiting?`<aside class="fts-briefing-notice" role="status"><b>추가 안내</b><span>${esc(session.notice)}</span></aside>`:''}
+${item.error?`<aside class="fts-briefing-error" role="alert"><b>진행 확인</b><span>${esc(item.error)}</span></aside>`:''}
+${session.showActions?section('actions','03','조치사항',waiting?'':p?.actions,waiting?'문제 발생 후 표시됩니다.':'별도로 제시된 조치사항이 없습니다.'):''}</div>`;
 }
 function speak(text){try{if(!text||!root.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';root.speechSynthesis.cancel();root.speechSynthesis.speak(u);}catch{}}
 
