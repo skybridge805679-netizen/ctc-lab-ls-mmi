@@ -29,11 +29,11 @@ FTS 제어통제 시스템(MMI 상단 **FTS 제어통제**)의 문제·상황·�
 | `deductions` | 감점사항: `[{"label":"...","points":10,"condition":조건}]` |
 | `script` | (선택) 내장 대본 ID — 대본 단계 진행률로 채점: `yongsan-5`, `yongsan-4`, `yeongdeungpo-1`, `geumcheon-1`, `geumcheon-6`, `em-01`~`em-06-2`, `sch-conflict`, `sch-create` |
 
-점수 = 배점 × (맞은 채점 점수 / 전체 채점 점수) − 감점.
+점수 = 배점 × (맞은 채점 점수 / 전체 채점 점수) − 감점. 발생한 감점은 조건이 해소되어도 유지합니다. 0점 배점·가중치는 그대로 보존합니다. 대본 문제는 단계와 열차 이동/대기열이 모두 끝나야 완료됩니다.
 
 ### 상황
 `{"id":"S-1","name":"상황명칭","section":"지하청량리-수원","scheduleId":"01201","limit":600,"problems":["P-101","P-102"]}`
-— `scheduleId`가 `schedules`에 있으면 상황이 시작될 때 그 열차 스케줄을 온라인 시간표로 불러옵니다. 없으면 지금 시간표를 씁니다.
+— `scheduleId`가 `schedules`에 있으면 상황이 시작될 때 그 열차 스케줄을 온라인 시간표로 불러옵니다. 없으면 지금 시간표를 씁니다. `limit`가 0보다 크면 상황 시작부터 발생조건 대기를 포함한 전체 시간제한이며, 만료 시 해당 상황의 진행·대기 문제를 시간초과로 처리합니다.
 
 ### 시나리오
 `{"id":"SC-1","name":"시나리오 이름","author":"C001","createdAt":"2026-10-30 12:00:00","situations":["S-1","S-2"]}`
@@ -67,7 +67,7 @@ FTS 제어통제 시스템(MMI 상단 **FTS 제어통제**)의 문제·상황·�
 덧붙일 수 있는 키: `trainAt.slot`(열번창), `trainExists.from/to/start`(시발·종착·출발시각 HH:MM:SS), `cancelled.value`(false면 부활운행), `event.station/id/value`, `script.steps`, `manual.key`.
 - `mode.value`: `CCM`·`AUTO`·`LOCAL` · `point.value`: `N`(정위)·`R`(반위)
 - `schedule.field`: `dwell`(정차시분, 초) · `arrival`/`departure`(HH:MM:SS) · `arrivalRoute`/`departureRoute`(예 `1B_3T`) · `cancelled`
-- `event.eventType`: MMI·LS 조작 종류 — `mode`, `route`, `stop`, `withdraw`, `point`, `lsOperation`, `schedule` 등
+- `event.eventType`: 현재 문제가 시작된 뒤의 실제 MMI·LS 조작 종류 — `mode`, `route`, `stop`, `withdraw`, `point`, `lsOperation`, `schedule` 등
 - `route`는 역의 진로표에 있는 ID만 됩니다 (예: 용산 `2A-5T`). 진로 이름은 LS 진로 메뉴와 같습니다.
 
 ## 현상
@@ -83,6 +83,12 @@ FTS 제어통제 시스템(MMI 상단 **FTS 제어통제**)의 문제·상황·�
 | `cancel` | 구간 운휴 | `train`, `from`, `to` |
 | `alarm` | 알람 발생 | `text` |
 | `notice` | 안내 메시지 | `text` |
+
+`createTrain.kind`로 열차종류를 선택할 수 있습니다.
+
+## 저장·진행
+
+데스크톱에서는 라이브러리·진행 중 교육·고정 시험지·이력이 독립 엔진에 저장됩니다. 교육 중 편집은 다음 교육에 적용됩니다. 초기 상황에 문제가 아직 없는 초안도 저장할 수 있지만 교육을 시작하려는 시나리오는 완성되어야 합니다.
 
 ## 역 ID
 `cheongnyangni` 청량리 · `jegidong` 제기동 · `sinseoldong` 신설동 · `dongmyo` 동묘앞 · `dongdaemun` 동대문 · `jongno5` 종로5가 · `jongno3` 종로3가 · `jonggak` 종각 · `cityhall` 시청 · `underground-seoul` 지하서울 · `seoul` 서울 · `namyeong` 남영 · `yongsan` 용산 · `noryangjin` 노량진 · `daebang` 대방 · `singil` 신길 · `yeongdeungpo` 영등포 · `sindorim` 신도림 · `guro` 구로 · `gasan` 가산디지털 · `doksan` 독산 · `geumcheon` 금천구청 · `seoksu` 석수 · `gwanak` 관악 · `anyang` 안양 · `myeonghak` 명학 · `geumjeong` 금정 · `gunpo` 군포 · `dangjeong` 당정 · `uiwang` 의왕 · `skku` 성균관대 · `hwaseo` 화서 · `suwon` 수원

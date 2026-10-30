@@ -1,7 +1,7 @@
 {
   "name": "orpheia-ctc-lab",
   "productName": "ORPHEIA CTC LAB",
-  "version": "0.29.0",
+  "version": "0.30.0",
   "description": "오르페이아 철도관제 LS·MMI 데스크톱 실습",
   "private": true,
   "author": "CTC LAB",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test desktop/*.test.cjs simulator/engine/*.test.cjs simulator/ui/*.test.cjs",
-    "test:desktop": "node desktop/smoke.cjs && node desktop/engine-smoke.cjs && node desktop/ls-windows-smoke.cjs",
+    "test:desktop": "node desktop/smoke.cjs && node desktop/engine-smoke.cjs && node desktop/ls-windows-smoke.cjs && node desktop/fts-smoke.cjs",
     "pack": "electron-builder --dir --publish never",
     "dist:mac": "electron-builder --mac --arm64 --publish never",
     "dist:win": "electron-builder --win --x64 --publish never",

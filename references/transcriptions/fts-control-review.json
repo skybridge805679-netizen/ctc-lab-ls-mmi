@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-30",
+  "baseline": {
+    "branch": "main",
+    "commit": "5e9441c",
+    "version": "0.29.0",
+    "staleClaudeBranchHead": "1ab6777"
+  },
+  "reference": "사용자 제공 FTS 제어통제 화면 사진과 기존 구술·실기 대본",
+  "design": {
+    "mainColour": "#BEE3E3",
+    "banner": "simulator/assets/orpheia/banner.png",
+    "directive": "FTS 제어통제 시스템이라고 써있는 넓은 직사각형 칸에 기존 에셋 배치"
+  },
+  "verification": "독립 엔진 소유, 고정 시험지, 문제·상황 시간제한, 현상 오류, 감점 유지, 재시도 기록, 이력 내보내기, 네이티브 렌더러 정지·재실행과 세션 복구",
+  "limits": [
+    "외부 CTC·EMC·SIC·DB 연결은 모의",
+    "FTS 구술 확인 조건은 교수 확인; 내장 대본은 기존 자동 구술·조작·이동 진행을 따르며 음성 인식 채점이 아님",
+    "상황 재로딩은 설정/문제 재시도이며 전체 철도망의 과거 상태 되감기가 아님"
+  ]
+}

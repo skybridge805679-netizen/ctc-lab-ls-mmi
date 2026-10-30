@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | [guide.png](guide.png) | 1069×1472 | 투명 | MMI 대기 배경·사용 안내 |
 | [emblem.png](emblem.png) | 1254×1254 | 투명 | 브랜드·창 식별·favicon·빈 기록 |
-| [banner.png](banner.png) | 2172×724 | 불투명 | 메인 작업 영역 헤더 |
+| [banner.png](banner.png) | 2172×724 | 불투명 | 메인 작업 영역 헤더 · FTS 총괄제어 제목 배너 |
 
 <img src="guide.png" height="260" alt="오르페이아 안내 캐릭터"> <img src="emblem.png" height="210" alt="오르페이아 원형 엠블럼">
 

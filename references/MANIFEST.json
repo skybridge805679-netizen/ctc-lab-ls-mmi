@@ -470,8 +470,26 @@
     {
       "path": "references/transcriptions/platform-heights.json",
       "original_name": "platform-heights.json",
-      "bytes": 975,
-      "sha256": "f357ea168d313af8c6741dda50405ef75ef3436c7f84f5f4ce567da49873d596"
+      "bytes": 1185,
+      "sha256": "5c7d74cc1002b203a84f81a2d5a93340028bc38a268f088febd9b83ba18fff24"
+    },
+    {
+      "path": "references/transcriptions/fts-control-review.json",
+      "original_name": "fts-control-review.json",
+      "bytes": 1021,
+      "sha256": "f1e2c28b13d698eba197c012578afff1c003173f4f4ef22a2c6e72aec79d286a"
+    },
+    {
+      "path": "references/route-menus/evidence/uiwang-up-2A_6T-3A_B1011T-2026-10-30.jpg",
+      "original_name": "uiwang-up-2A_6T-3A_B1011T-2026-10-30.jpg",
+      "bytes": 853458,
+      "sha256": "1a9643e62fe3997094c728f25397193b1f47ec3c510a52e1ff678f8ddd952279"
+    },
+    {
+      "path": "references/route-menus/evidence/geumjeong-up-2A_4T-3A_B993T-2026-10-30.jpg",
+      "original_name": "geumjeong-up-2A_4T-3A_B993T-2026-10-30.jpg",
+      "bytes": 770760,
+      "sha256": "e855f525a9a3c473658dda14242e9d5ebed699a006b2599501a633b7c15ea4c9"
     }
   ],
   "superseded_attachments": [

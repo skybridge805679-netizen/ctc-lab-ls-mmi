@@ -7,55 +7,60 @@ const doc=SimDOM.document,$=id=>doc.getElementById(id),F=()=>root.SimFTS,M=()=>r
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY={lib:'orpheia.fts.library.v1',users:'orpheia.fts.users.v1',history:'orpheia.fts.history.v1'};
 const load=(k,fallback)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v??fallback();}catch{return fallback();}};
-const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+const save=(k,v)=>{if(root.SimRemote&&host){if(k===KEY.users)remote({op:'users',users:v});if(k===KEY.history&&v.length===0)remote({op:'clearHistory'});}try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 const stamp=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Seoul'});
 const nm=id=>M()?.stationInfo(id)?.name||N().catalog[id]?.name||id;
 const clockText=s=>{s=Math.max(0,Math.round(s||0));return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,'0')).join(':');};
 const alert=t=>M().alertBox(t);
-let host=null,lib=null,users=null,history=null,session=null,events=[],page='setup',timer=null;
+let host=null,lib=null,users=null,history=null,session=null,events=[],page='setup',timer=null,localRunLibrary=null,remoteRevision=-1,lastNotice=0,monitorSignature='',problemSignature='';
 const scriptIds=()=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].map(s=>s.id);
 const scriptTitle=id=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].find(s=>s.id===id)?.title||id;
 function defaults(){
  const limits=Object.fromEntries(scriptIds().map(id=>[id,root.SimAssessment?.limitsFor(id)?.[0]]).filter(([,v])=>v));
  return {...F().seed({scripts:scriptIds(),limits}),schedules:[]};
 }
-const persist=()=>save(KEY.lib,lib);
+function persist(){if(root.SimRemote){const r=remote({op:'library',library:lib});if(!r.ok){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);alert(r.message);return false;}}save(KEY.lib,lib);return true;}
+const activeLibrary=()=>root.SimRemote?.snapshot.ftsRunLibrary||localRunLibrary||lib;
+function remote(action){const result=root.SimRemote.command({type:'fts',...action});syncRemote();return result;}
+function syncRemote(){const value=root.SimRemote?.snapshot.fts;if(!value)return;if(remoteRevision!==value.revision){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);remoteRevision=value.revision;}session=value.session;users=structuredClone(value.users);history=structuredClone(value.history);}
+
 const SECTIONS=['지하청량리-수원','지하청량리-영등포','지하청량리-지하서울','노량진-금천구청','용산-수원','영등포-수원'];
 
 // ---------------------------------------------------------------- shell
 const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리']];
 function shell(){
- return `<div class="fts"><div class="fts-head"><b>FTS 제어통제 시스템</b><span class="fts-lamps">${['CTC','EMC','SIC','DB'].map(x=>`<i title="${x} 연결">${x}</i>`).join('')}</span></div>
+ return `<div class="fts"><div class="fts-head"><img class="fts-banner" src="assets/orpheia/banner.png" alt="" aria-hidden="true" width="2172" height="724"><div class="fts-brand"><img src="assets/orpheia/emblem.png" alt="" width="38" height="38"><div><small>ORPHEIA · TRAINING CONTROL</small><b>FTS 제어통제 시스템</b></div></div><span class="fts-lamps"><i class="fts-engine" title="${root.SimRemote?'독립 관제 엔진 연결':'브라우저 실습'}">${root.SimRemote?'ENGINE':'LOCAL'}</i>${['CTC','EMC','SIC','DB'].map(x=>`<i class="simulated" title="${x} 모의 · 외부 장치 통신 미연결">${x} · 모의</i>`).join('')}</span></div>
 <div class="fts-main"><nav class="fts-nav">${MENU.map(([id,label,sub])=>`<button type="button" data-fts-page="${sub?sub[0][0]:id}" data-fts-group="${id}">▸ ${label}</button>${sub?`<div class="fts-sub">${sub.map(([s,l])=>`<button type="button" data-fts-page="${s}">— ${l}</button>`).join('')}</div>`:''}`).join('')}</nav>
-<section class="fts-body" id="ftsBody"></section></div></div>`;
+<section class="fts-workspace"><div class="fts-workspace-head"><div><small>INSTRUCTOR WORKSPACE</small><h2 id="ftsPageTitle">교육설정</h2></div><span id="ftsSessionStatus">교육 전 준비</span></div><div class="fts-body" id="ftsBody"></div></section></div></div>`;
 }
 function go(p){
- page=p;for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
+ page=p;monitorSignature='';problemSignature='';if($('ftsPageTitle'))$('ftsPageTitle').textContent={setup:'교육설정',system:'시스템관리',users:'사용자관리',problems:'문제 관리',situations:'상황 관리',scenarios:'시나리오 관리',monitor:'모니터링관리',history:'교육이력관리'}[p];for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
  $('ftsBody').innerHTML=PAGES[p].html();PAGES[p].bind?.();
 }
 
 // ---------------------------------------------------------------- shared bits
-const table=(id,head,rows,{selected=null,key=r=>r.id,empty='자료가 없습니다.'}={})=>`<div class="fts-table" id="${id}"><table><thead><tr><th>No</th>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map((r,i)=>`<tr data-key="${esc(key(r))}" class="${selected!==null&&key(r)===selected?'sel':''}"><td>${i+1}</td>${r.cells.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):`<tr class="empty"><td colspan="${head.length+1}">${empty}</td></tr>`}</tbody></table></div>`;
-const pick=(id,fn)=>{const el=$(id);if(el)el.onclick=e=>{const tr=e.target.closest('tr[data-key]');if(tr)fn(tr.dataset.key,e);};};
+const table=(id,head,rows,{selected=null,key=r=>r.id,empty='자료가 없습니다.'}={})=>`<div class="fts-table" id="${id}"><table><thead><tr><th>No</th>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map((r,i)=>`<tr data-key="${esc(key(r))}" tabindex="0" aria-selected="${selected!==null&&key(r)===selected}" class="${selected!==null&&key(r)===selected?'sel':''}"><td>${i+1}</td>${r.cells.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):`<tr class="empty"><td colspan="${head.length+1}">${empty}</td></tr>`}</tbody></table></div>`;
+const pick=(id,fn)=>{const el=$(id);if(el)el.onclick=e=>{const tr=e.target.closest('tr[data-key]');if(tr)fn(tr.dataset.key,e);};el.onkeydown=e=>{const tr=e.target.closest('tr[data-key]');if(tr&&['Enter',' '].includes(e.key)){e.preventDefault();fn(tr.dataset.key,e);}};};
 const opts=(list,value)=>list.map(o=>{const [v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}" ${String(v)===String(value)?'selected':''}>${esc(l)}</option>`;}).join('');
 const stationOpts=v=>opts(N().stations.map(s=>[s.id,nm(s.id)]),v);
 const yn=b=>b?'Y':'N';
 
 // condition / phenomenon editor rows: a type and its fields; stations are picked from a list
-const FIELD_LABEL={station:'역',value:'값',route:'진로',signal:'신호기',point:'전환기',number:'열차번호',slot:'열번창',train:'열차',from:'시작역',to:'마지막역',start:'시각',field:'항목',window:'창',eventType:'조작',seconds:'초',label:'내용',direction:'방향',minutes:'분',text:'문구',id:'대상'};
+const FIELD_LABEL={station:'역',value:'값',route:'진로',signal:'신호기',point:'전환기',number:'열차번호',slot:'열번창',train:'열차',from:'시작역',to:'마지막역',start:'시각',field:'항목',window:'창',eventType:'조작',seconds:'초',label:'내용',direction:'방향',minutes:'분',text:'문구',id:'대상',kind:'열차종류'};
 function fieldInput(prefix,f,v){
  const id=`${prefix}-${f}`;
  if(['station','from','to'].includes(f))return `<label>${FIELD_LABEL[f]}<select id="${id}"><option value=""></option>${stationOpts(v)}</select></label>`;
  if(f==='value')return `<label>${FIELD_LABEL[f]}<input id="${id}" value="${esc(v??'')}" placeholder="CCM / N·R / 600 / true"></label>`;
  if(f==='field')return `<label>${FIELD_LABEL[f]}<select id="${id}">${opts([['dwell','정차시분(초)'],['arrival','도착시각'],['departure','출발시각'],['arrivalRoute','도착진로'],['departureRoute','출발진로'],['cancelled','운휴']],v)}</select></label>`;
+ if(f==='kind')return `<label>열차종류<select id="${id}">${opts(T().KINDS||['전동열차','일반열차','회송열차','KTX'],v||'전동열차')}</select></label>`;
  if(f==='direction')return `<label>${FIELD_LABEL[f]}<select id="${id}">${opts([['up','상행'],['down','하행']],v)}</select></label>`;
  return `<label>${FIELD_LABEL[f]||f}<input id="${id}" value="${esc(v??'')}"></label>`;
 }
 const typed=v=>v==='true'?true:v==='false'?false:/^-?\d+(\.\d+)?$/.test(v)?Number(v):v;
-function readFields(prefix,kind,type){const d=(kind==='cond'?F().CONDITIONS:F().PHENOMENA)[type],out={type};for(const f of d.fields.concat(kind==='cond'&&['trainAt'].includes(type)?['slot']:[]).concat(kind==='cond'&&type==='trainExists'?['from','to','start']:[])){const el=$(`${prefix}-${f}`);if(el&&el.value!=='')out[f]=['value','seconds','minutes'].includes(f)?typed(el.value):el.value;}if(kind==='cond'&&type==='cancelled'&&$(`${prefix}-value`)?.value==='false')out.value=false;return out;}
+function readFields(prefix,kind,type){const d=(kind==='cond'?F().CONDITIONS:F().PHENOMENA)[type],out={type};for(const f of d.fields.concat(kind==='phen'&&type==='createTrain'?['kind']:[]).concat(kind==='cond'&&['trainAt'].includes(type)?['slot']:[]).concat(kind==='cond'&&type==='trainExists'?['from','to','start']:[])){const el=$(`${prefix}-${f}`);if(el&&el.value!=='')out[f]=['value','seconds','minutes'].includes(f)?typed(el.value):el.value;}if(kind==='cond'&&type==='cancelled'&&$(`${prefix}-value`)?.value==='false')out.value=false;return out;}
 function editorFields(prefix,kind,type,values={}){
  const d=(kind==='cond'?F().CONDITIONS:F().PHENOMENA)[type];if(!d)return '';
- let fs=[...d.fields];if(kind==='cond'&&type==='trainAt')fs.push('slot');if(kind==='cond'&&type==='trainExists')fs.push('from','to','start');if(kind==='cond'&&type==='cancelled')fs.push('value');
+ let fs=[...d.fields];if(kind==='phen'&&type==='createTrain')fs.push('kind');if(kind==='cond'&&type==='trainAt')fs.push('slot');if(kind==='cond'&&type==='trainExists')fs.push('from','to','start');if(kind==='cond'&&type==='cancelled')fs.push('value');
  return fs.filter(f=>!['conditions','condition'].includes(f)).map(f=>fieldInput(prefix,f,values[f])).join('');
 }
 
@@ -68,7 +73,7 @@ const listOf=(p,tab)=>tab==='phen'?p.phenomena:tab==='check'?p.checks:tab==='ded
 function pList(){
  const p=pDraft;const tab=pTab,list=listOf(p,tab);
  const text=x=>tab==='phen'?`${(F().PHENOMENA[x.type]?.label)||x.type} · ${esc(JSON.stringify({...x,type:undefined,after:undefined}).replace(/[{}"]/g,''))}`:esc(F().describe(tab==='trig'?x:x.condition));
- return `<div class="fts-table"><table><thead><tr><th></th><th>No</th><th>${tab==='phen'?'발생(초)':tab==='trig'?'조건':'항목'}</th><th>${tab==='phen'?'현상':'세부조건'}</th>${tab==='check'||tab==='deduct'?'<th>점수</th>':''}</tr></thead><tbody>${list.map((x,i)=>`<tr><td><input type="checkbox" data-del="${i}" aria-label="${i+1}번 선택"></td><td>${i+1}</td><td>${tab==='phen'?Number(x.after)||0:esc(tab==='trig'?(F().CONDITIONS[x.type]?.label||x.type):x.label||'')}</td><td>${text(x)}</td>${tab==='check'||tab==='deduct'?`<td>${Number(x.points)||(tab==='check'?1:0)}</td>`:''}</tr>`).join('')||'<tr class="empty"><td colspan="5">등록된 항목이 없습니다.</td></tr>'}</tbody></table></div>`;
+ return `<div class="fts-table"><table><thead><tr><th></th><th>No</th><th>${tab==='phen'?'발생(초)':tab==='trig'?'조건':'항목'}</th><th>${tab==='phen'?'현상':'세부조건'}</th>${tab==='check'||tab==='deduct'?'<th>점수</th>':''}</tr></thead><tbody>${list.map((x,i)=>`<tr><td><input type="checkbox" data-del="${i}" aria-label="${i+1}번 선택"></td><td>${i+1}</td><td>${tab==='phen'?Number(x.after)||0:esc(tab==='trig'?(F().CONDITIONS[x.type]?.label||x.type):x.label||'')}</td><td>${text(x)}</td>${tab==='check'||tab==='deduct'?`<td>${x.points??(tab==='check'?1:0)}</td>`:''}</tr>`).join('')||'<tr class="empty"><td colspan="5">등록된 항목이 없습니다.</td></tr>'}</tbody></table></div>`;
 }
 function pEditor(){
  const p=pDraft,tab=pTab,kind=tab==='phen'?'phen':'cond',types=Object.entries(kind==='phen'?F().PHENOMENA:F().CONDITIONS).filter(([k])=>!['all','any','not'].includes(k));
@@ -170,9 +175,13 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
    else{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('수정할 스케줄ID를 선택하세요.');return;}sch.timetable=snap;sch.createdAt=stamp();}
    persist();go('situations');alert(`${schSel} 열차 스케줄에 ${snap.trains.length}개 열차를 저장했습니다.`);
   };
-  $('schDelete').onclick=()=>{if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}M().confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
+  $('schDelete').onclick=()=>{const used=lib.situations.filter(x=>x.scheduleId===schSel);if(used.length){alert('상황에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}M().confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
   $('schApplySit').onclick=()=>{if(!sSel||!schSel){alert('상황과 스케줄ID를 모두 선택하세요.');return;}const s=lib.situations.find(x=>x.id===sSel);s.scheduleId=schSel;persist();go('situations');};
-  $('schCopy').onclick=()=>{const sch=schedules().find(x=>x.id===schSel),t=sch?.timetable?.trains.find(x=>x.id===schTrain);if(!t){alert('복사할 열차를 선택하세요.');return;}const target=schedules().find(x=>x.id!==schSel&&x.id===root.prompt?.('복사할 스케줄ID',''));if(!target){alert('대상 스케줄ID를 확인하세요.');return;}if(target.timetable.trains.some(x=>x.id===t.id)){alert('대상에 같은 열차번호가 있습니다.');return;}target.timetable.trains.push(structuredClone(t));persist();alert(`${t.id} 열차를 ${target.id}에 복사했습니다.`);};
+  $('schCopy').onclick=()=>{const sch=schedules().find(x=>x.id===schSel),t=sch?.timetable?.trains.find(x=>x.id===schTrain),targets=schedules().filter(x=>x.id!==schSel);if(!t){alert('복사할 열차를 선택하세요.');return;}if(!targets.length){alert('대상 스케줄ID를 먼저 생성하세요.');return;}
+   if(!M().windowIds().includes('ftsCopy'))M().createWindow('ftsCopy',{title:'스케줄 간 열차 복사',x:180,y:80,width:470,body:'<div class="fts-picker" id="ftsCopyBody"></div>'});
+   $('ftsCopyBody').innerHTML=`<p><b>${esc(t.id)}</b> · ${esc(sch.name)}</p><label class="fts-wide">대상 스케줄<select id="ftsCopyTarget">${opts(targets.map(x=>[x.id,x.id+' · '+x.name]))}</select></label><div class="fts-row-btns end"><button type="button" class="sched-btn" id="ftsCopyClose">닫기</button><button type="button" class="sched-btn primary" id="ftsCopyApply">복사</button></div>`;
+   $('ftsCopyClose').onclick=()=>M().close('ftsCopy');$('ftsCopyApply').onclick=()=>{const target=schedules().find(x=>x.id===$('ftsCopyTarget').value);if(target.timetable.trains.some(x=>x.id===t.id)){alert('대상에 같은 열차번호가 있습니다.');return;}target.timetable.trains.push(structuredClone(t));if(persist()){M().close('ftsCopy');alert(`${t.id} 열차를 ${target.id}에 복사했습니다.`);}};M().open('ftsCopy');
+  };
   $('schTrainDel').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch||!schTrain){alert('삭제할 열차를 선택하세요.');return;}M().confirmBox(`${schTrain} 열차를 ${sch.id}에서 삭제하시겠습니까?`,()=>{sch.timetable.trains=sch.timetable.trains.filter(t=>t.id!==schTrain);persist();schTrain=null;go('situations');});};
   $('schEdit').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('스케줄ID를 선택하세요.');return;}loadSchedule(sch,true);};
  }
@@ -184,31 +193,32 @@ function loadSchedule(sch,announce){
 }
 
 // ---------------------------------------------------------------- 시나리오 관리
-let cTab='new',cSel=null,cDraft=[],cPick=null,cRight=null;
+let cTab='new',cSel=null,cDraft=[],cPick=null,cRight=null,cRightIndex=null,cNameDraft='';
 PAGES.scenarios={
  html(){
   const sits=lib.situations.filter(x=>(!sFilter.name||x.name.includes(sFilter.name))&&(!sFilter.section||x.section===sFilter.section));
   const current=cTab==='edit'?lib.scenarios.find(c=>c.id===cSel):null;
-  const chosen=cDraft.map(id=>lib.situations.find(s=>s.id===id)).filter(Boolean);
+  const chosen=cDraft.map((id,index)=>{const s=lib.situations.find(s=>s.id===id);return s?{...s,index}:null;}).filter(Boolean);
   const focus=lib.situations.find(s=>s.id===(cRight||cPick));
   return `<div class="fts-tabs">${[['new','시나리오 등록'],['edit','시나리오 수정']].map(([k,l])=>`<button type="button" data-ctab="${k}" class="${cTab===k?'on':''}">${l}</button>`).join('')}</div>
 <div class="fts-scn"><div><div class="fts-cap">시나리오 상황 검색</div><div class="fts-grid2"><label>상황명칭<input id="cfName" value="${esc(sFilter.name)}"></label><label>구간<select id="cfSection"><option value="">전체</option>${opts(SECTIONS,sFilter.section)}</select></label><button type="button" class="sched-btn" id="cfFind">검색</button></div>
 ${table('cLeft',['상황 명','스케줄ID','제한시간'],sits.map(s=>({id:s.id,cells:[esc(s.name),esc(s.scheduleId||''),s.limit||'']})),{selected:cPick})}</div>
 <div class="fts-move"><button type="button" class="sched-btn" id="cIn" title="상황 추가">&gt;&gt;</button><button type="button" class="sched-btn" id="cOut" title="상황 빼기">&lt;&lt;</button></div>
 <div><div class="fts-cap">${cTab==='new'?'새로운 시나리오 추가':'시나리오 수정'}</div>${cTab==='edit'?`<label class="fts-wide">시나리오<select id="cWhich">${opts(lib.scenarios.map(c=>[c.id,c.name]),cSel)}</select></label>`:''}
-<div class="fts-grid2"><label>시나리오 이름<input id="cName" value="${esc(current?.name||'')}"></label><button type="button" class="sched-btn primary" id="cSave">저장</button>${cTab==='edit'?'<button type="button" class="sched-btn danger" id="cDelete">삭제</button>':''}</div>
-${table('cRight',['시나리오 상황 명칭','스케줄ID','제한시간'],chosen.map(s=>({id:s.id,cells:[esc(s.name),esc(s.scheduleId||''),s.limit||'']})),{selected:cRight})}</div></div>
+<div class="fts-grid2"><label>시나리오 이름<input id="cName" value="${esc(cNameDraft||current?.name||'')}"></label><button type="button" class="sched-btn primary" id="cSave">저장</button>${cTab==='edit'?'<button type="button" class="sched-btn danger" id="cDelete">삭제</button>':''}</div>
+${table('cRight',['시나리오 상황 명칭','스케줄ID','제한시간'],chosen.map(s=>({id:String(s.index),cells:[esc(s.name),esc(s.scheduleId||''),s.limit||'']})),{selected:cRightIndex===null?null:String(cRightIndex)})}<div class="fts-row-btns"><button type="button" class="sched-btn" id="cUp">위로 ↑</button><button type="button" class="sched-btn" id="cDown">아래로 ↓</button></div></div></div>
 <div class="fts-cap">선택 시나리오 상황 문제 리스트</div>${table('cProblems',['과목명칭','문제명칭','제한시간(초)'],(focus?.problems||[]).map(id=>{const p=lib.problems.find(x=>x.id===id);return {id,cells:[esc(p?.subject),esc(p?.name),p?.limit]};}))}`;
  },
  bind(){
-  for(const b of doc.querySelectorAll('[data-ctab]'))b.onclick=()=>{cTab=b.dataset.ctab;if(cTab==='edit'){cSel=cSel||lib.scenarios[0]?.id;cDraft=[...(lib.scenarios.find(c=>c.id===cSel)?.situations||[])];}else{cSel=null;cDraft=[];}go('scenarios');};
+  for(const b of doc.querySelectorAll('[data-ctab]'))b.onclick=()=>{cTab=b.dataset.ctab;if(cTab==='edit'){cSel=cSel||lib.scenarios[0]?.id;cDraft=[...(lib.scenarios.find(c=>c.id===cSel)?.situations||[])];cNameDraft=lib.scenarios.find(c=>c.id===cSel)?.name||'';}else{cSel=null;cDraft=[];cNameDraft='';}cRightIndex=null;go('scenarios');};
   $('cfFind').onclick=()=>{sFilter={name:$('cfName').value.trim(),section:$('cfSection').value};go('scenarios');};
-  pick('cLeft',id=>{cPick=id;cRight=null;go('scenarios');});pick('cRight',id=>{cRight=id;cPick=null;go('scenarios');});
-  $('cIn').onclick=()=>{if(!cPick){alert('추가할 상황을 선택하세요.');return;}cDraft.push(cPick);go('scenarios');};
-  $('cOut').onclick=()=>{if(!cRight){alert('뺄 상황을 선택하세요.');return;}const i=cDraft.indexOf(cRight);if(i>=0)cDraft.splice(i,1);cRight=null;go('scenarios');};
-  if($('cWhich'))$('cWhich').onchange=()=>{cSel=$('cWhich').value;cDraft=[...lib.scenarios.find(c=>c.id===cSel).situations];go('scenarios');};
+  const rememberName=()=>{cNameDraft=$('cName').value;};pick('cLeft',id=>{rememberName();cPick=id;cRight=null;cRightIndex=null;go('scenarios');});pick('cRight',id=>{rememberName();cRightIndex=+id;cRight=cDraft[cRightIndex];cPick=null;go('scenarios');});
+  $('cIn').onclick=()=>{if(!cPick){alert('추가할 상황을 선택하세요.');return;}rememberName();cDraft.push(cPick);go('scenarios');};
+  $('cOut').onclick=()=>{if(!cRight){alert('뺄 상황을 선택하세요.');return;}rememberName();if(cRightIndex!==null)cDraft.splice(cRightIndex,1);cRight=null;cRightIndex=null;go('scenarios');};
+  const reorder=delta=>{if(cRightIndex===null)return;const target=cRightIndex+delta;if(target<0||target>=cDraft.length)return;rememberName();[cDraft[target],cDraft[cRightIndex]]=[cDraft[cRightIndex],cDraft[target]];cRightIndex=target;go('scenarios');};$('cUp').onclick=()=>reorder(-1);$('cDown').onclick=()=>reorder(1);
+  if($('cWhich'))$('cWhich').onchange=()=>{cSel=$('cWhich').value;cDraft=[...lib.scenarios.find(c=>c.id===cSel).situations];cNameDraft=lib.scenarios.find(c=>c.id===cSel).name;cRightIndex=null;go('scenarios');};
   $('cSave').onclick=()=>{
-   const name=$('cName').value.trim();if(!name){alert('시나리오 이름을 입력하세요.');return;}if(!cDraft.length){alert('시나리오 상황을 추가하세요.');return;}
+   const name=$('cName').value.trim();cNameDraft=name;if(!name){alert('시나리오 이름을 입력하세요.');return;}if(!cDraft.length){alert('시나리오 상황을 추가하세요.');return;}
    M().confirmBox('시나리오를 저장하시겠습니까?',()=>{if(cTab==='edit'){const c=lib.scenarios.find(x=>x.id===cSel);Object.assign(c,{name,situations:[...cDraft]});}else{const id=nextId('SC-',lib.scenarios);lib.scenarios.push({id,name,author:'MMI-1',createdAt:stamp(),situations:[...cDraft]});cTab='edit';cSel=id;}persist();go('scenarios');alert('저장되었습니다.');});
   };
   if($('cDelete'))$('cDelete').onclick=()=>M().confirmBox('선택한 시나리오를 삭제하시겠습니까?',()=>{lib.scenarios=lib.scenarios.filter(c=>c.id!==cSel);persist();cSel=lib.scenarios[0]?.id||null;cDraft=[...(lib.scenarios.find(c=>c.id===cSel)?.situations||[])];go('scenarios');});
@@ -244,17 +254,18 @@ PAGES.system={
   $('libPaste').onclick=()=>{const data=parse();if(data)importLibrary(data,true);};
  }
 };
-const normalise=d=>({problems:d.problems||[],situations:d.situations||[],scenarios:d.scenarios||[],schedules:d.schedules||[]});
+const normalise=d=>({version:d?.version??F().VERSION,problems:d.problems||[],situations:d.situations||[],scenarios:d.scenarios||[],schedules:d.schedules||[]});
 function importLibrary(data,merge){
- const incoming=normalise(data),next=merge?{...lib,problems:[...lib.problems],situations:[...lib.situations],scenarios:[...lib.scenarios],schedules:[...schedules()]}:{version:F().VERSION,problems:[],situations:[],scenarios:[],schedules:[]};
+ if(!data||typeof data!=='object'||Array.isArray(data)){alert('라이브러리는 JSON 객체여야 합니다.');return false;}
+ const incoming=normalise(data);if(incoming.version!==F().VERSION||['problems','situations','scenarios','schedules'].some(k=>!Array.isArray(incoming[k]))){alert('라이브러리 버전과 목록 배열을 확인하세요.');return false;}const next=merge?{...lib,problems:[...lib.problems],situations:[...lib.situations],scenarios:[...lib.scenarios],schedules:[...schedules()]}:{version:F().VERSION,problems:[],situations:[],scenarios:[],schedules:[]};
  for(const k of ['problems','situations','scenarios','schedules'])for(const x of incoming[k]){const i=next[k].findIndex(y=>y.id===x.id);if(i>=0)next[k][i]=x;else next[k].push(x);}
  const errors=F().validate(next,{scripts:scriptIds()});
  if(errors.length){if($('libReport'))$('libReport').textContent=`가져오지 않았습니다 · 문제 ${errors.length}건\n`+errors.join('\n');alert(`가져오지 않았습니다. 문제 ${errors.length}건: ${errors[0]}`);return false;}
- lib=next;persist();if(page==='system')go('system');alert(`가져왔습니다. 문제 ${incoming.problems.length} · 상황 ${incoming.situations.length} · 시나리오 ${incoming.scenarios.length}`);return true;
+ lib=next;if(!persist())return false;if(page==='system')go('system');alert(`가져왔습니다. 문제 ${incoming.problems.length} · 상황 ${incoming.situations.length} · 시나리오 ${incoming.scenarios.length}`);return true;
 }
 
 // ---------------------------------------------------------------- 교육설정 · 시나리오 선택
-let setup={professor:'',student:'',scenario:null,showActions:true};
+let setup={professor:'',student:'',scenario:null,showActions:true,autoRun:true};
 PAGES.setup={
  html(){
   const sc=lib.scenarios.find(c=>c.id===setup.scenario),prof=users.filter(u=>u.role==='교수'),stud=users.filter(u=>u.role==='교육생');
@@ -264,12 +275,12 @@ PAGES.setup={
 <div class="fts-sub-bar">교육 시나리오 정보</div><button type="button" class="sched-btn fts-pick" id="suPick">시나리오 선택</button>
 <div class="fts-grid2"><label>시나리오 명칭<input readonly value="${esc(sc?.name||'')}" id="suName"></label><label>작성자<input readonly value="${esc(sc?.author||'')}"></label><label>작성일자<input readonly value="${esc(sc?.createdAt||'')}"></label></div>
 ${table('suSits',['시나리오상황','구간','스케줄ID'],rows)}
-<label><input type="checkbox" id="suActions" ${setup.showActions?'checked':''}> 교육생 문제 발생 화면에 조치사항 표시</label>
+<label><input type="checkbox" id="suActions" ${setup.showActions?'checked':''}> 교육생 문제 발생 화면에 조치사항 표시</label><label><input type="checkbox" id="suAuto" ${setup.autoRun?'checked':''}>교육 중 시간표에 따른 열차 자동운행</label>
 <div class="fts-row-btns"><button type="button" class="sched-btn primary" id="suStart">교육 시작</button><button type="button" class="sched-btn" id="suClear">Clear</button></div></div>
 <div class="fts-right"><div class="fts-bar">교육 설정</div><div class="fts-sub-bar">시나리오 조회</div><div class="fts-grid2"><label>스케줄ID<input id="suSch"></label><button type="button" class="sched-btn" id="suSchFind">조회</button></div><div id="suSchList"></div></div></div>`;
  },
  bind(){
-  const remember=()=>{setup.professor=$('suProf').value;setup.student=$('suStud').value;setup.showActions=$('suActions').checked;};
+  const remember=()=>{setup.professor=$('suProf').value;setup.student=$('suStud').value;setup.showActions=$('suActions').checked;setup.autoRun=$('suAuto').checked;};
   $('suPick').onclick=()=>{remember();openPicker();};
   $('suClear').onclick=()=>{setup={professor:'',student:'',scenario:null,showActions:true};go('setup');};
   $('suSchFind').onclick=()=>{const v=$('suSch').value.trim();const list=lib.situations.filter(s=>!v||s.scheduleId===v);$('suSchList').innerHTML=table('suSchRows',['상황','스케줄ID','제한시간'],list.map(s=>({id:s.id,cells:[esc(s.name),esc(s.scheduleId||''),s.limit||'']})));};
@@ -305,24 +316,26 @@ function uiState(){
 }
 function scriptProgress(id){
  const r=root.SimRemote?root.SimRemote.snapshot.scenario?.run:null,snap=r?{id:r.sc?.id,done:r.done}:root.SimScenarioUI?.snapshot?.();
- if(!snap||snap.id!==id)return {done:0,total:0};return {done:snap.done.filter(Boolean).length,total:snap.done.length};
+ if(!snap||snap.id!==id)return {done:0,total:0};return {done:snap.done.filter(Boolean).length,total:snap.done.length,complete:r?!!r.passed:!!snap.passed};
 }
 function ctxFor(item){
- const p=lib.problems.find(x=>x.id===item.problem),since=item.startedAt??session.readyAt;
- return {states:host.context().stationStates,ls:root.SimLSUI.getModel(),model:D().getModel(),events:events.filter(e=>e.at>=since),ui:uiState(),manual:session.manual[item.problem]||{},script:p?.script?scriptProgress(p.script):null};
+ const p=activeLibrary().problems.find(x=>x.id===item.problem),since=item.startedAt??session.readyAt;
+ return {states:host.context().stationStates,ls:root.SimLSUI.getModel(),model:D().getModel(),events:events.filter(e=>e.at>=since),ui:uiState(),manual:session.manual[session.items.indexOf(item)]||{},script:p?.script?scriptProgress(p.script):null};
 }
 function startSession(){
+ if(root.SimRemote){const r=remote({op:'start',...setup});if(!r.ok){alert(r.message);return;}go('monitor');tick();return;}
  const sc=lib.scenarios.find(c=>c.id===setup.scenario);
  if(!sc){alert('시나리오를 선택하세요.');return;}if(!setup.professor||!setup.student){alert('교수와 교육생을 선택하세요.');return;}
  const errors=F().validate(lib,{scripts:scriptIds()});if(errors.length){alert('라이브러리 오류로 시작할 수 없습니다: '+errors[0]);return;}
  const prof=users.find(u=>u.id===setup.professor),stud=users.find(u=>u.id===setup.student);
- session=F().createSession(lib,sc.id,{professor:prof?.name||setup.professor,student:stud?.id||setup.student,startedAt:now()});session.showActions=setup.showActions;session.situationLoaded=null;events=[];
+ localRunLibrary=structuredClone(lib);root.SimAssessmentUI?.beginTask('fts:'+Date.now(),sc.name,'integrated');
+ session=F().createSession(localRunLibrary,sc.id,{professor:prof?.name||setup.professor,student:stud?.id||setup.student,startedAt:now()});session.showActions=setup.showActions;session.situationLoaded=null;events=[];
  M().log('event',`교육 시작 · ${sc.name} · 교수 ${session.professor} · 교육생 ${session.student}`);
  go('monitor');tick();
 }
 function loadSituation(item){
- const s=lib.situations.find(x=>x.id===item.situation);if(!s||session.situationLoaded===s.id)return;
- session.situationLoaded=s.id;const sch=schedules().find(x=>x.id===s.scheduleId);
+ const s=activeLibrary().situations.find(x=>x.id===item.situation);if(!s||session.situationLoaded===(item.situationIndex??s.id))return;
+ session.situationLoaded=item.situationIndex??s.id;const sch=schedules().find(x=>x.id===s.scheduleId);
  if(sch?.timetable)loadSchedule(sch,false);
  M().log('event',`상황 시작 · ${s.name}${sch?` · 열차 스케줄 ${sch.id}`:''}`);
 }
@@ -347,20 +360,26 @@ function startScript(id){
  M().open('scenario');const sel=$('scSelect');if(!sel)return;sel.value=id;sel.dispatchEvent(new Event('change'));$('scStart').click();
 }
 function tick(){
+ if(root.SimRemote){
+  syncRemote();const state=root.SimRemote.snapshot.fts;if($('ftsSessionStatus'))$('ftsSessionStatus').textContent=session&&!session.finished?'교육 진행 · '+(session.current+1)+' / '+session.items.length+' 문제':session?'교육 종료':'교육 전 준비';if(session&&!session.finished&&!root.SimExtraLS){const ui=uiState(),sig=JSON.stringify(ui);if(tick.ui!==sig){tick.ui=sig;remote({op:'ui',ui});}}
+  if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}}
+  if(page==='monitor'&&M().isOpen('fts'))renderMonitor();if(M().isOpen('ftsProblem'))renderProblem();return;
+ }
  if(!session||session.finished)return;
- const t=now(),out=F().advance(lib,session,(item)=>ctxFor(item),t);
+ const t=now();const pending=session.items[session.current];if(pending)loadSituation(pending);const out=F().advance(activeLibrary(),session,(item)=>ctxFor(item),t);
  for(const o of out){
   if(o.kind==='activate'){loadSituation(o.item);if(o.problem.script)startScript(o.problem.script);speak(o.problem.voice||o.problem.name);showProblem();M().log('event',`문제 발생 · ${o.problem.name}`);}
   if(o.kind==='phenomenon')applyPhenomenon(o.phenomenon);
-  if(o.kind==='end'){const p=lib.problems.find(x=>x.id===o.item.problem);M().log('event',`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
+  if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);M().log('event',`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
   if(o.kind==='finished')finishSession('모든 문제 종료');
  }
  if(page==='monitor'&&M().isOpen('fts'))renderMonitor();
  if(M().isOpen('ftsProblem'))renderProblem();
 }
 function finishSession(reason){
+ if(root.SimRemote){remote({op:'stop'});tick();return;}
  if(!session||session.closed)return;session.closed=true;session.finished=true;
- const sum=F().summary(lib,session);
+ const sum=F().summary(activeLibrary(),session);
  history.unshift({id:'E'+Date.now(),at:stamp(),professor:session.professor,student:session.student,scenario:session.scenarioName,reason,...sum});save(KEY.history,history.slice(0,200));
  M().log('event',`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
  if(M().isOpen('ftsProblem'))renderProblem();if(page==='monitor')renderMonitor();
@@ -371,31 +390,33 @@ PAGES.monitor={html:()=>'<div id="ftsMonitor"></div>',bind:()=>renderMonitor()};
 function renderMonitor(){
  const box=$('ftsMonitor');if(!box)return;
  if(!session){box.innerHTML='<p class="fts-empty">진행 중인 교육이 없습니다. [교육설정]에서 시나리오를 고르고 교육 시작을 누르세요.</p>';return;}
- const item=session.items[Math.min(session.current,session.items.length-1)],p=lib.problems.find(x=>x.id===item.problem),s=lib.situations.find(x=>x.id===item.situation);
- const ctx=ctxFor(item),elapsed=item.startedAt!=null&&item.status==='진행'?now()-item.startedAt:0;
- const sits=[...new Set(session.items.map(i=>i.situation))].map(id=>lib.situations.find(x=>x.id===id));
- const manual=[...(p?.checks||[]),...(p?.deductions||[])].filter(k=>k.condition?.type==='manual');
+ const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem),s=activeLibrary().situations.find(x=>x.id===item.situation);
+ const ctx=ctxFor(item),elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0;
+ const remaining=Math.max(0,(p?.limit||0)-elapsed),progress=session.items.map(it=>{const q=activeLibrary().problems.find(x=>x.id===it.problem);return [it.status,it.error||'',it.score,(q?.checks||[]).map((_,i)=>!!it.met?.[i]),(q?.deductions||[]).map((_,i)=>!!it.deducted?.[i])];}),signature=JSON.stringify([session.current,progress,session.manual,session.finished,ctx.script,(p?.trigger?.conditions||[]).map((c,i)=>item.triggerMet?.[i]??F().test(c,ctx))]);
+ if(monitorSignature===signature){if($('mElapsed'))$('mElapsed').value=clockText(elapsed);if($('mRemaining'))$('mRemaining').value=clockText(remaining);return;}monitorSignature=signature;
+ const sits=[...new Set(session.items.map(i=>i.situation))].map(id=>activeLibrary().situations.find(x=>x.id===id));
+ const manual=[];const visit=c=>{if(c?.type==='manual'&&!manual.some(k=>(k.condition.key||k.condition.label)===(c.key||c.label)))manual.push({condition:c});if(c?.conditions)c.conditions.forEach(visit);if(c?.condition)visit(c.condition);};[...(p?.checks||[]),...(p?.deductions||[])].forEach(k=>visit(k.condition));
  box.innerHTML=`<div class="fts-split"><div class="fts-left"><div class="fts-bar">교육시나리오 정보</div>
 <div class="fts-grid2"><label>교수<input readonly value="${esc(session.professor)}"></label><label>교육생<input readonly value="${esc(session.student)}"></label><label class="fts-wide">시나리오 명칭<input readonly value="${esc(session.scenarioName)}"></label></div>
 ${table('mSits',['시나리오상황','구간','스케줄ID'],sits.map(x=>({id:x.id,cells:[esc(x.name),esc(x.section),esc(x.scheduleId||'')]})),{selected:s?.id})}
-${table('mProbs',['과목명칭','제한시간(초)','문제명칭','상태','점수'],session.items.map((it,i)=>{const q=lib.problems.find(x=>x.id===it.problem);return {id:String(i),cells:[esc(q?.subject),q?.limit,esc(q?.name),`<span class="fts-st st-${esc(it.status)}">${esc(it.status)}</span>`,it.status==='대기'?'':it.score]};}),{selected:String(session.current)})}
-<div class="fts-row-btns"><button type="button" class="sched-btn danger" id="mEnd">교육종료</button><button type="button" class="sched-btn" id="mNext" ${session.finished?'disabled':''}>문제종료</button><button type="button" class="sched-btn" id="mShow">문제 발생 화면</button></div></div>
+${table('mProbs',['과목명칭','제한시간(초)','문제명칭','상태','점수'],session.items.map((it,i)=>{const q=activeLibrary().problems.find(x=>x.id===it.problem);return {id:String(i),cells:[esc(q?.subject),q?.limit,esc(q?.name),`<span class="fts-st st-${esc(it.status)}">${esc(it.status)}</span>`,it.status==='대기'?'':it.score]};}),{selected:String(session.current)})}
+<div class="fts-row-btns"><button type="button" class="sched-btn danger" id="mEnd" ${session.finished?'disabled':''}>교육종료</button><button type="button" class="sched-btn" id="mNext" ${session.finished?'disabled':''}>문제종료</button><button type="button" class="sched-btn" id="mShow">문제 발생 화면</button></div></div>
 <div class="fts-right"><div class="fts-bar">모니터링 관리</div>
-<div class="fts-grid2"><label>제한시간<input readonly value="${clockText(p?.limit)}"></label><label>경과시간<input readonly id="mElapsed" value="${clockText(elapsed)}"></label><button type="button" class="sched-btn" id="mReload">상황 재로딩</button><span class="fts-progress">${session.finished?'교육 종료':item.status==='대기'?'발생조건 대기':'진행 중'}</span></div>
+<div class="fts-grid2 fts-clock-cards"><label>남은 시간<input readonly id="mRemaining" value="${clockText(remaining)}"></label><label>제한시간<input readonly value="${clockText(p?.limit)}"></label><label>경과시간<input readonly id="mElapsed" value="${clockText(elapsed)}"></label><button type="button" class="sched-btn" id="mReload" ${session.finished?'disabled':''}>상황 재로딩</button><span class="fts-progress">${session.finished?'교육 종료':item.error?'현상 적용 오류 · 일시정지':item.status==='대기'?'발생조건 대기':'진행 중'}</span></div>
 <div class="fts-grid2"><label>과목<input readonly value="${esc(p?.subject)}"></label><label class="fts-wide">문제명칭<input readonly value="${esc(p?.name)}"></label></div>
 <label class="fts-wide">상황<textarea readonly rows="3">${esc(p?.situation||'')}</textarea></label><label class="fts-wide">조치사항<textarea readonly rows="3">${esc(p?.actions||'')}</textarea></label>
-<div class="fts-cap">발생조건 · 세부조건</div><ul class="fts-checks">${p?.trigger?.useTime?`<li class="${item.status!=='대기'?'ok':''}">발생시간 ${p.trigger.at}초</li>`:''}${(p?.trigger?.conditions||[]).map(c=>`<li class="${F().test(c,ctx)?'ok':''}">${esc(F().describe(c))}</li>`).join('')}
-${(p?.checks||[]).map((k,i)=>`<li class="${item.met[i]?'ok':''}">${item.met[i]?'✔':'○'} ${esc(k.label||F().describe(k.condition))} <small>(${Number(k.points)||1})</small></li>`).join('')}
+${item.error?`<p class="fts-error" role="alert">${esc(item.error)}</p>`:''}<div class="fts-cap">발생조건 · 세부조건</div><ul class="fts-checks">${p?.trigger?.useTime?`<li class="${item.status!=='대기'?'ok':''}">발생시간 ${p.trigger.at}초</li>`:''}${(p?.trigger?.conditions||[]).map((c,i)=>`<li class="${(item.triggerMet?.[i]??F().test(c,ctx))?'ok':''}">${esc(F().describe(c))}</li>`).join('')}
+${(p?.checks||[]).map((k,i)=>`<li class="${item.met[i]?'ok':''}">${item.met[i]?'✔':'○'} ${esc(k.label||F().describe(k.condition))} <small>(${k.points??1})</small></li>`).join('')}
 ${(p?.deductions||[]).map((k,i)=>`<li class="${item.deducted[i]?'bad':''}">감점 ${Number(k.points)||0} · ${esc(k.label||F().describe(k.condition))}</li>`).join('')}
 ${p?.script?`<li class="${ctx.script?.done>=ctx.script?.total&&ctx.script?.total?'ok':''}">대본 ${esc(scriptTitle(p.script))} · ${ctx.script?.done||0}/${ctx.script?.total||0} 단계</li>`:''}</ul>
-${manual.length?`<div class="fts-cap">교수 확인 (구술)</div><div class="fts-row-btns wrap">${manual.map(k=>{const key=k.condition.key||k.condition.label,on=!!session.manual[item.problem]?.[key];return `<button type="button" class="sched-btn ${on?'primary':''}" data-manual="${esc(key)}">${on?'✔ ':''}${esc(k.condition.label)}</button>`;}).join('')}</div>`:''}
+${manual.length?`<div class="fts-cap">교수 확인 (구술)</div><div class="fts-row-btns wrap">${manual.map(k=>{const key=k.condition.key||k.condition.label,on=!!session.manual[session.items.indexOf(item)]?.[key];return `<button type="button" class="sched-btn ${on?'primary':''}" data-manual="${esc(key)}" ${session.finished?'disabled':''}>${on?'✔ ':''}${esc(k.condition.label)}</button>`;}).join('')}</div>`:''}
 <div class="fts-grid2"><label>스케줄ID<input readonly value="${esc(s?.scheduleId||'')}"></label><label>스케줄 명칭<input readonly value="${esc(schedules().find(x=>x.id===s?.scheduleId)?.name||'(현재 온라인 시간표)')}"></label><label>구간<input readonly value="${esc(s?.section||'')}"></label></div>
-${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(lib,session);return `결과 ${r.got}/${r.full}점 (${r.percent}%)`;})()}</div>`:''}</div></div>`;
+${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLibrary(),session);return `결과 ${r.got}/${r.full}점 (${r.percent}%)`;})()}</div>`:''}</div></div>`;
  $('mEnd').onclick=()=>M().confirmBox('교육을 종료하시겠습니까?',()=>{finishSession('교수 종료');});
- $('mNext').onclick=()=>{const p2=lib.problems.find(x=>x.id===session.items[session.current]?.problem);const out=F().endCurrent(session,now());if(p2?.script)$('scStop')?.click();if(out.some(o=>o.kind==='finished'))finishSession('모든 문제 종료');tick();renderMonitor();};
+ $('mNext').onclick=()=>{if(root.SimRemote){remote({op:'next'});tick();return;}const p2=activeLibrary().problems.find(x=>x.id===session.items[session.current]?.problem);const out=F().endCurrent(session,now());if(p2?.script)$('scStop')?.click();if(out.some(o=>o.kind==='finished'))finishSession('모든 문제 종료');tick();renderMonitor();};
  $('mShow').onclick=showProblem;
- $('mReload').onclick=()=>{session.situationLoaded=null;loadSituation(item);};
- for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{const m=session.manual[item.problem]??={};m[b.dataset.manual]=!m[b.dataset.manual];tick();renderMonitor();};
+ $('mReload').onclick=()=>{if(root.SimRemote){remote({op:'reload'});tick();return;}session.situationLoaded=null;loadSituation(item);};
+ for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{if(root.SimRemote){remote({op:'manual',key:b.dataset.manual});tick();return;}const m=session.manual[session.items.indexOf(item)]??={};m[b.dataset.manual]=!m[b.dataset.manual];tick();renderMonitor();};
 }
 
 // ---------------------------------------------------------------- 교육생 "문제 발생" 화면
@@ -406,9 +427,10 @@ function showProblem(){
 function renderProblem(){
  const box=$('ftsProblemBody');if(!box)return;
  if(!session){box.innerHTML='<p>진행 중인 교육이 없습니다.</p>';return;}
- const item=session.items[Math.min(session.current,session.items.length-1)],p=lib.problems.find(x=>x.id===item.problem);
- const elapsed=item.startedAt!=null&&item.status==='진행'?now()-item.startedAt:0;
- box.innerHTML=`<div class="fts-pb-time"><span>제한시간</span><b>${clockText(p?.limit)}</b><span>경과시간</span><b id="pbElapsed">${clockText(elapsed)}</b></div><h2>${session.finished?'교육 종료':item.status==='대기'?'다음 문제 대기':'문제 발생'}</h2>
+ const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem);
+ const elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0,remaining=Math.max(0,(p?.limit||0)-elapsed);
+ const signature=JSON.stringify([session.current,item.status,item.error,session.finished,session.showActions,session.notice]);if(problemSignature===signature){if($('pbElapsed'))$('pbElapsed').textContent=clockText(elapsed);if($('pbRemaining'))$('pbRemaining').textContent=clockText(remaining);return;}problemSignature=signature;
+ box.innerHTML=`<div class="fts-pb-time"><span>남은 시간</span><b id="pbRemaining">${clockText(remaining)}</b><span>제한시간</span><b>${clockText(p?.limit)}</b><span>경과시간</span><b id="pbElapsed">${clockText(elapsed)}</b></div><h2>${session.finished?'교육 종료':item.status==='대기'?'다음 문제 대기':'문제 발생'}</h2>
 <div class="fts-pb-cap">문제 명칭</div><div class="fts-pb-box">${esc(item.status==='대기'&&!session.finished?'':p?.name)}</div>
 <div class="fts-pb-cap">상황</div><div class="fts-pb-box">${esc(item.status==='대기'?'':p?.situation||'').replace(/\n/g,'<br>')}${session.notice?`<br>${esc(session.notice)}`:''}</div>
 ${session.showActions?`<div class="fts-pb-cap">조치사항</div><div class="fts-pb-box">${esc(item.status==='대기'?'':p?.actions||'').replace(/\n/g,'<br>')}</div>`:''}`;
@@ -417,10 +439,11 @@ function speak(text){try{if(!text||!root.speechSynthesis)return;const u=new Spee
 
 // ---------------------------------------------------------------- 교육이력관리
 PAGES.history={
- html:()=>`<div class="fts-cap">교육 이력</div>${table('hTable',['일시','교수','교육생','시나리오','점수','사유'],history.map(h=>({id:h.id,cells:[esc(h.at),esc(h.professor),esc(h.student),esc(h.scenario),`${h.got}/${h.full} (${h.percent}%)`,esc(h.reason)]})))}<div id="hDetail"></div>
-<div class="fts-row-btns"><button type="button" class="sched-btn danger" id="hClear">이력 모두 지우기</button></div>`,
+ html:()=>`<div class="fts-cap">교육 이력</div>${table('hTable',['일시','교수','교육생','시나리오','점수','사유'],history.map(h=>({id:h.id,cells:[esc(Number.isFinite(Date.parse(h.at))?new Date(h.at).toLocaleString('sv-SE',{timeZone:'Asia/Seoul'}):h.at),esc(h.professor),esc(h.student),esc(h.scenario),`${h.got}/${h.full} (${h.percent}%)`,esc(h.reason)]})))}<div id="hDetail"></div>
+<div class="fts-row-btns"><button type="button" class="sched-btn" id="hExport">교육 이력 내보내기</button><button type="button" class="sched-btn danger" id="hClear">이력 모두 지우기</button></div>`,
  bind(){
-  pick('hTable',id=>{const h=history.find(x=>x.id===id);$('hDetail').innerHTML=table('hRows',['과목','문제','상태','점수','소요(초)'],h.rows.map((r,i)=>({id:String(i),cells:[esc(r.subject),esc(r.problem),esc(r.status),`${r.score}/${r.full}`,r.seconds??'']})));});
+  pick('hTable',id=>{const h=history.find(x=>x.id===id);$('hDetail').innerHTML=table('hRows',['과목','문제','상태','점수','소요(초)','미충족·오류'],h.rows.map((r,i)=>({id:String(i),cells:[esc(r.subject),esc(r.problem),esc(r.status),`${r.score}/${r.full}`,r.seconds??'',esc(r.error||(r.checks||[]).filter(c=>!c.met).map(c=>c.label).join(' · '))]})));});
+  $('hExport').onclick=()=>{const a=doc.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({format:'ORPHEIA-FTS-HISTORY',version:1,history},null,2)],{type:'application/json'}));a.href=url;a.download='orpheia-fts-history.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
   $('hClear').onclick=()=>M().confirmBox('교육 이력을 모두 지우시겠습니까?',()=>{history=[];save(KEY.history,history);go('history');});
  }
 };
@@ -428,14 +451,15 @@ PAGES.history={
 // ---------------------------------------------------------------- init
 function init(api){
  host=api;lib=load(KEY.lib,defaults);if(!lib.schedules)lib.schedules=[];
- const errors=F().validate(lib,{scripts:scriptIds()});if(errors.length){lib=defaults();persist();}
- users=load(KEY.users,()=>[{role:'교수',id:'001',name:'교수'},{role:'교육생',id:'tester',name:'교육생',number:'202201'}]);history=load(KEY.history,()=>[]);
+ const errors=F().validate(lib,{scripts:scriptIds(),drafts:true});if(errors.length)lib=defaults();
+ const fallbackUsers=()=>[{role:'교수',id:'001',name:'교수'},{role:'교육생',id:'tester',name:'교육생',number:'202201'}];users=load(KEY.users,fallbackUsers);if(!Array.isArray(users)||users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'))users=fallbackUsers();history=load(KEY.history,()=>[]);if(!Array.isArray(history))history=[];history=history.filter(h=>h&&Array.isArray(h.rows));
  setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;
+ if(root.SimRemote){const r=root.SimRemote.command({type:'fts',op:'bootstrap',library:lib,users,history});if(!r.ok)console.warn(r.message);syncRemote();setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;}
  pDraft=blankProblem();
  const w=M().createWindow('fts',{title:'FTS 제어통제 시스템',x:20,y:10,width:1360,body:shell()});
  w.el.querySelector('.fts-nav').onclick=e=>{const b=e.target.closest('[data-fts-page]');if(b)go(b.dataset.ftsPage);};
  w.opener=()=>go(page);
- M().onEvent(e=>{if(session&&!session.finished){events.push({...e,at:now()});}});
+ M().onEvent(e=>{if(!root.SimRemote&&session&&!session.finished){events.push({...e,at:now()});}});
  timer=setInterval(()=>{try{tick();const el=$('mElapsed'),pb=$('pbElapsed');if(session&&!session.finished){const it=session.items[session.current];if(it?.startedAt!=null){if(el)el.value=clockText(now()-it.startedAt);if(pb)pb.textContent=clockText(now()-it.startedAt);}}}catch(e){console.error(e);}},500);
 }
 root.SimFTSUI={init,open:()=>M().open('fts'),go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};

@@ -25,6 +25,8 @@ def run(page, url):
     fts = page.locator('[data-mmi-window="fts"]')
     expect(fts.locator('.fts-head b')).to_have_text('FTS 제어통제 시스템')
     assert fts.locator('.fts-nav > button').all_inner_texts() == ['▸ 교육설정', '▸ 시스템관리', '▸ 사용자관리', '▸ 시나리오관리', '▸ 모니터링관리', '▸ 교육이력관리']
+    expect(fts.locator('.fts-banner')).to_be_visible()
+    assert fts.locator('.fts-banner').evaluate('e=>e.complete&&e.naturalWidth===2172')
     # ---- 문제 관리: write a problem with a phenomenon and a graded check
     fts.locator('[data-fts-page="problems"]').first.click()
     assert fts.locator('#pTable tr[data-key]').count() >= 20
