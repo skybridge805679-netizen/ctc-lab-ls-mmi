@@ -42,6 +42,11 @@ let application;const errors=[];
  await ls.waitForFunction(()=>SimDOM.document.body.ownerDocument===document.getElementById('mmiParking').contentDocument);
  await expect(graph.locator('#diaSvg')).toBeVisible();
  await ls.evaluate(()=>SimTG.actions.axisDialog());await expect(graph.locator('#axFrom')).toBeVisible();await graph.click('#axClose');
+ // FTS 제어통제: a session graded against the engine-process timetable (create C4201 through the remote timetable)
+ await ls.evaluate(()=>{SimFTSUI.go('setup');SimDOM.document.getElementById('suStart').click();});
+ await ls.waitForFunction(()=>SimFTSUI.session()?.items[0].status==='진행');
+ await ls.evaluate(()=>{const t=SimTimetable.pattern({id:'C4201',from:'yongsan',to:'suwon',start:3600});return SimTimetable.create(SimDiagram.getModel(),t);});
+ await ls.waitForFunction(()=>SimFTSUI.session().items[0].status==='완료',null,{timeout:10000});
  const beforeClosedTick=await ls.evaluate(()=>SimField.state('suwon').clock);
  await ls.evaluate(()=>SimMMI.run({type:'tick',seconds:10}));
  assert.equal(await ls.evaluate(()=>SimField.state('suwon').clock),beforeClosedTick+10);

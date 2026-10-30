@@ -265,3 +265,33 @@
 .tp-row{display:grid;grid-template-columns:30px 1fr 170px;gap:6px;align-items:center}.tp-row input[type=color]{width:26px;height:20px;padding:0;border:1px solid #888}
 .tp-name{border:1px solid #b9b9b4;background:#f4f4f1;padding:2px 6px;text-align:center}.tp-row select{font-family:monospace;letter-spacing:-1px}
 .tp-btns{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
+/* FTS 제어통제 시스템 */
+.fts{font-size:12px;background:#eef0f4;color:#1d2433}
+.fts-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#f7f8fa;border-bottom:1px solid #d5d9e2}.fts-head b{font-size:20px;letter-spacing:.5px}
+.fts-lamps{display:flex;gap:12px}.fts-lamps i{font-style:normal;font-size:10px;color:#556;display:flex;flex-direction:column;align-items:center}.fts-lamps i::before{content:'';width:5px;height:18px;border-radius:3px;background:#4cb34c;margin-bottom:2px}
+.fts-main{display:grid;grid-template-columns:170px minmax(0,1fr);min-height:640px}
+.fts-nav{background:#21386b;padding:6px 0;display:flex;flex-direction:column}.fts-nav button{all:unset;cursor:pointer;color:#fff;font-weight:700;font-size:14px;padding:12px 16px;border-bottom:1px solid #31508f}.fts-nav button.on,.fts-nav button:hover{background:#2d4c8d}
+.fts-sub{display:flex;flex-direction:column;background:#1b2f5c}.fts-sub button{font-size:12px;font-weight:600;padding:8px 22px;border-bottom:0}
+.fts-body{padding:10px 12px;overflow:auto;max-height:780px}
+.fts-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px}
+.fts-three{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:10px}
+.fts-scn{display:grid;grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:8px;align-items:start}.fts-move{display:flex;flex-direction:column;gap:8px;margin-top:80px}
+.fts-cap{font-weight:700;margin:8px 0 4px}.fts-bar{background:#2b2f36;color:#fff;font-weight:700;padding:5px 8px;margin-bottom:4px}.fts-sub-bar{background:#3c424d;color:#fff;padding:3px 8px;margin:6px 0 4px}
+.fts-grid2{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:4px 0}.fts-grid2 label,.fts-edit-row label{display:flex;gap:6px;align-items:center}
+.fts-wide{display:flex;flex-direction:column;gap:2px;margin:4px 0}.fts-wide textarea,.fts-wide input{width:100%;box-sizing:border-box;font:inherit}
+.fts-table{max-height:240px;overflow:auto;background:#fff;border:1px solid #c5cad3;margin:4px 0}.fts-table table{width:100%;border-collapse:collapse}.fts-table th{position:sticky;top:0;background:#dfe3ea;padding:3px 6px;text-align:left;white-space:nowrap}
+.fts-table td{padding:3px 6px;border-top:1px solid #edf0f4}.fts-table tr[data-key]{cursor:pointer}.fts-table tr.sel td{background:#2a64c8;color:#fff}.fts-table tr.empty td{color:#888;text-align:center}
+.fts-row-btns{display:flex;gap:6px;margin:6px 0}.fts-row-btns.end{justify-content:flex-end}.fts-row-btns.wrap{flex-wrap:wrap}
+.sched-btn.danger{background:#a8323a;color:#fff;border-color:#8a2830}
+.fts-tabs{display:flex;gap:2px;margin:6px 0}.fts-tabs button{border:1px solid #b9c0cc;background:#e8ebf0;padding:4px 12px;cursor:pointer}.fts-tabs button.on{background:#fff;font-weight:700;border-bottom-color:#fff}
+.fts-edit-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#f6f7f9;border:1px solid #d8dce3;padding:6px}.fts-fields{display:flex;flex-wrap:wrap;gap:6px}.fts-fields input{width:90px}
+.fts-tag{background:#e3ebff;color:#23408e;border-radius:3px;padding:0 4px}
+.fts-json{width:100%;box-sizing:border-box;font-family:Consolas,monospace;font-size:11px}.fts-report{white-space:pre-wrap;background:#fff;border:1px solid #ccd;padding:6px;max-height:200px;overflow:auto}
+.fts-checks{list-style:none;padding:0;margin:4px 0;background:#fff;border:1px solid #ccd}.fts-checks li{padding:3px 8px;border-top:1px solid #eef}.fts-checks li.ok{color:#1d6b33;font-weight:700}.fts-checks li.bad{color:#a8323a;font-weight:700}
+.fts-st{padding:0 4px;border-radius:3px}.st-진행{background:#ffe9a8}.st-완료{background:#c9f0d2}.st-시간초과,.st-종료{background:#f6cdd0}
+.fts-progress{font-weight:700;color:#23408e}.fts-result{margin-top:8px;font-size:15px;font-weight:700;color:#1d6b33}.fts-empty{padding:30px;color:#666}
+.fts-problem{background:#fff}.fts-problem h2{background:#232323;color:#ff6b6b;text-align:center;font-size:34px;margin:0;padding:16px;letter-spacing:6px}
+.fts-pb-time{display:flex;justify-content:flex-end;gap:6px;align-items:center;background:#232323;color:#ddd;padding:6px 10px}.fts-pb-time b{background:#fff;color:#111;padding:1px 8px;font-family:Consolas,monospace}
+.fts-pb-cap{padding:6px 10px 2px;color:#555}.fts-pb-box{background:#0b1d9e;color:#fff;font-size:18px;line-height:1.6;padding:12px 16px;margin:0 10px 6px;min-height:40px}
+.fts-picker{padding:8px 12px;font-size:12px}
+.fts-grid2 label,.fts-edit-row label{white-space:nowrap}.fts-table td{vertical-align:top}

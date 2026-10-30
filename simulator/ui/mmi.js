@@ -234,7 +234,8 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLineBtn">선로망</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiDrillBtn">경합해소 실습</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link" id="mmiFtsBtn">FTS 제어통제</button><button type="button" class="mmi-ls-link" id="mmiScenarioBtn">실기 시나리오</button><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLineBtn">선로망</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiDrillBtn">경합해소 실습</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.querySelector('#mmiFtsBtn').onclick=()=>open('fts');
  shell.querySelector('#mmiScenarioBtn').onclick=()=>open('scenario');
  shell.querySelector('#mmiEquipBtn').onclick=()=>open('equipment');
  shell.querySelector('#mmiCdrsBtn').onclick=()=>open('cdrs');
@@ -256,7 +257,7 @@ function init(){
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
- root.SimScheduleDialogs.init();root.SimNotes.init(host);root.SimDrill.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLineUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
+ root.SimScheduleDialogs.init();root.SimFTSUI.init(host);root.SimNotes.init(host);root.SimDrill.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLineUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
  root.SimMMIWindows.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
