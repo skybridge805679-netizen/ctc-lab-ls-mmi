@@ -7,3 +7,9 @@ node_modules/
 dist/
 playwright-report/
 test-results/
+
+# 버전별 소스 ZIP은 태그·GitHub Releases·보존 브랜치로 대신한다 (archive/ 커밋 금지)
+archive/
+# 교재·매뉴얼 원본 PDF는 저장소에 넣지 않는다. 되살린 원본이 다시 커밋되지 않게 막는다 (references/README.md)
+references/textbooks/
+references/manuals/

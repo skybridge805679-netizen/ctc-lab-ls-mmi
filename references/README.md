@@ -1,5 +1,10 @@
 # 개발 참고자료
 
+> **2026-10-30 정리** — 교재(`textbooks/`)·매뉴얼(`manuals/`) PDF 12개(약 144MB)는 공개 저장소의 저작권 문제로 저장소에서 뺐습니다. 아래 표의 PDF 링크는 원본 위치 기록입니다.
+> - **전문 텍스트**: [`extracted/text/`](extracted/text/) — 모든 PDF·HWP·HWPX·PPTX의 본문. PDF는 `=== 쪽 N ===`로 쪽이 구분됩니다(검색: `grep -rn "오버랩" references/extracted/text`). 다시 뽑을 때는 `python3 tools/extract-reference-text.py`.
+> - **원본 되살리기**(그림·표가 필요할 때): `git fetch origin references-originals-2026-10-30 && git restore --source=origin/references-originals-2026-10-30 --worktree -- references/textbooks references/manuals` (작업 폴더에만 꺼내며 커밋 대상에 올리지 않음). 되살린 파일은 `.gitignore`에 있어 다시 커밋되지 않습니다. 크기·SHA-256은 [MANIFEST.json](MANIFEST.json)에 그대로 있습니다.
+> - 배선도(`diagrams/`)·대본(`scenarios/`)·전사(`transcriptions/`)·증거 사진은 개발 도구가 직접 읽으므로 그대로 둡니다.
+
 사용자가 제공한 문서·배선도·세션 로그와 개발 대조 자료를 보관합니다. 파일명은 검색과 Git 호환성을 위해 한글 NFC로 정규화했고, 파일 내용은 첨부 원본과 바이트 단위로 동일합니다. 원래 첨부 파일명·크기·SHA-256은 [MANIFEST.json](MANIFEST.json)에 기록했습니다.
 
 ## 필기 교재 (2026-10-22 추가)
