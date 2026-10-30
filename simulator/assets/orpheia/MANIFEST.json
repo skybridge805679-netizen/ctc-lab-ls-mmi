@@ -50,6 +50,21 @@
       "transparent": false,
       "bytes": 1895681,
       "sha256": "4a08432849589958256e1e48c544158798b631bc1ec9473a0aa5ceb7292f56bb"
+    },
+    {
+      "path": "briefing.png",
+      "title": "Transparent Orpheia scenario briefing guide",
+      "usage": "FTS student problem-occurrence header, outside all problem text",
+      "generator": "OpenAI image_gen",
+      "reference": "Existing guide.png, based on the user-provided Orpheia character",
+      "generated_date": "2026-10-30",
+      "prompt_summary": "New waist-up attentive silver-haired green-eyed guide presenting a blank mint clipboard; ivory, #BEE3E3, deep teal and restrained gold; transparent background, no text or controls.",
+      "width": 1312,
+      "height": 1199,
+      "mode": "RGBA",
+      "transparent": true,
+      "bytes": 1972251,
+      "sha256": "892d60ea1b22877f75c559c4a2f59c1f22f07519180853e95560d8972cc9cccd"
     }
   ]
 }
