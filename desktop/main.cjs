@@ -6,6 +6,7 @@ const stations=require('../simulator/engine/network').stations.filter(s=>s.contr
 const trustedLS=sender=>[ls,...extraLS].some(win=>win&&!win.isDestroyed()&&win.webContents===sender);
 const {fitWindow,readState,writeState}=require('./window-state.cjs');
 // Sandboxed renderers load bundled UI and a single constrained simulation IPC bridge.
+const appIcon=path.join(__dirname,'resources',process.platform==='win32'?'icon.ico':'icon.png');
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
@@ -16,6 +17,8 @@ if(!single)app.quit();
 else{
  app.on('second-instance',()=>{if(ls){if(ls.isMinimized())ls.restore();ls.show();ls.focus();}});
  app.whenReady().then(async()=>{
+  if(process.platform==='darwin')app.dock?.setIcon(appIcon);
+  if(process.platform==='win32')app.setAppUserModelId('org.orpheia.ctclab');
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
   session.defaultSession.setPermissionRequestHandler((_contents,_permission,respond)=>respond(false));
   session.defaultSession.on('will-download',(_event,item)=>item.setSaveDialogOptions({defaultPath:path.join(app.getPath('downloads'),path.basename(item.getFilename()))}));
@@ -58,13 +61,13 @@ function protect(win){
  });
 }
 function createLS(){
- ls=new BrowserWindow({...savedBounds('ls'),show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
+ ls=new BrowserWindow({...savedBounds('ls'),show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:appIcon,webPreferences:prefs});
  remember(ls,'ls');protect(ls);
  ls.webContents.setWindowOpenHandler(({url,frameName})=>{
   if(url!=='about:blank')return {action:'deny'};
-  if(frameName.startsWith('orpheia-mmi-')&&!mmi)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
-  if(frameName.startsWith('orpheia-tg-')&&!graph)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('graph'),title:'ORPHEIA · 열차 그래프',backgroundColor:'#1e1e1e',autoHideMenuBar:true,webPreferences:prefs}};
-  if(frameName.startsWith('orpheia-fts-')&&!fts)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('fts'),title:'ORPHEIA · FTS 제어통제',backgroundColor:'#eef6f5',autoHideMenuBar:true,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-mmi-')&&!mmi)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-tg-')&&!graph)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('graph'),title:'ORPHEIA · 열차 그래프',backgroundColor:'#1e1e1e',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-fts-')&&!fts)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('fts'),title:'ORPHEIA · FTS 제어통제',backgroundColor:'#eef6f5',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
   return {action:'deny'};
  });
  ls.webContents.on('did-create-window',(child,{frameName})=>{
@@ -86,7 +89,7 @@ function createLS(){
 }
 function createExtraLS(station){
  if(!require('../simulator/ui/ls-presets').get(station))return;
- const win=new BrowserWindow({...savedBounds('ls:'+station),minWidth:320,minHeight:240,show:false,title:'ORPHEIA · LS',backgroundColor:'#686d68',icon:path.join(__dirname,'resources/icon.png'),webPreferences:prefs});
+ const win=new BrowserWindow({...savedBounds('ls:'+station),minWidth:320,minHeight:240,show:false,title:'ORPHEIA · LS',backgroundColor:'#686d68',icon:appIcon,webPreferences:prefs});
  extraLS.add(win);remember(win,'ls:'+station);protect(win);win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  win.once('ready-to-show',()=>win.show());win.on('closed',()=>extraLS.delete(win));
  win.loadURL(entryURL+'?desktop=1&lsStation='+encodeURIComponent(station));
