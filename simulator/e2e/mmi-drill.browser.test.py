@@ -76,9 +76,9 @@ def run(page, url):
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('합격')
     # the timetable is user data: other numbers, other spacing, only some trains
     page.locator('#drillReset').click()
-    page.evaluate("""()=>{const m=SimDiagram.getModel();
+    page.evaluate("""()=>{const m=structuredClone(SimRemote.snapshot.timetable);
       m.trains=m.trains.filter(t=>t.direction==='up'||['K1133','K1135'].includes(t.id));
-      for(const t of m.trains)t.id=t.id.replace('K','Z');SimDiagram.render();}""")
+      for(const t of m.trains)t.id=t.id.replace('K','Z');const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);SimDiagram.render();}""")
     page.locator('#drillNew').click()
     expect(page.locator('#drillMsg')).to_contain_text('출제되었습니다')
     msg = page.locator('#drillMsg').inner_text()
@@ -87,7 +87,7 @@ def run(page, url):
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('합격')
     # no down train at all -> a clear message, nothing is created
     page.locator('#drillReset').click()
-    page.evaluate("()=>{const m=SimDiagram.getModel();m.trains=m.trains.filter(t=>t.direction==='up');SimDiagram.render();}")
+    page.evaluate("()=>{const m=structuredClone(SimRemote.snapshot.timetable);m.trains=m.trains.filter(t=>t.direction==='up');const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);SimDiagram.render();}")
     page.locator('#drillNew').click(); expect(page.locator('#drillMsg')).to_contain_text('하행 열차가 없습니다')
     assert not errors, errors
 

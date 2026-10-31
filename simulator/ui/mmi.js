@@ -86,21 +86,8 @@ function raiseAlarm(text,state='',level='E',station=''){
  alarms.push({time:stamp(new Date()),text,state,level,station});if(alarms.length>50)alarms.shift();renderAlarm();
  alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
 }
-// 열차번호 중복 알람 (실무5 p.15: 충돌·구원연결로 한 열번창에 번호가 겹치면 "K0602 + K0604 열차번호 중복 알람")
-const dupSeen=new Set();
-function checkDuplicates(stationId){
- if(root.SimRemote)return; // Authoritative engine emits deduplicated alarms.
- const m=root.SimLSUI?.getModel?.(),st=m?.stations?.[stationId];if(!st)return;
- for(const [slot,rows] of Object.entries(st.windows||{})){
-  const key=`${stationId}|${slot}`,numbers=rows.map(r=>r.number);
-  if(numbers.length<2){for(const k of [...dupSeen])if(k.startsWith(key+'|'))dupSeen.delete(k);continue;}
-  const sig=`${key}|${numbers.join('+')}`;
-  if(dupSeen.has(sig))continue;
-  for(const k of [...dupSeen])if(k.startsWith(key+'|'))dupSeen.delete(k);
-  dupSeen.add(sig);const info=stationInfo(stationId);
-  raiseAlarm(`${info.name}${info.code?`(${info.code})`:''}역 ${numbers.join(' + ')} 열차번호 중복`,'','E',info.name);
- }
-}
+// 열차번호 중복 알람 (실무5 p.15: 충돌·구원연결로 한 열번창에 번호가 겹치면 "K0602 + K0604 열차번호 중복 알람")는 엔진이 낸다.
+function checkDuplicates(){}
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
 // 로그재생: every state change of a station is stored with a snapshot so the LS can be replayed (실기1 p.39-42)
 const replayLog={};

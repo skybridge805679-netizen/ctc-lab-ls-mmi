@@ -37,7 +37,7 @@ def run(page, url):
     page.locator('[data-eq="DTS2"]').uncheck()
     expect(page.locator('#eventLogBody')).to_contain_text('표준시각 전송 (')
     n = page.evaluate("SimEquipment.sentTimes().length")
-    page.evaluate("SimEquipment.tick(10790);SimEquipment.tick(10805)")
+    page.evaluate("()=>{const c=SimRemote.snapshot.states[SimRemote.snapshot.selected].clock,day=((c%86400)+86400)%86400;SimRemote.command({type:'tick',seconds:(10790-day+86400)%86400});SimRemote.command({type:'tick',seconds:15});}")   # 엔진 시계를 03:00 직전으로 보낸 뒤 넘긴다
     assert page.evaluate("SimEquipment.sentTimes().length") == n + 1
     assert page.evaluate("SimEquipment.sentTimes().slice(-1)[0]") == '매일 03:00:00'
     # signal / point fault and TTB end up in the station state and block a route request

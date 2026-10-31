@@ -7,7 +7,7 @@ const doc=SimDOM.document,$=id=>doc.getElementById(id),F=()=>root.SimFTS,M=()=>r
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY={lib:'orpheia.fts.library.v1',users:'orpheia.fts.users.v1',history:'orpheia.fts.history.v1'};
 const load=(k,fallback)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v??fallback();}catch{return fallback();}};
-const save=(k,v)=>{if(root.SimRemote&&host){if(k===KEY.users)remote({op:'users',users:v});if(k===KEY.history&&v.length===0)remote({op:'clearHistory'});}try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+const save=(k,v)=>{if(host){if(k===KEY.users)remote({op:'users',users:v});if(k===KEY.history&&v.length===0)remote({op:'clearHistory'});}try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 const stamp=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Seoul'});
 const nm=id=>M()?.stationInfo(id)?.name||N().catalog[id]?.name||id;
 const clockText=s=>{s=Math.max(0,Math.round(s||0));return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,'0')).join(':');};
@@ -16,24 +16,24 @@ const clockText=s=>{s=Math.max(0,Math.round(s||0));return [Math.floor(s/3600),Ma
 const panel=()=>$('ftsPanel'),ftsDoc=()=>panel()?.ownerDocument||document,ftsOpen=()=>!!panel()&&!panel().hidden;
 const alert=t=>M().alertBox(t,null,{document:ftsDoc()});
 const confirmBox=(t,yes)=>M().confirmBox(t,yes,{document:ftsDoc()});
-let host=null,lib=null,users=null,history=null,session=null,events=[],page='setup',timer=null,localRunLibrary=null,remoteRevision=-1,lastNotice=0,monitorSignature='',problemSignature='';
+let host=null,lib=null,users=null,history=null,session=null,page='setup',timer=null,remoteRevision=-1,lastNotice=0,monitorSignature='',problemSignature='';
 const scriptIds=()=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].map(s=>s.id);
 const scriptTitle=id=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].find(s=>s.id===id)?.title||id;
 function defaults(){
  const limits=Object.fromEntries(scriptIds().map(id=>[id,root.SimAssessment?.limitsFor(id)?.[0]]).filter(([,v])=>v));
  return {...F().seed({scripts:scriptIds(),limits}),schedules:[]};
 }
-function persist(){if(root.SimRemote){const r=remote({op:'library',library:lib});if(!r.ok){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);alert(r.message);return false;}}save(KEY.lib,lib);return true;}
-const activeLibrary=()=>root.SimRemote?.snapshot.ftsRunLibrary||localRunLibrary||lib;
+function persist(){const r=remote({op:'library',library:lib});if(!r.ok){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);alert(r.message);return false;}save(KEY.lib,lib);return true;}
+const activeLibrary=()=>root.SimRemote.snapshot.ftsRunLibrary||lib;
 function remote(action){const result=root.SimRemote.command({type:'fts',...action});syncRemote();return result;}
-function syncRemote(){const value=root.SimRemote?.snapshot.fts;if(!value)return;if(remoteRevision!==value.revision){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);remoteRevision=value.revision;}session=value.session;users=structuredClone(value.users);history=structuredClone(value.history);}
+function syncRemote(){const value=root.SimRemote.snapshot.fts;if(!value)return;if(remoteRevision!==value.revision){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);remoteRevision=value.revision;}session=value.session;users=structuredClone(value.users);history=structuredClone(value.history);}
 
 const SECTIONS=['지하청량리-수원','지하청량리-영등포','지하청량리-지하서울','노량진-금천구청','용산-수원','영등포-수원'];
 
 // ---------------------------------------------------------------- shell
 const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리']];
 function shell(){
- return `<div class="fts"><div class="fts-head"><img class="fts-banner" src="assets/orpheia/banner.png" alt="" aria-hidden="true" width="2172" height="724"><div class="fts-brand"><img src="assets/orpheia/emblem.png" alt="" width="38" height="38"><div><small>ORPHEIA · TRAINING CONTROL</small><b>FTS 제어통제 시스템</b></div></div><span class="fts-lamps"><i class="fts-engine" title="${root.SimRemote?'독립 관제 엔진 연결':'브라우저 실습'}">${root.SimRemote?'ENGINE':'LOCAL'}</i>${['CTC','EMC','SIC','DB'].map(x=>`<i class="simulated" title="${x} 모의 · 외부 장치 통신 미연결">${x} · 모의</i>`).join('')}</span></div>
+ return `<div class="fts"><div class="fts-head"><img class="fts-banner" src="assets/orpheia/banner.png" alt="" aria-hidden="true" width="2172" height="724"><div class="fts-brand"><img src="assets/orpheia/emblem.png" alt="" width="38" height="38"><div><small>ORPHEIA · TRAINING CONTROL</small><b>FTS 제어통제 시스템</b></div></div><span class="fts-lamps"><i class="fts-engine" title="${root.OrpheiaEngine.native===false?'관제 엔진 (브라우저 시험 연결)':'독립 관제 엔진 연결'}">ENGINE</i>${['CTC','EMC','SIC','DB'].map(x=>`<i class="simulated" title="${x} 모의 · 외부 장치 통신 미연결">${x} · 모의</i>`).join('')}</span></div>
 <div class="fts-main"><nav class="fts-nav">${MENU.map(([id,label,sub])=>`<button type="button" data-fts-page="${sub?sub[0][0]:id}" data-fts-group="${id}">▸ ${label}</button>${sub?`<div class="fts-sub">${sub.map(([s,l])=>`<button type="button" data-fts-page="${s}">— ${l}</button>`).join('')}</div>`:''}`).join('')}</nav>
 <section class="fts-workspace"><div class="fts-workspace-head"><div><small>INSTRUCTOR WORKSPACE</small><h2 id="ftsPageTitle">교육설정</h2></div><span id="ftsSessionStatus">교육 전 준비</span></div><div class="fts-body" id="ftsBody"></div></section></div></div>`;
 }
@@ -376,91 +376,24 @@ ${table('pkProbs',['과목명칭','문제명칭','제한시간(초)'],(sit?.prob
 // ---------------------------------------------------------------- 교육 진행
 const now=()=>D().clock();
 // 제어통제 로그: 교수 프로그램의 기록은 FTS에만 남긴다 (교육생이 쓰는 MMI 로그와 분리)
-let localLogs=[];
-function ftsLog(text,level='I'){localLogs.unshift({at:now(),time:new Date().toISOString(),text,level});if(localLogs.length>500)localLogs.length=500;renderLog();}
-const logs=()=>root.SimRemote?.snapshot.fts?.logs||localLogs;
+const logs=()=>root.SimRemote.snapshot.fts?.logs||[];
 function uiState(){
  const open=M().windowIds().filter(id=>M().isOpen(id));const g=$('graphPanel');if(g&&!g.hidden&&g.dataset.detached!=='1'||root.SimWorkspace?.graphOpen?.())open.push('graph');
  return {windows:[...new Set(open)],graphTrain:$('graphTrain')?.value||''};
 }
 function scriptProgress(id){
- const r=root.SimRemote?root.SimRemote.snapshot.scenario?.run:null,snap=r?{id:r.sc?.id,done:r.done}:root.SimScenarioUI?.snapshot?.();
- if(!snap||snap.id!==id)return {done:0,total:0};return {done:snap.done.filter(Boolean).length,total:snap.done.length,complete:r?!!r.passed:!!snap.passed};
+ const r=root.SimRemote.snapshot.scenario?.run;
+ if(!r||r.sc?.id!==id)return {done:0,total:0};return {done:r.done.filter(Boolean).length,total:r.done.length,complete:!!r.passed};
 }
-function ctxFor(item){
- const p=activeLibrary().problems.find(x=>x.id===item.problem),since=item.startedAt??session.readyAt;
- return {states:host.context().stationStates,ls:root.SimLSUI.getModel(),model:D().getModel(),events:events.filter(e=>e.at>=since),ui:uiState(),manual:session.manual[session.items.indexOf(item)]||{},script:p?.script?scriptProgress(p.script):null};
-}
-function startSession(){
- if(root.SimRemote){const r=remote({op:'start',...setup});if(!r.ok){alert(r.message);return;}go('monitor');tick();return;}
- const sc=lib.scenarios.find(c=>c.id===setup.scenario);
- if(!sc){alert('시나리오를 선택하세요.');return;}if(!setup.professor||!setup.student){alert('교수와 교육생을 선택하세요.');return;}
- const errors=F().validate(lib,{scripts:scriptIds()});if(errors.length){alert('라이브러리 오류로 시작할 수 없습니다: '+errors[0]);return;}
- const prof=users.find(u=>u.id===setup.professor),stud=users.find(u=>u.id===setup.student);
- localRunLibrary=structuredClone(lib);root.SimAssessmentUI?.beginTask('fts:'+Date.now(),sc.name,'integrated');
- session=F().createSession(localRunLibrary,sc.id,{professor:prof?.name||setup.professor,student:stud?.id||setup.student,startedAt:now()});session.showActions=setup.showActions;session.situationLoaded=null;events=[];
- ftsLog(`교육 시작 · ${sc.name} · 교수 ${session.professor} · 교육생 ${session.student}`);
- go('monitor');tick();
-}
-function loadSituation(item){
- const s=activeLibrary().situations.find(x=>x.id===item.situation);if(!s||session.situationLoaded===(item.situationIndex??s.id))return;
- session.situationLoaded=item.situationIndex??s.id;const sch=schedules().find(x=>x.id===s.scheduleId);
- if(sch?.timetable)loadSchedule(sch,false);
- ftsLog(`상황 시작 · ${s.name}${sch?` · 열차 스케줄 ${sch.id}`:''}`);
-}
-function applyPhenomenon(ph){
- const model=D().getModel();let r={ok:true};
- const atStation=(station,fn)=>{host.selectStation(station);return fn();};
- switch(ph.type){
-  case 'insertTrain':r=root.SimLSUI.dispatch({op:'insert',station:ph.station,slot:ph.slot,number:ph.number,direction:ph.direction||'up'});break;
-  case 'deleteTrain':for(const [station,st] of Object.entries(root.SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(st.windows))for(const row of [...rows])if(row.number===ph.number)root.SimLSUI.dispatch({op:'delete',station,slot,uid:row.uid});break;
-  case 'mode':r=atStation(ph.station,()=>host.run({type:'mode',value:ph.value,source:'SCENARIO'}));break;
-  case 'route':r=atStation(ph.station,()=>{const before=host.context().stationStates[ph.station].mode;host.run({type:'mode',value:'CCM',source:'SCENARIO'});const x=host.run({type:'route',id:ph.route,source:'SCENARIO'});if(before!=='CCM')host.run({type:'mode',value:before,source:'SCENARIO'});return x;});break;
-  case 'approach':r=atStation(ph.station,()=>host.run({type:'approach',signal:ph.signal,present:true,source:'SCENARIO'}));break;
-  case 'createTrain':{const hms=String(ph.start||'09:00:00'),[h,m,s=0]=hms.split(':').map(Number),t=T().pattern({id:ph.train,from:ph.from,to:ph.to,start:ph.startIn!==undefined?Math.round(now()+ph.startIn):h*3600+m*60+s-28800,kind:ph.kind||'전동열차'});if(t&&ph.replace&&model.trains.some(x=>x.id===ph.train))T().remove(model,ph.train);r=t?T().create(model,t):{ok:false,message:'열차 생성 조건을 확인하세요.'};D().render();break;}
-  case 'delay':r=T().delay(model,ph.train,ph.station,Number(ph.minutes));D().render();break;
-  case 'cancel':r=T().setCancelled(model,ph.train,ph.from,ph.to,true);D().render();break;
-  case 'moveTrain':{let f=null;for(const [station,st] of Object.entries(root.SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(st.windows))for(const row of rows)if(row.number===ph.number)f={station,slot,uid:row.uid};
-   r=f?(f.station===ph.station&&f.slot===ph.slot?{ok:true}:root.SimLSUI.dispatch({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:ph.station,targetSlot:ph.slot})):{ok:false,message:ph.number+' 열차번호가 LS에 없습니다'};break;}
-  case 'resetStation':{const st=host.context().stationStates[ph.station],c=root.SimCore.forStation(ph.station),clock=st.clock;for(const k of Object.keys(st))delete st[k];Object.assign(st,c.initial(),{clock});M().rebase(ph.station);break;}
-  case 'runTrain':{let f=null;for(const [station,st] of Object.entries(root.SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(st.windows))for(const row of rows)if(row.number===ph.number)f={station,slot,uid:row.uid};
-   if(!f){r={ok:false,message:ph.number+' 열차번호가 LS에 없습니다'};break;}
-   for(const l of ph.legs||[])root.SimScenarioUI.request({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover});
-   if(ph.exit)root.SimScenarioUI.request({op:'delete',station:f.station,slot:f.slot,uid:f.uid});break;}
-  case 'alarm':M().raiseAlarm(ph.text,'','W');break;
-  case 'notice':session.notice=ph.text;ftsLog('안내 · '+ph.text);break;
- }
- ftsLog(`현상 발생 · ${F().PHENOMENA[ph.type]?.label||ph.type}${r&&r.ok===false?' · 실패: '+(r.message||''):''}`);
-}
-function startScript(id){
- M().open('scenario');const sel=$('scSelect');if(!sel)return;sel.value=id;sel.dispatchEvent(new Event('change'));$('scStart').click();
-}
+// 모니터링에 필요한 것만 (채점은 엔진이 한다)
+function ctxFor(item){const p=activeLibrary().problems.find(x=>x.id===item.problem);return {script:p?.script?scriptProgress(p.script):null};}
+// 교육 진행·현상 적용·채점은 엔진(fts-controller)이 한다. 이 화면은 명령을 보내고 엔진 상태를 그린다.
+function startSession(){const r=remote({op:'start',...setup});if(!r.ok){alert(r.message);return;}go('monitor');tick();}
 function tick(){
- if(root.SimRemote){
   syncRemote();const state=root.SimRemote.snapshot.fts;if($('ftsSessionStatus'))$('ftsSessionStatus').textContent=session&&!session.finished?'교육 진행 · '+(session.current+1)+' / '+session.items.length+' 문제':session?'교육 종료':'교육 전 준비';if(session&&!session.finished&&!root.SimExtraLS){const ui=uiState(),sig=JSON.stringify(ui);if(tick.ui!==sig){tick.ui=sig;remote({op:'ui',ui});}}
   if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}}
-  if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}if(problemOpen())renderProblem();return;
- }
- if(!session||session.finished)return;
- const t=now();const pending=session.items[session.current];if(pending)loadSituation(pending);const out=F().advance(activeLibrary(),session,(item)=>ctxFor(item),t);
- for(const o of out){
-  if(o.kind==='activate'){loadSituation(o.item);if(o.problem.script)startScript(o.problem.script);speak(o.problem.voice||o.problem.name);showProblem();ftsLog(`문제 발생 · ${o.problem.name}`);}
-  if(o.kind==='phenomenon')applyPhenomenon(o.phenomenon);
-  if(o.kind==='branch')ftsLog('상황 변경 · '+o.branch.label);
-  if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);ftsLog(`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
-  if(o.kind==='finished')finishSession('모든 문제 종료');
- }
- if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}
- if(problemOpen())renderProblem();
-}
-function finishSession(reason){
- if(root.SimRemote){remote({op:'stop'});tick();return;}
- if(!session||session.closed)return;session.closed=true;session.finished=true;
- const sum=F().summary(activeLibrary(),session);
- history.unshift({id:'E'+Date.now(),at:stamp(),professor:session.professor,student:session.student,scenario:session.scenarioName,reason,...sum});save(KEY.history,history.slice(0,200));
- ftsLog(`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
- if(problemOpen())renderProblem();if(page==='monitor'){renderMonitor();renderLog();}
-}
+  if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}if(problemOpen())renderProblem();}
+function finishSession(){remote({op:'stop'});tick();}
 
 // ---------------------------------------------------------------- 모니터링관리
 PAGES.monitor={html:()=>'<div id="ftsMonitor"></div><div class="fts-cap">제어통제 로그 (교수용 · MMI 로그와 별개)</div><div id="ftsLog" class="fts-table fts-log"></div>',bind:()=>{renderMonitor();logSignature='';renderLog();}};
@@ -497,10 +430,10 @@ ${manual.length?`<div class="fts-cap">교수 확인 (구술)</div><div class="ft
 <div class="fts-grid2"><label>스케줄ID<input readonly value="${esc(s?.scheduleId||'')}"></label><label>스케줄 명칭<input readonly value="${esc(schedules().find(x=>x.id===s?.scheduleId)?.name||'(현재 온라인 시간표)')}"></label><label>구간<input readonly value="${esc(s?.section||'')}"></label></div>
 ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLibrary(),session);return `결과 ${r.got}/${r.full}점 (${r.percent}%)`;})()}</div>`:''}</div></div>`;
  $('mEnd').onclick=()=>confirmBox('교육을 종료하시겠습니까?',()=>{finishSession('교수 종료');});
- $('mNext').onclick=()=>{if(root.SimRemote){remote({op:'next'});tick();return;}const p2=activeLibrary().problems.find(x=>x.id===session.items[session.current]?.problem);const out=F().endCurrent(session,now());if(p2?.script)$('scStop')?.click();if(out.some(o=>o.kind==='finished'))finishSession('모든 문제 종료');tick();renderMonitor();};
+ $('mNext').onclick=()=>{remote({op:'next'});tick();};
  $('mShow').onclick=showProblem;
- $('mReload').onclick=()=>{if(root.SimRemote){remote({op:'reload'});tick();return;}session.situationLoaded=null;loadSituation(item);};
- for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{if(root.SimRemote){remote({op:'manual',key:b.dataset.manual});tick();return;}const m=session.manual[session.items.indexOf(item)]??={};m[b.dataset.manual]=b.dataset.manual.startsWith('branch:')?true:!m[b.dataset.manual];tick();renderMonitor();};
+ $('mReload').onclick=()=>{remote({op:'reload'});tick();};
+ for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{remote({op:'manual',key:b.dataset.manual});tick();};
 }
 
 // ---------------------------------------------------------------- 교육생 "문제 발생" 화면
@@ -549,12 +482,11 @@ function init(api){
  const errors=F().validate(lib,{scripts:scriptIds(),drafts:true});if(errors.length)lib=defaults();
  const fallbackUsers=()=>[{role:'교수',id:'001',name:'교수'},{role:'교육생',id:'tester',name:'교육생',number:'202201'}];users=load(KEY.users,fallbackUsers);if(!Array.isArray(users)||users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'))users=fallbackUsers();history=load(KEY.history,()=>[]);if(!Array.isArray(history))history=[];history=history.filter(h=>h&&Array.isArray(h.rows));
  setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;
- if(root.SimRemote){const r=root.SimRemote.command({type:'fts',op:'bootstrap',library:lib,users,history});if(!r.ok)console.warn(r.message);syncRemote();setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;}
+ {const r=root.SimRemote.command({type:'fts',op:'bootstrap',library:lib,users,history});if(!r.ok)console.warn(r.message);syncRemote();setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;}
  pDraft=blankProblem();
  const box=panel();box.innerHTML=shell()+'<button type="button" class="fts-inline-close" id="ftsInlineClose" aria-label="FTS 제어통제 닫기">✕ 닫기</button>';
  box.querySelector('.fts-nav').onclick=e=>{const b=e.target.closest('[data-fts-page]');if(b)go(b.dataset.ftsPage);};
  $('ftsInlineClose').onclick=close;
- M().onEvent(e=>{if(!root.SimRemote&&session&&!session.finished){events.push({...e,at:now()});}});
  timer=setInterval(()=>{try{tick();const el=$('mElapsed'),pb=$('pbElapsed');if(session&&!session.finished){const it=session.items[session.current];if(it?.startedAt!=null){if(el)el.value=clockText(now()-it.startedAt);if(pb)pb.textContent=clockText(now()-it.startedAt);}}}catch(e){console.error(e);}},500);
 }
 function open(){

@@ -15,7 +15,7 @@ try:
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect','cheongnyangni')
-   page.evaluate('SimDiagram.getModel().trains.splice(1);SimAutoUI.set(true)')
+   page.evaluate("()=>{const m=structuredClone(SimRemote.snapshot.timetable);m.trains.splice(1);const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);SimAutoUI.set(true);}")
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    # Depart at 30 s, clear at 50 s; the number then progresses through actual B codes.
    run({'type':'tick','seconds':30});run({'type':'tick','seconds':20})
@@ -42,7 +42,7 @@ try:
     assert run({'type':'stop','id':route.split('-')[0]})['ok']
    assert page.evaluate('SimNetworkTopology.audit().inferredCompositeRoutes.length')==0
    page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
-   page.evaluate('''()=>{const m=SimDiagram.getModel(),t=SimTimetable.pattern({id:'G9101',from:'uiwang',to:'suwon',start:0});t.calls[0].departureRoute='4A_FT';m.trains.splice(0,m.trains.length,t);SimAutoUI.set(true);}''')
+   page.evaluate('''()=>{const m=SimRemote.snapshot.timetable,t=SimTimetable.pattern({id:'G9101',from:'uiwang',to:'suwon',start:0});t.calls[0].departureRoute='4A_FT';const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:[t]}]});if(r.ok===false)throw Error(r.message);SimAutoUI.set(true);}''')
    run({'type':'tick','seconds':20})
    assert page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],20).boundary')=='external:uiwang:FT'
    run({'type':'tick','seconds':600});assert page.evaluate('Object.keys(SimField.state("suwon").routes).length')==0

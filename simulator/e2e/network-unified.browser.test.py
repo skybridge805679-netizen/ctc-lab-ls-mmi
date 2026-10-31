@@ -15,7 +15,7 @@ try:
   for width in [1440,1920]:
    page=b.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
-   page.evaluate('''()=>{SimDiagram.getModel().trains.splice(1);const c=SimCore.forStation('cheongnyangni');c.dispatch(SimField.state('cheongnyangni'),{type:'fault',kind:'signal',id:'4A',on:true});SimAutoUI.set(true);}''')
+   page.evaluate('''()=>{const m=structuredClone(SimRemote.snapshot.timetable);m.trains.splice(1);const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);const c=SimCore.forStation('cheongnyangni');c.dispatch(SimField.state('cheongnyangni'),{type:'fault',kind:'signal',id:'4A',on:true});SimAutoUI.set(true);}''')
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    run({'type':'tick','seconds':600})
    assert page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],600).station')=='cheongnyangni'
@@ -30,14 +30,14 @@ try:
    # A scripted emergency does not silently switch off shared block enforcement.
    page.evaluate("SimMMI.open('scenario')");page.select_option('#scSelect','em-03');page.click('#scStart');assert page.evaluate('SimLine.state.enforce')
    assert page.evaluate('''()=>{const id=SimScenarioUI.reservedNumbers().find(id=>Object.values(SimLSUI.getModel().stations).some(s=>Object.values(s.windows).some(rows=>rows.some(r=>r.number===id))));return SimAutoUI.position({id},1040)?.actual===true;}''')
-   # Empty single-line reservation: the opposite departure is rejected before a number enters.
+   # Empty single-line reservation (LS only): a wrong-direction departure onto the up line rejects the opposite departure before a number enters.
    page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.evaluate('SimAutoUI.set(false)')
-   page.evaluate('''()=>{SimLine.state.single.add('jonggak>underground-seoul:M');for(const id of ['jonggak','underground-seoul'])SimCore.forStation(id).dispatch(SimField.state(id),{type:'mode',value:'CCM'});}''')
-   page.select_option('#stationSelect','jonggak');assert run({'type':'route','id':'4A-B046T'})['ok']
-   page.select_option('#stationSelect','underground-seoul');r=run({'type':'route','id':'3A-B065T'});assert not r['ok'] and '전방 폐색' in r['message'],r
+   page.evaluate('''()=>{for(const id of ['jonggak','underground-seoul'])SimCore.forStation(id).dispatch(SimField.state(id),{type:'mode',value:'CCM'});}''')
+   page.select_option('#stationSelect','jonggak');assert run({'type':'route','id':'53-B045T'})['ok']
+   page.select_option('#stationSelect','underground-seoul');r=run({'type':'route','id':'3A-B065T'});assert not r['ok'] and '단선 운전' in r['message'],r
    if width==1920:
     page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.evaluate('SimAutoUI.set(true)')
-    result=page.evaluate('''()=>{for(let i=0;i<1200;i++){for(const st of SimNetwork.stations.filter(s=>s.controlled))SimCore.forStation(st.id).dispatch(SimField.state(st.id),{type:'tick',seconds:10});SimAutoUI.step();}return {positions:SimDiagram.getModel().trains.map(t=>SimAutoUI.position(t,12000)),routes:SimNetwork.stations.filter(s=>s.controlled).flatMap(st=>Object.keys(SimField.state(st.id).routes)),numbers:Object.values(SimLSUI.getModel().stations).flatMap(s=>Object.values(s.windows).flat()),troubles:document.querySelector('#acTroubles').innerText};}''')
+    result=page.evaluate('''()=>{SimRemote.command({type:'tick',seconds:12000});SimAutoUI.step();return {positions:SimDiagram.getModel().trains.map(t=>SimAutoUI.position(t,12000)),routes:SimNetwork.stations.filter(s=>s.controlled).flatMap(st=>Object.keys(SimField.state(st.id).routes)),numbers:Object.values(SimLSUI.getModel().stations).flatMap(s=>Object.values(s.windows).flat()),troubles:document.querySelector('#acTroubles').innerText};}''')
     assert not result['routes'] and not result['numbers'] and all(p is None for p in result['positions']),result
     assert result['troubles']=='등록된 트러블이 없습니다',result
     print('PASS 1920px: all 12 timetable trains finish the full protected network without leftover numbers, routes or troubles',flush=True)

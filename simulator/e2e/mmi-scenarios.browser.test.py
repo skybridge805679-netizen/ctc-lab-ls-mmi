@@ -34,8 +34,8 @@ def run(page, url):
             do({'type': 'tick', 'seconds': 10})
         raise AssertionError({'snapshot': page.evaluate('SimScenarioUI.snapshot()'), 'status': page.locator('#scMotionStatus').inner_text()})
     # the timetable is user data: rename every train and drop the first up train -> the choices follow the current timetable
-    page.evaluate("""()=>{const m=SimDiagram.getModel();for(const t of m.trains)t.id=(t.direction==='up'?'U':'D')+t.id.slice(1);
-      m.trains.splice(m.trains.findIndex(t=>t.direction==='up'),1);SimDiagram.render();}""")
+    page.evaluate("""()=>{const m=structuredClone(SimRemote.snapshot.timetable);for(const t of m.trains)t.id=(t.direction==='up'?'U':'D')+t.id.slice(1);
+      m.trains.splice(m.trains.findIndex(t=>t.direction==='up'),1);const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);SimDiagram.render();}""")
     page.locator('#scSelect').select_option('yongsan-5')
     page.locator('#scSelect').dispatch_event('change')
     options = page.locator('#scTrainList option').evaluate_all('o=>o.map(x=>x.value)')

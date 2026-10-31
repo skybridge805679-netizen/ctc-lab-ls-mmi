@@ -78,6 +78,8 @@ function create(){
   if(cache)return cache;
 
   const positions=Object.fromEntries(model.trains.map(t=>[t.id,root.SimAutoUI.position(t,states[session.selected].clock)]));
+  // 시나리오 열차(시간표 밖 예약 번호)의 실제 위치도 엔진이 낸다 — 화면은 계산하지 않는다
+  for(const id of root.SimScenarioUI.reservedNumbers?.()||[])if(!(id in positions))positions[id]=root.SimScenarioUI.position({id});
   if(ftsLibrarySource!==fts.library()){ftsLibrarySource=fts.library();ftsLibraryCache=structuredClone(ftsLibrarySource);}if(ftsRunSource!==fts.runLibrary()){ftsRunSource=fts.runLibrary();ftsRunCache=structuredClone(ftsRunSource);}
   const value={fts:fts.snapshot(),editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},assessment:assessment.snapshot(now()),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],events};
   if(tableDirty||!tableCache){tableCache=JSON.parse(JSON.stringify(model));tableDirty=false;}

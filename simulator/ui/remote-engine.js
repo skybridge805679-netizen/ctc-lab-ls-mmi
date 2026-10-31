@@ -1,5 +1,6 @@
 (function(root){'use strict';
-if(!root.OrpheiaEngine){if(new URLSearchParams(root.location.search).get('desktop')==='1'){root.SimSession.create=()=>{throw new Error('Desktop engine bridge unavailable; local simulation is disabled.');};}return;}
+// 엔진 연결: 데스크톱은 preload, 브라우저는 page-engine.js가 OrpheiaEngine을 준다. 화면이 따로 계산하는 경로는 없다.
+if(!root.OrpheiaEngine)throw new Error('엔진 연결(OrpheiaEngine)이 없습니다.');
 const requested=new URLSearchParams(root.location.search).get('lsStation');let viewStation=root.SimLSPresets.get(requested)?.station||null;root.SimExtraLS=!!viewStation;
 let mirror=null,cursor=0,version=-1;const pending=[];
 function reconcile(target,source){
