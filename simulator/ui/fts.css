@@ -56,3 +56,14 @@ body.fts-detached .fts-panel{margin:0;min-height:100vh;border:0;border-radius:0;
 /* 능동형 문제: 탭 도움말 · 능동형 표시 */
 .fts-help{margin:4px 0 6px;font-size:12px;line-height:1.5;color:var(--fts-muted,#5b6b7a)}
 .fts-tag.active{background:#e3f4ea;color:#17603a;border-color:#9cd3b2}
+/* 독립 창: 창 높이를 끝까지 채운다 (고정 높이 760px 때문에 큰 창에서 아래가 비던 문제) */
+body.fts-detached{margin:0;height:100vh;overflow:hidden}
+body.fts-detached .fts-panel{height:100vh;min-height:0;display:flex;flex-direction:column}
+body.fts-detached .fts{flex:1;display:flex;flex-direction:column;min-height:0}
+body.fts-detached .fts-main{flex:1;height:auto;max-height:none;min-height:0}
+/* 문제 발생: 교육생이 보는 독립 창 (MMI와 별개). 팝업이 막히면 LS 화면 위에 띄운다. */
+.problem-panel{margin:0;padding:0;background:#bee3e3}
+.problem-panel[hidden]{display:none}
+.problem-panel.problem-inline{position:fixed;inset:24px 40px;z-index:900;overflow:auto;border-radius:10px;box-shadow:0 18px 50px #12363a55;scrollbar-gutter:stable}
+body.problem-detached{margin:0;height:100vh;overflow:hidden;background:#bee3e3}
+body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter:stable}

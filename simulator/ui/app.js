@@ -76,7 +76,7 @@ function render(){
  SimDOM.document.querySelectorAll('#stationTabs [data-station]').forEach(b=>{const s=stationStates[b.dataset.station],monitor=!!window.SimLSPresets.get(b.dataset.view).monitor,n=monitor?0:Object.keys(s.routes).length;b.classList.toggle('selected',b.dataset.view===selectedView);b.querySelector('.tab-dot').className='tab-dot '+(monitor?'monitor':s.mode.toLowerCase());b.querySelector('.tab-count').textContent=n?n:'';b.title=monitor?window.SimLSPresets.get(b.dataset.view).name+' · 역간 운행 감시':`${N.catalog[b.dataset.station].name} · ${s.mode} · ${n}개 진로`;});
  SimDOM.document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
  const monitor=!!window.SimLSPresets.get(selectedView).monitor;$('topStation').textContent=window.SimLSPresets.get(selectedView).name;$('topCode').textContent=monitor?'':st.code;
- $('drawerBtn').hidden=monitor;$('resetBtn').hidden=monitor;if(monitor&&window.SimShell)window.SimShell.drawer(false);
+ if($('drawerBtn'))$('drawerBtn').hidden=monitor;$('resetBtn').hidden=monitor;if(monitor&&window.SimShell)window.SimShell.drawer(false);
  SimDOM.document.querySelector('.fidelity-note').innerHTML=monitor?`${viewInfo.name} LS<b>역간 운행 감시 · ${viewInfo.plates.join(' · ')}</b>`:`${viewInfo.name} LS<b>${(ownIntermediate.length?'관할 '+ownIntermediate.join(' · ')+' · ':'')+'접근쇄정·오버랩 연습'}</b>`;
  SimDOM.document.querySelector('.fidelity-note').insertAdjacentHTML('beforeend','<span class="platform-legend" aria-label="승강장 범례"><span><i class="platform-key orange"></i>고상홈</span><span><i class="platform-key cyan"></i>저상홈</span></span>');
  const controlled=lsViews,index=controlled.findIndex(s=>s.id===selectedView);
@@ -178,8 +178,6 @@ $('extraLSBtn').onclick=()=>window.OrpheiaEngine?.openView('ls',selectedView);
 if(window.SimExtraLS){
  document.body.classList.add('workspace-split');
  window.addEventListener('DOMContentLoaded',()=>{
- $('detachMMIBtn').onclick=()=>window.OrpheiaEngine.openView('mmi');
- $('graphWinBtn').onclick=()=>window.OrpheiaEngine.openView('graph');
  $('ftsWinBtn').onclick=()=>window.OrpheiaEngine.openView('fts');
  window.SimWorkspace.detach=()=>window.OrpheiaEngine.openView('mmi');
  window.SimWorkspace.openGraph=()=>window.OrpheiaEngine.openView('graph');

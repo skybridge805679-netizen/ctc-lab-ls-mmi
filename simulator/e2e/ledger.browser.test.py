@@ -17,7 +17,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(url, wait_until='networkidle')
-    page.locator('#mmiLedgerBtn').click()
+    page.evaluate("SimMMI.open('ledger')")
     expect(page.locator('[data-mmi-window="ledger"]')).to_be_visible()
     expect(page.locator('#ldRows tr.empty')).to_have_count(1)
     page.evaluate("""()=>{const m=SimDiagram.getModel(),t=m.trains.find(x=>x.direction==='down');

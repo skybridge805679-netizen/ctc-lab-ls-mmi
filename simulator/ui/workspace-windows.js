@@ -2,7 +2,8 @@
 'use strict';
 // One engine in the LS window. Adopt live MMI nodes, never start a second simulator.
 const doc=document;let popup=null,anchor=null,poll=null,restoring=false;
-const button=()=>doc.getElementById('detachMMIBtn');
+// LS 상단의 MMI 창 버튼은 없앴다(MMI는 실습 화면 메뉴 · Ctrl/⌘+2). 상태 표시는 화면 밖 버튼에 둔다.
+const spare=doc.createElement('button'),button=()=>doc.getElementById('detachMMIBtn')||spare;
 const overlays=d=>Array.from(d.querySelectorAll('.mmi-alarm,.mmi-shield:not([data-ls-owned])'));
 function transfer(node,target){const modal=node.matches('dialog[open]');if(modal)node.close();target.appendChild(node);if(modal)node.showModal();}
 function resize(){root.dispatchEvent(new Event('resize'));}
@@ -92,8 +93,34 @@ function openFts(){
  ftsPoll=root.setInterval(()=>{if(next.closed)closeFts();},500);
  resize();next.focus();return true;
 }
+// 문제 발생 화면: 교육생이 보는 독립 창 (MMI 창 안이 아니다). FTS가 문제를 낼 때 연다.
+let prob=null,probHome=null,probPoll=null,probClosing=false;
+function closeProblem(){
+ if(!prob||probClosing)return;probClosing=true;
+ const old=prob;clearInterval(probPoll);probPoll=null;
+ const panel=old.document.getElementById('problemPanel');
+ if(panel&&probHome?.parentNode){delete panel.dataset.detached;panel.hidden=true;probHome.parentNode.insertBefore(panel,probHome);}
+ root.SimDOM.setDocument('problem',null);probHome?.remove();probHome=null;prob=null;
+ if(!old.closed)old.close();probClosing=false;resize();
+}
+function openProblem(){
+ if(prob&&!prob.closed){prob.focus();return true;}
+ const panel=root.SimDOM.document.getElementById('problemPanel');if(!panel)return false;
+ const next=root.open('about:blank','orpheia-problem-'+sessionId,'popup,width=1120,height=900,resizable=yes,scrollbars=yes');
+ if(!next)return false;
+ prob=next;const d=next.document;d.title='ORPHEIA · 문제 발생';d.documentElement.lang='ko';
+ const base=d.createElement('base');base.href=doc.baseURI;d.head.appendChild(base);
+ for(const css of doc.querySelectorAll('link[rel="stylesheet"]')){const link=d.createElement('link');link.rel='stylesheet';link.href=css.href;link.onload=resize;d.head.appendChild(link);}
+ d.body.className='problem-detached';
+ probHome=doc.createComment('problem return position');panel.before(probHome);
+ panel.classList.remove('problem-inline');panel.dataset.detached='1';d.body.appendChild(panel);panel.hidden=false;
+ root.SimDOM.setDocument('problem',d);
+ next.addEventListener('resize',resize);next.addEventListener('beforeunload',closeProblem);
+ probPoll=root.setInterval(()=>{if(next.closed)closeProblem();},500);
+ resize();return true;
+}
 const sessionId=Math.random().toString(36).slice(2);
-root.SimWorkspace={detach,closeMMI:park,openGraph,closeGraph,openFts,closeFts,ftsDetached:()=>!!fts&&!fts.closed,graphDetached:()=>!!tg&&!tg.closed,detached:()=>!!popup&&!popup.closed,focusMMI:()=>popup?.focus()};
+root.SimWorkspace={detach,closeMMI:park,openGraph,closeGraph,openFts,closeFts,ftsDetached:()=>!!fts&&!fts.closed,openProblem,closeProblem,problemDetached:()=>!!prob&&!prob.closed,graphDetached:()=>!!tg&&!tg.closed,detached:()=>!!popup&&!popup.closed,focusMMI:()=>popup?.focus()};
 button().onclick=detach;button().setAttribute('aria-pressed','false');
-root.addEventListener('pagehide',()=>{if(popup&&!popup.closed)popup.close();if(tg&&!tg.closed)tg.close();if(fts&&!fts.closed)fts.close();});
+root.addEventListener('pagehide',()=>{if(popup&&!popup.closed)popup.close();if(tg&&!tg.closed)tg.close();if(fts&&!fts.closed)fts.close();if(prob&&!prob.closed)prob.close();});
 })(window);

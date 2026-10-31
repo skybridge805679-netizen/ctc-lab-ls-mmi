@@ -76,7 +76,7 @@ def run(page, url):
     expect(page.locator('#suName')).to_have_value('연습 시나리오 A')
     page.locator('#suStart').click()
     # problem 1 fires: its phenomenon puts K0651 on the LS and the 문제 발생 screen opens
-    expect(page.locator('[data-mmi-window="ftsProblem"]')).to_be_visible()
+    expect(page.locator('#problemPanel')).to_be_visible()
     expect(page.locator('#ftsProblemBody')).to_contain_text('의왕역 K0651열차를 B1011T')
     page.wait_for_function("()=>Object.values(SimLSUI.getModel().stations.uiwang.windows).flat().some(r=>r.number==='K0651')")
     assert page.evaluate("SimDiagram.getModel().trains.length") == 12   # 01201 schedule loaded

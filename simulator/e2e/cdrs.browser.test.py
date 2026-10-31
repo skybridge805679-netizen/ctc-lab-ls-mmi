@@ -17,7 +17,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(url, wait_until='networkidle')
-    page.locator('#mmiCdrsBtn').click()
+    page.evaluate("SimMMI.open('cdrs')")
     expect(page.locator('[data-mmi-window="cdrs"]')).to_be_visible()
     expect(page.locator('#cdrsRows tr.empty')).to_have_count(1)   # default timetable has no conflict
     # a follower 60 s behind creates conflicts (the timetable is whatever is loaded: pick the first down train)

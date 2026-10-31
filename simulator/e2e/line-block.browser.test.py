@@ -27,7 +27,7 @@ def run(page, url):
     assert not r['ok'] and '전방 폐색' in r['message'] and 'K0001' in r['message'], r
     expect(page.locator('.mmi-alarm')).to_contain_text('전방 폐색'); ack()
     # the window shows the occupied section
-    page.locator('#mmiLineBtn').click()
+    page.evaluate("SimMMI.open('lineNet')")
     expect(page.locator('[data-mmi-window="lineNet"]')).to_be_visible()
     expect(page.locator('#lnRows')).to_contain_text('K0001'); expect(page.locator('#lnRows')).to_contain_text('하2선')
     # switch the check off: the same route can be set

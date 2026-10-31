@@ -22,9 +22,9 @@ try:
    image=box.locator('.fts-briefing-art img');expect(image).to_be_visible();assert image.evaluate('e=>e.complete&&e.naturalWidth===1312');assert box.locator('.fts-briefing-content img').count()==0
    assert box.evaluate("""e=>{const art=e.querySelector('.fts-briefing-art').getBoundingClientRect(),hero=e.querySelector('.fts-briefing-hero').getBoundingClientRect(),content=e.querySelector('.fts-briefing-content').getBoundingClientRect();return art.bottom<=hero.bottom+1&&content.top>=hero.bottom-1;}""")
    assert box.locator('[data-problem-section=situation]').evaluate("e=>getComputedStyle(e).whiteSpace==='pre-wrap'&&parseFloat(getComputedStyle(e).fontSize)>=16")
-   page.locator('[data-problem-section=actions]').scroll_into_view_if_needed();assert page.locator('[data-mmi-window=ftsProblem] .mmi-win-body').evaluate('e=>e.scrollWidth<=e.clientWidth+2');expect(box.locator('#pbRemaining')).to_be_visible()
+   page.locator('[data-problem-section=actions]').scroll_into_view_if_needed();assert page.locator('#problemPanel').evaluate('e=>e.scrollWidth<=e.clientWidth+2');expect(box.locator('#pbRemaining')).to_be_visible()
    # The instructor navigation stays reachable while the decorated student window is open.
-   page.locator('#ftsPanel [data-fts-page=monitor]').first.click();page.click('#mEnd');page.click('#mmiConfirmYes');page.evaluate("SimMMI.close('ftsProblem')")
+   page.locator('#ftsPanel [data-fts-page=monitor]').first.click();page.click('#mEnd');page.click('#mmiConfirmYes');page.evaluate("SimFTSUI.closeProblem()")
    page.locator('#ftsPanel [data-fts-page=setup]').first.click();page.uncheck('#suActions');page.click('#suStart');expect(box.locator('[data-problem-section=actions]')).to_have_count(0);expect(box.locator('[data-problem-section=name]')).to_have_text(name);expect(box.locator('[data-problem-section=situation]')).to_have_text(situation)
    assert not errors,errors
    print(f'PASS briefing full multiline text, escaping, artwork separation, wrapping, sticky timer and exam hiding at {width}x{height}');page.close()

@@ -22,7 +22,7 @@ function create(){
  const F=require('./fts'),FTS=require('./fts-controller.cjs'),scripts=[...root.SimScenarios.list,...root.SimEmergency.list,...root.SimScheduleScenarios.list].map(s=>s.id);
  const fts=FTS.create({scripts,defaults:()=>({...F.seed({scripts,limits:Object.fromEntries(scripts.map(id=>[id,require('./assessment').limitsFor(id)[0]]).filter(([,v])=>v))}),schedules:[]}),context:()=>({states,ls,model,now:now()}),pattern:Timetable.pattern,
   apply:a=>{const r=execute({...a,fts:true});if(['timetable','scenario:start'].includes(a.type))tableDirty=true;return r;},
-  log:(text,level='I')=>emit('log',{channel:'event',text,level}),alarm:text=>emit('alarm',{text,state:'교육 현상',level:'W',station:''}),
+  alarm:text=>emit('alarm',{text,state:'교육 현상',level:'W',station:''}),
   pause:value=>{paused=value;},auto:on=>root.SimAutoUI.set(on),startAssessment:()=>assessment.start({subject:'integrated'},now()),beginTask:o=>assessment.begin(o,now()),endTask:(key,status)=>{if(key)assessment.finishTask(now(),status,key);},finishAssessment:()=>assessment.finish(now()),
   stopScript:()=>root.SimScenarioUI.stop(),
   resetStation:st=>{const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});},

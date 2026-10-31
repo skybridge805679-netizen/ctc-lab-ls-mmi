@@ -37,6 +37,10 @@ try:
   page.wait_for_function("Object.values(SimLSUI.getModel().stations).some(s=>Object.values(s.windows).some(r=>r.some(x=>x.number==='K1137')))")
   last=page.locator('[data-manual="comm:n22"]');last.click();expect(page.locator('[data-manual="comm:n22"]')).to_be_disabled()
   expect(page.locator('[data-manual="comm:n1"]')).to_be_enabled()
+  # 교수 프로그램의 기록은 FTS 제어통제 로그에만 남고, 교육생의 MMI 로그에는 남지 않는다. 문제 발생 화면은 MMI 창이 아니다.
+  expect(page.locator('#ftsLog')).to_contain_text('교육 시작');expect(page.locator('#ftsLog')).to_contain_text('문제 발생')
+  assert 'FTS' not in page.evaluate("JSON.stringify(SimMMI.getLogs())") and '교육 시작' not in page.evaluate("JSON.stringify(SimMMI.getLogs())")
+  expect(page.locator('#problemPanel #ftsProblemBody')).to_contain_text('비상시 조治'.replace('治','치'));assert page.locator('[data-mmi-window=ftsProblem]').count()==0
   assert not errors,errors
   b.close()
  print('PASS active FTS problems: built-ins open as unordered objectives, copy-to-apply editing of objectives/communications/reactions/setup, validation before add, session setup and any-order confirmations')

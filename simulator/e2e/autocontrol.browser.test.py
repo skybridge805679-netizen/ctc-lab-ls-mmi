@@ -31,12 +31,12 @@ def run(page, url):
     tick = lambda n: page.evaluate('n=>SimMMI.run({type:"tick",seconds:n})', n)
     page.locator('#stationSelect').select_option('cheongnyangni')
     # default OFF: AUTO mode alone changes nothing
-    expect(page.locator('#mmiAutoBtn')).to_have_text('자동제어 OFF')
+    assert not page.evaluate('SimAutoUI.enabled()')
     tick(10)
     expect(page.locator('#stateRoutes')).to_contain_text('0개 설정')
     # ON: the first train (시발 at 청량리, departs at 30 s) gets its departure route at once
-    page.locator('#mmiAutoBtn').click()
-    expect(page.locator('#mmiAutoBtn')).to_have_text('자동제어 ON')
+    page.evaluate('SimAutoUI.set(true)')
+    assert page.evaluate('SimAutoUI.enabled()')
     expect(page.locator('#stateRoutes')).to_contain_text('1개 설정')
     expect(page.locator('#alarmLogBody')).to_contain_text('진로설정')
     tick(30)                                         # t=40: the train has left the station track and runs through the departure route
@@ -61,7 +61,7 @@ def run(page, url):
     menu(page, '프로그램', '프로그램 환경설정')
     expect(page.locator('#acEnabled')).to_be_checked()
     page.locator('#acEnabled').uncheck()
-    expect(page.locator('#mmiAutoBtn')).to_have_text('자동제어 OFF')
+    assert not page.evaluate('SimAutoUI.enabled()')
     expect(page.locator('#eventLogBody')).to_contain_text('열차 자동제어(AUTO) 중지')
     # replay keeps the automatic changes (the log is the source for 로그재생)
     assert page.evaluate("SimMMI.replayLog('cheongnyangni').length") >= 2

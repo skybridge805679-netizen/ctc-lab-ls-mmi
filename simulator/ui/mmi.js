@@ -234,11 +234,7 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><button type="button" class="mmi-ls-link" id="mmiEquipBtn">설비 장애</button><button type="button" class="mmi-ls-link" id="mmiCdrsBtn">CDRS 해소안</button><button type="button" class="mmi-ls-link" id="mmiLineBtn">선로망</button><button type="button" class="mmi-ls-link" id="mmiLedgerBtn">운전정리 대장</button><button type="button" class="mmi-ls-link" id="mmiAutoBtn" aria-pressed="false">자동제어 OFF</button><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
- shell.querySelector('#mmiEquipBtn').onclick=()=>open('equipment');
- shell.querySelector('#mmiCdrsBtn').onclick=()=>open('cdrs');
- shell.querySelector('#mmiLineBtn').onclick=()=>open('lineNet');
- shell.querySelector('#mmiLedgerBtn').onclick=()=>open('ledger');
+ shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
  shell.appendChild(buildMenu());
  desktop=doc.createElement('div');desktop.className='mmi-desktop';desktop.id='mmiDesktop';
  desktop.innerHTML=brand();

@@ -17,7 +17,7 @@ try:
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.clock.install();page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
    page.click('#pauseBtn')
-   with page.expect_popup() as new:page.click('#detachMMIBtn')
+   with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;mmi.on('pageerror',lambda e:errors.append(str(e)))
    expect(mmi.locator('#mmiShell')).to_be_visible();expect(page.locator('#mmiShell')).to_have_count(0)
    assert mmi.evaluate('typeof SimCore')=='undefined' # no second engine
@@ -77,22 +77,22 @@ try:
    # Unacknowledged alarms, station and route state survive closing/reopening.
    mmi.close();page.clock.run_for(600);expect(page.locator('#mmiShell')).to_have_count(0);expect(page.locator('.mmi-alarm')).to_have_count(0)
    expect(page.frame_locator('#mmiParking').locator('#stationSelect')).to_have_value('guro')
-   with page.expect_popup() as new:page.click('#detachMMIBtn')
+   with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;expect(mmi.locator('.mmi-alarm')).to_be_visible()
    # Existing popup is focused rather than duplicated.
-   page.click('#detachMMIBtn');assert len(page.context.pages)==2
+   page.evaluate('SimWorkspace.detach()');assert len(page.context.pages)==2
    # Closing with an MMI modal restores that dialog and its handlers too.
    page.evaluate('SimMMI.alertBox("창 복원 확인")')
    mmi.locator('.mmi-shield[open]').evaluate('el=>el.ownerDocument.defaultView.close()')
    page.clock.run_for(600);expect(page.locator('#mmiShell')).to_have_count(0)
    expect(page.frame_locator('#mmiParking').locator('.mmi-shield[open]')).to_have_count(1)
-   with page.expect_popup() as new:page.click('#detachMMIBtn')
+   with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;expect(mmi.locator('.mmi-shield[open]')).to_be_visible();mmi.click('#mmiAlertOk')
    page.evaluate('SimWorkspace.closeMMI()');expect(page.locator('#mmiShell')).to_have_count(0)
    assert len(page.context.pages)==1
    # Scenario controls in MMI drive timed train movement on the other screen.
    page.reload(wait_until='networkidle');page.click('#pauseBtn')
-   with page.expect_popup() as new:page.click('#detachMMIBtn')
+   with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;page.evaluate("SimMMI.open('scenario')");mmi.select_option('#scSelect','yongsan-5');mmi.click('#scStart')
    number=mmi.input_value('#scTrain')
    for action in [{'type':'mode','value':'CCM','source':'MMI'},{'type':'stop','id':'2A','source':'LS'},{'type':'tick','seconds':90},{'type':'route','id':'2A-5T','source':'LS'}]:
@@ -103,7 +103,7 @@ try:
    expect(mmi.locator('#eventLogBody')).to_contain_text('시나리오 열차 이동 완료')
    page.evaluate('SimWorkspace.closeMMI()')
    # Browsers denying window.open leave the combined UI intact.
-   page.evaluate('window.open=()=>null');page.click('#detachMMIBtn');expect(page.locator('#mmiShell')).to_have_count(0)
+   page.evaluate('window.open=()=>null');page.evaluate('SimWorkspace.detach()');expect(page.locator('#mmiShell')).to_have_count(0)
    assert not errors,errors
    print(f'PASS {width}px: shared controls, alarm-time clock, screen-local dialogs, original target, schedule edit, timed scenario, closed MMI stays off LS, reopen, popup fallback',flush=True)
    page.close()

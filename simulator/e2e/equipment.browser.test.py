@@ -17,7 +17,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(url, wait_until='networkidle')
-    page.locator('#mmiEquipBtn').click()
+    page.evaluate("SimMMI.open('equipment')")
     expect(page.locator('[data-mmi-window="equipment"]')).to_be_visible()
     page.locator('[data-eq="EIS1"]').check()
     expect(page.locator('#lsStage [data-equipment="EIS1"]')).to_have_class(__import__('re').compile('fault'))

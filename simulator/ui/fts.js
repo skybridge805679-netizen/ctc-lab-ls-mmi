@@ -370,6 +370,10 @@ ${table('pkProbs',['과목명칭','문제명칭','제한시간(초)'],(sit?.prob
 
 // ---------------------------------------------------------------- 교육 진행
 const now=()=>D().clock();
+// 제어통제 로그: 교수 프로그램의 기록은 FTS에만 남긴다 (교육생이 쓰는 MMI 로그와 분리)
+let localLogs=[];
+function ftsLog(text,level='I'){localLogs.unshift({at:now(),time:new Date().toISOString(),text,level});if(localLogs.length>500)localLogs.length=500;renderLog();}
+const logs=()=>root.SimRemote?.snapshot.fts?.logs||localLogs;
 function uiState(){
  const open=M().windowIds().filter(id=>M().isOpen(id));const g=$('graphPanel');if(g&&!g.hidden&&g.dataset.detached!=='1'||root.SimWorkspace?.graphOpen?.())open.push('graph');
  return {windows:[...new Set(open)],graphTrain:$('graphTrain')?.value||''};
@@ -390,14 +394,14 @@ function startSession(){
  const prof=users.find(u=>u.id===setup.professor),stud=users.find(u=>u.id===setup.student);
  localRunLibrary=structuredClone(lib);root.SimAssessmentUI?.beginTask('fts:'+Date.now(),sc.name,'integrated');
  session=F().createSession(localRunLibrary,sc.id,{professor:prof?.name||setup.professor,student:stud?.id||setup.student,startedAt:now()});session.showActions=setup.showActions;session.situationLoaded=null;events=[];
- M().log('event',`교육 시작 · ${sc.name} · 교수 ${session.professor} · 교육생 ${session.student}`);
+ ftsLog(`교육 시작 · ${sc.name} · 교수 ${session.professor} · 교육생 ${session.student}`);
  go('monitor');tick();
 }
 function loadSituation(item){
  const s=activeLibrary().situations.find(x=>x.id===item.situation);if(!s||session.situationLoaded===(item.situationIndex??s.id))return;
  session.situationLoaded=item.situationIndex??s.id;const sch=schedules().find(x=>x.id===s.scheduleId);
  if(sch?.timetable)loadSchedule(sch,false);
- M().log('event',`상황 시작 · ${s.name}${sch?` · 열차 스케줄 ${sch.id}`:''}`);
+ ftsLog(`상황 시작 · ${s.name}${sch?` · 열차 스케줄 ${sch.id}`:''}`);
 }
 function applyPhenomenon(ph){
  const model=D().getModel();let r={ok:true};
@@ -419,9 +423,9 @@ function applyPhenomenon(ph){
    for(const l of ph.legs||[])root.SimScenarioUI.request({op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover});
    if(ph.exit)root.SimScenarioUI.request({op:'delete',station:f.station,slot:f.slot,uid:f.uid});break;}
   case 'alarm':M().raiseAlarm(ph.text,'','W');break;
-  case 'notice':session.notice=ph.text;M().log('event','안내 · '+ph.text);break;
+  case 'notice':session.notice=ph.text;ftsLog('안내 · '+ph.text);break;
  }
- M().log('event',`현상 발생 · ${F().PHENOMENA[ph.type]?.label||ph.type}${r&&r.ok===false?' · 실패: '+(r.message||''):''}`);
+ ftsLog(`현상 발생 · ${F().PHENOMENA[ph.type]?.label||ph.type}${r&&r.ok===false?' · 실패: '+(r.message||''):''}`);
 }
 function startScript(id){
  M().open('scenario');const sel=$('scSelect');if(!sel)return;sel.value=id;sel.dispatchEvent(new Event('change'));$('scStart').click();
@@ -430,30 +434,33 @@ function tick(){
  if(root.SimRemote){
   syncRemote();const state=root.SimRemote.snapshot.fts;if($('ftsSessionStatus'))$('ftsSessionStatus').textContent=session&&!session.finished?'교육 진행 · '+(session.current+1)+' / '+session.items.length+' 문제':session?'교육 종료':'교육 전 준비';if(session&&!session.finished&&!root.SimExtraLS){const ui=uiState(),sig=JSON.stringify(ui);if(tick.ui!==sig){tick.ui=sig;remote({op:'ui',ui});}}
   if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}}
-  if(page==='monitor'&&ftsOpen())renderMonitor();if(M().isOpen('ftsProblem'))renderProblem();return;
+  if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}if(problemOpen())renderProblem();return;
  }
  if(!session||session.finished)return;
  const t=now();const pending=session.items[session.current];if(pending)loadSituation(pending);const out=F().advance(activeLibrary(),session,(item)=>ctxFor(item),t);
  for(const o of out){
-  if(o.kind==='activate'){loadSituation(o.item);if(o.problem.script)startScript(o.problem.script);speak(o.problem.voice||o.problem.name);showProblem();M().log('event',`문제 발생 · ${o.problem.name}`);}
+  if(o.kind==='activate'){loadSituation(o.item);if(o.problem.script)startScript(o.problem.script);speak(o.problem.voice||o.problem.name);showProblem();ftsLog(`문제 발생 · ${o.problem.name}`);}
   if(o.kind==='phenomenon')applyPhenomenon(o.phenomenon);
-  if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);M().log('event',`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
+  if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);ftsLog(`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
   if(o.kind==='finished')finishSession('모든 문제 종료');
  }
- if(page==='monitor'&&ftsOpen())renderMonitor();
- if(M().isOpen('ftsProblem'))renderProblem();
+ if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}
+ if(problemOpen())renderProblem();
 }
 function finishSession(reason){
  if(root.SimRemote){remote({op:'stop'});tick();return;}
  if(!session||session.closed)return;session.closed=true;session.finished=true;
  const sum=F().summary(activeLibrary(),session);
  history.unshift({id:'E'+Date.now(),at:stamp(),professor:session.professor,student:session.student,scenario:session.scenarioName,reason,...sum});save(KEY.history,history.slice(0,200));
- M().log('event',`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
- if(M().isOpen('ftsProblem'))renderProblem();if(page==='monitor')renderMonitor();
+ ftsLog(`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
+ if(problemOpen())renderProblem();if(page==='monitor'){renderMonitor();renderLog();}
 }
 
 // ---------------------------------------------------------------- 모니터링관리
-PAGES.monitor={html:()=>'<div id="ftsMonitor"></div>',bind:()=>renderMonitor()};
+PAGES.monitor={html:()=>'<div id="ftsMonitor"></div><div class="fts-cap">제어통제 로그 (교수용 · MMI 로그와 별개)</div><div id="ftsLog" class="fts-table fts-log"></div>',bind:()=>{renderMonitor();logSignature='';renderLog();}};
+let logSignature='';
+function renderLog(){const box=$('ftsLog');if(!box)return;const list=logs().slice(0,100),sig=list.length+':'+(list[0]?.time||'');if(sig===logSignature)return;logSignature=sig;
+ box.innerHTML=`<table><thead><tr><th>시각</th><th>구분</th><th>내용</th></tr></thead><tbody>${list.map(l=>`<tr class="${l.level==='E'?'bad':''}"><td>${esc(T().clock(l.at))}</td><td>${l.level==='E'?'오류':'정보'}</td><td>${esc(l.text)}</td></tr>`).join('')||'<tr class="empty"><td colspan="3">기록이 없습니다.</td></tr>'}</tbody></table>`;}
 function renderMonitor(){
  const box=$('ftsMonitor');if(!box)return;
  if(!session){box.innerHTML='<p class="fts-empty">진행 중인 교육이 없습니다. [교육설정]에서 시나리오를 고르고 교육 시작을 누르세요.</p>';return;}
@@ -490,10 +497,14 @@ ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLi
 }
 
 // ---------------------------------------------------------------- 교육생 "문제 발생" 화면
+// 문제 발생 화면은 교육생이 보는 독립 창이다 (MMI 창이 아니다). 팝업이 막히면 LS 화면 안에 띄운다.
+const problemPanel=()=>$('problemPanel'),problemOpen=()=>!!problemPanel()&&!problemPanel().hidden;
 function showProblem(){
- if(!M().windowIds().includes('ftsProblem'))M().createWindow('ftsProblem',{title:'문제 발생',x:230,y:20,width:1060,body:'<div id="ftsProblemBody" class="fts-problem"></div>'});
- M().open('ftsProblem');renderProblem();
+ const panel=problemPanel();if(!panel)return;
+ if(!root.SimWorkspace?.openProblem?.()){panel.hidden=false;panel.classList.add('problem-inline');}
+ problemSignature='';renderProblem();
 }
+function closeProblem(){if(root.SimWorkspace?.problemDetached?.()){root.SimWorkspace.closeProblem();return;}const panel=problemPanel();if(panel){panel.hidden=true;panel.classList.remove('problem-inline');}}
 function renderProblem(){
  const box=$('ftsProblemBody');if(!box)return;
  if(!session){box.innerHTML='<p>진행 중인 교육이 없습니다.</p>';return;}
@@ -545,5 +556,5 @@ function open(){
  panel().hidden=false;panel().classList.add('fts-inline');panel().scrollIntoView({block:'start'});return true;   // pop-ups blocked: in the LS page
 }
 function close(){if(root.SimWorkspace?.ftsDetached?.()){root.SimWorkspace.closeFts();return;}panel().hidden=true;panel().classList.remove('fts-inline');}
-root.SimFTSUI={init,open,close,isOpen:ftsOpen,go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
+root.SimFTSUI={init,open,close,isOpen:ftsOpen,showProblem,closeProblem,problemOpen,logs,go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
 })(window);

@@ -19,7 +19,7 @@ try:
   page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm');page.click('#nextStation')
   expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon');expect(page.locator('#stationSelect')).to_have_value('uiwang');expect(page.locator('#lsStage')).to_contain_text('성균관대');expect(page.locator('#lsStage')).to_contain_text('화서');assert page.locator('#lsStage [data-mode],#lsStage [data-stop-all],#lsStage [data-equipment]').count()==0
   assert page.locator('#lsStage').get_attribute('data-control-station')==''
-  expect(page.locator('#resetBtn')).to_be_hidden();expect(page.locator('#drawerBtn')).to_be_hidden()
+  expect(page.locator('#resetBtn')).to_be_hidden()
   assert page.locator('[data-point-control]').count()==0
   def win(slot):return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
   def action(name):return page.locator(f'[data-context-action="{name}"]')
