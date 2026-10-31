@@ -53,3 +53,6 @@ body.fts-detached .fts-panel{margin:0;min-height:100vh;border:0;border-radius:0;
 .fts-comms{list-style:none;margin:4px 0;padding:0;max-height:260px;overflow:auto;border:1px solid #cfe3df;background:#fff}
 .fts-comms li{padding:5px 8px;border-top:1px solid #eef5f3}.fts-comms li.ok{background:#f1faf5}.fts-comms li small{color:#55706b}
 .fts-checks .fts-reaction{color:#3b5f8f}.fts-hint{color:#7a6a2f}
+/* 능동형 문제: 탭 도움말 · 능동형 표시 */
+.fts-help{margin:4px 0 6px;font-size:12px;line-height:1.5;color:var(--fts-muted,#5b6b7a)}
+.fts-tag.active{background:#e3f4ea;color:#17603a;border-color:#9cd3b2}

@@ -33,7 +33,7 @@ def run(page, url):
     page.locator('#pSubject').select_option('철도관제시스템 운용'); page.locator('#pLimit').fill('120')
     page.locator('#pName').fill('의왕역 K0651열차를 B1011T 열번창으로 이동하시오')
     page.locator('#pSituation').fill('의왕역 열번 정리')
-    page.locator('#pfType').select_option('insertTrain'); page.locator('#pfType').dispatch_event('change')
+    page.locator('[data-ptab="phen"]').click(); page.locator('#pfType').select_option('insertTrain'); page.locator('#pfType').dispatch_event('change')
     page.locator('#pf-station').select_option('uiwang'); page.locator('#pf-slot').fill('B1012T'); page.locator('#pf-number').fill('K0651'); page.locator('#pfAdd').click()
     expect(page.locator('#pTabs tbody tr')).to_have_count(1)
     page.locator('[data-ptab="check"]').click()
