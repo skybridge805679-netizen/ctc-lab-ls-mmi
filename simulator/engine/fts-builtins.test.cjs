@@ -7,11 +7,17 @@ const refs=(c,out=[])=>{if(!c)return out;if(c.type==='objective')out.push(c.id);
 const leaf=(c,type)=>c.type===type?c:(c.conditions||[]).map(k=>leaf(k,type)).find(Boolean)||(c.condition&&leaf(c.condition,type))||null;
 
 // 대본과 다른 순서: 통보를 먼저 모두 거꾸로 확인하고, 목표는 목록 뒤쪽(나중 역 · 나중 단계)부터 할 수 있는 것을 고른다.
-function solve(p,{log=false}={}){
+function solve(p0,{log=false,branches=[]}={}){
+ const p1=p0;
  const r=R.create(),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
- assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p)}).ok);
+ assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p0)}).ok);
  const started=r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false});assert.ok(started.ok,started.message);
  r.command({type:'tick',seconds:1});
+ // 상황 변경: 교수가 모니터링에서 주입한 것처럼 켠 뒤, 그 분기가 반영된 목표·통보로 푼다
+ for(const id of branches){const x=r.command({type:'fts',op:'manual',key:'branch:'+id});assert.ok(x.ok,x.message);}
+ r.command({type:'tick',seconds:0});
+ assert.deepEqual(Object.keys(item().branch||{}).sort(),[...branches].sort());
+ const p=F.view(p1,item());
  const row=n=>{for(const [station,s] of Object.entries(S().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid,direction:x.direction};return null;};
  const control=(station,action)=>r.command({type:'control',station,action});
  const ccm=st=>S().states[st].mode==='CCM'||control(st,{type:'mode',value:'CCM'}).ok;
@@ -85,4 +91,19 @@ for(const p of problems)test(`${p.id}: solvable in an order different from the s
  assert.notDeepEqual(ops,script.filter(id=>ops.includes(id)),'다른 순서로 풀어야 합니다');
  assert.ok(item.score>=90,`${p.id} 점수 ${item.score}`);
 });
+// 상황별 대응 요령: 분기 원문이 붙어 있고, 분기를 주입하면 그 분기의 목표·통보로 바뀌어도 풀린다
+test('emergency problems carry the situation-change branches of the response guide',()=>{
+ const em=Object.fromEntries(problems.filter(p=>p.id.startsWith('P-em-')).map(p=>[p.id,p]));
+ for(const id of ['P-em-01','P-em-02','P-em-03','P-em-04','P-em-05','P-em-06','P-em-06-1'])assert.ok(em[id].branches.length>=2,id);
+ for(const p of Object.values(em))for(const b of p.branches||[]){assert.ok(b.text.length>3,b.id);assert.ok(b.communications.every(c=>c.text.trim()),p.id+' '+b.id);assert.doesNotMatch(b.text,/[\uE000-\uF8FF]/);}
+ const delay=em['P-em-04'].branches.find(b=>b.id==='v-delay');assert.deepEqual(delay.drop,['n18','n19']);assert.match(delay.communications[0].text,/조치지연 수신/);
+ const view=F.view(em['P-em-05'],{branch:{'v-bogie':0}});assert.ok(!view.objectives.some(o=>o.id==='rename-G1210'));assert.ok(view.communications.some(c=>c.id==='v13'));
+ assert.equal(F.view(em['P-em-05'],{branch:{}}),em['P-em-05']);
+ assert.ok(em['P-em-03'].communications.find(c=>c.id==='proactive')?.optional);
+});
+for(const [id,branches] of [['P-em-05',['v-bogie']],['P-em-04',['v-delay','v-a1005']],['P-em-06',['v-self-run-first']],['P-em-02',['v-derail-k604','v-point-23b']]])
+ test(`${id} with ${branches.join('+')}: solvable after the situation changes`,()=>{
+  const p=problems.find(x=>x.id===id),{item,missing,error}=solve(p,{branches});
+  assert.equal(error,undefined);assert.deepEqual(missing,[]);assert.equal(item.status,'완료');
+ });
 module.exports={solve,problems};

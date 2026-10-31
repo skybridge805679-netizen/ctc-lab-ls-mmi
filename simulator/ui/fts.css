@@ -67,3 +67,9 @@ body.fts-detached .fts-main{flex:1;height:auto;max-height:none;min-height:0}
 .problem-panel.problem-inline{position:fixed;inset:24px 40px;z-index:900;overflow:auto;border-radius:10px;box-shadow:0 18px 50px #12363a55;scrollbar-gutter:stable}
 body.problem-detached{margin:0;height:100vh;overflow:hidden;background:#bee3e3}
 body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter:stable}
+/* 상황 변경 (상황별 대응 요령) */
+.fts-branches{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
+.fts-branches li{background:#fffef9;border:1px solid #d1e3de;border-radius:6px;padding:6px 8px}
+.fts-branches li.ok{border-color:#9cd3b2;background:#eef8f1}
+.fts-branches details summary{cursor:pointer;color:#4d6f66;font-size:11px}
+.fts-branches pre{white-space:pre-wrap;font:12px/1.5 inherit;margin:6px 0 0;max-height:220px;overflow:auto}

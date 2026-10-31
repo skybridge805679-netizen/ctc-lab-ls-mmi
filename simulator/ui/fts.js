@@ -76,24 +76,25 @@ function editorFields(prefix,kind,type,values={}){return fieldList(kind,type).ma
 // ---------------------------------------------------------------- 문제 관리
 // 능동형 문제 탭: 초기 상태(setup) · 목표(objectives, 순서 없음) · 통보·지시(communications) · 상황 반응(reactions)
 let pSel=null,pDraft=null,pTab='obj';
-const blankProblem=()=>({id:'',subject:'열차 운행 계획',name:'',limit:60,score:100,voice:'',situation:'',actions:'',trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:[],setup:{},objectives:[],communications:[],reactions:[]});
+const blankProblem=()=>({id:'',subject:'열차 운행 계획',name:'',limit:60,score:100,voice:'',situation:'',actions:'',trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:[],setup:{},objectives:[],communications:[],reactions:[],branches:[]});
 function problemRows(filter){return lib.problems.filter(p=>(!filter.subject||p.subject===filter.subject)&&(!filter.name||p.name.includes(filter.name))).map(p=>({id:p.id,cells:[esc(p.subject),esc(p.name)+(p.script?` <small class="fts-tag">대본 ${esc(p.script)}</small>`:'')+(p.objectives?.length?` <small class="fts-tag active">능동형 · 목표 ${p.objectives.length}</small>`:''),p.limit,yn(p.trigger?.useTime),yn(p.trigger?.conditions?.[0]),yn(p.trigger?.conditions?.[1]),yn(p.trigger?.conditions?.[2])]}));}
 let pFilter={subject:'',name:''};
-const PTABS=[['obj','목표 (순서 없음)'],['comm','통보·지시'],['react','상황 반응'],['setup','초기 상태'],['phen','현상 설정'],['check','채점 항목'],['deduct','감점사항'],['trig','발생조건']];
+const PTABS=[['obj','목표 (순서 없음)'],['comm','통보·지시'],['react','상황 반응'],['branch','상황 변경'],['setup','초기 상태'],['phen','현상 설정'],['check','채점 항목'],['deduct','감점사항'],['trig','발생조건']];
 // 초기 상태 항목 ↔ 현상 종류 (LS에 적용되는 순서: 역 초기화 → 지울 번호 → 진로 → 접근 열차 → 제어모드 → 열번 표시)
 const SETUP_KINDS=[['resetStation','reset',x=>x.station],['deleteTrain','clear',x=>x.number],['route','routes',x=>({station:x.station,route:x.route})],['approach','approach',x=>({station:x.station,signal:x.signal})],['mode','modes',x=>({station:x.station,value:x.value})],['insertTrain','trains',x=>({station:x.station,slot:x.slot,number:x.number,direction:x.direction})]];
 function setupRows(p){const st=p.setup||{},out=[];for(const [type,key] of SETUP_KINDS)(st[key]||[]).forEach((v,i)=>out.push({key,i,ph:key==='reset'?{type,station:v}:key==='clear'?{type,number:v}:{...v,type}}));return out;}
-const listOf=(p,tab)=>tab==='phen'?p.phenomena:tab==='check'?p.checks:tab==='deduct'?p.deductions:tab==='obj'?(p.objectives??=[]):tab==='comm'?(p.communications??=[]):tab==='react'?(p.reactions??=[]):tab==='setup'?setupRows(p):p.trigger.conditions;
+const listOf=(p,tab)=>tab==='phen'?p.phenomena:tab==='check'?p.checks:tab==='deduct'?p.deductions:tab==='obj'?(p.objectives??=[]):tab==='comm'?(p.communications??=[]):tab==='react'?(p.reactions??=[]):tab==='branch'?(p.branches??=[]):tab==='setup'?setupRows(p):p.trigger.conditions;
 const phenText=x=>`${esc((F().PHENOMENA[x.type]?.label)||x.type)} · ${esc(JSON.stringify({...x,type:undefined,after:undefined}).replace(/[{}"]/g,'').replace(/,/g,', '))}`;
 const shortText=(t,n=60)=>{t=String(t||'').replace(/\s+/g,' ');return t.length>n?t.slice(0,n-1)+'…':t;};
 const whenText=r=>(r.when?esc(F().describe(r.when)):'문제 시작')+(r.after?` · ${r.after}초 뒤`:'');
-const LIST_HEAD={phen:['발생(초)','현상'],setup:['종류','내용'],obj:['목표','조건','점수'],comm:['통보·지시','문안','점수'],react:['상황 반응','계기','현상'],check:['항목','세부조건','점수'],deduct:['항목','세부조건','점수'],trig:['조건','세부조건']};
+const LIST_HEAD={phen:['발생(초)','현상'],setup:['종류','내용'],obj:['목표','조건','점수'],comm:['통보·지시','문안','점수'],react:['상황 반응','계기','현상'],branch:['상황 변경','바뀌는 것','원문'],check:['항목','세부조건','점수'],deduct:['항목','세부조건','점수'],trig:['조건','세부조건']};
 function listCells(tab,x){
  if(tab==='phen')return [Number(x.after)||0,phenText(x)];
  if(tab==='setup')return [esc(F().PHENOMENA[x.ph.type].label),phenText(x.ph)];
  if(tab==='obj')return [esc(x.label),esc(F().describe(x.condition))+[x.final?' <small class="fts-tag">끝날 때 유지</small>':'',x.optional?' <small class="fts-tag">선택</small>':'',x.deadline?` <small class="fts-tag">기한 ${x.deadline}초</small>`:''].join(''),x.points??1];
  if(tab==='comm')return [esc(x.label),esc(shortText(x.text)),x.points??1];
  if(tab==='react')return [esc(x.label||x.id),whenText(x),x.do.map(phenText).join('<br>')];
+ if(tab==='branch')return [esc(x.label),`통보 ${(x.communications||[]).length} · 목표 ${(x.objectives||[]).length} · 반응 ${(x.reactions||[]).length}${x.drop?.length?` · 제외 ${esc(x.drop.join(', '))}`:''}`,`<small>${esc(shortText(x.text,80))}</small>`];
  if(tab==='trig')return [esc(F().CONDITIONS[x.type]?.label||x.type),esc(F().describe(x))];
  return [esc(x.label||''),esc(F().describe(x.condition)),x.points??(tab==='check'?1:0)];
 }
@@ -104,9 +105,10 @@ function pList(){
 const HELP={obj:'목표는 순서 없이 채점합니다. 관제사가 상황을 보고 먼저 할 일을 정합니다. 「끝날 때 유지」는 문제가 끝날 때 그 상태여야 하는 목표(예: AUTO 복귀), 「선행 목표」는 그 목표가 먼저 이루어져야 인정되는 목표입니다. 기한을 넘기면 절반만 인정합니다.',
  comm:'통보·지시는 교육생이 말로 하는 것을 교수가 모니터링 화면에서 확인합니다. 순서는 정하지 않습니다.',
  react:'상황 반응은 계기(문제 시작 · 목표 달성 · 통보 확인)가 처음 이루어지고 지연 시간이 지나면 한 번 일어납니다. 열차 운행은 진로가 설정되기를 기다려 움직입니다.',
- setup:'초기 상태는 문제가 시작될 때 LS에 한 번 적용됩니다.'};
+ setup:'초기 상태는 문제가 시작될 때 LS에 한 번 적용됩니다.',
+ branch:'상황 변경은 감독관(교수)이 교육 중 상황을 바꾸는 분기입니다(예: 비상시조치 평가 상황별 대응 요령). 모니터링에서 [주입]하면 그 분기의 목표·통보·반응이 더해지고 drop의 기본 항목은 빠집니다. when 조건을 주면 조건이 맞을 때 저절로 일어납니다. JSON으로 등록하며 같은 id면 바꿉니다.'};
 function pEditor(){
- const p=pDraft,tab=pTab,kind=['phen','setup','react'].includes(tab)?'phen':tab==='comm'?null:'cond';
+ const p=pDraft,tab=pTab,kind=['phen','setup','react'].includes(tab)?'phen':['comm','branch'].includes(tab)?null:'cond';
  const types=kind?Object.entries(kind==='phen'?F().PHENOMENA:F().CONDITIONS).filter(([k])=>!['all','any','not'].includes(k)&&(tab!=='setup'||SETUP_KINDS.some(s=>s[0]===k))&&(tab!=='obj'||!['objective','communication','script'].includes(k))):[];
  const objOpts=(p.objectives||[]).map(o=>[o.id,`${o.id} · ${shortText(o.label,30)}`]),commOpts=(p.communications||[]).map(c=>[c.id,`${c.id} · ${shortText(c.label,30)}`]);
  const typeRow=types.length?`<label>[${kind==='phen'?'현상':'조건'}]<select id="pfType">${types.map(([k,d])=>`<option value="${k}">${esc(d.label)}</option>`).join('')}</select></label><span id="pfFields" class="fts-fields">${editorFields('pf',kind,types[0][0])}</span>`:'';
@@ -116,6 +118,7 @@ function pEditor(){
   obj:`<label>목표<input id="pfLabel" placeholder="비우면 조건 문장"></label><label>점수<input id="pfPoints" type="number" min="0" value="2"></label><label>기한<input id="pfDeadline" type="number" min="1" placeholder="없음">초</label><label><input type="checkbox" id="pfFinal">끝날 때 유지</label><label><input type="checkbox" id="pfOptional">선택</label><label>선행 목표<select id="pfPre"><option value="">(없음)</option>${opts(objOpts,'')}</select></label>`,
   comm:`<label>통보·지시<input id="pfLabel" placeholder="예: 후속열차 정차 지시"></label><label>점수<input id="pfPoints" type="number" min="0" value="1"></label><label>기한<input id="pfDeadline" type="number" min="1" placeholder="없음">초</label><label class="fts-wide">문안<textarea id="pfText" rows="2"></textarea></label>`,
   react:`<label>이름<input id="pfLabel" placeholder="예: 후속열차 접근"></label><label>계기<select id="pfWhen"><option value="">문제 시작</option>${opts([...objOpts.map(([v,l])=>['objective:'+v,'목표 달성 · '+l]),...commOpts.map(([v,l])=>['communication:'+v,'통보 확인 · '+l])],'')}</select></label><label>지연<input id="pfAfter" type="number" min="0" value="0">초 뒤</label>`,
+  branch:`<label class="fts-wide">상황 변경 JSON<textarea id="pfJson" rows="5" placeholder='{"label":"사고조치 지연","text":"원문","drop":["n18"],"communications":[{"id":"v18","label":"조치지연 통보","text":"..."}]}'></textarea></label>`,
   setup:'',trig:''}[tab];
  return `<div class="fts-tabs">${PTABS.map(([k,l])=>`<button type="button" data-ptab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('')}</div>
 ${HELP[tab]?`<p class="fts-help">${HELP[tab]}</p>`:''}<div class="fts-edit-row">${extra}${typeRow}<button type="button" class="sched-btn" id="pfAdd">등록</button></div>
@@ -139,7 +142,7 @@ const freeId=(prefix,list)=>{let n=list.length+1;while(list.some(x=>x.id===prefi
 // one item checked with the library validator before it is added (the draft problem itself is checked again on 저장)
 function probeErrors(item,where){
  const base={id:'x',subject:F().SUBJECTS[0],name:'x',limit:1,checks:[{condition:{type:'manual',label:'x'}}]};
- const p={...base,...item,objectives:[...(pDraft.objectives||[]),...(item.objectives||[])],communications:[...(pDraft.communications||[]),...(item.communications||[])]};
+ const p={...base,...item,objectives:[...(pDraft.objectives||[]),...(item.objectives||[])],communications:[...(pDraft.communications||[]),...(item.communications||[])],reactions:[...(pDraft.reactions||[]),...(item.reactions||[])]};
  return F().validate({problems:[p],situations:[],scenarios:[]}).filter(e=>where.some(w=>e.includes(w))).map(e=>e.replace(/^문제 x /,''));
 }
 function bindTabs(){
@@ -147,17 +150,19 @@ function bindTabs(){
  for(const b of doc.querySelectorAll('[data-ptab]'))b.onclick=()=>{readProblem();pTab=b.dataset.ptab;$('pTabs').innerHTML=pEditor();bindTabs();};
  if($('pfType'))$('pfType').onchange=()=>{$('pfFields').innerHTML=editorFields('pf',['phen','setup','react'].includes(pTab)?'phen':'cond',$('pfType').value);};
  $('pfAdd').onclick=()=>{
-  const tab=pTab,kind=['phen','setup','react'].includes(tab)?'phen':tab==='comm'?null:'cond',x=kind?readFields('pf',kind,$('pfType').value):null;
+  const tab=pTab,kind=['phen','setup','react'].includes(tab)?'phen':['comm','branch'].includes(tab)?null:'cond',x=kind?readFields('pf',kind,$('pfType').value):null;
   const label=$('pfLabel')?.value.trim()||'',points=Number($('pfPoints')?.value),deadline=Number($('pfDeadline')?.value)||undefined;
   let item,bad=[];
   if(tab==='obj'){const pre=$('pfPre').value;item={id:freeId('o',pDraft.objectives),label:label||F().describe(x),condition:pre?{type:'all',conditions:[{type:'objective',id:pre},x]}:x,points:Number.isFinite(points)?points:2,...(deadline?{deadline}:{}),...($('pfFinal').checked?{final:true}:{}),...($('pfOptional').checked?{optional:true}:{})};bad=probeErrors({objectives:[item]},['목표']);}
   else if(tab==='comm'){const text=$('pfText').value.trim();item={id:freeId('c',pDraft.communications),label:label||shortText(text,40),text,points:Number.isFinite(points)?points:1,...(deadline?{deadline}:{})};bad=probeErrors({communications:[item]},['통보']);}
   else if(tab==='react'){const w=$('pfWhen').value,[t,id]=w.split(':'),after=Number($('pfAfter').value)||0;item={id:freeId('r',pDraft.reactions),label:label||F().PHENOMENA[x.type].label,...(w?{when:{type:t,id}}:{}),...(after?{after}:{}),do:[x]};bad=probeErrors({reactions:[item]},['상황반응']);}
+  else if(tab==='branch'){try{item=JSON.parse($('pfJson').value);}catch{alert('JSON 형식이 아닙니다.');return;}if(!item||typeof item!=='object'||Array.isArray(item)){alert('상황 변경은 JSON 객체 하나입니다.');return;}item.id||=freeId('b',pDraft.branches);const others=pDraft.branches.filter(b=>b.id!==item.id);bad=probeErrors({branches:[...others,item]},['상황변경','목표','통보','상황반응']);}
   else if(tab==='setup'){const [,key,pick]=SETUP_KINDS.find(s=>s[0]===x.type);item={setup:{[key]:[pick(x)]}};bad=probeErrors(item,['초기상태']);}
   else if(kind==='cond'){bad=probeErrors({checks:[{condition:x}]},['채점']);}
   else bad=probeErrors({phenomena:[x]},['현상']);
   if(bad.length){alert(bad.join('\n'));return;}
-  if(tab==='obj')pDraft.objectives.push(item);else if(tab==='comm')pDraft.communications.push(item);else if(tab==='react')pDraft.reactions.push(item);
+  if(tab==='branch'){const i=pDraft.branches.findIndex(b=>b.id===item.id);if(i>=0)pDraft.branches[i]=item;else pDraft.branches.push(item);}
+  else if(tab==='obj')pDraft.objectives.push(item);else if(tab==='comm')pDraft.communications.push(item);else if(tab==='react')pDraft.reactions.push(item);
   else if(tab==='setup'){const [key,[v]]=Object.entries(item.setup)[0];((pDraft.setup??={})[key]??=[]).push(v);}
   else{const list=listOf(pDraft,tab);if(tab==='phen')list.push({after:Number($('pfAfter').value)||0,...x});else if(tab==='trig')list.push(x);else list.push({label:label||F().describe(x),points:Number.isFinite(points)?points:0,condition:x});}
   redraw();
@@ -178,7 +183,7 @@ PAGES.problems={
 <div class="fts-right" id="pForm">${problemForm()}</div></div>`,
  bind(){
   $('pfFind').onclick=()=>{pFilter={subject:$('pfSubject').value,name:$('pfName').value.trim()};go('problems');};
-  pick('pTable',id=>{pSel=id;pDraft=structuredClone(lib.problems.find(p=>p.id===id));pDraft.trigger??={useTime:false,at:0,conditions:[]};for(const k of ['phenomena','checks','deductions','objectives','communications','reactions'])pDraft[k]??=[];pDraft.setup??={};go('problems');});
+  pick('pTable',id=>{pSel=id;pDraft=structuredClone(lib.problems.find(p=>p.id===id));pDraft.trigger??={useTime:false,at:0,conditions:[]};for(const k of ['phenomena','checks','deductions','objectives','communications','reactions','branches'])pDraft[k]??=[];pDraft.setup??={};go('problems');});
   bindTabs();
   $('pVoiceTest').onclick=()=>speak($('pVoice').value||$('pName').value);
   $('pClear').onclick=()=>{pSel=null;pDraft=blankProblem();go('problems');};
@@ -441,6 +446,7 @@ function tick(){
  for(const o of out){
   if(o.kind==='activate'){loadSituation(o.item);if(o.problem.script)startScript(o.problem.script);speak(o.problem.voice||o.problem.name);showProblem();ftsLog(`문제 발생 · ${o.problem.name}`);}
   if(o.kind==='phenomenon')applyPhenomenon(o.phenomenon);
+  if(o.kind==='branch')ftsLog('상황 변경 · '+o.branch.label);
   if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);ftsLog(`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
   if(o.kind==='finished')finishSession('모든 문제 종료');
  }
@@ -465,8 +471,8 @@ function renderMonitor(){
  const box=$('ftsMonitor');if(!box)return;
  if(!session){box.innerHTML='<p class="fts-empty">진행 중인 교육이 없습니다. [교육설정]에서 시나리오를 고르고 교육 시작을 누르세요.</p>';return;}
  const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem),s=activeLibrary().situations.find(x=>x.id===item.situation);
- const ctx=ctxFor(item),elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0;
- const remaining=Math.max(0,(p?.limit||0)-elapsed),progress=session.items.map(it=>{const q=activeLibrary().problems.find(x=>x.id===it.problem);return [it.status,it.error||'',it.score,(q?.checks||[]).map((_,i)=>!!it.met?.[i]),(q?.deductions||[]).map((_,i)=>!!it.deducted?.[i]),it.obj,it.comm,it.reactions];}),signature=JSON.stringify([session.current,progress,session.manual,session.finished,ctx.script,(p?.trigger?.conditions||[]).map((c,i)=>item.triggerMet?.[i]??F().test(c,ctx))]);
+ const v=F().view(p,item),ctx=ctxFor(item),elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0;
+ const remaining=Math.max(0,(p?.limit||0)-elapsed),progress=session.items.map(it=>{const q=activeLibrary().problems.find(x=>x.id===it.problem);return [it.status,it.error||'',it.score,(q?.checks||[]).map((_,i)=>!!it.met?.[i]),(q?.deductions||[]).map((_,i)=>!!it.deducted?.[i]),it.obj,it.comm,it.reactions,it.branch];}),signature=JSON.stringify([session.current,progress,session.manual,session.finished,ctx.script,(p?.trigger?.conditions||[]).map((c,i)=>item.triggerMet?.[i]??F().test(c,ctx))]);
  if(monitorSignature===signature){if($('mElapsed'))$('mElapsed').value=clockText(elapsed);if($('mRemaining'))$('mRemaining').value=clockText(remaining);return;}monitorSignature=signature;
  const sits=[...new Set(session.items.map(i=>i.situation))].map(id=>activeLibrary().situations.find(x=>x.id===id));
  const manual=[];const visit=c=>{if(c?.type==='manual'&&!manual.some(k=>(k.condition.key||k.condition.label)===(c.key||c.label)))manual.push({condition:c});if(c?.conditions)c.conditions.forEach(visit);if(c?.condition)visit(c.condition);};[...(p?.checks||[]),...(p?.deductions||[])].forEach(k=>visit(k.condition));
@@ -482,10 +488,11 @@ ${table('mProbs',['과목명칭','제한시간(초)','문제명칭','상태','�
 ${item.error?`<p class="fts-error" role="alert">${esc(item.error)}</p>`:''}<div class="fts-cap">발생조건 · 세부조건</div><ul class="fts-checks">${p?.trigger?.useTime?`<li class="${item.status!=='대기'?'ok':''}">발생시간 ${p.trigger.at}초</li>`:''}${(p?.trigger?.conditions||[]).map((c,i)=>`<li class="${(item.triggerMet?.[i]??F().test(c,ctx))?'ok':''}">${esc(F().describe(c))}</li>`).join('')}
 ${(p?.checks||[]).map((k,i)=>`<li class="${item.met[i]?'ok':''}">${item.met[i]?'✔':'○'} ${esc(k.label||F().describe(k.condition))} <small>(${k.points??1})</small></li>`).join('')}
 ${(p?.deductions||[]).map((k,i)=>`<li class="${item.deducted[i]?'bad':''}">감점 ${Number(k.points)||0} · ${esc(k.label||F().describe(k.condition))}</li>`).join('')}
-${(p?.objectives||[]).map(o=>{const at=item.obj?.[o.id],late=at!=null&&o.deadline!==undefined&&at>o.deadline;return `<li class="${at!=null?(late?'bad':'ok'):''}" data-objective="${esc(o.id)}">${at!=null?'✔':'○'} 목표 · ${esc(o.label)} <small>(${o.points??1}${o.deadline!==undefined?` · 기한 ${clockText(o.deadline)}`:''}${at!=null?` · ${clockText(at)}${late?' 지연':''}`:''})</small>${at==null&&o.hint?`<br><small class="fts-hint">힌트: ${esc(o.hint)}</small>`:''}</li>`;}).join('')}
-${Object.entries(item.reactions||{}).filter(([,r])=>r.fired).map(([id,r])=>{const x=(p?.reactions||[]).find(y=>y.id===id);return `<li class="fts-reaction">↻ 상황 반응 · ${esc(x?.label||id)} <small>(${clockText(r.firedAt)})</small></li>`;}).join('')}
+${(v?.objectives||[]).map(o=>{const at=item.obj?.[o.id],late=at!=null&&o.deadline!==undefined&&at>o.deadline;return `<li class="${at!=null?(late?'bad':'ok'):''}" data-objective="${esc(o.id)}">${at!=null?'✔':'○'} 목표 · ${esc(o.label)} <small>(${o.points??1}${o.deadline!==undefined?` · 기한 ${clockText(o.deadline)}`:''}${at!=null?` · ${clockText(at)}${late?' 지연':''}`:''})</small>${at==null&&o.hint?`<br><small class="fts-hint">힌트: ${esc(o.hint)}</small>`:''}</li>`;}).join('')}
+${Object.entries(item.reactions||{}).filter(([,r])=>r.fired).map(([id,r])=>{const x=(v?.reactions||[]).find(y=>y.id===id);return `<li class="fts-reaction">↻ 상황 반응 · ${esc(x?.label||id)} <small>(${clockText(r.firedAt)})</small></li>`;}).join('')}
 ${p?.script?`<li class="${ctx.script?.done>=ctx.script?.total&&ctx.script?.total?'ok':''}">대본 ${esc(scriptTitle(p.script))} · ${ctx.script?.done||0}/${ctx.script?.total||0} 단계</li>`:''}</ul>
-${(p?.communications||[]).length?`<div class="fts-cap">통보 · 구술 (순서 없음 · 교육생이 말하면 교수가 확인)</div><ul class="fts-comms">${p.communications.map(c=>{const at=item.comm?.[c.id];return `<li class="${at!=null?'ok':''}"><button type="button" class="sched-btn ${at!=null?'primary':''}" data-manual="comm:${esc(c.id)}" ${session.finished||at!=null?'disabled':''}>${at!=null?'✔ '+clockText(at):'확인'}</button> <b>${esc(c.label)}</b>${c.text?`<br><small>${esc(c.text)}</small>`:''}</li>`;}).join('')}</ul>`:''}
+${(p?.branches||[]).length?`<div class="fts-cap">상황 변경 (상황별 대응 요령 · 교수가 감독관으로서 주입)</div><ul class="fts-branches">${p.branches.map(b=>{const at=item.branch?.[b.id];return `<li class="${at!=null?'ok':''}"><button type="button" class="sched-btn ${at!=null?'primary':''}" data-manual="branch:${esc(b.id)}" ${session.finished||at!=null||item.status!=='진행'?'disabled':''}>${at!=null?'✔ '+clockText(at):'주입'}</button> <b>${esc(b.label)}</b>${b.drop?.length?` <small class="fts-tag">기본 항목 ${b.drop.length}개 제외</small>`:''}<details><summary>원문</summary><pre>${esc(b.text||'')}</pre></details></li>`;}).join('')}</ul>`:''}
+${(v?.communications||[]).length?`<div class="fts-cap">통보 · 구술 (순서 없음 · 교육생이 말하면 교수가 확인)</div><ul class="fts-comms">${v.communications.map(c=>{const at=item.comm?.[c.id];return `<li class="${at!=null?'ok':''}"><button type="button" class="sched-btn ${at!=null?'primary':''}" data-manual="comm:${esc(c.id)}" ${session.finished||at!=null?'disabled':''}>${at!=null?'✔ '+clockText(at):'확인'}</button> <b>${esc(c.label)}</b>${c.text?`<br><small>${esc(c.text)}</small>`:''}</li>`;}).join('')}</ul>`:''}
 ${manual.length?`<div class="fts-cap">교수 확인 (구술)</div><div class="fts-row-btns wrap">${manual.map(k=>{const key=k.condition.key||k.condition.label,on=!!session.manual[session.items.indexOf(item)]?.[key];return `<button type="button" class="sched-btn ${on?'primary':''}" data-manual="${esc(key)}" ${session.finished?'disabled':''}>${on?'✔ ':''}${esc(k.condition.label)}</button>`;}).join('')}</div>`:''}
 <div class="fts-grid2"><label>스케줄ID<input readonly value="${esc(s?.scheduleId||'')}"></label><label>스케줄 명칭<input readonly value="${esc(schedules().find(x=>x.id===s?.scheduleId)?.name||'(현재 온라인 시간표)')}"></label><label>구간<input readonly value="${esc(s?.section||'')}"></label></div>
 ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLibrary(),session);return `결과 ${r.got}/${r.full}점 (${r.percent}%)`;})()}</div>`:''}</div></div>`;
@@ -493,7 +500,7 @@ ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLi
  $('mNext').onclick=()=>{if(root.SimRemote){remote({op:'next'});tick();return;}const p2=activeLibrary().problems.find(x=>x.id===session.items[session.current]?.problem);const out=F().endCurrent(session,now());if(p2?.script)$('scStop')?.click();if(out.some(o=>o.kind==='finished'))finishSession('모든 문제 종료');tick();renderMonitor();};
  $('mShow').onclick=showProblem;
  $('mReload').onclick=()=>{if(root.SimRemote){remote({op:'reload'});tick();return;}session.situationLoaded=null;loadSituation(item);};
- for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{if(root.SimRemote){remote({op:'manual',key:b.dataset.manual});tick();return;}const m=session.manual[session.items.indexOf(item)]??={};m[b.dataset.manual]=!m[b.dataset.manual];tick();renderMonitor();};
+ for(const b of box.querySelectorAll('[data-manual]'))b.onclick=()=>{if(root.SimRemote){remote({op:'manual',key:b.dataset.manual});tick();return;}const m=session.manual[session.items.indexOf(item)]??={};m[b.dataset.manual]=b.dataset.manual.startsWith('branch:')?true:!m[b.dataset.manual];tick();renderMonitor();};
 }
 
 // ---------------------------------------------------------------- 교육생 "문제 발생" 화면

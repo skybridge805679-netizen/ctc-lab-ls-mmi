@@ -14,6 +14,7 @@ const EM=()=>node?require('./emergency.js'):root.SimEmergency;
 const N=()=>node?require('./network.js'):root.SimNetwork;
 const Core=()=>node?require('./core.js'):root.SimCore;
 const T=()=>node?require('./timetable.js'):root.SimTimetable;
+const VB=()=>node?require('./emergency-branches.js'):root.SimEmergencyBranches;
 const nm=id=>N().catalog[id]?.name||id;
 const OP_POINTS=2,COMM_POINTS=1;
 const short=(s,n=48)=>{s=String(s).replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1)+'…':s;};
@@ -95,7 +96,9 @@ function emergency({limits={}}={}){
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
    setup:{reset:[...sc.stations],clear:E.numbersOf(sc),routes:setupRoutes,approach:[],modes:sc.stations.map(station=>({station,value:'AUTO'})),
     trains:E.castFor(sc).map(c=>({station:c.station,slot:c.slot,number:c.number,direction:c.dir}))},
-   objectives:book.list,communications:comms,reactions};
+   objectives:book.list,communications:[...comms,...(VB()?.proactiveFor(sc.key)||[])],reactions,
+   // 상황별 대응 요령: 감독관이 상황을 바꾸는 분기 (교수가 모니터링에서 주입)
+   branches:VB()?.branchesFor(sc.key)||[]};
  });
 }
 
