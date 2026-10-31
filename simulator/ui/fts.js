@@ -352,7 +352,7 @@ function applyPhenomenon(ph){
   case 'mode':r=atStation(ph.station,()=>host.run({type:'mode',value:ph.value,source:'SCENARIO'}));break;
   case 'route':r=atStation(ph.station,()=>{const before=host.context().stationStates[ph.station].mode;host.run({type:'mode',value:'CCM',source:'SCENARIO'});const x=host.run({type:'route',id:ph.route,source:'SCENARIO'});if(before!=='CCM')host.run({type:'mode',value:before,source:'SCENARIO'});return x;});break;
   case 'approach':r=atStation(ph.station,()=>host.run({type:'approach',signal:ph.signal,present:true,source:'SCENARIO'}));break;
-  case 'createTrain':{const hms=String(ph.start||'09:00:00'),[h,m,s=0]=hms.split(':').map(Number),t=T().pattern({id:ph.train,from:ph.from,to:ph.to,start:ph.startIn!==undefined?Math.round(now()+ph.startIn):h*3600+m*60+s-28800,kind:ph.kind||'전동열차'});r=t?T().create(model,t):{ok:false,message:'열차 생성 조건을 확인하세요.'};D().render();break;}
+  case 'createTrain':{const hms=String(ph.start||'09:00:00'),[h,m,s=0]=hms.split(':').map(Number),t=T().pattern({id:ph.train,from:ph.from,to:ph.to,start:ph.startIn!==undefined?Math.round(now()+ph.startIn):h*3600+m*60+s-28800,kind:ph.kind||'전동열차'});if(t&&ph.replace&&model.trains.some(x=>x.id===ph.train))T().remove(model,ph.train);r=t?T().create(model,t):{ok:false,message:'열차 생성 조건을 확인하세요.'};D().render();break;}
   case 'delay':r=T().delay(model,ph.train,ph.station,Number(ph.minutes));D().render();break;
   case 'cancel':r=T().setCancelled(model,ph.train,ph.from,ph.to,true);D().render();break;
   case 'moveTrain':{let f=null;for(const [station,st] of Object.entries(root.SimLSUI.getModel().stations))for(const [slot,rows] of Object.entries(st.windows))for(const row of rows)if(row.number===ph.number)f={station,slot,uid:row.uid};

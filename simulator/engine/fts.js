@@ -113,6 +113,7 @@ function checkPhenomenon(k,where,errors){
  }
  if(k.type==='delay'&&!finite(k.minutes,-120,120))errors.push(`${where}: 지연은 -120~120분`);
  if(k.type==='createTrain'&&!(k.start!==undefined?Number.isFinite(hms(k.start)):finite(k.startIn,-86400)))errors.push(`${where}: 출발시각(start) 또는 지금부터 초(startIn)를 확인하세요`);
+ if(k.type==='createTrain'&&k.replace!==undefined&&typeof k.replace!=='boolean')errors.push(`${where}: replace는 true/false`);
  if(k.type==='runTrain'){
   if(!/^[A-Za-z]{0,2}[0-9]{1,6}$/.test(k.number||''))errors.push(`${where}: 열차번호를 확인하세요`);
   const ws=node?require('./train-windows').data:root.SimTrainWindows.data;
@@ -273,16 +274,19 @@ function seed({scripts=[],limits={}}={}){
  // built-in scripts
  const titles={'yongsan-5':'용산역 부본선(5번) 대피','yongsan-4':'용산역 부본선(하 4번선) 대피','yeongdeungpo-1':'영등포역 부본선(1번) 대피','geumcheon-1':'금천구청역 부본선(1번) 대피','geumcheon-6':'금천구청역 부본선(6번) 대피','sch-conflict':'경합 해소','sch-create':'스케줄 생성'};
  const scriptProblem=(sid,subject,name)=>prob({id:'P-'+sid,subject,name,limit:limits[sid]||600,script:sid,actions:'실기 시나리오 대본의 조작·구술 단계',checks:[]});
- const evac=['yongsan-5','yongsan-4','yeongdeungpo-1','geumcheon-1','geumcheon-6'].filter(s=>scripts.includes(s)).map(s=>scriptProblem(s,'운행선 관리',`${titles[s]}를 시행하시오`));
+ // 부본선 대피 · 비상시 조치: 대본을 능동형 데이터 문제(초기상태 · 순서 없는 목표 · 통보 · 상황반응)로 바꾼 것 (engine/fts-builtins.js)
+ const B=node?require('./fts-builtins.js'):root.SimFTSBuiltins,data=id=>{const p=P.find(x=>x.id===id);return p;};
+ const active=B?B.all({limits}):[];for(const p of active)prob(p);
+ const evac=active.filter(p=>p.subject==='운행선 관리').map(p=>p.id);
  const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`));
- const emergency=scripts.filter(s=>s.startsWith('em-')).map(s=>scriptProblem(s,'비상 시 조치',`비상시 조치 ${s.slice(3)}번 대본을 시행하시오`));
+ const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
  const s4=sit({id:'S-04',name:'시나리오 상황#4',scheduleId:'01178',limit:3600,problems:[c1,c2,c3,c4,c5]});
  const sTg=sit({id:'S-TG',name:'#1-열차운행계획-009(구술)',scheduleId:'01105',limit:600,problems:[g1]});
  const sPlan=plan.length?sit({id:'S-PLAN',name:'#1-열차운행계획-004(스케줄)',scheduleId:'01106',limit:1800,problems:plan}):null;
  const sOral=sit({id:'S-ORAL',name:'#2-철도관제시스템운용실무(구술)',section:'지하청량리-영등포',scheduleId:'01105',limit:300,problems:[o1,o2,o3]});
- const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+P.find(x=>x.id===p).name.replace(/를 시행하시오$/,''),limit:P.find(x=>x.id===p).limit,problems:[p]}));
- const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:P.find(x=>x.id===p).limit,problems:[p]}));
+ const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
+ const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
  const scen=(o)=>{SC.push({author:'C001',createdAt:'2026-10-30 00:00:00',...o});};
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});

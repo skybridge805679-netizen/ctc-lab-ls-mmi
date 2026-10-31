@@ -7,13 +7,16 @@
 const core=()=>typeof module!=='undefined'?require('./core.js'):root.SimCore;
 
 // ---- predicates over ctx = {state, events, model}
-const sawMode=(station,value)=>ctx=>ctx.events.some(e=>e.ok&&e.type==='mode'&&e.station===station&&e.value===value)&&ctx.state.mode===value;
-const stopped=signals=>ctx=>signals.every(sig=>ctx.events.some(e=>e.ok&&((e.type==='stop'&&e.id===sig)||(e.type==='withdraw'&&String(e.id).startsWith(sig+'-')))));
-const released=signals=>ctx=>signals.every(sig=>ctx.state.signals[sig]==='STOP'&&!Object.keys(ctx.state.routes).some(r=>r.startsWith(sig+'-')));
-const routeSet=id=>ctx=>!!ctx.state.routes[id];
-const modeIs=value=>ctx=>ctx.state.mode===value;
+// each predicate also carries `spec`: the same check as FTS conditions (station '{역}' and train '{고장}' are filled per script),
+// so the scripts can be turned into FTS data problems (engine/fts-builtins.js)
+const spec=(fn,s)=>Object.assign(fn,{spec:s});
+const sawMode=(station,value)=>spec(ctx=>ctx.events.some(e=>e.ok&&e.type==='mode'&&e.station===station&&e.value===value)&&ctx.state.mode===value,[{type:'mode',station,value}]);
+const stopped=signals=>spec(ctx=>signals.every(sig=>ctx.events.some(e=>e.ok&&((e.type==='stop'&&e.id===sig)||(e.type==='withdraw'&&String(e.id).startsWith(sig+'-'))))),signals.map(signal=>({type:'signalCancelled',station:'{역}',signal})));
+const released=signals=>spec(ctx=>signals.every(sig=>ctx.state.signals[sig]==='STOP'&&!Object.keys(ctx.state.routes).some(r=>r.startsWith(sig+'-'))),signals.map(signal=>({type:'signalStop',station:'{역}',signal})));
+const routeSet=id=>spec(ctx=>!!ctx.state.routes[id],[{type:'route',station:'{역}',route:id}]);
+const modeIs=value=>spec(ctx=>ctx.state.mode===value,[{type:'mode',station:'{역}',value}]);
 // the broken-down train is whichever timetable train the operator picked (the timetable changes from scenario to scenario)
-const departureRoute=(station,route)=>ctx=>{const t=ctx.model.trains.find(x=>x.id===ctx.train),c=t?.calls.find(x=>x.station===station);return !!c&&c.departureRoute===route;};
+const departureRoute=(station,route)=>spec(ctx=>{const t=ctx.model.trains.find(x=>x.id===ctx.train),c=t?.calls.find(x=>x.station===station);return !!c&&c.departureRoute===route;},[{type:'schedule',train:'{고장}',station,field:'departureRoute',value:route}]);
 
 const NOTE_APPROACH='접근쇄정: 열차가 신호기 외방 일정구간에 진입한 뒤 신호를 취소해도 장내 90초·출발 30초 동안 진로를 쇄정하는 것.';
 const NOTE_OVERLAP='오버랩: 장내 진입 열차가 출발신호기 정지를 넘어 과주할 경우에 대비해 출발신호기 전방 일정거리 안의 선로전환기를 안전측으로 쇄정하는 것.';

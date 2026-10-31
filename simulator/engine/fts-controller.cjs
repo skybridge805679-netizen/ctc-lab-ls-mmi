@@ -18,7 +18,7 @@ function create(host){
   case 'mode':if(c.states[ph.station].mode!==ph.value)action(ph.station,{type:'mode',value:ph.value});break;
   case 'route':{const before=c.states[ph.station].mode;if(before==='LOCAL')throw Error('LOCAL 역의 진로는 CCM 전환 후 설정하세요.');try{if(before!=='CCM')action(ph.station,{type:'mode',value:'CCM'});action(ph.station,{type:'route',id:ph.route});}finally{if(before!=='CCM')action(ph.station,{type:'mode',value:before});}break;}
   case 'approach':action(ph.station,{type:'approach',signal:ph.signal,present:true});break;
-  case 'createTrain':{const [h,m,s=0]=String(ph.start||'').split(':').map(Number),start=ph.startIn!==undefined?Math.round(now()+ph.startIn):h*3600+m*60+s-28800,t=host.pattern({id:ph.train,from:ph.from,to:ph.to,start,kind:ph.kind||'전동열차'});error(host.apply({type:'timetable',method:'create',args:[t]}));break;}
+  case 'createTrain':{const [h,m,s=0]=String(ph.start||'').split(':').map(Number),start=ph.startIn!==undefined?Math.round(now()+ph.startIn):h*3600+m*60+s-28800,t=host.pattern({id:ph.train,from:ph.from,to:ph.to,start,kind:ph.kind||'전동열차'});if(ph.replace&&c.model.trains.some(x=>x.id===ph.train))error(host.apply({type:'timetable',method:'remove',args:[ph.train]}));error(host.apply({type:'timetable',method:'create',args:[t]}));break;}
   case 'delay':error(host.apply({type:'timetable',method:'delay',args:[ph.train,ph.station,ph.minutes]}));break;
   case 'cancel':error(host.apply({type:'timetable',method:'setCancelled',args:[ph.train,ph.from,ph.to,true]}));break;
   case 'moveTrain':{let found=null;for(const [station,s]of Object.entries(c.ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)found={station,slot,uid:r.uid};

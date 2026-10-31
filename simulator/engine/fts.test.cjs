@@ -4,10 +4,11 @@ const SC=require('./scenarios.js'),EM=require('./emergency.js'),SS=require('./sc
 const scripts=[...SC.list,...EM.list,...SS.list].map(s=>s.id);
 const limits=Object.fromEntries(scripts.map(id=>[id,A.limitsFor(id)[0]]).filter(([,v])=>v));
 const lib=()=>F.seed({scripts,limits});
-test('the built-in library is valid and uses every script once',()=>{
+test('the built-in library is valid: schedule scripts once, 대피·비상 as active data problems',()=>{
  const l=lib();assert.deepEqual(F.validate(l,{scripts}),[]);
- assert.deepEqual(l.problems.filter(p=>p.script).map(p=>p.script).sort(),[...scripts].sort());
- assert.equal(l.problems.find(p=>p.script==='em-01').limit,A.limitsFor('em-01')[0]);
+ assert.deepEqual(l.problems.filter(p=>p.script).map(p=>p.script).sort(),SS.list.map(s=>s.id).sort());
+ for(const id of [...SC.list,...EM.list].map(s=>s.id))assert.ok(l.problems.find(p=>p.id==='P-'+id)?.objectives.length,id);
+ assert.equal(l.problems.find(p=>p.id==='P-em-01').limit,A.limitsFor('em-01')[0]);
 });
 test('validation names what is wrong in a hand- or AI-made library',()=>{
  const bad={problems:[{id:'X',subject:'수학',name:'',limit:0,checks:[{condition:{type:'route',station:'yongsan',route:'9Z-1T'}},{condition:{type:'teleport'}}],phenomena:[{type:'route',station:'nowhere',route:'1A-1T'}]}],situations:[{id:'S',name:'s',problems:['Y']}],scenarios:[{id:'C',name:'c',situations:['Q']}]};
