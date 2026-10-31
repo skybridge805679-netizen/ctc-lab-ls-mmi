@@ -9,7 +9,7 @@ const {fitWindow,readState,writeState}=require('./window-state.cjs');
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
-let ls=null,mmi=null,graph=null,stateFile,layout={},quitting=false,engine=null,tray=null;
+let ls=null,mmi=null,graph=null,fts=null,stateFile,layout={},quitting=false,engine=null,tray=null;
 if(process.argv.includes('--orpheia-smoke-test')&&process.env.ORPHEIA_TEST_USER_DATA)app.setPath('userData',process.env.ORPHEIA_TEST_USER_DATA);
 const single=app.requestSingleInstanceLock();
 if(!single)app.quit();
@@ -26,7 +26,7 @@ else{
    if(!message||typeof message.action?.type!=='string'||message.action.type.startsWith('session:')||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
-  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='mmi')script('SimWorkspace.detach()');else if(kind==='graph')script('SimWorkspace.openGraph()');});
+  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='mmi')script('SimWorkspace.detach()');else if(kind==='graph')script('SimWorkspace.openGraph()');else if(kind==='fts')script('SimFTSUI.open()');});
   installMenu();createLS();
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
@@ -64,14 +64,15 @@ function createLS(){
   if(url!=='about:blank')return {action:'deny'};
   if(frameName.startsWith('orpheia-mmi-')&&!mmi)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,webPreferences:prefs}};
   if(frameName.startsWith('orpheia-tg-')&&!graph)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('graph'),title:'ORPHEIA · 열차 그래프',backgroundColor:'#1e1e1e',autoHideMenuBar:true,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-fts-')&&!fts)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('fts'),title:'ORPHEIA · FTS 제어통제',backgroundColor:'#eef6f5',autoHideMenuBar:true,webPreferences:prefs}};
   return {action:'deny'};
  });
  ls.webContents.on('did-create-window',(child,{frameName})=>{
-  const isGraph=frameName.startsWith('orpheia-tg-');
-  if(isGraph)graph=child;else mmi=child;
-  remember(child,isGraph?'graph':'mmi');protect(child);
+  const kind=frameName.startsWith('orpheia-tg-')?'graph':frameName.startsWith('orpheia-fts-')?'fts':'mmi';
+  if(kind==='graph')graph=child;else if(kind==='fts')fts=child;else mmi=child;
+  remember(child,kind);protect(child);
   child.webContents.setWindowOpenHandler(()=>({action:'deny'}));
-  child.on('closed',()=>{if(mmi===child)mmi=null;if(graph===child)graph=null;});
+  child.on('closed',()=>{if(mmi===child)mmi=null;if(graph===child)graph=null;if(fts===child)fts=null;});
  });
  ls.once('ready-to-show',()=>ls?.show());
  ls.webContents.on('did-finish-load',()=>{
@@ -97,6 +98,7 @@ function installMenu(){
   {label:'LS 추가 창',submenu:require('../simulator/ui/ls-presets').list().map(st=>({label:st.name,click:()=>createExtraLS(st.id)}))},
   {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
   {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
+  {label:'FTS 제어통제 창',accelerator:'CmdOrCtrl+4',click:()=>script('window.SimFTSUI.open()')},
   {type:'separator'},
   {label:'실습 세션 저장…',accelerator:'CmdOrCtrl+Shift+S',click:()=>sessionFile(false)},
   {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>sessionFile(true)},

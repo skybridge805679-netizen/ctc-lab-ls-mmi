@@ -11,7 +11,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)));T
 try:
  with sync_playwright() as p:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page(viewport={'width':1920,'height':1080});errors=[];dialogs=[];page.on('pageerror',lambda e:errors.append(str(e)));page.on('dialog',lambda d:(dialogs.append(d.type),d.dismiss()))
-  page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#mmiFtsBtn');fts=page.locator('[data-mmi-window=fts]');fts.locator('[data-fts-page=scenarios]').first.click();page.fill('#cName','순서 보존 검증')
+  page.add_init_script('window.open=()=>null');page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#ftsWinBtn');fts=page.locator('#ftsPanel');fts.locator('[data-fts-page=scenarios]').first.click();page.fill('#cName','순서 보존 검증')
   for sid in ['S-04','S-ORAL','S-04']:
    page.locator(f'#cLeft tr[data-key="{sid}"]').click();page.click('#cIn')
   expect(page.locator('#cName')).to_have_value('순서 보존 검증');page.locator('#cRight tr[data-key="2"]').click();page.click('#cUp');page.click('#cOut');expect(page.locator('#cRight tr[data-key]')).to_have_count(2)

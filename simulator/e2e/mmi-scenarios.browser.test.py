@@ -19,7 +19,7 @@ def run(page, url):
     page.clock.install()
     page.goto(url, wait_until='networkidle')
     page.locator('#pauseBtn').click()
-    page.locator('#mmiScenarioBtn').click()
+    page.evaluate("SimMMI.open('scenario')")
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')
     assert page.locator('#scSelect option').count() == 16
     def do(action):

@@ -10,7 +10,7 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  await ls.evaluate(()=>SimRemote.command({type:'clock',paused:true}));
  await ls.selectOption('#lsStationSelect','geumcheon');await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');await ls.locator('[data-point-control="51A"]').click();await expect(ls.locator('#actionDialog')).toContainText('SW_51A');await ls.click('#dialogConfirm');await ls.waitForFunction(()=>SimRemote.snapshot.states.geumcheon.points['52']==='R');await expect(ls.locator('[data-switch-connection="52"]')).toHaveAttribute('data-connected','true');
  const t=await ls.evaluate(()=>SimRemote.snapshot.timetable.trains.find(t=>t.direction==='up'&&t.calls.some(c=>c.station==='yongsan')).id);
- let mmi=app.windows().find(p=>p!==ls);await mmi.click('#mmiScenarioBtn');await mmi.selectOption('#scSelect','yongsan-5');await mmi.fill('#scTrain',t);await mmi.click('#scStart');
+ let mmi=app.windows().find(p=>p!==ls);await ls.evaluate(()=>SimMMI.open('scenario'));await mmi.selectOption('#scSelect','yongsan-5');await mmi.fill('#scTrain',t);await mmi.click('#scStart');
  for(const action of [{type:'mode',value:'CCM',source:'MMI'},{type:'stop',id:'2A',source:'LS'},{type:'tick',seconds:90},{type:'route',id:'2A-5T',source:'LS'}])assert.ok((await ls.evaluate(a=>SimMMI.run(a),action)).ok);
  assert.ok(await ls.evaluate(()=>SimRemote.snapshot.scenario.jobs.some(j=>j.phase==='moving')));
  await ls.evaluate(()=>SimMMI.run({type:'tick',seconds:60}));await expect(ls.locator('[data-train-slot="5T"]')).toContainText(t);

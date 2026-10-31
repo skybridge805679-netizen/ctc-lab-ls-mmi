@@ -21,8 +21,8 @@ def run(page, url):
     page.goto(url, wait_until='networkidle')
     ok = lambda: page.locator('#mmiAlertOk').click()
     yes = lambda: page.locator('#mmiConfirmYes').click()
-    page.locator('#mmiFtsBtn').click()
-    fts = page.locator('[data-mmi-window="fts"]')
+    page.locator('#ftsWinBtn').click()
+    fts = page.locator('#ftsPanel')
     expect(fts.locator('.fts-head b')).to_have_text('FTS 제어통제 시스템')
     assert fts.locator('.fts-nav > button').all_inner_texts() == ['▸ 교육설정', '▸ 시스템관리', '▸ 사용자관리', '▸ 시나리오관리', '▸ 모니터링관리', '▸ 교육이력관리']
     expect(fts.locator('.fts-banner')).to_be_visible()

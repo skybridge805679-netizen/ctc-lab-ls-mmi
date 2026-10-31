@@ -11,7 +11,11 @@ const save=(k,v)=>{if(root.SimRemote&&host){if(k===KEY.users)remote({op:'users',
 const stamp=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Seoul'});
 const nm=id=>M()?.stationInfo(id)?.name||N().catalog[id]?.name||id;
 const clockText=s=>{s=Math.max(0,Math.round(s||0));return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,'0')).join(':');};
-const alert=t=>M().alertBox(t);
+// FTS is the instructor's own program, not an MMI window: it lives in #ftsPanel (an independent window like the T/G, or
+// inline in the LS page when pop-ups are blocked). Its message boxes open in the FTS document.
+const panel=()=>$('ftsPanel'),ftsDoc=()=>panel()?.ownerDocument||document,ftsOpen=()=>!!panel()&&!panel().hidden;
+const alert=t=>M().alertBox(t,null,{document:ftsDoc()});
+const confirmBox=(t,yes)=>M().confirmBox(t,yes,{document:ftsDoc()});
 let host=null,lib=null,users=null,history=null,session=null,events=[],page='setup',timer=null,localRunLibrary=null,remoteRevision=-1,lastNotice=0,monitorSignature='',problemSignature='';
 const scriptIds=()=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].map(s=>s.id);
 const scriptTitle=id=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].find(s=>s.id===id)?.title||id;
@@ -126,9 +130,9 @@ PAGES.problems={
   $('pSave').onclick=()=>{
    const p=readProblem();if(!p.id)p.id=nextId('P-',lib.problems);
    const probe={problems:[p],situations:[],scenarios:[]},bad=F().validate(probe,{scripts:scriptIds()});if(bad.length){alert(bad.join('\n'));return;}
-   M().confirmBox('문제를 저장하시겠습니까?',()=>{const i=lib.problems.findIndex(x=>x.id===p.id);if(i>=0)lib.problems[i]=structuredClone(p);else lib.problems.push(structuredClone(p));persist();pSel=p.id;go('problems');alert('저장되었습니다.');});
+   confirmBox('문제를 저장하시겠습니까?',()=>{const i=lib.problems.findIndex(x=>x.id===p.id);if(i>=0)lib.problems[i]=structuredClone(p);else lib.problems.push(structuredClone(p));persist();pSel=p.id;go('problems');alert('저장되었습니다.');});
   };
-  $('pDelete').onclick=()=>{if(!pSel){alert('삭제할 문제를 선택하세요.');return;}const used=lib.situations.filter(s=>s.problems.includes(pSel));if(used.length){alert(`상황 ${used.map(s=>s.name).join(', ')}에서 쓰고 있어 삭제할 수 없습니다.`);return;}M().confirmBox('선택한 문제를 삭제하시겠습니까?',()=>{lib.problems=lib.problems.filter(p=>p.id!==pSel);persist();pSel=null;pDraft=blankProblem();go('problems');});};
+  $('pDelete').onclick=()=>{if(!pSel){alert('삭제할 문제를 선택하세요.');return;}const used=lib.situations.filter(s=>s.problems.includes(pSel));if(used.length){alert(`상황 ${used.map(s=>s.name).join(', ')}에서 쓰고 있어 삭제할 수 없습니다.`);return;}confirmBox('선택한 문제를 삭제하시겠습니까?',()=>{lib.problems=lib.problems.filter(p=>p.id!==pSel);persist();pSel=null;pDraft=blankProblem();go('problems');});};
  }
 };
 
@@ -164,8 +168,8 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
   $('sAdd').onclick=()=>{if(!sSel){alert('상황을 먼저 저장하거나 선택하세요.');return;}const s=draft();s.problems.push($('sAddProblem').value);keep(s);go('situations');};
   $('sRemove').onclick=()=>{if(!sSel||pIndex===null){alert('뺄 문제를 선택하세요.');return;}const s=draft();s.problems.splice(pIndex,1);keep(s);go('situations');};
   $('sClear').onclick=()=>{sSel=null;go('situations');};
-  $('sSave').onclick=()=>{const s=draft();if(!s.name){alert('상황명칭을 입력하세요.');return;}if(!s.id){s.id=nextId('S-',lib.situations);if(!s.problems.length&&lib.problems[0])s.problems=[];}M().confirmBox('상황을 저장하시겠습니까?',()=>{keep(s);go('situations');alert(s.problems.length?'저장되었습니다.':'저장되었습니다. 문제를 추가하세요.');});};
-  $('sDelete').onclick=()=>{if(!sSel){alert('삭제할 상황을 선택하세요.');return;}const used=lib.scenarios.filter(c=>c.situations.includes(sSel));if(used.length){alert(`시나리오 ${used.map(c=>c.name).join(', ')}에서 쓰고 있어 삭제할 수 없습니다.`);return;}M().confirmBox('선택한 상황을 삭제하시겠습니까?',()=>{lib.situations=lib.situations.filter(s=>s.id!==sSel);persist();sSel=null;go('situations');});};
+  $('sSave').onclick=()=>{const s=draft();if(!s.name){alert('상황명칭을 입력하세요.');return;}if(!s.id){s.id=nextId('S-',lib.situations);if(!s.problems.length&&lib.problems[0])s.problems=[];}confirmBox('상황을 저장하시겠습니까?',()=>{keep(s);go('situations');alert(s.problems.length?'저장되었습니다.':'저장되었습니다. 문제를 추가하세요.');});};
+  $('sDelete').onclick=()=>{if(!sSel){alert('삭제할 상황을 선택하세요.');return;}const used=lib.scenarios.filter(c=>c.situations.includes(sSel));if(used.length){alert(`시나리오 ${used.map(c=>c.name).join(', ')}에서 쓰고 있어 삭제할 수 없습니다.`);return;}confirmBox('선택한 상황을 삭제하시겠습니까?',()=>{lib.situations=lib.situations.filter(s=>s.id!==sSel);persist();sSel=null;go('situations');});};
   pick('schTable',id=>{schSel=id;schTrain=null;go('situations');});
   const trainPick=id=>{schTrain=id;for(const tr of doc.querySelectorAll('#schUp tr,#schDown tr'))tr.classList.toggle('sel',tr.dataset.key===id);};pick('schUp',trainPick);pick('schDown',trainPick);
   $('schApply').onclick=()=>{
@@ -175,14 +179,14 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
    else{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('수정할 스케줄ID를 선택하세요.');return;}sch.timetable=snap;sch.createdAt=stamp();}
    persist();go('situations');alert(`${schSel} 열차 스케줄에 ${snap.trains.length}개 열차를 저장했습니다.`);
   };
-  $('schDelete').onclick=()=>{const used=lib.situations.filter(x=>x.scheduleId===schSel);if(used.length){alert('상황에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}M().confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
+  $('schDelete').onclick=()=>{const used=lib.situations.filter(x=>x.scheduleId===schSel);if(used.length){alert('상황에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
   $('schApplySit').onclick=()=>{if(!sSel||!schSel){alert('상황과 스케줄ID를 모두 선택하세요.');return;}const s=lib.situations.find(x=>x.id===sSel);s.scheduleId=schSel;persist();go('situations');};
   $('schCopy').onclick=()=>{const sch=schedules().find(x=>x.id===schSel),t=sch?.timetable?.trains.find(x=>x.id===schTrain),targets=schedules().filter(x=>x.id!==schSel);if(!t){alert('복사할 열차를 선택하세요.');return;}if(!targets.length){alert('대상 스케줄ID를 먼저 생성하세요.');return;}
-   if(!M().windowIds().includes('ftsCopy'))M().createWindow('ftsCopy',{title:'스케줄 간 열차 복사',x:180,y:80,width:470,body:'<div class="fts-picker" id="ftsCopyBody"></div>'});
+   if(!M().windowIds().includes('ftsCopy'))M().createWindow('ftsCopy',{container:panel(),title:'스케줄 간 열차 복사',x:180,y:80,width:470,body:'<div class="fts-picker" id="ftsCopyBody"></div>'});
    $('ftsCopyBody').innerHTML=`<p><b>${esc(t.id)}</b> · ${esc(sch.name)}</p><label class="fts-wide">대상 스케줄<select id="ftsCopyTarget">${opts(targets.map(x=>[x.id,x.id+' · '+x.name]))}</select></label><div class="fts-row-btns end"><button type="button" class="sched-btn" id="ftsCopyClose">닫기</button><button type="button" class="sched-btn primary" id="ftsCopyApply">복사</button></div>`;
    $('ftsCopyClose').onclick=()=>M().close('ftsCopy');$('ftsCopyApply').onclick=()=>{const target=schedules().find(x=>x.id===$('ftsCopyTarget').value);if(target.timetable.trains.some(x=>x.id===t.id)){alert('대상에 같은 열차번호가 있습니다.');return;}target.timetable.trains.push(structuredClone(t));if(persist()){M().close('ftsCopy');alert(`${t.id} 열차를 ${target.id}에 복사했습니다.`);}};M().open('ftsCopy');
   };
-  $('schTrainDel').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch||!schTrain){alert('삭제할 열차를 선택하세요.');return;}M().confirmBox(`${schTrain} 열차를 ${sch.id}에서 삭제하시겠습니까?`,()=>{sch.timetable.trains=sch.timetable.trains.filter(t=>t.id!==schTrain);persist();schTrain=null;go('situations');});};
+  $('schTrainDel').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch||!schTrain){alert('삭제할 열차를 선택하세요.');return;}confirmBox(`${schTrain} 열차를 ${sch.id}에서 삭제하시겠습니까?`,()=>{sch.timetable.trains=sch.timetable.trains.filter(t=>t.id!==schTrain);persist();schTrain=null;go('situations');});};
   $('schEdit').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('스케줄ID를 선택하세요.');return;}loadSchedule(sch,true);};
  }
 };
@@ -219,9 +223,9 @@ ${table('cRight',['시나리오 상황 명칭','스케줄ID','제한시간'],cho
   if($('cWhich'))$('cWhich').onchange=()=>{cSel=$('cWhich').value;cDraft=[...lib.scenarios.find(c=>c.id===cSel).situations];cNameDraft=lib.scenarios.find(c=>c.id===cSel).name;cRightIndex=null;go('scenarios');};
   $('cSave').onclick=()=>{
    const name=$('cName').value.trim();cNameDraft=name;if(!name){alert('시나리오 이름을 입력하세요.');return;}if(!cDraft.length){alert('시나리오 상황을 추가하세요.');return;}
-   M().confirmBox('시나리오를 저장하시겠습니까?',()=>{if(cTab==='edit'){const c=lib.scenarios.find(x=>x.id===cSel);Object.assign(c,{name,situations:[...cDraft]});}else{const id=nextId('SC-',lib.scenarios);lib.scenarios.push({id,name,author:'MMI-1',createdAt:stamp(),situations:[...cDraft]});cTab='edit';cSel=id;}persist();go('scenarios');alert('저장되었습니다.');});
+   confirmBox('시나리오를 저장하시겠습니까?',()=>{if(cTab==='edit'){const c=lib.scenarios.find(x=>x.id===cSel);Object.assign(c,{name,situations:[...cDraft]});}else{const id=nextId('SC-',lib.scenarios);lib.scenarios.push({id,name,author:'MMI-1',createdAt:stamp(),situations:[...cDraft]});cTab='edit';cSel=id;}persist();go('scenarios');alert('저장되었습니다.');});
   };
-  if($('cDelete'))$('cDelete').onclick=()=>M().confirmBox('선택한 시나리오를 삭제하시겠습니까?',()=>{lib.scenarios=lib.scenarios.filter(c=>c.id!==cSel);persist();cSel=lib.scenarios[0]?.id||null;cDraft=[...(lib.scenarios.find(c=>c.id===cSel)?.situations||[])];go('scenarios');});
+  if($('cDelete'))$('cDelete').onclick=()=>confirmBox('선택한 시나리오를 삭제하시겠습니까?',()=>{lib.scenarios=lib.scenarios.filter(c=>c.id!==cSel);persist();cSel=lib.scenarios[0]?.id||null;cDraft=[...(lib.scenarios.find(c=>c.id===cSel)?.situations||[])];go('scenarios');});
  }
 };
 
@@ -248,7 +252,7 @@ PAGES.system={
   $('libExport').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(lib,null,2)],{type:'application/json'}));const a=doc.createElement('a');a.href=url;a.download='fts-scenarios.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
   const file=merge=>{const input=doc.createElement('input');input.type='file';input.accept='.json,application/json';input.onchange=async()=>{try{importLibrary(JSON.parse(await input.files[0].text()),merge);}catch(e){alert('파일을 읽지 못했습니다: '+e.message);}};input.click();};
   $('libImport').onclick=()=>file(false);$('libMerge').onclick=()=>file(true);
-  $('libReset').onclick=()=>M().confirmBox('기본 라이브러리로 되돌리시겠습니까? 직접 만든 문제·상황·시나리오는 지워집니다.',()=>{lib=defaults();persist();go('system');});
+  $('libReset').onclick=()=>confirmBox('기본 라이브러리로 되돌리시겠습니까? 직접 만든 문제·상황·시나리오는 지워집니다.',()=>{lib=defaults();persist();go('system');});
   const parse=()=>{try{return JSON.parse($('libText').value);}catch(e){$('libReport').textContent='JSON 문법 오류: '+e.message;return null;}};
   $('libCheck').onclick=()=>{const data=parse();if(!data)return;const errors=F().validate(normalise(data),{scripts:scriptIds()});$('libReport').textContent=errors.length?`문제 ${errors.length}건\n`+errors.join('\n'):'형식 검사 통과';};
   $('libPaste').onclick=()=>{const data=parse();if(data)importLibrary(data,true);};
@@ -289,7 +293,7 @@ ${table('suSits',['시나리오상황','구간','스케줄ID'],rows)}
 };
 let pickState={name:'',author:'',scenario:null,situation:null};
 function openPicker(){
- if(!M().windowIds().includes('ftsPicker'))M().createWindow('ftsPicker',{title:'시나리오 선택',x:180,y:40,width:980,body:'<div id="ftsPickerBody" class="fts-picker"></div>'});
+ if(!M().windowIds().includes('ftsPicker'))M().createWindow('ftsPicker',{container:panel(),title:'시나리오 선택',x:180,y:40,width:980,body:'<div id="ftsPickerBody" class="fts-picker"></div>'});
  M().open('ftsPicker');renderPicker();
 }
 function renderPicker(){
@@ -363,7 +367,7 @@ function tick(){
  if(root.SimRemote){
   syncRemote();const state=root.SimRemote.snapshot.fts;if($('ftsSessionStatus'))$('ftsSessionStatus').textContent=session&&!session.finished?'교육 진행 · '+(session.current+1)+' / '+session.items.length+' 문제':session?'교육 종료':'교육 전 준비';if(session&&!session.finished&&!root.SimExtraLS){const ui=uiState(),sig=JSON.stringify(ui);if(tick.ui!==sig){tick.ui=sig;remote({op:'ui',ui});}}
   if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}}
-  if(page==='monitor'&&M().isOpen('fts'))renderMonitor();if(M().isOpen('ftsProblem'))renderProblem();return;
+  if(page==='monitor'&&ftsOpen())renderMonitor();if(M().isOpen('ftsProblem'))renderProblem();return;
  }
  if(!session||session.finished)return;
  const t=now();const pending=session.items[session.current];if(pending)loadSituation(pending);const out=F().advance(activeLibrary(),session,(item)=>ctxFor(item),t);
@@ -373,7 +377,7 @@ function tick(){
   if(o.kind==='end'){const p=activeLibrary().problems.find(x=>x.id===o.item.problem);M().log('event',`문제 ${o.status} · ${p?.name} · ${o.item.score}점`);if(p?.script&&o.status!=='완료')$('scStop')?.click();}
   if(o.kind==='finished')finishSession('모든 문제 종료');
  }
- if(page==='monitor'&&M().isOpen('fts'))renderMonitor();
+ if(page==='monitor'&&ftsOpen())renderMonitor();
  if(M().isOpen('ftsProblem'))renderProblem();
 }
 function finishSession(reason){
@@ -412,7 +416,7 @@ ${p?.script?`<li class="${ctx.script?.done>=ctx.script?.total&&ctx.script?.total
 ${manual.length?`<div class="fts-cap">교수 확인 (구술)</div><div class="fts-row-btns wrap">${manual.map(k=>{const key=k.condition.key||k.condition.label,on=!!session.manual[session.items.indexOf(item)]?.[key];return `<button type="button" class="sched-btn ${on?'primary':''}" data-manual="${esc(key)}" ${session.finished?'disabled':''}>${on?'✔ ':''}${esc(k.condition.label)}</button>`;}).join('')}</div>`:''}
 <div class="fts-grid2"><label>스케줄ID<input readonly value="${esc(s?.scheduleId||'')}"></label><label>스케줄 명칭<input readonly value="${esc(schedules().find(x=>x.id===s?.scheduleId)?.name||'(현재 온라인 시간표)')}"></label><label>구간<input readonly value="${esc(s?.section||'')}"></label></div>
 ${session.finished?`<div class="fts-result">${(()=>{const r=F().summary(activeLibrary(),session);return `결과 ${r.got}/${r.full}점 (${r.percent}%)`;})()}</div>`:''}</div></div>`;
- $('mEnd').onclick=()=>M().confirmBox('교육을 종료하시겠습니까?',()=>{finishSession('교수 종료');});
+ $('mEnd').onclick=()=>confirmBox('교육을 종료하시겠습니까?',()=>{finishSession('교수 종료');});
  $('mNext').onclick=()=>{if(root.SimRemote){remote({op:'next'});tick();return;}const p2=activeLibrary().problems.find(x=>x.id===session.items[session.current]?.problem);const out=F().endCurrent(session,now());if(p2?.script)$('scStop')?.click();if(out.some(o=>o.kind==='finished'))finishSession('모든 문제 종료');tick();renderMonitor();};
  $('mShow').onclick=showProblem;
  $('mReload').onclick=()=>{if(root.SimRemote){remote({op:'reload'});tick();return;}session.situationLoaded=null;loadSituation(item);};
@@ -451,7 +455,7 @@ PAGES.history={
  bind(){
   pick('hTable',id=>{const h=history.find(x=>x.id===id);$('hDetail').innerHTML=table('hRows',['과목','문제','상태','점수','소요(초)','미충족·오류'],h.rows.map((r,i)=>({id:String(i),cells:[esc(r.subject),esc(r.problem),esc(r.status),`${r.score}/${r.full}`,r.seconds??'',esc(r.error||(r.checks||[]).filter(c=>!c.met).map(c=>c.label).join(' · '))]})));});
   $('hExport').onclick=()=>{const a=doc.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({format:'ORPHEIA-FTS-HISTORY',version:1,history},null,2)],{type:'application/json'}));a.href=url;a.download='orpheia-fts-history.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  $('hClear').onclick=()=>M().confirmBox('교육 이력을 모두 지우시겠습니까?',()=>{history=[];save(KEY.history,history);go('history');});
+  $('hClear').onclick=()=>confirmBox('교육 이력을 모두 지우시겠습니까?',()=>{history=[];save(KEY.history,history);go('history');});
  }
 };
 
@@ -463,11 +467,17 @@ function init(api){
  setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;
  if(root.SimRemote){const r=root.SimRemote.command({type:'fts',op:'bootstrap',library:lib,users,history});if(!r.ok)console.warn(r.message);syncRemote();setup.professor=users.find(u=>u.role==='교수')?.id||'';setup.student=users.find(u=>u.role==='교육생')?.id||'';setup.scenario=lib.scenarios[0]?.id||null;}
  pDraft=blankProblem();
- const w=M().createWindow('fts',{title:'FTS 제어통제 시스템',x:20,y:10,width:1360,body:shell()});
- w.el.querySelector('.fts-nav').onclick=e=>{const b=e.target.closest('[data-fts-page]');if(b)go(b.dataset.ftsPage);};
- w.opener=()=>go(page);
+ const box=panel();box.innerHTML=shell()+'<button type="button" class="fts-inline-close" id="ftsInlineClose" aria-label="FTS 제어통제 닫기">✕ 닫기</button>';
+ box.querySelector('.fts-nav').onclick=e=>{const b=e.target.closest('[data-fts-page]');if(b)go(b.dataset.ftsPage);};
+ $('ftsInlineClose').onclick=close;
  M().onEvent(e=>{if(!root.SimRemote&&session&&!session.finished){events.push({...e,at:now()});}});
  timer=setInterval(()=>{try{tick();const el=$('mElapsed'),pb=$('pbElapsed');if(session&&!session.finished){const it=session.items[session.current];if(it?.startedAt!=null){if(el)el.value=clockText(now()-it.startedAt);if(pb)pb.textContent=clockText(now()-it.startedAt);}}}catch(e){console.error(e);}},500);
 }
-root.SimFTSUI={init,open:()=>M().open('fts'),go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
+function open(){
+ if(!panel())return false;go(page);
+ if(root.SimWorkspace?.openFts?.())return true;           // independent window
+ panel().hidden=false;panel().classList.add('fts-inline');panel().scrollIntoView({block:'start'});return true;   // pop-ups blocked: in the LS page
+}
+function close(){if(root.SimWorkspace?.ftsDetached?.()){root.SimWorkspace.closeFts();return;}panel().hidden=true;panel().classList.remove('fts-inline');}
+root.SimFTSUI={init,open,close,isOpen:ftsOpen,go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
 })(window);

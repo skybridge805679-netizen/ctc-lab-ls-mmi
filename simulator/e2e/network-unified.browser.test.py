@@ -30,7 +30,7 @@ try:
    for _ in range(42):run({'type':'tick','seconds':10})
    assert page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],1040).station')=='dongmyo'
    # A scripted emergency does not silently switch off shared block enforcement.
-   page.click('#mmiScenarioBtn');page.select_option('#scSelect','em-03');page.click('#scStart');assert page.evaluate('SimLine.state.enforce')
+   page.evaluate("SimMMI.open('scenario')");page.select_option('#scSelect','em-03');page.click('#scStart');assert page.evaluate('SimLine.state.enforce')
    assert page.evaluate('''()=>{const id=SimScenarioUI.reservedNumbers().find(id=>Object.values(SimLSUI.getModel().stations).some(s=>Object.values(s.windows).some(rows=>rows.some(r=>r.number===id))));return SimAutoUI.position({id},1040)?.actual===true;}''')
    # Empty single-line reservation: the opposite departure is rejected before a number enters.
    page.reload(wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.evaluate('SimAutoUI.set(false)')

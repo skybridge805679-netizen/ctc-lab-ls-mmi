@@ -30,7 +30,7 @@ def run(page, url):
     do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
     rows = lambda st: page.evaluate("st=>Object.fromEntries(Object.entries(SimLSUI.getModel().stations[st].windows).filter(([k,v])=>v.length).map(([k,v])=>[k,v.map(r=>r.number+':'+r.direction)]))", st)
     for sid, (st, stops, route, siding, start, direction) in CASES.items():
-        page.locator('#mmiScenarioBtn').click()
+        page.evaluate("SimMMI.open('scenario')")
         page.locator('#scSelect').select_option(sid); page.locator('#scSelect').dispatch_event('change')
         page.locator('#scStart').click()
         train = page.locator('#scTrain').input_value()

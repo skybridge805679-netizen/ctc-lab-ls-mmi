@@ -14,7 +14,7 @@ try:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=b.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.click('#mmiScenarioBtn')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.evaluate("SimMMI.open('scenario')")
    page.select_option('#scSelect','yongsan-5');page.click('#scStart');number=page.input_value('#scTrain')
    # starting a scenario starts the exam clock (v0.27.0), so pause again for the frozen-motion check
    if '일시정지' in page.inner_text('#pauseBtn'):page.click('#pauseBtn')

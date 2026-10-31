@@ -11,6 +11,7 @@ function init(){
  root.addEventListener('resize',fit);fit();
  $('drawerBtn').onclick=()=>drawer();$('drawerClose').onclick=()=>drawer(false);
  $('graphWinBtn').onclick=()=>root.SimWorkspace?.openGraph();
+ $('ftsWinBtn').onclick=()=>root.SimFTSUI?.open();
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sideDrawer').hidden&&!document.querySelector('dialog[open]'))drawer(false);});
 }
 root.SimShell={drawer};

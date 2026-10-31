@@ -29,7 +29,7 @@ def run(page, url):
     ok = lambda: page.locator('#mmiAlertOk').click()
     done = lambda: page.locator('#scSteps li.sc-do.done').count()
     # ------------------------------------------------------------ 경합 시나리오
-    page.locator('#mmiScenarioBtn').click()
+    page.evaluate("SimMMI.open('scenario')")
     page.locator('#scSelect').select_option('sch-conflict'); page.locator('#scSelect').dispatch_event('change')
     page.locator('#scStart').click()
     expect(page.locator('#scProblem')).to_contain_text('B0000')
@@ -63,7 +63,7 @@ def run(page, url):
     expect(page.locator('#scStatus')).to_contain_text('합격')
     # ------------------------------------------------------------ 스케줄 생성 시나리오
     page.evaluate("SimMMI.close('schedule')") if False else None
-    page.locator('#mmiScenarioBtn').click()
+    page.evaluate("SimMMI.open('scenario')")
     page.locator('#scSelect').select_option('sch-create'); page.locator('#scSelect').dispatch_event('change')
     page.locator('#scStart').click()
     problem = page.locator('#scProblem').inner_text()

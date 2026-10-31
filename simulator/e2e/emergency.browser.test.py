@@ -17,7 +17,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(url, wait_until='networkidle')
-    page.locator('#mmiScenarioBtn').click()
+    page.evaluate("SimMMI.open('scenario')")
     assert page.locator('#scSelect optgroup').count() == 3
     page.locator('#scSelect').select_option('em-02'); page.locator('#scSelect').dispatch_event('change')
     expect(page.locator('#scTrainRow')).to_be_hidden()

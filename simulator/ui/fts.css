@@ -42,3 +42,10 @@
 .fts-briefing-name .fts-pb-box{font-size:18px;font-weight:550;color:#244c3d;border-left-color:#76a697;background:#fcfff9;line-height:1.8}.fts-briefing-actions .fts-pb-box{background:#f5faf0;border-left-color:#adbc85}.fts-problem .fts-pb-empty{font-size:12px;font-weight:400;color:#84957d}
 .fts-briefing-notice,.fts-briefing-error{display:flex;flex-direction:column;gap:4px;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:7px;padding:12px 16px;font-size:12px;line-height:1.7}.fts-briefing-notice{border:1px solid #c7ded2;background:#e5f2e9;color:#54735a}.fts-briefing-error{border:1px solid #e6c4ad;background:#fff1e1;color:#9a694b}.fts-briefing-notice b,.fts-briefing-error b{font-size:10px;letter-spacing:.4px}
 .fts-problem[data-status=error] .fts-briefing-heading h2{color:#a16d4b}.fts-problem[data-status=waiting] .fts-briefing-heading h2,.fts-problem[data-status=finished] .fts-briefing-heading h2{color:#65866d}
+/* FTS 제어통제 is its own program: an independent window, or inline in the LS page when pop-ups are blocked */
+.fts-panel{position:relative;margin:12px;padding:0;overflow:visible}
+.fts-panel[hidden]{display:none}
+.fts-inline-close{display:none;position:absolute;top:10px;right:12px;z-index:5;background:#fff;border:1px solid #9fc7c0;border-radius:6px;padding:4px 12px;font-weight:700;color:#174a46;cursor:pointer}
+.fts-panel.fts-inline .fts-inline-close{display:block}
+body.fts-detached{margin:0;background:#eef6f5}
+body.fts-detached .fts-panel{margin:0;min-height:100vh;border:0;border-radius:0;box-shadow:none}

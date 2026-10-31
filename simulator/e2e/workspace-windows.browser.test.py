@@ -93,7 +93,7 @@ try:
    # Scenario controls in MMI drive timed train movement on the other screen.
    page.reload(wait_until='networkidle');page.click('#pauseBtn')
    with page.expect_popup() as new:page.click('#detachMMIBtn')
-   mmi=new.value;mmi.click('#mmiScenarioBtn');mmi.select_option('#scSelect','yongsan-5');mmi.click('#scStart')
+   mmi=new.value;page.evaluate("SimMMI.open('scenario')");mmi.select_option('#scSelect','yongsan-5');mmi.click('#scStart')
    number=mmi.input_value('#scTrain')
    for action in [{'type':'mode','value':'CCM','source':'MMI'},{'type':'stop','id':'2A','source':'LS'},{'type':'tick','seconds':90},{'type':'route','id':'2A-5T','source':'LS'}]:
     assert page.evaluate('a=>SimMMI.run(a)',action)['ok']

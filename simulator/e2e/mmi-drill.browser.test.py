@@ -28,7 +28,7 @@ def run(page, url):
     page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     page.locator('.mmi-top-btn', has_text='열차스케줄').click(); page.locator('.mmi-menu-list [data-mmi-open="graph"]').first.click()
-    page.locator('#mmiDrillBtn').click()
+    page.evaluate("SimMMI.open('conflictDrill')")
     expect(page.locator('[data-mmi-window="conflictDrill"]')).to_be_visible()
     expect(page.locator('#drillRows tr.empty')).to_have_count(1)
     page.locator('#drillGrade').click(); expect(page.locator('#drillMsg')).to_contain_text('출제된 문제가 없습니다')
