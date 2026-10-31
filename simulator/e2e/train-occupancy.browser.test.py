@@ -20,10 +20,10 @@ try:
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    for a in [{'type':'mode','value':'CCM'},{'type':'route','id':'2A-5T'},{'type':'occupy','id':'2A-5T','seconds':20}]:assert run(a)['ok']
    path=page.locator('[data-train-run="2A-5T"]');start=path.get_attribute('d')
-   page.select_option('#graphSpeed','10',force=True);page.clock.run_for(1000)
+   page.select_option('#graphSpeed','10',force=True);page.clock.run_for(2000)
    assert path.get_attribute('d')!=start
    if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.3-train-run.png'),style='#toast{visibility:hidden}')
-   page.select_option('#graphSpeed','60',force=True);page.clock.run_for(1000)
+   page.select_option('#graphSpeed','60',force=True);page.clock.run_for(2000)   # 엔진 시계 진행과 화면 갱신(1초 주기)은 따로 돈다 — 한 주기 늦게 그려질 수 있다
    end=path.get_attribute('d');assert end!=start,'last frame must redraw even when the clock jumps past completion'
    page.clock.run_for(1000);assert path.get_attribute('d')==end,'completed train stays at the end until clear'
    assert run({'type':'clear','id':'2A-5T'})['ok'];expect(path).to_have_count(0)
