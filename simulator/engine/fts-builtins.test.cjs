@@ -4,9 +4,12 @@ const R=require('./runtime.cjs'),F=require('./fts.js'),B=require('./fts-builtins
 const problems=B.all({});
 const libraryOf=p=>({version:F.VERSION,problems:[p],situations:[{id:'S',name:'S',section:'',scheduleId:'',limit:0,timetable:null,problems:[p.id]}],scenarios:[{id:'SC',name:'SC',situations:['S']}],schedules:[]});
 const refs=(c,out=[])=>{if(!c)return out;if(c.type==='objective')out.push(c.id);(c.conditions||[]).forEach(k=>refs(k,out));refs(c.condition,out);return out;};
+// 선행 조건(목표 · 상황 반응)을 벗긴 실제 조건
+const gated=c=>c.type==='all'&&['objective','reaction'].includes(c.conditions[0].type)?c.conditions[1]:c;
+const waits=(c,out=[])=>{if(!c)return out;if(c.type==='reaction')out.push(c.id);(c.conditions||[]).forEach(k=>waits(k,out));waits(c.condition,out);return out;};
 const leaf=(c,type)=>c.type===type?c:(c.conditions||[]).map(k=>leaf(k,type)).find(Boolean)||(c.condition&&leaf(c.condition,type))||null;
 
-// 대본과 다른 순서: 통보를 먼저 모두 거꾸로 확인하고, 목표는 목록 뒤쪽(나중 역 · 나중 단계)부터 할 수 있는 것을 고른다.
+// 대본과 다른 순서: 목표는 목록 뒤쪽(나중 역 · 나중 단계)부터 할 수 있는 것을 고르고, 통보는 그 뒤에 대본과 거꾸로 확인한다.
 function solve(p0,{log=false,branches=[]}={}){
  const p1=p0;
  const r=R.create(),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
@@ -21,24 +24,24 @@ function solve(p0,{log=false,branches=[]}={}){
  const row=n=>{for(const [station,s] of Object.entries(S().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid,direction:x.direction};return null;};
  const control=(station,action)=>r.command({type:'control',station,action});
  const ccm=st=>S().states[st].mode==='CCM'||control(st,{type:'mode',value:'CCM'}).ok;
- const order=[];
- for(const c of [...p.communications].reverse()){assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+c.id,checked:true}).ok);order.push('comm:'+c.id);}
+ const order=[];let commsDone=false;
  const done=()=>item().obj||{};
- const ready=o=>{const d=done();if(refs(o.condition).some(id=>d[id]==null))return false;
+ const ready=o=>{const d=done();if(refs(o.condition).some(id=>d[id]==null))return false;if(waits(o.condition).some(id=>!item().reactions?.[id]?.fired))return false;
   if(o.final)return p.objectives.every(x=>x.final||d[x.id]!=null);
-  const k=o.condition.type==='all'&&o.condition.conditions[0].type==='objective'?o.condition.conditions[1]:o.condition,st=k.station;
+  const k=gated(o.condition),st=k.station;
   if(k.type==='route')return p.objectives.filter(x=>x.condition.station===st&&['signalCancelled','signalStop'].includes(x.condition.type)).every(x=>d[x.id]!=null);
   if(o.condition.type==='signalStop')return p.objectives.filter(x=>x.condition.type==='signalCancelled'&&x.condition.station===st&&x.condition.signal===o.condition.signal).every(x=>d[x.id]!=null);
   return true;};
  function perform(o){
-  const c=o.condition;
+  const c=gated(o.condition);
+  // 열차가 스스로 지나가야 하는 목표(상황 반응의 열차 운행)는 진로를 내 주고 기다린다
+  if(o.condition.type==='all'&&o.condition.conditions[0].type==='reaction'&&c.type==='trainGone')return false;
   if(o.final){const st=leaf(c,'mode').station;return control(st,{type:'mode',value:'AUTO'}).ok;}
   if(c.type==='event')return control(c.station,{type:'mode',value:c.value}).ok;
   if(c.type==='signalCancelled')return ccm(c.station)&&control(c.station,{type:'stop',id:c.signal}).ok;
   if(c.type==='signalStop')return false;                                           // 접근쇄정 시간이 지나기를 기다린다
-  if(c.type==='route')return ccm(c.station)&&control(c.station,{type:'route',id:c.route}).ok;
   if(c.type==='schedule'){const t=structuredClone(S().timetable.trains.find(x=>x.id===c.train));if(!t)return false;t.calls.find(k=>k.station===c.station)[c.field]=c.value;return r.command({type:'timetable',method:'update',args:[c.train,t]}).ok!==false;}
-  const k=c.type==='all'&&c.conditions[0].type==='objective'?c.conditions[1]:c;
+  const k=c;
   if(k.type==='route'){if(!ccm(k.station))return false;if(control(k.station,{type:'route',id:k.route}).ok)return true;
    // 진로가 서지 않으면 관제사처럼 그 역에 남아 있는 다른 진로를 취소하고 해정을 기다린다
    const sig=k.route.split('-')[0];for(const id of Object.keys(S().states[k.station].routes))if(!id.startsWith(sig+'-'))control(k.station,{type:'withdraw',id});return false;}
@@ -50,6 +53,8 @@ function solve(p0,{log=false,branches=[]}={}){
  }
  for(let pass=0;pass<240&&item().status==='진행';pass++){
   for(const o of [...p.objectives].reverse()){if(item().status!=='진행')break;if(done()[o.id]==null&&ready(o)&&perform(o))order.push(o.id);r.command({type:'tick',seconds:0});}
+  // 통보는 조작을 다 한 뒤 대본과 거꾸로 확인한다 (운행 재개 통보를 신호 정지 전에 하면 열차가 먼저 지나가 버린다 — 실제와 같다)
+  if(!commsDone&&p.objectives.every(o=>done()[o.id]!=null)){commsDone=true;for(const c of [...p.communications].reverse()){assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+c.id,checked:true}).ok);order.push('comm:'+c.id);}}
   r.command({type:'tick',seconds:5});
  }
  const it=item(),failed=S().fts.session&&r.snapshot();
@@ -101,9 +106,22 @@ test('emergency problems carry the situation-change branches of the response gui
  assert.equal(F.view(em['P-em-05'],{branch:{}}),em['P-em-05']);
  assert.ok(em['P-em-03'].communications.find(c=>c.id==='proactive')?.optional);
 });
-for(const [id,branches] of [['P-em-05',['v-bogie']],['P-em-04',['v-delay','v-a1005']],['P-em-06',['v-self-run-first']],['P-em-02',['v-derail-k604','v-point-23b']]])
+for(const [id,branches] of [['P-em-05',['v-bogie']],['P-em-04',['v-delay','v-a1005']],['P-em-01',['v-k1008-approach','v-k1006-passed']],['P-em-01',['v-k1008-far']],['P-em-06',['v-self-run-first']],['P-em-02',['v-derail-k604','v-point-23b']]])
  test(`${id} with ${branches.join('+')}: solvable after the situation changes`,()=>{
   const p=problems.find(x=>x.id===id),{item,missing,error}=solve(p,{branches});
   assert.equal(error,undefined);assert.deepEqual(missing,[]);assert.equal(item.status,'완료');
  });
+test('A1005 cannot pass Anyang while the K0811 route 4B-B660T stands; cancelling 4B and returning AUTO lets its automatic routes through',()=>{
+ const p=problems.find(x=>x.id==='P-em-04'),r=R.create(),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
+ assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p)}).ok);assert.ok(r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false}).ok);
+ r.command({type:'tick',seconds:1});assert.ok(r.command({type:'fts',op:'manual',key:'branch:v-a1005'}).ok);r.command({type:'tick',seconds:2});
+ const at=()=>Object.entries(S().ls.stations).flatMap(([st,x])=>Object.entries(x.windows).filter(([,rows])=>rows.some(t=>t.number==='A1005')).map(([slot])=>st+':'+slot));
+ assert.deepEqual(at(),['anyang:B658T']);assert.ok(S().states.anyang.routes['4B-B660T']);
+ r.command({type:'tick',seconds:300});assert.deepEqual(at(),['anyang:B658T'],'4B-B660T가 서 있으면 A1005는 들어오지 못한다');
+ r.command({type:'control',station:'anyang',action:{type:'mode',value:'CCM'}});assert.ok(r.command({type:'control',station:'anyang',action:{type:'stop',id:'4B'}}).ok!==false);
+ r.command({type:'tick',seconds:60});assert.deepEqual(at(),['anyang:B658T'],'CCM에서는 자동 진로가 서지 않는다');
+ r.command({type:'control',station:'anyang',action:{type:'mode',value:'AUTO'}});
+ for(let i=0;i<120&&at().length;i++)r.command({type:'tick',seconds:5});
+ assert.deepEqual(at(),[],'4B 해정 · AUTO 복귀 뒤 A1005가 자동 진로로 통과한다');assert.notEqual(item().obj['a1005-passed'],undefined);
+});
 module.exports={solve,problems};

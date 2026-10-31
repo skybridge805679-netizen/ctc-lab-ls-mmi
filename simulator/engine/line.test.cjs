@@ -50,8 +50,17 @@ assert.strictEqual(L.handoff('geumcheon','B968T',slots).signal,'1A');assert.stri
  // 단선지령식: one occupied track closes the exits of both directions at both ends
  const t=L.line.sections.find(x=>x.trunk==='MU'&&x.west==='jonggak'&&x.east==='underground-seoul');assert.ok(t);
  const J=mk('jonggak'),U=mk('underground-seoul'),st2={jonggak:J.s,'underground-seoul':U.s};
+ // 정방향(상행) 열차가 상선에 있을 때와, 하행 열차가 상선에 있을 때(LS에서 반대선으로 옮긴 단선 운전)를 비교한다
+ ops.dispatch(ls,{op:'insert',station:'underground-seoul',slot:'B065T',number:'K1138',direction:'up'});
+ L.refresh(st2,ls);const normal=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);assert.equal(L.state.auto.size,0);
+ const uidUp=ls.stations['underground-seoul'].windows.B065T[0].uid;ops.dispatch(ls,{op:'delete',station:'underground-seoul',slot:'B065T',uid:uidUp});
  ops.dispatch(ls,{op:'insert',station:'underground-seoul',slot:'B065T',number:'K1137',direction:'down'});
- L.refresh(st2,ls);const before=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);
- L.state.single.add('jonggak>underground-seoul:M');L.refresh(st2,ls);const after=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);
- assert.notStrictEqual(before,after,'single-line operation closes more exits');L.state.single.clear();L.state.enforce=true;}
+ L.refresh(st2,ls);const single=JSON.stringify([J.s.exitBlocked,U.s.exitBlocked]);
+ assert.ok(L.state.auto.has('jonggak>underground-seoul:M'),'LS에서 반대선으로 옮긴 열차만으로 단선 운전 구간이 된다');
+ assert.notStrictEqual(normal.replaceAll('K1138','K1137'),single,'single-line operation closes more exits');
+ // 반대 방향 진로(종각 53-B045T)만 서 있어도 맞은편(지하서울)의 같은 선로 정방향 출발을 막는다
+ const uid2=ls.stations['underground-seoul'].windows.B065T[0].uid;ops.dispatch(ls,{op:'delete',station:'underground-seoul',slot:'B065T',uid:uid2});
+ L.refresh(st2,ls);const Jc=require('./core.js').forStation('jonggak');Jc.dispatch(J.s,{type:'mode',value:'CCM'});{const r=Jc.dispatch(J.s,{type:'route',id:'53-B045T'});assert.ok(r.ok,r.message);}
+ L.refresh(st2,ls);assert.match(U.s.exitBlocked?.B065T||'',/53-B045T 단선 운전/);assert.ok(L.wrongDirection('jonggak','B045T'));assert.ok(!L.wrongDirection('jonggak','B046T'));
+ L.state.single.clear();L.state.enforce=true;}
 console.log('line: ok',line.sections.length,'sections');

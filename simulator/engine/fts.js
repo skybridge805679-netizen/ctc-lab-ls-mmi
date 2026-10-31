@@ -41,6 +41,7 @@ const CONDITIONS={
  signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll'))),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
  failedOp:{label:'실패한 조작',fields:[],test:(c,x)=>(x.events||[]).filter(e=>e.ok===false&&(!c.station||e.station===c.station)&&(!c.eventType||e.type===c.eventType)).length>=(c.count||1),text:c=>`${c.station?nm(c.station)+'역 ':''}거부된 조작${c.count>1?` ${c.count}회`:''}`},
  objective:{label:'목표 달성',fields:['id'],test:(c,x)=>x.objectives?.[c.id]!=null,text:c=>`목표 ${c.id} 달성`},
+ reaction:{label:'상황 반응 발생',fields:['id'],test:(c,x)=>!!x.reactions?.[c.id]?.fired,text:c=>`상황 반응 ${c.id} 발생`},
  branch:{label:'상황 변경 발생',fields:['id'],test:(c,x)=>x.branches?.[c.id]!=null,text:c=>`상황 변경 ${c.id} 발생`},
  communication:{label:'통보 확인',fields:['id'],test:(c,x)=>x.manual?.['comm:'+c.id]===true,text:c=>`통보 ${c.id} 확인`},
  elapsed:{label:'경과시간',fields:['seconds'],test:(c,x)=>(x.elapsed||0)>=Number(c.seconds),text:c=>`${c.seconds}초 경과`},
@@ -133,8 +134,8 @@ function checkActive(p,w,errors){
  const objectives=[...list('objectives'),...branches.flatMap(b=>sub(b,'objectives'))],comms=[...list('communications'),...branches.flatMap(b=>sub(b,'communications'))],reactions=[...list('reactions'),...branches.flatMap(b=>sub(b,'reactions'))];
  objectives.forEach((o,i)=>{const where=`${w} 목표 ${i+1}`;if(!idOk(o,where))return;if(typeof o.label!=='string'||!o.label.trim())errors.push(`${where}: 이름이 없습니다`);checkCondition(o.condition,where,errors);if(o.points!==undefined&&!finite(o.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(o.deadline!==undefined&&!finite(o.deadline,1))errors.push(`${where}: 기한은 1~86400초`);for(const f of ['final','optional'])if(o[f]!==undefined&&typeof o[f]!=='boolean')errors.push(`${where}: ${f}는 true/false`);});
  comms.forEach((c,i)=>{const where=`${w} 통보 ${i+1}`;if(!idOk(c,where))return;if(typeof c.label!=='string'||!c.label.trim())errors.push(`${where}: 이름이 없습니다`);if(c.text!==undefined&&typeof c.text!=='string')errors.push(`${where}: 문안은 문자열`);if(c.points!==undefined&&!finite(c.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(c.deadline!==undefined&&!finite(c.deadline,1))errors.push(`${where}: 기한은 1~86400초`);});
- const known={objective:new Set(objectives.map(o=>o?.id)),communication:new Set(comms.map(c=>c?.id)),branch:new Set(branches.map(b=>b?.id))};
- const refs=(c,where)=>{if(!object(c))return;if(['objective','communication','branch'].includes(c.type)&&!known[c.type].has(c.id))errors.push(`${where}: 없는 ${{objective:'목표',communication:'통보',branch:'상황 변경'}[c.type]} ${c.id}`);(c.conditions||[]).forEach(k=>refs(k,where));if(c.condition)refs(c.condition,where);};
+ const known={objective:new Set(objectives.map(o=>o?.id)),communication:new Set(comms.map(c=>c?.id)),branch:new Set(branches.map(b=>b?.id)),reaction:new Set(reactions.map(r=>r?.id))};
+ const refs=(c,where)=>{if(!object(c))return;if(['objective','communication','branch','reaction'].includes(c.type)&&!known[c.type].has(c.id))errors.push(`${where}: 없는 ${{objective:'목표',communication:'통보',branch:'상황 변경',reaction:'상황 반응'}[c.type]} ${c.id}`);(c.conditions||[]).forEach(k=>refs(k,where));if(c.condition)refs(c.condition,where);};
  objectives.forEach((o,i)=>refs(o.condition,`${w} 목표 ${i+1}`));
  reactions.forEach((r,i)=>{const where=`${w} 상황반응 ${i+1}`;if(!idOk(r,where))return;if(r.when!=null){checkCondition(r.when,where,errors);refs(r.when,where);}if(r.after!==undefined&&!finite(r.after))errors.push(`${where}: 지연은 0~86400초`);if(!Array.isArray(r.do)||!r.do.length||r.do.length>50)errors.push(`${where}: 현상(do)은 1~50개`);else r.do.forEach((k,j)=>checkPhenomenon(k,`${where}.${j+1}`,errors));});
  const base={objective:new Set((p.objectives||[]).map(o=>o?.id)),communication:new Set((p.communications||[]).map(c=>c?.id)),reaction:new Set((p.reactions||[]).map(r=>r?.id))};
@@ -242,7 +243,7 @@ function advance(lib,session,ctxFor,now){
   if(item.triggerTimeMet&&item.triggerMet.every(Boolean)){item.status='진행';item.startedAt=now;item.fired=[];item.obj={};item.comm={};item.reactions={};item.branch={};out.push({kind:'activate',item,problem:p});for(const ph of setupActions(p.setup))out.push({kind:'phenomenon',item,phenomenon:ph,setup:true});return out;}
   else return out;
  }
- const elapsed=now-item.startedAt,ctx={...ctxFor(item,elapsed),elapsed,objectives:item.obj||{},branches:item.branch||{}};
+ const elapsed=now-item.startedAt,ctx={...ctxFor(item,elapsed),elapsed,objectives:item.obj||{},branches:item.branch||{},reactions:item.reactions||{}};
  for(const b of p.branches||[]){if(item.branch?.[b.id]!=null)continue;if(ctx.manual?.['branch:'+b.id]===true||(b.when!=null&&test(b.when,ctx))){(item.branch??={})[b.id]=elapsed;out.push({kind:'branch',item,branch:b});}}
  (p.phenomena||[]).forEach((ph,i)=>{if(!item.fired.includes(i)&&elapsed>=(Number(ph.after)||0)){item.fired.push(i);out.push({kind:'phenomenon',item,phenomenon:ph});}});
  // 상황 반응: 조건이 처음 맞은 때(없으면 문제 시작)부터 after초 뒤에 한 번 일어난다

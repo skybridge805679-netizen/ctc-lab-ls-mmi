@@ -50,7 +50,8 @@ function seedRoutes(station,signals,approach=[]){
  c.dispatch(s,{type:'mode',value:'CCM',source:'SCENARIO'});
  for(const sig of signals){
   const departure=c.signals[sig]?.kind==='출발';
-  const id=typeof sig==='string'&&c.routes[sig]?sig:Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
+  const L=node?require('./line.js'):root.SimLine,wrong=r=>!!L?.wrongDirection?.(station,c.routes[r].destination);   // 반대 방향(단선 운전) 진로는 고르지 않는다
+  const id=typeof sig==='string'&&c.routes[sig]?sig:Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
   if(id&&c.dispatch(s,{type:'route',id,source:'SCENARIO'}).ok)out.push({station,route:id});
  }
  return {routes:out,approach:approach.map(signal=>({station,signal}))};

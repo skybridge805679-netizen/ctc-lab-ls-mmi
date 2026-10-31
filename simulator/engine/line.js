@@ -106,7 +106,7 @@ function viaStations(a,b,trunk){
  return N.catalog[a].order<N.catalog[b].order?list:list.reverse();
 }
 // ---- 회로 단위 점유: 바로 앞 회로를 검사한다. 단선지령식의 대향 보호는 구간 전체를 유지한다.
-const state={enforce:true,single:new Set()};            // single: "서쪽>동쪽:M|G|E" 단선지령식 시행 중인 구간
+const state={enforce:true,single:new Set(),auto:new Set()};   // single: "서쪽>동쪽:M|G|E" 단선지령식 시행 중인 구간 (auto: LS 조작에서 알아낸 구간)
 const TW=isNode?require('./train-windows.js'):root.SimTrainWindows;
 const slotsOfDefault=id=>((TW.data||TW)[id]||[]).map(x=>x.slot);
 function sectionNumbers(sec,ls,slotsOf=slotsOfDefault){
@@ -114,6 +114,22 @@ function sectionNumbers(sec,ls,slotsOf=slotsOfDefault){
  pick(sec.west,n=>n>=numberOf(sec.westSide));pick(sec.east,n=>n<=numberOf(sec.eastSide));return out;
 }
 const key=(sec)=>`${sec.west}>${sec.east}:${sec.trunk[0]}`;
+// 이 역에서 이 회로로 나가는 진로가 본선의 반대 방향(단선 운전)인가
+function wrongDirection(station,destination){return line.sections.some(sec=>{const down=sec.trunk.endsWith('D'),end=down?sec.east:sec.west;return end===station&&(end===sec.west?sec.westSide:sec.eastSide)===destination;});}
+const isSingle=sec=>state.single.has(key(sec))||state.auto.has(key(sec));
+// 단선지령식은 LS 조작만으로 시행한다: 반대 방향으로 그 선로에 나가는 진로(예: 종각 53-B045T)가 서 있거나, 진행 방향과 반대인
+// 열차번호가 그 구간 열번창에 있으면 그 역간을 단선 운전 구간으로 보고 양끝 진로를 보호한다. 진로가 풀리고 열차가 빠지면 끝난다.
+function autoSingle(states,ls,slotsOf=slotsOfDefault){
+ const out=new Set();
+ for(const sec of line.sections){
+  const down=sec.trunk.endsWith('D'),end=down?sec.east:sec.west,wrongExit=end===sec.west?sec.westSide:sec.eastSide;
+  if(wrongExit&&Object.keys(states?.[end]?.routes||{}).some(id=>N.catalog[end]?.routes?.[id]?.destination===wrongExit)){out.add(key(sec));continue;}
+  const rows=[],pick=(station,test)=>{for(const slot of slotsOf(station)){if(numberOf(slot)===null||trunkOf(slot)!==sec.trunk||!test(numberOf(slot)))continue;rows.push(...(ls?.stations?.[station]?.windows?.[slot]||[]));}};
+  pick(sec.west,n=>n>=numberOf(sec.westSide));pick(sec.east,n=>n<=numberOf(sec.eastSide));
+  if(rows.some(r=>r.direction&&r.direction!==(down?'down':'up')))out.add(key(sec));
+ }
+ return out;
+}
 // exits that are closed right now: {station:{destination circuit: train number}}
 function blockedExits(ls,slotsOf,states={}){
  const out={},put=(st,name,who)=>{if(name)(out[st]??={})[name]??=who;};
@@ -123,7 +139,7 @@ function blockedExits(ls,slotsOf,states={}){
   const nums=occ.get(sec.id);if(!nums.length)continue;
   const first=sec.trunk.endsWith('D')?graph.chains[sec.id][0]:graph.chains[sec.id].at(-1),front=occupied[first];
   if(front?.length){if(sec.trunk.endsWith('D'))put(sec.west,sec.westSide,front[0]);else put(sec.east,sec.eastSide,front[0]);}
-  if(state.single.has(key(sec))){       // 단선지령식: 한 선로를 양방향이 쓰므로 어느 쪽 열차가 있어도 양쪽 끝에서 나가는 진로를 막는다
+  if(isSingle(sec)){       // 단선지령식: 한 선로를 양방향이 쓰므로 어느 쪽 열차가 있어도 양쪽 끝에서 나가는 진로를 막는다
    for(const mate of line.sections.filter(x=>x.west===sec.west&&x.east===sec.east&&x.trunk[0]===sec.trunk[0])){
     const t=line.stations;for(const st of [sec.west,sec.east])for(const d of ['D','U']){const tr=t[st].trunks[sec.trunk[0]+d];if(tr){put(st,sec.west===st?tr.right:tr.left,nums[0]);}}
    }
@@ -132,12 +148,13 @@ function blockedExits(ls,slotsOf,states={}){
  return out;
 }
 function refresh(states,ls,slotsOf){
+ state.auto=autoSingle(states,ls,slotsOf);
  const occupied=circuitOccupancy(ls,states,slotsOf),blocked=state.enforce?blockedExits(ls,slotsOf,states):{};
  for(const [id,s]of Object.entries(states))s.circuitOccupied=Object.fromEntries(Object.entries(occupied).filter(([code])=>graph.circuits[code].sources.some(src=>src.station===id)));
  // Reserve a single-line section as soon as an outbound route is set, before the number enters.
  // An empty section must never permit opposing departure routes at the same time.
  if(state.enforce)for(const sec of line.sections){
-  if(!state.single.has(key(sec)))continue;
+  if(!isSingle(sec))continue;
   const start=sec.trunk.endsWith('D')?sec.west:sec.east;
   const exit=start===sec.west?sec.westSide:sec.eastSide;
   const active=Object.keys(states[start]?.routes||{}).find(id=>N.catalog[start].routes[id]?.destination===exit);
@@ -148,9 +165,16 @@ function refresh(states,ls,slotsOf){
    if(destination)(blocked[opposite]??={})[destination]=start+' '+active+' 진로 예약';
   }
  }
+ // 반대 방향 진로(단선 운전)가 서 있으면 맞은편 역에서 같은 선로로 나가는 정방향 진로를 막는다 (정면 충돌 방지)
+ if(state.enforce)for(const sec of line.sections){
+  const down=sec.trunk.endsWith('D'),end=down?sec.east:sec.west,wrongExit=end===sec.west?sec.westSide:sec.eastSide;
+  const wrong=wrongExit&&Object.keys(states?.[end]?.routes||{}).find(id=>N.catalog[end]?.routes?.[id]?.destination===wrongExit);if(!wrong)continue;
+  const start=down?sec.west:sec.east,exit=start===sec.west?sec.westSide:sec.eastSide;
+  if(exit)(blocked[start]??={})[exit]=end+' '+wrong+' 단선 운전 진로';
+ }
  for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
  return blocked;
 }
-const api={graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
+const api={graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,autoSingle,isSingle,wrongDirection,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

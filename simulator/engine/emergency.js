@@ -178,7 +178,8 @@ function seed(sc,states){
  for(const [st,sigs] of Object.entries(sc.seeds)){
   const c=c0.forStation(st),s=states[st];c.dispatch(s,{type:'mode',value:'CCM',source:'SCENARIO'});
   for(const sig of sigs){const departure=c.signals[sig]?.kind==='출발';
-   const id=Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
+   const L=isNode?require('./line.js'):root.SimLine,wrong=r=>!!L?.wrongDirection?.(st,c.routes[r].destination);   // 반대 방향(단선 운전) 진로는 seed로 고르지 않는다
+   const id=Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
    if(id)c.dispatch(s,{type:'route',id,source:'SCENARIO'});}      // a route that cannot be set (conflict) just stays stopped
   c.dispatch(s,{type:'mode',value:'AUTO',source:'SCENARIO'});
  }

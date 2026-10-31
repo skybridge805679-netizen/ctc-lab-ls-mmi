@@ -20,9 +20,7 @@ try:
    run({'type':'tick','seconds':600})
    assert page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],600).station')=='cheongnyangni'
    assert page.evaluate('''()=>{const rows=[];for(const [st,s]of Object.entries(SimLSUI.getModel().stations))for(const ts of Object.values(s.windows))for(const t of ts)if(t.number==='K1131')rows.push(st);return rows.length==1&&rows.every(st=>st==='cheongnyangni');}''')
-   page.evaluate("SimMMI.open('lineNet')");expect(page.locator('#lnSummary')).to_contain_text('33개 역');expect(page.locator('#lnSummary')).to_contain_text('46개 본선')
-   expect(page.locator('#lnRows tr')).to_have_count(46)
-   if width==1440:page.locator('[data-mmi-window="lineNet"]').screenshot(path=str(ROOT.parent/'docs/preview-v0.19.3-network.png'))
+   assert page.evaluate("SimNetwork.stations.length")==33 and page.evaluate("SimLine.line.sections.length")==46
    page.evaluate('''()=>{SimCore.forStation('cheongnyangni').dispatch(SimField.state('cheongnyangni'),{type:'fault',kind:'signal',id:'4A',on:false});SimAutoUI.step();}''')
    run({'type':'tick','seconds':20})
    pos=page.evaluate('SimAutoUI.position(SimDiagram.getModel().trains[0],620)');assert 0<=pos['order']<1,pos

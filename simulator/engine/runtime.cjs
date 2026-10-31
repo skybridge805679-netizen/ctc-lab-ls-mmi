@@ -67,7 +67,7 @@ function create(){
   if(type==='scenario:stop'){if(fts.ownsScript())return {ok:false,message:'FTS 교육 대본은 총괄제어의 문제종료·교육종료로 중지하세요.'};const key=root.SimScenarioUI.snapshot().run?.assessmentKey;if(key)assessment.finishTask(now(),'stopped',key);root.SimScenarioUI.stop();return {ok:true};}
   if(type==='scenario:say'){root.SimScenarioUI.say(action.index,action.checked);return {ok:true};}
   if(type==='scenario:ui'){root.SimScenarioUI.ui(action.ui);return {ok:true};}
-  if(type==='scenario:move')return root.SimScenarioUI.request(action.action);
+  if(type==='scenario:move')return action.auto?root.SimScenarioUI.run(action.action):root.SimScenarioUI.request(action.action);
   if(type==='drill:create'){const r=root.SimDrill.createProblem(action.options);if(r.ok&&action.options?.select!==false&&!fts.isActive()){assessment.begin({key:'drill:'+seq+':'+now(),title:'열차운행계획 · 경합 해소',subject:'plan'},now());paused=false;}return r;}
   if(type==='drill:grade'){const r=root.SimDrill.grade(),task=assessment.snapshot(now()).task;if(r.message?.startsWith('합격:')&&task?.key.startsWith('drill:'))assessment.finishTask(now(),'completed',task.key);return r;}
   if(type==='drill:reset'){const task=assessment.snapshot(now()).task;if(task?.key.startsWith('drill:'))assessment.finishTask(now(),'stopped',task.key);root.SimDrill.reset();return {ok:true};}

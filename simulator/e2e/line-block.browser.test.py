@@ -1,4 +1,4 @@
-"""폐색 점유가 진로 설정을 막는다, 선로망 현황 창, 단선지령식 (Chromium)."""
+"""폐색 점유가 진로 설정을 막는다, LS 조작만으로 하는 단선지령식 보호 (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -26,24 +26,27 @@ def run(page, url):
     r = run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})
     assert not r['ok'] and '전방 폐색' in r['message'] and 'K0001' in r['message'], r
     expect(page.locator('.mmi-alarm')).to_contain_text('전방 폐색'); ack()
-    # the window shows the occupied section
-    page.evaluate("SimMMI.open('lineNet')")
-    expect(page.locator('[data-mmi-window="lineNet"]')).to_be_visible()
-    expect(page.locator('#lnRows')).to_contain_text('K0001'); expect(page.locator('#lnRows')).to_contain_text('하2선')
+    # the occupied section is the engine's block state (선로망 창은 실제 프로그램에 없어 뺐다)
+    assert 'K0001' in page.evaluate("JSON.stringify(SimField.state('anyang').exitBlocked||{})")
     # switch the check off: the same route can be set
-    page.locator('#lnEnforce').uncheck()
+    line = lambda on: page.evaluate('on=>window.SimRemote?SimRemote.command({type:"line",enforce:on}):(SimLine.state.enforce=on)', on)
+    line(False)
     assert run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})['ok']
     run_({'type': 'withdraw', 'id': '4A-B984T', 'source': 'LS'})
-    page.locator('#lnEnforce').check()
+    line(True)
     assert not run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})['ok']; ack()
     uid = page.evaluate("SimLSUI.getModel().stations.anyang.windows.B984T[0].uid")
     run_({'type': 'lsOperation', 'operation': {'op': 'delete', 'station': 'anyang', 'slot': 'B984T', 'uid': uid}, 'source': 'LS'})
     assert run_({'type': 'route', 'id': '4A-B984T', 'source': 'LS'})['ok']
-    # 단선지령식 on/off is logged and listed
-    page.locator('#lnPair').select_option(index=0); page.locator('#lnSingleOn').click()
-    expect(page.locator('#lnSingleList')).not_to_contain_text('없음')
-    expect(page.locator('#eventLogBody')).to_contain_text('단선지령식 시행')
-    page.locator('#lnSingleOff').click(); expect(page.locator('#lnSingleList')).to_contain_text('없음')
+    # 단선지령식은 LS 조작만으로: 종각에서 반대 방향 진로(53-B045T)를 내면 지하서울의 같은 선로 정방향 출발(3A-B065T)이 막힌다
+    select = lambda st: page.evaluate("st=>{const s=document.querySelector('#stationSelect');s.value=st;s.dispatchEvent(new Event('change'));}", st)
+    select('jonggak'); run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
+    assert run_({'type': 'route', 'id': '53-B045T', 'source': 'LS'})['ok']
+    select('underground-seoul'); run_({'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
+    r = run_({'type': 'route', 'id': '3A-B065T', 'source': 'LS'}); ack()
+    assert not r['ok'] and '단선 운전' in r['message'], r
+    select('jonggak'); run_({'type': 'withdraw', 'id': '53-B045T', 'source': 'LS'})
+    select('underground-seoul'); assert run_({'type': 'route', 'id': '3A-B065T', 'source': 'LS'})['ok']
     assert not errors, errors
     print('line block: ok')
 
