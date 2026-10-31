@@ -51,7 +51,7 @@
         "dmg",
         "zip"
       ],
-      "icon": "desktop/resources/icon.png",
+      "icon": "desktop/resources/icon.icns",
       "identity": "-"
     },
     "win": {
@@ -70,7 +70,7 @@
     },
     "linux": {
       "target": "dir",
-      "icon": "desktop/resources/icon.png"
+      "icon": "desktop/resources/icon.icns"
     }
   }
 }

@@ -1,0 +1,28 @@
+{
+  "generated_date": "2026-10-31",
+  "generator": "OpenAI image_gen",
+  "design": "Orpheia lyre and railway symbol; mint #BEE3E3, ivory, midnight teal, muted gold; rounded tile with transparent outside; no text",
+  "conversion": "Electron nativeImage.resize quality=best; multi-size ICO and PNG-chunk ICNS; original design preserved",
+  "files": [
+    {
+      "path": "docs/assets/orpheia-app-icon-source.png",
+      "bytes": 1687846,
+      "sha256": "4386aad8d6e07bcee276b3ec207bea3a49be1f39c3b9424a1081b267a7f0c59f"
+    },
+    {
+      "path": "desktop/resources/icon.png",
+      "bytes": 1113248,
+      "sha256": "4a07c7077541ab344d61dbcf9d491a8531e18c23615d0871b5af908c98e00cc1"
+    },
+    {
+      "path": "desktop/resources/icon.ico",
+      "bytes": 132243,
+      "sha256": "8dbeac7fa76f3fcdd63498be0fda84c2ea63da1d7b1304bb1ee76e80c24ea375"
+    },
+    {
+      "path": "desktop/resources/icon.icns",
+      "bytes": 1901195,
+      "sha256": "b4753eaef738cf62c0d73d3bde6157513fa14fd5157d3ca1e2f1c07b4aeb0bf2"
+    }
+  ]
+}
