@@ -25,6 +25,7 @@ function create(){
   log:(text,level='I')=>emit('log',{channel:'event',text,level}),alarm:text=>emit('alarm',{text,state:'교육 현상',level:'W',station:''}),
   pause:value=>{paused=value;},auto:on=>root.SimAutoUI.set(on),startAssessment:()=>assessment.start({subject:'integrated'},now()),beginTask:o=>assessment.begin(o,now()),endTask:(key,status)=>{if(key)assessment.finishTask(now(),status,key);},finishAssessment:()=>assessment.finish(now()),
   stopScript:()=>root.SimScenarioUI.stop(),
+  resetStation:st=>{const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});},
   startScript:(id,number,key,ui)=>{const sc=root.SimScenarios.list.find(s=>s.id===id);if(!number&&sc)number=root.SimScenarios.candidates(sc,model)[0];const r=root.SimScenarioUI.start(id,number,ui);if(r.ok){const run=root.SimScenarioUI.snapshot().run;run.assessmentKey=key;tableDirty=true;}return r;},
   scriptStatus:id=>{const r=root.SimScenarioUI.snapshot().run;return r?.sc.id===id?{done:r.done.filter(Boolean).length,total:r.done.length,complete:!!r.passed}:{done:0,total:0,complete:false};}
  });

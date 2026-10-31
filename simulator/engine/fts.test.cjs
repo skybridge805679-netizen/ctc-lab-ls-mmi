@@ -41,3 +41,29 @@ test('conditions read LS, station state, events, schedule and manual marks',()=>
  assert.ok(F.test({type:'all',conditions:yes},ctx));assert.ok(!F.test({type:'not',condition:yes[0]},ctx));
 });
 test('library survives a JSON round trip (export -> import)',()=>{const l=lib();assert.deepEqual(F.validate(JSON.parse(JSON.stringify(l)),{scripts}),[]);});
+test('active problem: setup, objectives in any order, communications, reactions and deadlines',()=>{
+ const p={id:'A',subject:'운행선 관리',name:'용산 5번 대피',limit:600,score:100,
+  setup:{routes:[{station:'yongsan',route:'2A-7T'}],approach:[{station:'yongsan',signal:'2A'}],modes:[{station:'yongsan',value:'AUTO'}],trains:[{number:'A1002',station:'yongsan',slot:'B607T',direction:'up'}]},
+  objectives:[{id:'ccm',label:'CCM 전환',condition:{type:'mode',station:'yongsan',value:'CCM'}},{id:'cancel',label:'2A 취소',condition:{type:'signalCancelled',station:'yongsan',signal:'2A'}},{id:'route',label:'2A-5T',condition:{type:'route',station:'yongsan',route:'2A-5T'},deadline:300}],
+  communications:[{id:'follow',label:'후속열차 통보',text:'후속열차 주의운전'},{id:'station',label:'용산역 통보'}],
+  reactions:[{id:'enter',label:'고장열차 5번선 진입',when:{type:'objective',id:'route'},after:30,do:[{type:'moveTrain',number:'A1002',station:'yongsan',slot:'5T'}]}]};
+ const lib={problems:[p],situations:[{id:'S',name:'s',problems:['A']}],scenarios:[{id:'C',name:'c',situations:['S']}]};
+ assert.deepEqual(F.validate(lib),[]);
+ const s=F.createSession(lib,'C',{startedAt:0}),state={mode:'AUTO',routes:{},signals:{}},ctx={states:{yongsan:state},events:[],manual:{}};const at=t=>F.advance(lib,s,()=>ctx,t);
+ let out=at(0);assert.deepEqual(out.filter(o=>o.setup).map(o=>o.phenomenon.type),['route','approach','mode','insertTrain']);
+ // communications first, then operations in a different order than the script — all count
+ ctx.manual['comm:station']=true;at(10);
+ ctx.events.push({type:'stop',station:'yongsan',id:'2A',ok:true});at(20);
+ state.mode='CCM';at(30);
+ assert.equal(s.items[0].status,'진행');
+ state.routes['2A-5T']={};at(400);                                   // after its 300 s deadline: half credit
+ assert.ok(s.items[0].obj.route>300);
+ out=at(429);assert.ok(!out.some(o=>o.reaction));out=at(431);assert.deepEqual(out.filter(o=>o.reaction).map(o=>o.phenomenon.slot),['5T']);
+ ctx.manual['comm:follow']=true;at(440);
+ assert.equal(s.items[0].status,'완료');
+ const sum=F.summary(lib,s).rows[0];assert.equal(sum.objectives.find(o=>o.id==='route').late,true);
+ assert.equal(s.items[0].score,Math.round(100*(1+1+0.5+1+1)/5));
+ // references to unknown objectives / phenomena are refused
+ const bad=structuredClone(lib);bad.problems[0].reactions[0].when={type:'objective',id:'nope'};bad.problems[0].reactions[0].do[0].slot='ZZT';
+ assert.match(F.validate(bad).join('\n'),/없는 목표 nope[\s\S]*없는 열번창 ZZT/);
+});

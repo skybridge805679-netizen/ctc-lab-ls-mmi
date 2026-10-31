@@ -37,7 +37,8 @@ function runQueue(){
 const station=()=>host.context().stationStates[run.sc.station];
 const ctx=()=>({state:station(),model:root.SimDiagram.getModel(),states:host.context().stationStates,ls:lsm(),ui:lastUI});
 function evaluate(){
- if(!run||mmi().replaying())return;
+ if(mmi().replaying())return;
+ if(!run){motion.step();return;}       // FTS data problems move trains without a script run
  SC().advance(run,ctx());Flow.advance(run,station().clock);
  if(isSch(run.sc)){const k=run.sc.steps.findIndex((x,i)=>x.kind==='do'&&!run.done[i]);run.explain=k>=0&&run.sc.steps[k].explain?run.sc.steps[k].explain(ctx()):'';}
  if(isEm(run.sc)){EM().applyAutos(run.sc,run,a=>a.op==='move'||a.op==='delete'?motion.request(a):root.SimLSUI.dispatch(a),lsm);}
