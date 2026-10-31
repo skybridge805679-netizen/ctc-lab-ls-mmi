@@ -46,7 +46,8 @@ function showProblem(){
 // 화면 상태가 바뀌면 엔진에 알리고(스케줄 대본의 조작 인식), 엔진의 대본 진행을 그린다
 function evaluate(){
  if(!host||!$('scSteps'))return;
- const ui=uiState(),signature=JSON.stringify(ui);if(signature!==lastUI){lastUI=signature;engine().command({type:'scenario:ui',ui});}
+ // 화면 상태는 대본이 진행 중일 때만 엔진에 보낸다 (보낼 때마다 엔진 상태 판이 바뀌어 화면을 다시 그리게 된다)
+ if(engine().snapshot.scenario.run){const ui=uiState(),signature=JSON.stringify(ui);if(signature!==lastUI){lastUI=signature;engine().command({type:'scenario:ui',ui});}}else lastUI='';
  run=engine().snapshot.scenario.run;if(run&&run.started!==started){started=run.started;showProblem();}
  render();renderMotion();
 }

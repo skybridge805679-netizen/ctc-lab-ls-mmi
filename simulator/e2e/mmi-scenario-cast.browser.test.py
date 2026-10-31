@@ -53,17 +53,16 @@ def run(page, url):
             assert len(followers) == 2, followers
             do({'type': 'mode', 'value': 'AUTO', 'source': 'MMI'})
             idx = page.evaluate("[...document.querySelectorAll('#scSteps li.sc-say')].findIndex(li=>li.textContent.includes('진입 완료'))")
-            page.evaluate("SimMMI.run({type:'tick',seconds:120})")
-            do({'type':'tick','seconds':20})
-            page.wait_for_function("([n])=>(SimLSUI.getModel().stations.yongsan.windows['7T']||[]).some(r=>r.number===n)", arg=[followers[0]])
-            do({'type': 'tick', 'seconds': 35})
-            page.wait_for_timeout(550)
-            do({'type':'tick','seconds':20})
-            page.wait_for_function("([n])=>(SimLSUI.getModel().stations.yongsan.windows['B605T']||[]).some(r=>r.number===n)", arg=[followers[0]])
-            do({'type': 'tick', 'seconds': 35})
-            page.wait_for_timeout(550)
-            do({'type':'tick','seconds':20})
-            page.wait_for_function("([n])=>!JSON.stringify(SimLSUI.getModel().stations.yongsan.windows).includes(n)", arg=[followers[0]])
+            # 엔진이 대본 진행(통보)과 열차 이동을 시계에 따라 한다: 10초씩 진행하며 7T → B605T → 역 밖으로 나가는 것을 확인한다
+            where = lambda n: page.evaluate("n=>Object.entries(SimLSUI.getModel().stations.yongsan.windows).filter(([,v])=>v.some(r=>r.number===n)).map(([k])=>k)", n)
+            seen = []
+            for _ in range(60):
+                page.evaluate("SimMMI.run({type:'tick',seconds:10})")
+                now = where(followers[0])
+                if now and (not seen or seen[-1] != now[0]): seen.append(now[0])
+                if not now and seen: break
+            assert '7T' in seen and 'B605T' in seen and seen.index('7T') < seen.index('B605T'), seen
+            assert not where(followers[0]), 'follower leaves the station area'
     assert not errors, errors
     print('scenario cast: ok')
 

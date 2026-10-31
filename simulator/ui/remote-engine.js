@@ -31,5 +31,5 @@ const timetable=root.SimTimetable;
 for(const method of ['delay','cancel','setCancelled','create','update','remove','copy','import','undo','redo']){const local=timetable[method];timetable[method]=(model,...args)=>model===mirror.timetable?command({type:'timetable',method,args}):local(model,...args);}
 const localHistory=timetable.history;timetable.history=model=>model===mirror.timetable?mirror.editHistory:localHistory(model);
 const initial=timetable.initial;timetable.initial=()=>mirror.timetable;
-root.SimRemote={command,poll:()=>command({type:'poll'}),get snapshot(){return mirror;},reset:station=>command({type:'station:reset',station})};
+root.SimRemote={command,poll:()=>command({type:'poll'}),get snapshot(){return mirror;},get version(){return version;},reset:station=>command({type:'station:reset',station})};
 })(window);

@@ -7,7 +7,7 @@ function create(host){
  // 제어통제 로그: 교수 프로그램(FTS)의 기록. 교육생이 쓰는 MMI 로그에는 남기지 않는다.
  const log=(text,level='I')=>{logs.unshift({seq:++sequence,at:now(),time:new Date().toISOString(),text,level});if(logs.length>500)logs.length=500;};
  const now=()=>host.context().now;
- const announce=(kind,text)=>{notice={id:++sequence,kind,text,index:session?.current};log(text,kind==='error'?'E':'I');};
+ const announce=(kind,text,logText=text)=>{notice={id:++sequence,kind,text,index:session?.current};log(logText,kind==='error'?'E':'I');};
  const error=r=>{if(r?.ok===false)throw Error(r.message||'현상 적용 실패');return r;};
  const current=()=>session?.items[session.current];
  const problem=it=>runLibrary.problems.find(p=>p.id===it.problem);
@@ -46,7 +46,7 @@ function create(host){
    for(let pass=0;pass<4&&active(session);pass++){
     const out=F.advance(runLibrary,session,(x,e)=>context(x,e),now());if(!out.length)break;let again=false;
     for(const o of out){
-     if(o.kind==='activate'){o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name);again=true;}
+     if(o.kind==='activate'){o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
      if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
      if(o.kind==='branch'){announce('branch','상황 변경 · '+o.branch.label);again=true;}
      if(o.kind==='end'){ended(o.item,o.status);again=false;}

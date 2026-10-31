@@ -67,7 +67,11 @@ $('stationTabs').innerHTML=lsViews.filter(v=>!v.monitor).map(v=>`<button data-st
 $('stationTabs').onclick=e=>{const button=e.target.closest('[data-view]');if(button)selectStation(button.dataset.view);};
 for(const [id,step]of [['previousStation',-1],['nextStation',1]])$(id).onclick=()=>{const next=lsViews[lsViews.findIndex(v=>v.id===selectedView)+step];if(next)selectStation(next.id);};
 function renderLogs(){$('logCount').textContent=state.logs.length+' events';$('logList').innerHTML=state.logs.length?state.logs.slice(0,100).map(l=>`<div class="log-row"><span class="log-time">${time(l.time)}</span><div><p>${escapeHTML(l.message)}</p><div class="log-meta">${escapeHTML(l.source)} · <span class="${['완료','접수'].includes(l.result)?'result-ok':'result-bad'}">${l.result}</span></div></div></div>`).join(''):'<p class="empty">첫 조작을 기다리고 있습니다.</p>';}
+var drawnVersion=-1;   // 마지막으로 그린 엔진 상태 (그 뒤 바뀐 것이 없으면 1초 주기에서 다시 그리지 않는다)
 function render(){
+ drawnVersion=window.SimRemote.version;
+ // 일시정지 표시는 언제나 엔진 시계를 따른다 (시나리오·FTS 시작이 시계를 다시 움직일 수 있다)
+ paused=window.SimRemote.snapshot.clock.paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';
  const task=window.SimAssessmentUI?.snapshot()?.task;
  const st=N.catalog[selectedStation];
  const viewInfo=window.SimLSPresets.get(selectedView),hostedCorridor=window.SimLSPresets.CORRIDORS.find(c=>c.host===selectedStation),ownIntermediate=st.map.view.intermediate.filter(name=>!(hostedCorridor&&window.SimLSPresets.get(hostedCorridor.id).plates.includes(name)));
@@ -156,7 +160,9 @@ $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 �
 $('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.34.0',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),assessment:window.SimAssessmentUI.snapshot(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 // 화면은 엔진(데스크톱: 별도 프로세스, 브라우저: page-engine)의 상태를 1초마다 받아 그린다. 시계는 엔진이 진행한다.
 setInterval(()=>{try{window.SimRemote.poll();}catch(error){if(error.message==='Engine offline')return;throw error;}   // 종료 중 엔진이 먼저 멈추면 조용히 넘어간다
- paused=window.SimRemote.snapshot.clock.paused;$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';window.SimAutoUI?.step();window.SimScenarioUI?.stepMotion();window.SimMMI.syncAll(stationStates);render();window.SimDiagram.render();},1000);
+ window.SimScenarioUI?.stepMotion();
+ if(window.SimRemote.version===drawnVersion)return;drawnVersion=window.SimRemote.version;   // 엔진 상태가 그대로면 다시 그리지 않는다
+ window.SimAutoUI?.step();window.SimMMI.syncAll(stationStates);render();window.SimDiagram.render();},1000);
 window.SimLSUI.init({context:()=>({station:selectedStation,C,state,stationStates,monitor:!!window.SimLSPresets.get(selectedView).monitor,viewName:window.SimLSPresets.get(selectedView).name}),run,render,openAction,toast,selectStation});
 window.SimAssessmentUI.init({context:()=>({state,paused}),resume:()=>{paused=false;window.SimRemote.command({type:'clock',paused:false});$('pauseBtn').textContent='Ⅱ 일시정지';},openAction,render});
 fields();render();taskView();

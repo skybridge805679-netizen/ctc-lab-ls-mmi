@@ -104,7 +104,8 @@ function closeProblem(){
  if(!old.closed)old.close();probClosing=false;resize();
 }
 function openProblem(){
- if(prob&&!prob.closed){prob.focus();return true;}
+ // 이미 떠 있으면 그대로 내용만 바뀐다 — 교육생이 LS·MMI에서 조작 중일 때 포커스를 빼앗지 않는다
+ if(prob&&!prob.closed)return true;
  const panel=root.SimDOM.document.getElementById('problemPanel');if(!panel)return false;
  const next=root.open('about:blank','orpheia-problem-'+sessionId,'popup,width=1120,height=900,resizable=yes,scrollbars=yes');
  if(!next)return false;
