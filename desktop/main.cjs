@@ -68,12 +68,14 @@ function createLS(){
   if(frameName.startsWith('orpheia-mmi-')&&!mmi)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('mmi'),title:'ORPHEIA · MMI',backgroundColor:'#e6efec',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
   if(frameName.startsWith('orpheia-tg-')&&!graph)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('graph'),title:'ORPHEIA · 열차 그래프',backgroundColor:'#1e1e1e',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
   if(frameName.startsWith('orpheia-fts-')&&!fts)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('fts'),title:'ORPHEIA · FTS 제어통제',backgroundColor:'#eef6f5',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
-  if(frameName.startsWith('orpheia-problem-')&&!problem)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('problem'),title:'ORPHEIA · 문제 발생',backgroundColor:'#bee3e3',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
+  if(frameName.startsWith('orpheia-problem-')&&!problem)return {action:'allow',overrideBrowserWindowOptions:{...savedBounds('problem'),show:false,title:'ORPHEIA · 문제 발생',backgroundColor:'#bee3e3',autoHideMenuBar:true,icon:appIcon,webPreferences:prefs}};
   return {action:'deny'};
  });
  ls.webContents.on('did-create-window',(child,{frameName})=>{
   const kind=frameName.startsWith('orpheia-tg-')?'graph':frameName.startsWith('orpheia-fts-')?'fts':frameName.startsWith('orpheia-problem-')?'problem':'mmi';
   if(kind==='graph')graph=child;else if(kind==='fts')fts=child;else if(kind==='problem')problem=child;else mmi=child;
+  // 문제 발생 창은 교육생이 LS·MMI를 조작하는 중에 뜬다 — 포커스를 빼앗지 않고 보이기만 한다
+  if(kind==='problem')child.showInactive();
   remember(child,kind);protect(child);
   child.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   child.on('closed',()=>{if(mmi===child)mmi=null;if(graph===child)graph=null;if(fts===child)fts=null;if(problem===child)problem=null;});
