@@ -73,11 +73,11 @@ function create(host){
  function event(e){if(active(session)){events.push({...clone(e),seq:++sequence,at:now()});if(events.length>4000)events.shift();
   // 열번 이동은 LS 표시를 고치는 조작일 뿐 열차를 움직이지 않는다: 열차 운행·구원연결 목표로 인정하지 않는다는 것을 교수 로그에 남긴다
   if(e.type==='lsOperation'&&e.ok&&e.source!=='FTS'&&e.operation?.op==='move')manualMove(e.operation);}}
- // 열번 수동 이동: 단선지령식 반대선 운행처럼 대본이 수동 이동을 명시한 열차(목표가 trainAt)는 정상 절차, 그 밖에는 표시 정정일 뿐이다
+ // 열번 수동 이동: 문제가 그 열차의 열번 이동을 요구하면(목표·채점 항목에 trainAt — 단선지령식 반대선 운행, 관제시스템 운용·열차운행계획의 「열번 이동」 문제) 정상 조작, 그 밖에는 표시 정정일 뿐이다
  function manualMove(op){const it=current();if(!it)return;const target=op.targetStation||op.station;let number='';for(const rows of Object.values(host.context().ls.stations[target]?.windows||{}))for(const r of rows)if(r.uid===op.uid)number=r.number;
   const leaf=(c,n)=>c?.type==='trainAt'&&c.number===n||(c?.conditions||[]).some(k=>leaf(k,n))||(c?.condition&&leaf(c.condition,n));
-  const expected=number&&(F.view(problem(it),it)?.objectives||[]).some(o=>leaf(o.condition,number));
-  if(expected)log(`열번 수동 이동 · ${number} → ${target} ${op.targetSlot||''} (대본에 명시된 수동 이동 — 단선지령식 반대선 운행 등)`,'I');
+  const v=F.view(problem(it),it),expected=number&&[...(v?.objectives||[]),...(v?.checks||[])].some(o=>leaf(o.condition,number));
+  if(expected)log(`열번 수동 이동 · ${number} → ${target} ${op.targetSlot||''} (문제가 요구한 열번 이동 — 단선지령식 반대선 운행, 열번 이동 문제 등)`,'I');
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
  function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}

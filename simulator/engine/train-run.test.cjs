@@ -43,6 +43,13 @@ test('a saved session with automatic control state restores (started is a Map) a
 test('a manual number move the script prescribes (단선지령식 반대선 운행) is logged as the normal procedure, not as a display correction',()=>{
  const r=start('P-em-02'),f=row(r,'K0608');assert.ok(f);
  assert.ok(r.command({type:'numbers',action:{op:'move',...f,targetStation:'dongmyo',targetSlot:'B011T'}}).ok);tick(r,1);
- const last=r.snapshot().fts.logs.find(l=>/열번 이동|열번 수동 이동/.test(l.text));assert.match(last.text,/대본에 명시된 수동 이동/);
+ const last=r.snapshot().fts.logs.find(l=>/열번 이동|열번 수동 이동/.test(l.text));assert.match(last.text,/문제가 요구한 열번 이동/);
  assert.notEqual(item(r).obj['move-K0608'],undefined);
+});
+test('a 관제시스템 운용 problem that asks to move a train number (checks: trainAt) treats the manual move as the expected operation',()=>{
+ const r=R.create(),lib={version:1,problems:[{id:'P-mv',subject:'철도관제시스템 운용',name:'열번 이동',limit:120,score:100,phenomena:[{type:'insertTrain',station:'uiwang',slot:'B1012T',number:'K0651',direction:'up'}],checks:[{label:'K0651 열번 이동',condition:{type:'trainAt',number:'K0651',station:'uiwang',slot:'B1011T'}}]}],situations:[{id:'S',name:'S',problems:['P-mv']}],scenarios:[{id:'SC',name:'SC',situations:['S']}],schedules:[]};
+ assert.ok(r.command({type:'fts',op:'library',library:lib}).ok);assert.ok(r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false}).ok);
+ const f=row(r,'K0651');assert.ok(r.command({type:'numbers',action:{op:'move',...f,targetStation:'uiwang',targetSlot:'B1011T'}}).ok);
+ const last=r.snapshot().fts.logs.find(l=>/열번 수동 이동|수동 열번 이동/.test(l.text));assert.match(last.text,/문제가 요구한 열번 이동/);
+ assert.equal(r.snapshot().fts.history[0]?.got,100);
 });
