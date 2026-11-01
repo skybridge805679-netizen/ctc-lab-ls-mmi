@@ -8,8 +8,10 @@ function create(){
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
  const root={SimCore:{...Core,forStation:session.core},SimNetwork:Network,SimTimetable:Timetable,SimTrainWindows:Windows,SimTrackNetwork:require('./track-network'),SimLine:require('./line'),SimAuto:require('./autocontrol'),SimScenarios:require('./scenarios'),SimEmergency:require('./emergency'),SimScheduleScenarios:require('./schedule-scenarios'),SimScenarioMotion:require('./scenario-motion')};
  root.SimLine.journeys.clear();root.SimLine.state.enforce=true;root.SimLine.state.single.clear();
- const dupSeen=new Set();
- function checkDuplicates(station){for(const [slot,rows]of Object.entries(ls.stations[station]?.windows||{})){const key=station+'|'+slot+'|',sig=key+rows.map(r=>r.number).join('+');for(const old of dupSeen)if(old.startsWith(key)&&old!==sig)dupSeen.delete(old);if(rows.length<2||dupSeen.has(sig))continue;dupSeen.add(sig);const info=Network.catalog[station];emit('alarm',{text:info.name+'역 '+rows.map(r=>r.number).join(' + ')+' 열차번호 중복',state:'',level:'E',station:info.name});}}
+ // 열차번호 중복 알람: 한 열번창에 이미 열차가 있는데 다른 열차가 새로 들어와 겹칠 때만 낸다(충돌·구원연결).
+ // 열번 고유 ID로 본다 — 번호를 고치거나(K0450→G0450) 겹친 열차 중 하나가 빠지는 것은 새 중복이 아니다.
+ const windowUids=new Map();
+ function checkDuplicates(station){for(const [slot,rows]of Object.entries(ls.stations[station]?.windows||{})){const key=station+'|'+slot,prev=windowUids.get(key)||new Set(),now=new Set(rows.map(r=>r.uid));windowUids.set(key,now);if(rows.length<2||![...now].some(u=>!prev.has(u)))continue;const info=Network.catalog[station];emit('alarm',{text:info.name+'역 '+rows.map(r=>r.number).join(' + ')+' 열차번호 중복',state:'',level:'E',station:info.name});}}
  root.SimMMI={replaying:()=>replay,checkDuplicates,stationInfo:id=>Network.catalog[id],markAuto:key=>emit('markAuto',{key}),log:(channel,text,_date,level='I')=>emit('log',{channel,text,level})};
  root.SimMMI.raiseAlarm=(text,state,level,station)=>emit('alarm',{text,state,level,station});
  root.SimEquipment=require('./equipment-controller.cjs').create(root);
