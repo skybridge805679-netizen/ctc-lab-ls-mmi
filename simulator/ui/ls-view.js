@@ -343,14 +343,27 @@ function render(st,def,core,model,neighbours={}){
  });
  // Each signal stays at its surveyed mast and lamp coordinates. Paired signals retain their source stack.
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
+ // Give a tight stack of names its own minimum line spacing, without moving lamps.
+ const nameY=new Map(placed.map(s=>[s.id,T([0,s.lampY])[1]])),nameColumns=new Map();
+ for(const s of placed){const key=s.anchorX.toFixed(1)+'|'+s.dir;if(!nameColumns.has(key))nameColumns.set(key,[]);nameColumns.get(key).push(s);}
+ for(const column of nameColumns.values()){
+  column.sort((a,b)=>nameY.get(a.id)-nameY.get(b.id));let first=0;
+  while(first<column.length){let end=first+1;while(end<column.length&&nameY.get(column[end].id)-nameY.get(column[end-1].id)<18)end++;
+   const group=column.slice(first,end);
+   if(group.length>1){const base=group.reduce((sum,s,i)=>sum+nameY.get(s.id)-i*18,0)/group.length;group.forEach((s,i)=>nameY.set(s.id,base+i*18));}
+   first=end;
+  }
+ }
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
   const LY=T([0,s.lampY])[1],lampX=X+dir*18;
+  const labelY=nameY.get(id);
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
+  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8]);
   occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-dir*8}" y="${labelY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
   // Resolve dense labels locally only. Never detach an annotation from its turnout.

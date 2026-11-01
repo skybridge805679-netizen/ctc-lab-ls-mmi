@@ -1,5 +1,5 @@
 {
-  "version": "0.38.1",
+  "version": "0.38.2",
   "backupDate": "2026-11-01",
   "scope": "현재 작업 트리. references는 references/MANIFEST.json 및 보존 브랜치 참조. 버전 ZIP 재생성 없음.",
   "files": [
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 62368,
-      "sha256": "d90002118e800f4de46857dc7df88d2969d0f10fd9bf598d1c19a339649daf3e"
+      "bytes": 62712,
+      "sha256": "0af547963562eafbe4e25882af7628889d3c000e697cb58caf88d2cb6bec2a0a"
     },
     {
       "path": "README.md",
-      "bytes": 22831,
-      "sha256": "8fe37de839acc2685eba4c9b3dfdeed73ef2da382a50ded7282dc6aff470fefb"
+      "bytes": 23165,
+      "sha256": "f3dfcc6617632eb33e7dd82d612e16f22c29b458431b75b04504537d3dc6e033"
     },
     {
       "path": "desktop/check-package.cjs",
@@ -90,8 +90,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 13731,
-      "sha256": "2bfa465bca2d4d06e1a6ceabc5e9cf12a6a40f41b2c133b68fee6dd11f9c13ca"
+      "bytes": 13986,
+      "sha256": "72d5a883658ab9806c05781191a559c6aebbf9649b960d1238f8a3004bc62891"
     },
     {
       "path": "desktop/reset-smoke.cjs",
@@ -242,6 +242,231 @@
       "path": "docs/design/ls-v0.10-imagegen-reference.png",
       "bytes": 1372259,
       "sha256": "a383b05668fbfa7e7b9884849c7992bcbbaefd6fc8beef15397a308b22da29ba"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/anyang-geumjeong.png",
+      "bytes": 72932,
+      "sha256": "4a673ab131a3df58c7697a300e537906b60fe3969546953de8a0a910e0099064"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/anyang.png",
+      "bytes": 156001,
+      "sha256": "c4bff167aa6762bd2aff82f3ea1d03c6ba03ddc840d066b4395d27bdbb68eae4"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/audit.json",
+      "bytes": 256033,
+      "sha256": "6d6a9ef561a3eb9fdefe85b5673e04608c1651574818c931a6e1e3e5e602747c"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/cheongnyangni.png",
+      "bytes": 106333,
+      "sha256": "c23241bfe0950f5ccbd325457a70cdc59b4c4f46c759cc9706f012f59dee1147"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/dongmyo.png",
+      "bytes": 128328,
+      "sha256": "cc2cb163a5fc5dde7bcc87159a9bc5315e5f46bb76b973c3734926e845535d50"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/geumcheon.png",
+      "bytes": 166486,
+      "sha256": "5962ea24cb79a1e8fc671cc1e966feafd31dbaf51974c5877272be7fd43b1897"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/geumjeong.png",
+      "bytes": 108706,
+      "sha256": "257ebc99bce17faba5ef0388f3d22095fe9be823693c9e962dcce7b65c78bfdd"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/gunpo-uiwang.png",
+      "bytes": 77797,
+      "sha256": "caf78e5c463b24b04d9f75f6413cc574b8bd1d9a86ef2f9d215c18752bda6b7b"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/gunpo.png",
+      "bytes": 113347,
+      "sha256": "2ac78fca4f3e6a00cdf9c9deb8911795087cc6d7a73beae08cf1dcbc44f13961"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/guro.png",
+      "bytes": 167595,
+      "sha256": "bda9c53713e9e4e93753aed8187346c10919ccc9fc2acffa0ebccc193addbd17"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/jonggak.png",
+      "bytes": 122561,
+      "sha256": "9dd3f30aca0bcbe480b67b7fd030f87e971e063635bdc828cde3b3f84e49feab"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/noryangjin.png",
+      "bytes": 140287,
+      "sha256": "dd2d55a01b0632463af3481c923465d9daf8a763a49cdcbb66778d5d25832a29"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/seoul.png",
+      "bytes": 153025,
+      "sha256": "843f1b1897aade0ec27e5db2bc882b1eae913d41fb8d871b0f059bab1dd91308"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/sheet.png",
+      "bytes": 641762,
+      "sha256": "54ea9aa238697d32988b9f546355ae386b00fd39b95d3bd8db87d00b12f24f01"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/summary.json",
+      "bytes": 11559,
+      "sha256": "70021c23eccc30dd439582d6535418266e5d51aabe0aa2af614f518fcb051c06"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/suwon.png",
+      "bytes": 135229,
+      "sha256": "2ee03858249f249a54a54f7989cb799ff77fe81a7a58c1f746ff9dd20150bd10"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/uiwang-suwon.png",
+      "bytes": 101983,
+      "sha256": "ec9c40256dbf255459ea8533cfc32012d2c9c79a8568d5a1f18a56cf71da2a95"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/uiwang.png",
+      "bytes": 158088,
+      "sha256": "e2aaa51c573fde7902ec2486a2bfe7d33129eb2afb63c19b0f546db5e7bee0db"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/underground-seoul.png",
+      "bytes": 113902,
+      "sha256": "6f8280e73abb7c16f4ff5ebaec90626dcc930f56897fb1e9ea6ed205c7844f12"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/yeongdeungpo.png",
+      "bytes": 162042,
+      "sha256": "71c541c24f6caaef17f0a0b108952aaecb6f3fef35d7f443546e3321fbc5128a"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/after/yongsan.png",
+      "bytes": 169943,
+      "sha256": "92b15f7a3890e98d8589f15e9051cf54a0ef631f997d21c2124c4c36774008e7"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/anyang-geumjeong.png",
+      "bytes": 72932,
+      "sha256": "4a673ab131a3df58c7697a300e537906b60fe3969546953de8a0a910e0099064"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/anyang.png",
+      "bytes": 156001,
+      "sha256": "c4bff167aa6762bd2aff82f3ea1d03c6ba03ddc840d066b4395d27bdbb68eae4"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/audit.json",
+      "bytes": 263397,
+      "sha256": "b6aa6d96bbce4266a8f8069c1394d2397fc2fe112f7272abfe60c52c231ab3f3"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/cheongnyangni.png",
+      "bytes": 106333,
+      "sha256": "c23241bfe0950f5ccbd325457a70cdc59b4c4f46c759cc9706f012f59dee1147"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/dongmyo.png",
+      "bytes": 128328,
+      "sha256": "cc2cb163a5fc5dde7bcc87159a9bc5315e5f46bb76b973c3734926e845535d50"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/geumcheon.png",
+      "bytes": 166486,
+      "sha256": "5962ea24cb79a1e8fc671cc1e966feafd31dbaf51974c5877272be7fd43b1897"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/geumjeong.png",
+      "bytes": 108706,
+      "sha256": "257ebc99bce17faba5ef0388f3d22095fe9be823693c9e962dcce7b65c78bfdd"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/gunpo-uiwang.png",
+      "bytes": 77797,
+      "sha256": "caf78e5c463b24b04d9f75f6413cc574b8bd1d9a86ef2f9d215c18752bda6b7b"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/gunpo.png",
+      "bytes": 113347,
+      "sha256": "2ac78fca4f3e6a00cdf9c9deb8911795087cc6d7a73beae08cf1dcbc44f13961"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/guro.png",
+      "bytes": 167508,
+      "sha256": "90770d5eae994bd72dc09e1ac32e6d842c50ee596b0463396ce8ede3b3caf6bc"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/jonggak.png",
+      "bytes": 122561,
+      "sha256": "9dd3f30aca0bcbe480b67b7fd030f87e971e063635bdc828cde3b3f84e49feab"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/noryangjin.png",
+      "bytes": 139684,
+      "sha256": "e854fb4b8d75e040ddc17b76c809323e08232a34de977e24ad0bbf2d4674c8cd"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/seoul.png",
+      "bytes": 153025,
+      "sha256": "843f1b1897aade0ec27e5db2bc882b1eae913d41fb8d871b0f059bab1dd91308"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/sheet.png",
+      "bytes": 641555,
+      "sha256": "9931b5d64abae78873cf23e560e03c352c63d19ec59ee0c9d820f01b14d6d13c"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/summary.json",
+      "bytes": 11909,
+      "sha256": "1b75fef265fb683bcc3a6964740140a2b27542e8ba1730455294bf0059c2b715"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/suwon.png",
+      "bytes": 135234,
+      "sha256": "c329448d3692f5523a9d5079717a38b6caca0fdc84dbfa3c82c52b870fa671e2"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/uiwang-suwon.png",
+      "bytes": 101983,
+      "sha256": "ec9c40256dbf255459ea8533cfc32012d2c9c79a8568d5a1f18a56cf71da2a95"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/uiwang.png",
+      "bytes": 158088,
+      "sha256": "e2aaa51c573fde7902ec2486a2bfe7d33129eb2afb63c19b0f546db5e7bee0db"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/underground-seoul.png",
+      "bytes": 113902,
+      "sha256": "6f8280e73abb7c16f4ff5ebaec90626dcc930f56897fb1e9ea6ed205c7844f12"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/yeongdeungpo.png",
+      "bytes": 162079,
+      "sha256": "3a49a32cdb80e66daeaf7a739193d6ada8209d8160926ecbd22f514d7e9b7a1e"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/before/yongsan.png",
+      "bytes": 169944,
+      "sha256": "1f8a22e1d2761d1c03579ef01859f896392d2ab11c5b353a76d220408e6e891b"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/comparison.png",
+      "bytes": 81206,
+      "sha256": "fc0d2ffbcafc05d65c7650e38480f91d549c97e3648d422966c81d95dea68e76"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/index.html",
+      "bytes": 8099,
+      "sha256": "05647847365bca12514af85795b7eb6b2cda39c2b856cd1955d395abc91792f8"
+    },
+    {
+      "path": "docs/layout-review-v0.38.2/metadata.json",
+      "bytes": 1685,
+      "sha256": "5b6a9b3a4fbd00a892ce51f680c2a55eee212ce42657e09cf40e07e9291bd832"
     },
     {
       "path": "docs/network-audit-v0.19.3.json",
@@ -2159,6 +2384,11 @@
       "sha256": "a1c21eb887f78747003befa17aa6fe5a77711f00545aca5c104dc567e79ea62f"
     },
     {
+      "path": "docs/v0.38.2-전체역배선정리.md",
+      "bytes": 4162,
+      "sha256": "8bc9559c081abfe9ef63cbbeb0280fc884b4d0b87828e582d58caaed33cac910"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -2256,17 +2486,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "a100afc27ba7c00d815dd65dfc58c0c3e5415d54fd28b2d15bab18e79ee376d5"
+      "sha256": "09d8bfc682dc15a6550480dd001debf872e54350b1e4a6cc2b8f3cf2b0bec265"
     },
     {
       "path": "package.json",
       "bytes": 2248,
-      "sha256": "70135f6dcb34909ee65d81e2f671f08ab89fe2d18b872ea51c987f979f5e8035"
+      "sha256": "40396fd23958fb0d354e882891ca277055dd238ce2af3fa10246e1ce7ba3d206"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 11447,
-      "sha256": "b0beac32907a8db1be62bcbe88ac79c6b60513c6c39e7d936a92fbc118af30c6"
+      "bytes": 11666,
+      "sha256": "79f4822101d27c4236b4ca7bc01a376f8833dc6de4537d53a902641bc347426b"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2432,6 +2662,11 @@
       "path": "simulator/e2e/_previews.py",
       "bytes": 1215,
       "sha256": "ddaefefee8c467129676a00b030ca1e8e43faa43713bfbb012b0b30abeb966de"
+    },
+    {
+      "path": "simulator/e2e/all-stations-layout.browser.test.py",
+      "bytes": 3038,
+      "sha256": "f01b02bdf2024d7b92b6c5262c41e4ba550ca9ec7a685ee532ac2137e44d625c"
     },
     {
       "path": "simulator/e2e/anyang-parallel.browser.test.py",
@@ -3055,8 +3290,8 @@
     },
     {
       "path": "simulator/engine/schematic-details.js",
-      "bytes": 36482,
-      "sha256": "795d17b4bc0179be984fe29e0b5215c632e7ede907320e2f15eb220e7d029ed8"
+      "bytes": 36629,
+      "sha256": "b43d80ec602bc70acff4cf30ea37258dd0ccab708ef3b5c75467d231919cce33"
     },
     {
       "path": "simulator/engine/schematic-source.json",
@@ -3100,8 +3335,8 @@
     },
     {
       "path": "simulator/engine/track-geometry.js",
-      "bytes": 2087,
-      "sha256": "21d6b655e64dded73fa04568ce9627a9356711cef30d54038397e2e71c32ef8b"
+      "bytes": 2346,
+      "sha256": "7fb17c073669453ec89ff2ec7423aebb7ae87eb24120534fcf5013815772efb9"
     },
     {
       "path": "simulator/engine/track-network.js",
@@ -3195,8 +3430,8 @@
     },
     {
       "path": "simulator/ui/ls-block-signals.js",
-      "bytes": 1810,
-      "sha256": "58fd5368e707600de704f3f81a400585e6790d9403f9c49177fa7447fcf17982"
+      "bytes": 2784,
+      "sha256": "bd2c922f0e119b87825450defae14691417733b914e55bb2531aa6e7143a7a56"
     },
     {
       "path": "simulator/ui/ls-block-signals.test.cjs",
@@ -3245,8 +3480,8 @@
     },
     {
       "path": "simulator/ui/ls-view.js",
-      "bytes": 37818,
-      "sha256": "2c8f4815b1990704ba4893d860274699e1e892eb4f3136f19621e18af63c81a2"
+      "bytes": 38770,
+      "sha256": "8005d8861b41bc5c2d960697703d88fcf75f741d3269270802606a7e63abf21d"
     },
     {
       "path": "simulator/ui/ls-view.test.cjs",
@@ -3422,6 +3657,11 @@
       "path": "simulator/고증대조표.json",
       "bytes": 454,
       "sha256": "0fadb50525e6c6fceb673e39e2d38ebd851052b6a8f4f2642e53444900ffa500"
+    },
+    {
+      "path": "tools/audit-ls-layout.py",
+      "bytes": 6962,
+      "sha256": "571672ab1afeb3fa2ebbf110c962efe4ed7312083f0c258a9eb003e46fda4dc0"
     },
     {
       "path": "tools/audit-network.cjs",
