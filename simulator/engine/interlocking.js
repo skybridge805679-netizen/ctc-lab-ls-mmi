@@ -26,9 +26,9 @@ const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.inclu
 // (금천구청 2B-6T 26 정위, 1B-1T 54 반위, 영등포 1A-1T → 4B 해정) and the 용산 6번 "출발 먼저" order come out of the same rule
 // and stay listed above as checked cases.
 const isNode=typeof module!=='undefined';
-const lib=name=>isNode?require('./'+name):root[{network:'SimNetwork',wiring:'SimWiring',line:'SimLine'}[name]];
+const lib=name=>isNode?require('./'+name):root[{network:'SimNetwork',wiring:'SimWiring',line:'SimLine','train-windows':'SimTrainWindows','track-geometry':'SimTrackGeometry','scenario-motion':'SimScenarioMotion'}[name]];
 const STUB=d=>!/^B\d+T/.test(d)&&!/^\d+T$/.test(d);          // 26BT, CT, AT …: dead-end / safety tracks, not the line or a platform track
-const cache={approach:new Map(),overlap:new Map()};
+const cache={approach:new Map(),overlap:new Map(),windows:new Map()};
 const xOf=p=>Number(String(p).split(':')[1].split(',')[0]);
 function signalRow(station,signal){return lib('wiring').data[station]?.signals.find(x=>x[0]===signal);}
 // rear edges of a signal on its own rail, nearest first, up to the first point; with the line circuit codes they belong to
@@ -43,9 +43,21 @@ function approachSection(station,signal){
  }
  cache.approach.set(key,out);return out;
 }
+// LS 열번창 in rear of the signal on its own line, nearest first (the platform track itself for a departure signal):
+// a train shown there is approaching even when its circuit is outside the interlocked edges (폐색 구간 · 승강장 선로)
+function approachWindows(station,signal){
+ const key=station+'|'+signal;if(cache.windows.has(key))return cache.windows.get(key);let out=[];
+ try{const N=lib('network'),meta=N.catalog[station]?.signals[signal],row=signalRow(station,signal),def=lib('wiring').data[station],M=lib('scenario-motion'),G=lib('track-geometry');
+  if(meta&&row&&approach.seconds[meta.kind]&&M&&G){const y=G.railY(def,row[1],row[2]),dir=meta.dir;
+   out=(lib('train-windows').data[station]||[]).map(w=>({slot:w.slot,p:M.point(station,w.slot)})).filter(o=>o.p&&Math.abs(o.p[1]-y)<10&&(o.p[0]-row[2])*dir<0&&Math.abs(o.p[0]-row[2])<700)
+    .sort((a,b)=>Math.abs(a.p[0]-row[2])-Math.abs(b.p[0]-row[2])).slice(0,2).map(o=>o.slot);
+   if(meta.kind==='출발'&&def.rails.some(r=>r[0]===row[1])&&!out.includes(row[1]))out.unshift(row[1]);}}catch{out=[];}
+ cache.windows.set(key,out);return out;
+}
 // is a train in the approach section of the signal right now? (LS 열번 · 자동운행 열차 · 진로 점유, as refreshed by SimLine)
 function approachTrain(station,signal,state){
  const sec=approachSection(station,signal);
+ for(const w of approachWindows(station,signal)){const t=state.circuitOccupied?.[w]?.[0]||state.platformOccupied?.[w]?.[0];if(t)return {code:w,train:t};}
  const code=sec.codes.find(c=>(state.circuitOccupied?.[c]||[]).length);if(code)return {code,train:state.circuitOccupied[code][0]};
  const res=sec.resources.find(r=>state.occupied?.[r]);if(res)return {code:res,train:''};
  return null;
@@ -75,6 +87,6 @@ function rulesFor(station,route){
  if(explicit)return {...explicit,points:{...(derived?.points||{}),...explicit.points},exits:derived?.exits||[],checked:true};
  return derived;
 }
-const api={approach,overlap,parallel,parallelFor,rulesFor,derivedOverlap,approachSection,approachTrain};
+const api={approach,overlap,parallel,parallelFor,rulesFor,derivedOverlap,approachSection,approachTrain,approachWindows};
 if(typeof module!=='undefined')module.exports=api;else root.SimInterlocking=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -55,6 +55,8 @@ def run(page, url):
     at('jonggak', {'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
     for sig in ('2A', '1A', '4A'):
         at('jonggak', {'type': 'stop', 'id': sig, 'source': 'LS'})
+    # 열차가 서 있는 승강장·뒤쪽 열번창의 신호를 정지하면 접근쇄정(장내 90초)이 걸린다: 해정을 기다린 뒤 다음 진로를 낸다
+    page.evaluate("SimMMI.run({type:'tick',seconds:95})");page.wait_for_timeout(300)
     at('jonggak', {'type': 'route', 'id': '51-1T', 'source': 'LS'})
     at('dongmyo', {'type': 'route', 'id': '24-B015T', 'source': 'LS'})
     page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length===7")

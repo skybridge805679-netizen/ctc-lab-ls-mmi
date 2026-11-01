@@ -17,7 +17,7 @@ function apply(snapshot){
  if(root.SimLine?.journeys){root.SimLine.journeys.clear();for(const [id,code]of mirror.journeys)root.SimLine.journeys.set(id,code);}
  if(!root.SimExtraLS)pending.push(...(snapshot.events||[]));drain();
 }
-function drain(){if(!root.SimMMI||!root.SimDOM.document.getElementById('mmiShell'))return;while(pending.length){const event=pending.shift();if(event.kind==='log')root.SimMMI.log(event.channel,event.text,undefined,event.level);if(event.kind==='markAuto')root.SimMMI.markAuto(event.key);if(event.kind==='alarm')root.SimMMI.raiseAlarm(event.text,event.state,event.level,event.station);}}
+function drain(){if(!root.SimMMI||!root.SimDOM.document.getElementById('mmiShell'))return;while(pending.length){const event=pending.shift();if(event.kind==='log')root.SimMMI.log(event.channel,event.text,undefined,event.level);if(event.kind==='markAuto')root.SimMMI.markAuto(event.key);if(event.kind==='alarm')root.SimMMI.raiseAlarm(event.text,event.state,event.level,event.station);if(event.kind==='alarmClear')root.SimMMI.clearAlarms?.();}}
 root.addEventListener('DOMContentLoaded',()=>setTimeout(drain,0));
 function command(action){const response=root.OrpheiaEngine.request(action,cursor,version);if(response.error)throw new Error(response.error);apply(response.snapshot);return response.result;}
 command({type:'poll'});

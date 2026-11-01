@@ -29,7 +29,7 @@ function create(host){
   case 'clearTimetable':error(host.apply({type:'timetable',method:'import',args:[{serviceDate:c.model.serviceDate,trains:[]}]}));break;
   case 'runTrain':{let f=null;for(const [station,s]of Object.entries(host.context().ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)f={station,slot,uid:r.uid};
    if(!f)throw Error(ph.number+' 열차번호가 LS에 없습니다');
-   for(const l of ph.legs||[])error(host.apply({type:'scenario:move',auto:true,action:{op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover}}));
+   for(const l of ph.legs||[])error(host.apply({type:'scenario:move',auto:true,action:{op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.rescue?{rescue:true}:{})}}));
    if(ph.exit)error(host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid}}));break;}
   case 'alarm':host.alarm(ph.text);break;
   case 'notice':session.notice=ph.text;break;
@@ -47,9 +47,9 @@ function create(host){
    for(let pass=0;pass<4&&active(session);pass++){
     const out=F.advance(runLibrary,session,(x,e)=>context(x,e),now());if(!out.length)break;let again=false;
     for(const o of out){
-     if(o.kind==='activate'){o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
+     if(o.kind==='activate'){host.clearAlarms?.();o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
      if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
-     if(o.kind==='branch'){announce('branch','상황 변경 · '+o.branch.label);again=true;}
+     if(o.kind==='branch'){const said=String(o.branch.text||o.branch.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||o.branch.label;announce('branch','상황 변경 · '+said,'상황 변경 · '+o.branch.label);again=true;}
      if(o.kind==='end'){ended(o.item,o.status);again=false;}
      if(o.kind==='finished')close('모든 문제 종료');
     }if(!again)break;
@@ -58,7 +58,7 @@ function create(host){
  }
  function configure(next){const errors=F.validate(next,{scripts:host.scripts,drafts:true});if(errors.length)return {ok:false,message:errors.join('\n')};library=clone(next);library.schedules??=[];configured=true;revision++;return {ok:true};}
  function command(a){switch(a.op){
-  case 'bootstrap':if(!configured){if(a.library){const r=configure(F.upgrade(a.library,host.defaults()));if(!r.ok)return r;}if(Array.isArray(a.history))history=clone(a.history.slice(0,200));if(Array.isArray(a.users)&&a.users.length){const r=command({op:'users',users:a.users});if(!r.ok)return r;}configured=true;}return {ok:true};
+  case 'bootstrap':if(!configured){if(a.library){const up=F.upgrade(a.library,host.defaults()),r=configure(up);if(up!==a.library)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');if(!r.ok)return r;}if(Array.isArray(a.history))history=clone(a.history.slice(0,200));if(Array.isArray(a.users)&&a.users.length){const r=command({op:'users',users:a.users});if(!r.ok)return r;}configured=true;}return {ok:true};
   case 'library':return configure(a.library);
   case 'users':if(!Array.isArray(a.users)||a.users.some(u=>!u||!['교수','교육생'].includes(u.role)||typeof u.id!=='string'||!u.id||typeof u.name!=='string'||!u.name)||new Set(a.users.map(u=>u.id)).size!==a.users.length)return {ok:false,message:'사용자 ID·이름·구분을 확인하세요.'};users=clone(a.users);revision++;return {ok:true};
   case 'start':{if(active(session))return {ok:false,message:'진행 중인 교육을 먼저 종료하세요.'};const sc=library.scenarios.find(s=>s.id===a.scenario);if(!sc)return {ok:false,message:'시나리오를 선택하세요.'};const sits=library.situations.filter(s=>sc.situations.includes(s.id)),pids=sits.flatMap(s=>s.problems),selected={...library,scenarios:[sc],situations:sits,problems:library.problems.filter(p=>pids.includes(p.id))};const errors=F.validate(selected,{scripts:host.scripts});if(errors.length)return {ok:false,message:errors.join('\n')};const prof=users.find(u=>u.id===a.professor&&u.role==='교수'),stud=users.find(u=>u.id===a.student&&u.role==='교육생');if(!prof||!stud)return {ok:false,message:'교수와 교육생을 선택하세요.'};configured=true;runLibrary=clone(library);session=F.createSession(runLibrary,sc.id,{professor:prof.name,student:stud.id,startedAt:now()});Object.assign(session,{id:'E'+Date.now()+'-'+(++sequence),showActions:a.showActions!==false,loadedEntry:null,attempt:0,attempts:[]});events=[];const budget=host.startAssessment();session.totalLimit=budget?.session?.limitSeconds||3600;host.pause(false);host.auto(a.autoRun!==false);announce('start','교육 시작 · '+sc.name);step();return {ok:true};}
@@ -70,9 +70,11 @@ function create(host){
   case 'clearHistory':history=[];return {ok:true};
   default:return {ok:false,message:'알 수 없는 FTS 명령'};
  }}
- function event(e){if(active(session)){events.push({...clone(e),seq:++sequence,at:now()});if(events.length>4000)events.shift();}}
+ function event(e){if(active(session)){events.push({...clone(e),seq:++sequence,at:now()});if(events.length>4000)events.shift();
+  // 열번 이동은 LS 표시를 고치는 조작일 뿐 열차를 움직이지 않는다: 열차 운행·구원연결 목표로 인정하지 않는다는 것을 교수 로그에 남긴다
+  if(e.type==='lsOperation'&&e.ok&&e.source!=='FTS'&&e.operation?.op==='move')log(`수동 열번 이동 · ${e.operation.targetStation||e.station} ${e.operation.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음)`,'W');}}
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
- function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));library=F.upgrade(library,host.defaults());logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];}
+ function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}
  return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,snapshot:()=>({session,history,users,revision,notice,logs})};
 }
 function validateCheckpoint(d,scripts){if(!d||!Number.isInteger(d.sequence)||d.sequence<0||!Number.isInteger(d.revision)||d.revision<0||F.validate(d.library,{scripts,drafts:true}).length||d.runLibrary&&F.validate(d.runLibrary,{scripts,drafts:true}).length||!Array.isArray(d.users)||d.users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'||!['교수','교육생'].includes(u.role))||!Array.isArray(d.history)||d.history.some(h=>!h||!Array.isArray(h.rows)||!Number.isFinite(h.got)||!Number.isFinite(h.full))||!Array.isArray(d.events)||!Number.isInteger(d.sequence)||!Number.isInteger(d.revision))throw Error('Invalid FTS checkpoint');if(d.session){const s=d.session;if(!d.runLibrary||!Array.isArray(s.items)||!Number.isInteger(s.current)||s.current<0||s.current>s.items.length||!Number.isFinite(s.startedAt)||!s.manual||s.items.some(it=>!d.runLibrary.problems.some(p=>p.id===it.problem)||!d.runLibrary.situations.some(x=>x.id===it.situation)||!Number.isInteger(it.situationIndex)||!Number.isFinite(it.score)||!Array.isArray(it.met)||!Array.isArray(it.deducted)||it.startedAt!==null&&!Number.isFinite(it.startedAt)||it.endedAt!==null&&!Number.isFinite(it.endedAt)||!['대기','진행','완료','시간초과','종료','미실시'].includes(it.status)))throw Error('Invalid FTS session');}}

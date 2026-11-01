@@ -21,10 +21,12 @@ function create(){
  root.SimDrill=require('./conflict-drill.cjs').create(root);
  root.SimScenarioUI=require('./scenario-controller.cjs').create(root,host);
  root.SimAutoUI=require('./auto-controller.cjs').create(root,host);
+ host.moved=m=>fts.event({type:'trainRun',...m,ok:true,source:'motion'});
  const F=require('./fts'),FTS=require('./fts-controller.cjs'),scripts=[...root.SimScenarios.list,...root.SimEmergency.list,...root.SimScheduleScenarios.list].map(s=>s.id);
  const fts=FTS.create({scripts,defaults:()=>({...F.seed({scripts,limits:Object.fromEntries(scripts.map(id=>[id,require('./assessment').limitsFor(id)[0]]).filter(([,v])=>v))}),schedules:[]}),context:()=>({states,ls,model,now:now()}),pattern:Timetable.pattern,
   apply:a=>{const r=execute({...a,fts:true});if(['timetable','scenario:start'].includes(a.type))tableDirty=true;return r;},
   alarm:text=>emit('alarm',{text,state:'교육 현상',level:'W',station:''}),
+  clearAlarms:()=>emit('alarmClear',{}),
   pause:value=>{paused=value;},auto:on=>root.SimAutoUI.set(on),startAssessment:()=>assessment.start({subject:'integrated'},now()),beginTask:o=>assessment.begin(o,now()),endTask:(key,status)=>{if(key)assessment.finishTask(now(),status,key);},finishAssessment:()=>assessment.finish(now()),
   stopScript:()=>root.SimScenarioUI.stop(),
   resetStation:st=>{const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});},
@@ -93,7 +95,8 @@ function create(){
  function snapshot(since=0){const copy=structuredClone(current());copy.events=events.filter(e=>e.seq>since).map(e=>structuredClone(e));return copy;}
  function transport(version=-1,since=0){const data=current(),delta=Number.isInteger(version)&&version>=0&&version<=revision,out={delta,version:revision,seq,events:events.filter(e=>e.seq>since)};for(const [key,value]of Object.entries(data))if(key!=='events'&&(!delta||published.get(key)?.at>version))out[key]=value;return out;}
  function checkpoint(){return structuredClone({format:'ORPHEIA-SESSION',schema:1,fts:fts.checkpoint(),selected:session.selected,states,ls,timetable:model,clock:{paused,speed},assessment:assessment.checkpoint(),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single],journeys:[...root.SimLine.journeys]},equipment:root.SimEquipment.checkpoint(),auto:root.SimAutoUI.checkpoint(),scenario:root.SimScenarioUI.checkpoint(),drill:root.SimDrill.snapshot(),seq,events});}
- function restore(saved){
+ function restore(saved){const before=checkpoint();try{restoreInto(saved);}catch(error){try{restoreInto(before);}catch{}throw error;}}
+ function restoreInto(saved){
   if(saved?.format!=='ORPHEIA-SESSION'||saved.schema!==1||!states[saved.selected]||!Array.isArray(saved.timetable?.trains)||saved.timetable.trains.some(t=>!Timetable.valid(t))||new Set(saved.timetable.trains.map(t=>t.id)).size!==saved.timetable.trains.length)throw new Error('Invalid saved session');
   for(const id of Object.keys(states)){const st=saved.states?.[id],numbers=saved.ls?.stations?.[id];if(!st||!numbers||!Number.isFinite(st.clock)||!['AUTO','CCM','LOCAL'].includes(st.mode)||Object.keys(st.routes||{}).some(key=>!session.core(id).routes[key]))throw new Error('Invalid saved station '+id);for(const [slot,rows]of Object.entries(numbers.windows))if(!Windows.data[id].some(w=>w.slot===slot)||!Array.isArray(rows))throw new Error('Invalid saved number window');}
   if(!Number.isFinite(saved.clock?.speed)||saved.clock.speed<0||saved.clock.speed>120||!saved.auto?.engine||!saved.scenario?.motion||!Array.isArray(saved.events))throw new Error('Invalid saved controller');
@@ -105,6 +108,9 @@ function create(){
   fts.restore(data.fts);
   assessment.restore(data.assessment);root.SimEquipment.restore(data.equipment);root.SimAutoUI.restore(data.auto);root.SimDrill.restore(data.drill);root.SimScenarioUI.restore(data.scenario);seq=data.seq;events.length=0;events.push(...data.events);emit('log',{channel:'event',text:'저장된 실습 세션을 복원했습니다. 일시정지 상태에서 시작합니다.',level:'I'});refresh();revision++;cache=null;tableDirty=true;published.clear();
  }
- return {command,snapshot,transport,checkpoint,restore,pulse:()=>{if(!paused&&!replay){tick(speed);revision++;cache=null;}}};
+ // 실시간 맞춤: 타이머가 늦게 와도(창이 뒤에 있거나 macOS App Nap) 실제로 흐른 시간만큼 진행한다. 한 번에 최대 30초까지 따라잡는다.
+ let wall=null,carry=0;
+ function pulse(at=Date.now()){if(paused||replay){wall=at;carry=0;return;}const real=wall===null?1:Math.min(30,Math.max(1,Math.max(0,(at-wall)/1000)+carry));wall=at;const whole=Math.floor(real);carry=real-whole;tick(speed*whole);revision++;cache=null;}
+ return {command,snapshot,transport,checkpoint,restore,pulse};
 }
 module.exports={create};

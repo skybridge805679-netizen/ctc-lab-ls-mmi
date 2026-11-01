@@ -423,7 +423,7 @@ ${table('mProbs',['과목명칭','제한시간(초)','문제명칭','상태','�
 <label class="fts-wide">상황<textarea readonly rows="3">${esc(p?.situation||'')}</textarea></label><label class="fts-wide">조치사항<textarea readonly rows="3">${esc(p?.actions||'')}</textarea></label>
 ${item.error?`<p class="fts-error" role="alert">${esc(item.error)}</p>`:''}<div class="fts-cap">발생조건 · 세부조건</div>${(()=>{const o=(v?.objectives||[]).filter(x=>!x.optional&&item.obj?.[x.id]==null).length,c=(v?.communications||[]).filter(x=>!x.optional&&item.comm?.[x.id]==null).length;return (v?.objectives?.length||v?.communications?.length)&&item.status==='진행'?`<p class="fts-remaining" data-remaining>완료까지 남은 것 · 목표 ${o}개 · 통보 확인 ${c}개 <small>(목표와 통보를 모두 마쳐야 「완료」로 끝납니다)</small></p>`:'';})()}<ul class="fts-checks">${p?.trigger?.useTime?`<li class="${item.status!=='대기'?'ok':''}">발생시간 ${p.trigger.at}초</li>`:''}${(p?.trigger?.conditions||[]).map((c,i)=>`<li class="${(item.triggerMet?.[i]??F().test(c,ctx))?'ok':''}">${esc(F().describe(c))}</li>`).join('')}
 ${(p?.checks||[]).map((k,i)=>`<li class="${item.met[i]?'ok':''}">${item.met[i]?'✔':'○'} ${esc(k.label||F().describe(k.condition))} <small>(${k.points??1})</small></li>`).join('')}
-${(p?.deductions||[]).map((k,i)=>`<li class="${item.deducted[i]?'bad':''}">감점 ${Number(k.points)||0} · ${esc(k.label||F().describe(k.condition))}</li>`).join('')}
+${(p?.deductions||[]).map((k,i)=>`<li class="${item.deducted[i]?'bad':''}" data-deduction="${i}">${item.deducted[i]?'✖ 감점 적용':'감점 기준'} −${Number(k.points)||0} · ${esc(k.label||F().describe(k.condition))}</li>`).join('')}
 ${(v?.objectives||[]).map(o=>{const at=item.obj?.[o.id],late=at!=null&&o.deadline!==undefined&&at>o.deadline;return `<li class="${at!=null?(late?'bad':'ok'):''}" data-objective="${esc(o.id)}">${at!=null?'✔':'○'} 목표 · ${esc(o.label)} <small>(${o.points??1}${o.deadline!==undefined?` · 기한 ${clockText(o.deadline)}`:''}${at!=null?` · ${clockText(at)}${late?' 지연':''}`:''})</small>${at==null&&o.hint?`<br><small class="fts-hint">힌트: ${esc(o.hint)}</small>`:''}</li>`;}).join('')}
 ${Object.entries(item.reactions||{}).filter(([,r])=>r.fired).map(([id,r])=>{const x=(v?.reactions||[]).find(y=>y.id===id);return `<li class="fts-reaction">↻ 상황 반응 · ${esc(x?.label||id)} <small>(${clockText(r.firedAt)})</small></li>`;}).join('')}
 ${p?.script?`<li class="${ctx.script?.done>=ctx.script?.total&&ctx.script?.total?'ok':''}">대본 ${esc(scriptTitle(p.script))} · ${ctx.script?.done||0}/${ctx.script?.total||0} 단계</li>`:''}</ul>
@@ -453,7 +453,7 @@ function renderProblem(){
  if(!session){box.innerHTML='<p>진행 중인 교육이 없습니다.</p>';return;}
  const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem);
  const elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0,remaining=Math.max(0,(p?.limit||0)-elapsed);
- const signature=JSON.stringify([session.current,item.status,item.error,session.finished,session.showActions,session.notice]);if(problemSignature===signature){if($('pbElapsed'))$('pbElapsed').textContent=clockText(elapsed);if($('pbRemaining'))$('pbRemaining').textContent=clockText(remaining);return;}problemSignature=signature;
+ const signature=JSON.stringify([session.current,item.status,item.error,session.finished,session.showActions,session.notice,Object.keys(item.branch||{})]);if(problemSignature===signature){if($('pbElapsed'))$('pbElapsed').textContent=clockText(elapsed);if($('pbRemaining'))$('pbRemaining').textContent=clockText(remaining);return;}problemSignature=signature;
  const waiting=item.status==='대기'&&!session.finished,title=session.finished?'교육 종료':waiting?'다음 문제 대기':item.error?'진행 확인 필요':'문제 발생',status=session.finished?'finished':item.error?'error':waiting?'waiting':'active';
  const text=value=>esc(value||'');
  const section=(key,number,label,content,empty)=>`<section class="fts-briefing-section fts-briefing-${key}" aria-labelledby="pb-${key}-label"><div class="fts-pb-cap" id="pb-${key}-label"><span aria-hidden="true">${number}</span>${label}</div><div class="fts-pb-box" data-problem-section="${key}">${content?text(content):`<span class="fts-pb-empty">${empty}</span>`}</div></section>`;
@@ -462,10 +462,13 @@ function renderProblem(){
 <header class="fts-briefing-hero"><div class="fts-briefing-heading"><small>ORPHEIA · SCENARIO BRIEFING</small><h2>${title}</h2><div class="fts-briefing-meta"><span>${esc(p?.subject||'관제 실습')}</span><span>문제 ${Math.min(session.current+1,session.items.length)} / ${session.items.length}</span></div><p>${session.finished?'교육 기록에서 결과와 조치 내용을 확인하세요.':waiting?'다음 문제의 발생조건을 기다리고 있습니다.':'제시된 내용을 확인하고 LS·MMI에서 조치하세요.'}</p></div><div class="fts-briefing-art" aria-hidden="true"><img src="assets/orpheia/briefing.png" alt="" width="1312" height="1199"></div></header>
 <div class="fts-briefing-content">${section('name','01','문제명칭',waiting?'':p?.name,waiting?'문제 발생 대기 중입니다.':'별도로 제시된 문제명칭이 없습니다.')}
 ${section('situation','02','상황',waiting?'':p?.situation,waiting?'상황 발생을 기다리고 있습니다.':'별도로 제시된 상황이 없습니다.')}
+${changes(p,item).length&&!waiting?`<aside class="fts-briefing-notice fts-briefing-change" role="status" data-problem-section="change"><b>상황 변경</b><span>${changes(p,item).map(esc).join('<br>')}</span></aside>`:''}
 ${session.notice&&!waiting?`<aside class="fts-briefing-notice" role="status"><b>추가 안내</b><span>${esc(session.notice)}</span></aside>`:''}
 ${item.error?`<aside class="fts-briefing-error" role="alert"><b>진행 확인</b><span>${esc(item.error)}</span></aside>`:''}
 ${session.showActions?section('actions','03','조치사항',waiting?'':p?.actions,waiting?'문제 발생 후 표시됩니다.':'별도로 제시된 조치사항이 없습니다.'):''}</div>`;
 }
+// 교수가 주입한 상황 변경: 교육생에게는 감독관이 알려 주는 상황(분기 문서 첫 줄)만 보인다 — 모범 대응은 보이지 않는다
+function changes(p,item){return (p?.branches||[]).filter(b=>item.branch?.[b.id]!=null).map(b=>String(b.text||b.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||b.label);}
 function speak(text){try{if(!text||!root.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';root.speechSynthesis.cancel();root.speechSynthesis.speak(u);}catch{}}
 
 // ---------------------------------------------------------------- 교육이력관리

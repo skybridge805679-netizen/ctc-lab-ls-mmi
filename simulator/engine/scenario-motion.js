@@ -57,6 +57,10 @@ function create(host){
   }
   const C=cachedCore(f.station),s=states()[f.station];
   const a=point(f.station,f.slot),b=point(target,to),def=W.data[f.station];
+  // 구원운전(전령법): 관제 지시로 전령자가 승차한 구원열차는 신호 없이 사고 열차가 있는 폐색 구간에 들어가 연결한다
+  if(j.action.rescue&&a&&b){j.phase='handover';j.fromTime=s.clock;j.until=s.clock+40;j.reason='구원운전 (전령법) · '+(target===f.station?'':N.catalog[target]?.name+'역 ')+to+' 사고 열차로';
+   const dir=f.train.direction==='up'?-1:1,addR=(station,points,from,until)=>{(states()[station].scenarioMotions??=[]).push({id:j.id,uid:j.uid,number:j.number,points,from:from+states()[station].clock-s.clock,to:until+states()[station].clock-s.clock});};
+   if(target===f.station)addR(f.station,[a,b],s.clock,s.clock+40);else{addR(f.station,[a,[a[0]+dir*60,a[1]]],s.clock,s.clock+20);addR(target,[[b[0]-dir*60,b[1]],b],s.clock+20,s.clock+40);}return;}
   const straight=target===f.station&&a&&b&&Math.abs(a[1]-b[1])<6&&!def.rails.some(r=>r[0]===f.slot||r[0]===to)&&!def.signals.some(sig=>Math.abs(LS.railY(def,sig[1],sig[2])-a[1])<6&&sig[2]>Math.min(a[0],b[0])&&sig[2]<Math.max(a[0],b[0]));
   const ids=target===f.station&&!straight?candidates(f.station,f.slot,to,f.train.direction):[];
   const active=ids.find(id=>s.routes[id]&&!s.routes[id].occupied&&!s.routes[id].lock);
@@ -107,7 +111,7 @@ function create(host){
     release(j);j.phase='cancelled';j.reason='열차 위치·모의점유 변경으로 취소';changed=true;
    }else if(now(j)>=j.until){
     const operation=j.legTo?{op:'move',station:f.station,slot:f.slot,uid:j.uid,targetStation:f.station,targetSlot:j.legTo}:{...j.action,station:f.station,slot:f.slot,uid:j.uid};
-    const result=host.commit(operation);
+    const result=host.commit(operation,j);
     if(result.ok){release(j);j.route=null;j.phase=j.legTo?'waiting':'done';j.reason=j.legTo?'다음 진로 진행 대기':'도착';j.legTo=null;changed=true;if(j.phase==='waiting')begin(j,locate(j.uid));}else{j.reason=result.message;}
    }
   }

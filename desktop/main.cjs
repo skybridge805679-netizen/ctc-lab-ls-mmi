@@ -1,5 +1,5 @@
 'use strict';
-const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray}=require('electron');
+const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray,powerSaveBlocker}=require('electron');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const stations=require('../simulator/engine/network').stations.filter(s=>s.controlled),extraLS=new Set();
@@ -17,6 +17,8 @@ if(!single)app.quit();
 else{
  app.on('second-instance',()=>{if(ls){if(ls.isMinimized())ls.restore();ls.show();ls.focus();}});
  app.whenReady().then(async()=>{
+  // 실습 시계는 창이 뒤에 있어도 실제 시간대로 흘러야 한다 (macOS App Nap이 엔진 타이머를 늦추지 않게)
+  powerSaveBlocker.start('prevent-app-suspension');
   if(process.platform==='darwin')app.dock?.setIcon(appIcon);
   if(process.platform==='win32')app.setAppUserModelId('org.orpheia.ctclab');
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
@@ -123,7 +125,8 @@ function installMenu(){
   // T/G 파일 메뉴는 원본처럼 [OPN] 열기 · 인쇄만 두고, 시간표 JSON 파일은 여기서 다룬다
   {label:'시간표 JSON 열기…',click:()=>script('SimTimetableFiles.open()')},
   {label:'시간표 JSON 저장…',click:()=>script('SimTimetableFiles.save()')},
-  {role:'togglefullscreen',label:'전체 화면'}
+  // macOS는 이 메뉴에 「전체 화면」을 스스로 넣는다 — 중복되지 않게 다른 OS에서만 넣는다
+  ...(process.platform==='darwin'?[]:[{role:'togglefullscreen',label:'전체 화면'}])
  ]};
  const menu=[...(process.platform==='darwin'?[{label:app.name,submenu:[{role:'about',label:'ORPHEIA 정보'},{type:'separator'},{role:'hide',label:'숨기기'},{role:'hideOthers',label:'다른 앱 숨기기'},{type:'separator'},{role:'quit',label:'종료'}]}]:[]),workspace,
   {label:'편집',submenu:[{label:'실행 취소',accelerator:'CmdOrCtrl+Z',click:()=>editHistory(false)},{label:'다시 실행',accelerator:'CmdOrCtrl+Shift+Z',click:()=>editHistory(true)},{type:'separator'},{role:'cut',label:'잘라내기'},{label:'복사',accelerator:'CmdOrCtrl+C',click:()=>editKey('copy','copy')},{label:'붙여넣기',accelerator:'CmdOrCtrl+V',click:()=>editKey('paste','paste')},{label:'모두 선택',accelerator:'CmdOrCtrl+A',click:()=>editKey('selectAll','create')}]},

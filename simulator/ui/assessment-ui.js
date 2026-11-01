@@ -13,7 +13,7 @@ function render(){if(!host)return;
  $('assessmentPhase').textContent=task?(A.subjects[task.subject]+(task.remaining===null?'':' · 상황 '+format(task.remaining))+(task.status==='completed'?(task.timely===false?' · 완료(시간초과)':' · 완료'):task.status==='expired'?' · 시간초과':'')):session?A.subjects[session.subject]+' · '+session.basis:'선택한 실습을 시작하세요';
  $('assessmentBtn').dataset.status=session?.status||'idle';$('assessmentBtn').title=task?task.title+' · 진행 상태와 시간 기준 보기':'교재 기준 통합 60분 · 과목별 임의 배분 없음';
  $('pauseBtn').title='열차·대본·시험 제한시간을 함께 일시정지합니다.';$('skipBtn').title='열차·대본·시험 제한시간을 함께 10초 진행합니다.';
- if($('scTimerStatus'))$('scTimerStatus').textContent=task?`전체 ${format(session.remaining)} · ${task.limitSeconds===null?'과목별 독립 제한 없음':'상황 '+format(task.remaining)} · ${statuses[task.status]||task.status}`:'';
+ if($('scTimerStatus'))$('scTimerStatus').textContent=task?`전체 남은 시간 ${format(session.remaining)} · ${task.limitSeconds===null?'과목별 독립 제한 없음':'이 문제 남은 시간 '+format(task.remaining)} · ${statuses[task.status]||task.status}`:'';
 }
 function open(){
  if(root.SimRemote.snapshot.fts?.session&&!root.SimRemote.snapshot.fts.session.finished){host.openAction('FTS 교육 시간',`<p>현재 FTS 교육을 진행 중입니다. 전체 시험 시간과 문제별 제한시간은 총괄제어에서 관리합니다.</p><p>일시정지·배속·10초 진행은 열차와 교육 시간에 함께 적용됩니다.</p><button type="button" id="assessmentFTS" class="primary">FTS 모니터링 열기</button>`,null,'닫기');$('assessmentFTS').onclick=()=>{$('actionDialog').close();root.SimWorkspace?.detach();root.SimFTSUI.go('monitor');root.SimFTSUI.open();};return;}

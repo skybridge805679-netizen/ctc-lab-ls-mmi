@@ -40,6 +40,7 @@ const CONDITIONS={
  cancelled:{label:'구간 운휴/운행',fields:['train','from','to'],test:(c,x)=>{const t=trainOf(x,c.train),part=t&&span(t,c.from,c.to);return !!part&&part.every(k=>!!k.cancelled===(c.value!==false));},text:c=>`${c.train} ${nm(c.from)}~${nm(c.to)} ${c.value===false?'운행(부활)':'운휴'}`},
  windowOpen:{label:'MMI 창 열림',fields:['window'],test:(c,x)=>!!x.ui?.windows?.includes(c.window),text:c=>`${c.window} 창 열기`},
  graphTrain:{label:'그래프 열차 선택',fields:['train'],test:(c,x)=>x.ui?.graphTrain===c.train&&!!x.ui?.windows?.includes('graph'),text:c=>`열차그래프에서 ${c.train} 검색`},
+ trainRun:{label:'열차 운행 도착 (진로·신호 또는 전령법으로 실제 운행)',fields:['number','station'],test:(c,x)=>(x.events||[]).some(e=>e.type==='trainRun'&&e.number===c.number&&e.station===c.station&&(!c.slot||e.slot===c.slot)),text:c=>`${c.number} 열차가 ${nm(c.station)}역${c.slot?' '+c.slot:''}까지 운행 (열번 수동 이동은 인정 안 함)`},
  event:{label:'조작 기록',fields:['eventType'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.type===c.eventType&&(!c.station||e.station===c.station)&&(c.id===undefined||String(e.id)===String(c.id))&&(c.value===undefined||e.value===c.value)),text:c=>`${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
  signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll'))),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
  failedOp:{label:'실패한 조작',fields:[],test:(c,x)=>(x.events||[]).filter(e=>e.ok===false&&(!c.station||e.station===c.station)&&(!c.eventType||e.type===c.eventType)).length>=(c.count||1),text:c=>`${c.station?nm(c.station)+'역 ':''}거부된 조작${c.count>1?` ${c.count}회`:''}`},
@@ -306,8 +307,10 @@ function seed({scripts=[],limits={}}={}){
  const B=node?require('./fts-builtins.js'):root.SimFTSBuiltins,data=id=>{const p=P.find(x=>x.id===id);return p;};
  const active=B?B.all({limits}):[];for(const p of active)prob(p);
  const evac=active.filter(p=>p.subject==='운행선 관리').map(p=>p.id);
- const SITUATION={'sch-conflict':'임시열차 B0000이 선행 하행열차를 따라잡아 경합이 생깁니다. 온라인 열차그래프에서 경합 구간을 찾고, 가장 가까운 앞쪽 해소역에서 B0000의 시각(+2분)과 도착·출발진로를 수정해 해소하시오.','sch-create':'지금 시간표에 새 열차를 만들어야 합니다. 패턴을 불러와 열차를 생성하고 편집적용하시오.'};
- const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`);P.find(x=>x.id===id).situation=SITUATION[s];return id;});
+ // 상황은 교육생에게 보이는 사실만: 해소 방법(해소역 · +2분 · 진로 변경)은 조치사항에 둔다 (조치사항 표시를 끄면 보이지 않음)
+ const SITUATION={'sch-conflict':['임시열차 B0000 운행 요청이 들어와 시간표에 추가되었습니다. 경합을 확인하고 해소하시오.','온라인 열차그래프에서 경합 구간을 찾고, 경합지에서 가장 가까운 앞쪽 해소역(용산·영등포·금천구청·안양·군포·의왕)에서 B0000의 시각을 +2분 늦추고 도착·출발진로를 바꿔 해소합니다. 3차 경합이 생기지 않게 하고 최소 운전시격은 120초입니다.'],
+  'sch-create':['지금 시간표에 새 열차를 만들어야 합니다. 열차를 생성하고 편집적용하시오.','열차스케줄 → 패턴을 불러와 열차를 생성 → 편집적용']};
+ const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');return id;});
 
  const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
@@ -321,10 +324,12 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
- for(const x of [...P,...S,...SC])x.builtin=BUILTIN;
+ // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
+ for(const x of [...P,...S,...SC])x.builtin=BUILTIN+'#'+stamp(x);
  return {version:VERSION,problems:P,situations:S,scenarios:SC};
 }
 // 저장된 라이브러리의 내장 항목을 지금 앱의 내장 항목으로 갱신한다. 사용자 항목은 건드리지 않는다.
+function stamp(x){const j=JSON.stringify(x);let h=2166136261;for(let i=0;i<j.length;i++){h^=j.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(36);}
 function upgrade(lib,defaults){
  if(!object(lib)||!object(defaults))return lib;const next=structuredClone(lib);let changed=0;
  for(const kind of ['problems','situations','scenarios']){const list=next[kind]=Array.isArray(next[kind])?next[kind]:[];

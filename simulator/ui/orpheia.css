@@ -70,7 +70,7 @@ dialog::backdrop{background:#133d414f;backdrop-filter:blur(3px)}
 .route-choice:hover{background:var(--orpheia)}
 .ls-context-menu,.ls-submenu{background:var(--paper);border-color:#9fbeb7;box-shadow:var(--window-shadow);border-radius:5px;color:var(--deep)}
 .ls-menu-row>button{color:var(--deep);border-radius:3px}
-.ls-menu-row>button:hover,.ls-menu-row>button:focus,.ls-menu-row.open>button{background:var(--orpheia);border-color:#91bdb6}
+.ls-menu-row>button:focus,.ls-menu-row.open>button{background:var(--orpheia);border-color:#91bdb6}
 /* MMI keeps the original control hierarchy, with an ORPHEIA frame and surfaces. */
 .mmi-shell{border:1px solid #91b7af;background:var(--paper);color:var(--deep);border-radius:9px;margin-top:20px}
 .mmi-appbar{min-height:49px;padding:9px 16px;gap:12px;background:var(--orpheia);border-color:#9bc3bc;color:var(--deep)}

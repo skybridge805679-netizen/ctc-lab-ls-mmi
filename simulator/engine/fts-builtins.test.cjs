@@ -47,6 +47,8 @@ function solve(p0,{log=false,branches=[]}={}){
   if(k.type==='route'){if(!ccm(k.station))return false;if(control(k.station,{type:'route',id:k.route}).ok)return true;
    // 진로가 서지 않으면 관제사처럼 그 역에 남아 있는 다른 진로를 취소하고 해정을 기다린다
    const sig=k.route.split('-')[0];for(const id of Object.keys(S().states[k.station].routes))if(!id.startsWith(sig+'-'))control(k.station,{type:'withdraw',id});return false;}
+  // 구원연결: 열번을 옮기지 않는다. 구원열차 출발 지시(통보)를 하고 열차가 전령법으로 도착하기를 기다린다
+  const run=leaf(k,'trainRun');if(run){const rx=p.reactions.find(x=>x.do.some(d=>d.type==='runTrain'&&d.number===run.number&&d.legs.some(l=>l.rescue)));const comm=rx&&leaf(rx.when,'communication');if(comm&&!item().comm?.[comm.id])r.command({type:'fts',op:'manual',key:'comm:'+comm.id,checked:true});return false;}
   const at=leaf(k,'trainAt'),made=k.type==='all'?k.conditions[0]:null,gone=made?k.conditions[1]:leaf(k,'trainGone');
   if(at){const f=row(at.number);if(!f)return false;const slot=at.slot||EM.platform(at.station,f.direction);return f.station===at.station&&f.slot===slot||r.command({type:'numbers',action:{op:'move',...f,targetStation:at.station,targetSlot:slot}}).ok;}
   if(made&&gone){const f=row(gone.number);if(!f)return false;return r.command({type:'numbers',action:{op:'rename',...f,number:made.condition.number}}).ok;}

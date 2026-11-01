@@ -5,7 +5,7 @@ function create(root,host){
  const isEm=sc=>sc?.group==='emergency',isSch=sc=>sc?.group==='schedule';
  const lsm=()=>root.SimLSUI.getModel();
  let run=null,lastUI={};
- const motion=root.SimScenarioMotion.create({states:()=>host.context().stationStates,model:lsm,validate:a=>root.SimLSUI.validate(a),commit:a=>{const result=root.SimLSUI.dispatchDirect(a);if(result.ok)mmi().log('event','시나리오 열차 이동 완료 · '+a.station+' '+a.slot+' → '+(a.targetSlot||'관제구간 밖'));return result;}});
+ const motion=root.SimScenarioMotion.create({states:()=>host.context().stationStates,model:lsm,validate:a=>root.SimLSUI.validate(a),commit:(a,j)=>{const result=root.SimLSUI.dispatchDirect(a);if(result.ok){mmi().log('event','시나리오 열차 이동 완료 · '+a.station+' '+a.slot+' → '+(a.targetSlot||'관제구간 밖'));host.moved?.({number:j?.number,station:a.op==='move'?a.targetStation||a.station:a.station,slot:a.op==='move'?a.targetSlot:null,exit:a.op==='delete',rescue:!!j?.action?.rescue});}return result;}});
 function findRow(number){
  for(const [station,st] of Object.entries(lsm().stations))for(const [slot,rows] of Object.entries(st.windows))for(const r of rows)if(r.number===number)return {station,slot,uid:r.uid};
  return null;

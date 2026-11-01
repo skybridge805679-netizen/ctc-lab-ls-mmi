@@ -71,6 +71,7 @@ FTS 제어통제 시스템(LS 상단 **↗ FTS** · 실습 화면 → FTS 제어
 | `signalStop` | 신호 정지 | `station`, `signal` |
 | `point` | 선로전환기 | `station`, `point`, `value` |
 | `trainAt` | 열번창 열차번호 | `number`, `station` |
+| `trainRun` | 열차가 **실제로 운행해** 도착 (진로·신호 또는 전령법 — 열번 수동 이동은 인정 안 함) | `number`, `station`, (`slot`) |
 | `trainGone` | 열차번호 없음 | `number` |
 | `trainExists` | 스케줄 열차 있음 | `train` |
 | `trainMissing` | 스케줄 열차 없음 | `train` |
@@ -109,12 +110,12 @@ FTS 제어통제 시스템(LS 상단 **↗ FTS** · 실습 화면 → FTS 제어
 | `delay` | 열차 지연 | `train`, `station`, `minutes` |
 | `cancel` | 구간 운휴 | `train`, `from`, `to` |
 | `moveTrain` | 열차번호 즉시 이동 | `number`, `station`, `slot` |
-| `runTrain` | 열차 운행 — 진로가 설정되기를 기다려 구간마다 이동 | `number`, `legs:[{"station","slot","handover"}]`, (`exit`) |
+| `runTrain` | 열차 운행 — 진로가 설정되기를 기다려 구간마다 이동 | `number`, `legs:[{"station","slot","handover","rescue"}]`, (`exit`) |
 | `resetStation` | 역 상태 초기화 | `station` |
 | `alarm` | 알람 발생 | `text` |
 | `notice` | 안내 메시지 | `text` |
 
-`createTrain`: `kind`로 열차종류, 출발시각은 `start`(HH:MM:SS) 또는 `startIn`(지금부터 초, 음수 가능), `replace:true`면 같은 번호 스케줄을 지우고 새로 만듭니다(재로딩해도 오류 없이). `runTrain.legs`의 `handover:true`는 이웃 역 LS로 넘어가는 구간, `exit:true`는 마지막에 화면 밖으로 나감.
+`createTrain`: `kind`로 열차종류, 출발시각은 `start`(HH:MM:SS) 또는 `startIn`(지금부터 초, 음수 가능), `replace:true`면 같은 번호 스케줄을 지우고 새로 만듭니다(재로딩해도 오류 없이). `runTrain.legs`의 `handover:true`는 이웃 역 LS로 넘어가는 구간, `exit:true`는 마지막에 화면 밖으로 나감. `rescue:true`는 구원운전(전령법)이다. 신호 없이 사고 열차가 있는 열번창까지 들어가 연결한다(약 40초). 도착하면 엔진이 열차번호 중복 알람을 낸다. 내장 비상 문제는 「구원열차 … 지시」 통보와 구원열차 번호 수정 뒤에 이 운행을 시작하고, 구원연결 목표를 `trainRun`으로 채점한다.
 
 ## 저장·진행
 

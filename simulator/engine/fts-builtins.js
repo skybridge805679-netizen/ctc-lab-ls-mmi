@@ -41,11 +41,16 @@ function objectiveBook(){
   route:(station,route,label)=>add(`route-${station}-${route}`,`${nm(station)}역 ${route} ${label||'진로 설정'}`,{type:'route',station,route}),
   rename(from,to){const id=add('rename-'+to,`열차번호 ${from} → ${to} 수정`,after(from,{type:'all',conditions:[exists(to),{type:'trainGone',number:from}]}));lastFor.set(to,id);return id;},
   move(number,station,slot,label){const c={type:'trainAt',number,station};if(slot)c.slot=slot;const id=add('move-'+number,label||`열차번호 ${number} → ${nm(station)}역${slot?' '+slot:''} 열번창`,after(number,c));lastFor.set(number,id);return id;},
+  // 구원연결: 관제 지시를 받은 구원열차가 실제로 운행해 사고 열차의 열번창에 도착해야 한다 (열번 수동 이동으로는 인정하지 않음)
+  rescue(number,station,slot,target){const id=add('move-'+number,`${number} 구원운전 → ${nm(station)} ${slot}${target?' ('+target+')':''} 도착 · 구원연결 (관제 지시 후 열차가 운행 — 열번 수동 이동은 인정 안 함)`,after(number,{type:'trainRun',number,station,slot}));lastFor.set(number,id);return id;},
   remove(number){const id=add('delete-'+number,`열차번호 ${number} 삭제`,after(number,{type:'trainGone',number}));lastFor.set(number,id);return id;},
   schedule:(c)=>add(`schedule-${c.train}-${c.station}`,`${c.train} ${nm(c.station)} 출발진로 ${c.value} (스케줄 수정)`,c)
  };
+ api.last=number=>lastFor.get(number);
  return api;
 }
+const lastFor=(book,number)=>book.last(number);
+const routeOf=c=>c?.type==='route'?c:c?.type==='all'?c.conditions.map(routeOf).find(Boolean):null;
 
 // 대본 진로 seed와 같은 방식으로 신호기마다 첫 진로를 고르고, 실제로 설정되는 진로만 남긴다
 function seedRoutes(station,signals,approach=[],occupied=new Set()){
@@ -87,6 +92,11 @@ function emergency({limits={}}={}){
    else if(a.type==='stop')id=a.ids.filter(sig=>proceeding.has(a.station+'|'+sig)).map(sig=>book.cancel(a.station,sig)).at(-1);
    else if(a.type==='route')id=book.route(a.station,a.id,st.text.split(a.id).slice(1).join(a.id).trim()||'진로 설정');   // 대본 단계의 목적(예: K0456 상1선 운행선 변경)을 목표 이름에 남긴다
    else if(a.type==='rename')id=book.rename(a.from,a.to);
+   else if(a.type==='move'&&/구원연결/.test(st.text)){const before=lastFor(book,a.number);id=book.rescue(a.number,a.station,a.slot,/(\w+)(?:이|가) 있는/.exec(st.text)?.[1]);
+    // 구원열차는 "구원열차 … 지시" 통보(그 앞 마지막 것)와 구원열차 번호 수정 뒤에 출발해 전령법으로 사고 열차까지 운행한다
+    const order=comms.filter(c=>/구원/.test(c.label)&&/지시|출발/.test(c.label)).at(-1)||comms.at(-1);
+    reactions.push({id:'r-rescue-'+a.number,label:`${a.number} 구원열차 출발 (통보 ${order?.id||'-'} 확인 후 전령법 운행)`,when:{type:'all',conditions:[...(order?[{type:'communication',id:order.id}]:[]),...(before?[{type:'objective',id:before}]:[]),exists(a.number)]},do:[{type:'runTrain',number:a.number,legs:[{station:a.station,slot:a.slot,rescue:true}]}]});
+    book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});}
    else if(a.type==='move'){id=book.move(a.number,a.station,a.slot,st.text);
     // 구원연결로 한 열번창에 번호가 겹치면 "열차번호 중복 알람"을 확인해야 한다 (대본)
     if(/중복 알람/.test(st.text))book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});}
@@ -108,8 +118,11 @@ function emergency({limits={}}={}){
    }
    dos.push(...runs.values());
    const trigger=opening.has(tag)?null:tagTo[tag];if(!opening.has(tag)&&!trigger)continue;
-   const guards=[...runs.keys()].map(exists),when=[...(trigger?[trigger]:[]),...guards];
-   reactions.push({id:'r-'+tag,label:trigger?`${trigger.type==='communication'?'통보':'목표'} ${trigger.id} 이후 열차 변화`:'사고 발생 시점의 열차 변화',...(when.length?{when:when.length===1?when[0]:{type:'all',conditions:when}}:{}),do:dos});
+   // 진로를 기다려 달리는 열차(운행선 변경 등)는 관제사가 그 구간 진로를 내면 바로 출발 준비를 한다 — 통보 확인만 기다리지 않는다
+   const routeGoals=trigger?.type==='communication'?book.list.filter(o=>{const c=routeOf(o.condition);if(!c)return false;const r=Core().forStation(c.station).routes[c.route];return [...runs.values()].some(x=>(x.legs||[]).some(l=>l.station===c.station&&r?.destination===l.slot));}).map(o=>({type:'objective',id:o.id})):[];
+   const start=trigger&&routeGoals.length?{type:'any',conditions:[trigger,...routeGoals]}:trigger;
+   const guards=[...runs.keys()].map(exists),when=[...(start?[start]:[]),...guards];
+   reactions.push({id:'r-'+tag,label:trigger?`${trigger.type==='communication'?'통보':'목표'} ${trigger.id}${routeGoals.length?' 또는 '+routeGoals.map(g=>g.id).join('·'):''} 이후 열차 변화`:'사고 발생 시점의 열차 변화',...(when.length?{when:when.length===1?when[0]:{type:'all',conditions:when}}:{}),do:dos});
   }
   return {id:'P-'+sc.id,subject:'비상 시 조치',name:`비상시 조치 ${sc.title}`,limit:limits[sc.id]||900,score:100,voice:sc.problem,
    situation:[sc.problem,...sc.trains,...sc.notes].join('\n'),actions:reference(order),source:sc.source,

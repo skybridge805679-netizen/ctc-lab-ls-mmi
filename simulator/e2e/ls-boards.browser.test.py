@@ -54,8 +54,15 @@ def run(page, url):
     b = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
     assert b['w'] > w0 + 50 and b['h'] > 80, b
     page.mouse.move(grip['x'] + 160 - 2, grip['y'] + 70 - 2)
-    page.locator('#lsStage [data-ls-board] [data-board-resize]').scroll_into_view_if_needed()
-    grip = page.locator('#lsStage [data-ls-board] [data-board-resize]').bounding_box()
+    # LS가 엔진 갱신으로 표지판을 다시 그리면 요소가 바뀐다: 새로 찾아 다시 시도한다
+    for attempt in range(5):
+        try:
+            page.locator('#lsStage [data-ls-board] [data-board-resize]').scroll_into_view_if_needed(timeout=2000)
+            grip = page.locator('#lsStage [data-ls-board] [data-board-resize]').bounding_box()
+            if grip: break
+        except Exception:
+            if attempt == 4: raise
+            page.wait_for_timeout(100)
     page.mouse.move(grip['x'] + grip['width'] / 2, grip['y'] + grip['height'] / 2); page.mouse.down(); page.mouse.move(grip['x'] - 300, grip['y'] - 150, steps=6); page.mouse.up()
     s = page.evaluate("SimLSUI.getModel().stations.anyang.boards[0]")
     assert s['w'] >= 60 and s['h'] >= 30 and s['w'] < b['w'], s                                          # shrinks, never below the minimum

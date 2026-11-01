@@ -88,6 +88,8 @@ function raiseAlarm(text,state='',level='E',station=''){
  alarms.push({time:stamp(new Date()),text,state,level,station});if(alarms.length>50)alarms.shift();renderAlarm();
  alarmEl.querySelector('[data-alarm-mute]').disabled=false;clearInterval(beepTimer);beep();beepTimer=setInterval(beep,2500);
 }
+// 새 문제·상황 재로딩: 지난 문제의 알람은 남기지 않는다 (교육 문제마다 새로 확인)
+function clearAlarms(){alarms.length=0;clearInterval(beepTimer);beepTimer=null;renderAlarm();}
 // 열차번호 중복 알람 (실무5 p.15: 충돌·구원연결로 한 열번창에 번호가 겹치면 "K0602 + K0604 열차번호 중복 알람")는 엔진이 낸다.
 function checkDuplicates(){}
 const CONTROL=['route','withdraw','stop','stopAll','point','pointLock'];
@@ -256,5 +258,5 @@ function init(){
 if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',init);else init();
 function connect(api){host=api;root.SimDiagram.subscribe(change=>{root.SimMMITrains?.refresh();log('event',`온라인 스케줄 ${change.id||''} · ${change.type}`);record('schedule',{type:change.type,train:change.id||'',text:JSON.stringify(change),console:'MMI-1'});emit({type:'schedule',change,ok:true});});}
 function refresh(){root.SimMMITrains?.refresh();}
-root.SimMMI={checkDuplicates,markAuto:key=>autoMarks.add(key),replayLog:id=>replayLog[id]||[],replaying:()=>root.SimReplay?.active?.()||false,render:()=>host?.render?.(),run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
+root.SimMMI={checkDuplicates,clearAlarms,markAuto:key=>autoMarks.add(key),replayLog:id=>replayLog[id]||[],replaying:()=>root.SimReplay?.active?.()||false,render:()=>host?.render?.(),run:a=>host.run(a),onEvent:fn=>{eventListeners.add(fn);return ()=>eventListeners.delete(fn);},rebase:id=>{delete seen[id];},confirmBox,LEVELS,history:()=>structuredClone(history),record,raiseAlarm,alarms:()=>structuredClone(alarms),labelOf:id=>windows[id]?.title,connect,refresh,dock,getLogs:()=>structuredClone(logRows),createWindow,alertBox,open,close,isOpen,log,sync,syncAll,stationInfo,menus:MENUS,windowIds:()=>Object.keys(windows)};
 })(window);

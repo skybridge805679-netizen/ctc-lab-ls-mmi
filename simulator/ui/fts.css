@@ -50,7 +50,7 @@
 body.fts-detached{margin:0;background:#eef6f5}
 body.fts-detached .fts-panel{margin:0;min-height:100vh;border:0;border-radius:0;box-shadow:none}
 /* 능동형 문제: 목표 · 통보 · 상황 반응 */
-.fts-comms{list-style:none;margin:4px 0;padding:0;max-height:260px;overflow:auto;border:1px solid #cfe3df;background:#fff}
+.fts-comms{list-style:none;margin:4px 0;padding:0;max-height:none;overflow:visible;border:1px solid #cfe3df;background:#fff}
 .fts-comms li{padding:5px 8px;border-top:1px solid #eef5f3}.fts-comms li.ok{background:#f1faf5}.fts-comms li small{color:#55706b}
 .fts-checks .fts-reaction{color:#3b5f8f}.fts-hint{color:#7a6a2f}
 /* 능동형 문제: 탭 도움말 · 능동형 표시 */

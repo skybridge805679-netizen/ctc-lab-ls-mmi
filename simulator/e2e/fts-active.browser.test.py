@@ -32,7 +32,7 @@ try:
   page.click('[data-ptab="react"]');page.select_option('#pfType','runTrain');page.dispatch_event('#pfType','change');page.fill('#pf-number','K0602');page.fill('#pf-legs','dongmyo:없는창');page.click('#pfAdd');expect(page.locator('.mmi-alert')).to_contain_text('없는 열번창');page.click('#mmiAlertOk')
   page.click('#pSave');page.click('#mmiConfirmYes');page.click('#mmiAlertOk')
   made=page.evaluate("(()=>{const p=SimFTSUI.library().problems.find(x=>x.name==='응용 · 동묘앞역 충돌 + 구로역 CCM');return p&&{id:p.id,obj:p.objectives.length,comm:p.communications.length,react:p.reactions.length,reset:p.setup.reset,pre:p.objectives.at(-1).condition.conditions[0].id,errors:SimFTS.validate(SimFTSUI.library(),{drafts:true,scripts:SimScheduleScenarios.list.map(s=>s.id)})}})()")
-  assert made and made['obj']==20 and made['comm']==29 and made['react']==6 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
+  assert made and made['obj']==20 and made['comm']==29 and made['react']==7 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
   # 교육: 비상시 조치 종합 → 첫 문제(em-01)는 초기 상태가 LS에 놓이고, 통보를 아무 순서로나 확인할 수 있다
   fts.locator('[data-fts-page=setup]').first.click();page.click('#suPick');page.locator('#pkScen tr[data-key="SC-04"]').click();page.click('#pkOk');page.uncheck('#suAuto');page.click('#suStart')
   fts.locator('[data-fts-page=monitor]').first.click()
@@ -41,6 +41,8 @@ try:
   # 상황 변경 주입: 분기 통보가 더해지고 제어통제 로그에 남는다
   inject=page.locator('[data-manual="branch:v-k1006-passed"]');inject.click();expect(inject).to_be_disabled();expect(page.locator('[data-manual="comm:v-k1006-passed-c"]')).to_be_visible()
   expect(page.locator('#ftsLog')).to_contain_text('상황 변경 · K1006 이미 통과')
+  # 교육생 문제 화면에는 감독관이 알려 주는 상황 변경만 보이고 모범 대응(원문 뒤쪽)은 보이지 않는다
+  change=page.locator('#problemPanel [data-problem-section=change]');expect(change).to_be_visible();expect(change).to_contain_text('K1006')
   last=page.locator('[data-manual="comm:n22"]');last.click();expect(page.locator('[data-manual="comm:n22"]')).to_be_disabled()
   expect(page.locator('[data-manual="comm:n1"]')).to_be_enabled()
   # 교수 프로그램의 기록은 FTS 제어통제 로그에만 남고, 교육생의 MMI 로그에는 남지 않는다. 문제 발생 화면은 MMI 창이 아니다.
