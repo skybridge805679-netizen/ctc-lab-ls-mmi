@@ -74,6 +74,7 @@ function render(st,def,core,model,neighbours={}){
  const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 노란 화살표 자리만큼 위를 비운다
 ,T=L.pt;
  const plateGap=prepared.corridor?128:94;
+ const edgePorts=seams.ports(st,def,data);
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -213,7 +214,7 @@ function render(st,def,core,model,neighbours={}){
   platforms+=`<rect data-platform-height="${info.height}" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} 승강장 · ${info.label}</title></rect>`;
   occupiedBoxes.push([p.x-3,p.y-3,p.right+3,p.y+p.height+3]);
  }
- for(const points of paths)rails+=`<path d="${dpath(points)}"/>`;
+ for(const [i,points]of paths.entries())rails+=`<path${i>=def.rails.length&&i<def.rails.length+(data.joins||[]).length?` data-reviewed-join="${i-def.rails.length}"`:''} d="${dpath(points)}"/>`;
  for(const polygon of (data.joins?.length?[]:wing.diags))rails+=`<polygon class="rail-join" points="${polygon.map(p=>T(p).join(',')).join(' ')}"/>`;
  for(const c of cells){
   const state=onRoute(c)?.state||'clear';
@@ -250,11 +251,17 @@ function render(st,def,core,model,neighbours={}){
  const addRailName=(name,anchor,poly,offset=0)=>{
   if(!name||hasName(name))return;
   const [baseX,y]=T(anchor),width=name.length*7.2+6;
-  const intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
-  let x=baseX+offset;
+  let intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
+  // An unnamed boundary segment belongs beyond the local endpoint, on the existing
+  // horizontal screen continuation. Never push B607T back into the named YT circuit.
+  const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);
+  const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
+  if(extension){intervals=[[edgeX+4,WIDTH-12]];symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
+  const preferredX=extension?(edgeX+4+WIDTH-12)/2:baseX+offset;
+  let x=preferredX;
   const deltas=[0];for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
-  for(const dx of deltas){const candidate=baseX+offset+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
-  labels+=`<text class="rail-name" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
+  for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
+  labels+=`<text class="rail-name" data-label-placement="${extension?'edge-extension':'native-rail'}" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
   occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
  };
  for(const [id,poly,target,left,right]of def.rails){
@@ -388,7 +395,7 @@ function render(st,def,core,model,neighbours={}){
  const around=presets.neighbours?.(neighbours.preset||st.id)||{};
  plates+=arrow(neighbours.left===undefined?around.left:neighbours.left,'left')+arrow(neighbours.right===undefined?around.right:neighbours.right,'right');
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
- const ports=seams.ports(st,def,data).map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
+ const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
  return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
