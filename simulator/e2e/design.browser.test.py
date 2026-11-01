@@ -18,10 +18,9 @@ try:
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
    expect(page.locator('.brand-icon img')).to_have_attribute('src','assets/orpheia/emblem.png')
    assert page.locator('.brand-icon img').evaluate('e=>e.complete&&e.naturalWidth>0')
-   expect(page.locator('#exportBtn .ui-icon')).to_have_count(1)
-   page.click('#guideBtn');expect(page.locator('#guideDialog')).to_be_visible();page.locator('.guide-intro').scroll_into_view_if_needed();page.wait_for_function("document.querySelector('.guide-intro img').naturalWidth>0")
-   if width==1440:page.locator('#guideDialog').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-guide.png'))
-   page.click('#closeGuide');page.select_option('#lsStationSelect','suwon');assert page.locator('.ls-name').evaluate('e=>getComputedStyle(e).backgroundColor')=='rgb(8, 11, 8)'
+   expect(page.locator('#resetBtn .ui-icon')).to_have_count(1)
+   expect(page.locator('#exportBtn,#guideBtn,#lsStationSelect,.mmi-appbar')).to_have_count(0)
+   page.evaluate('(id)=>selectStation(id)','suwon');assert page.locator('.ls-name').evaluate('e=>getComputedStyle(e).backgroundColor')=='rgb(8, 11, 8)'
    page.locator('[data-mode="CCM"]').click();expect(page.locator('#actionDialog')).to_have_class('mode-confirm');page.keyboard.press('n');expect(page.locator('#actionDialog')).not_to_be_visible()
    page.locator('#toast').evaluate('e=>e.style.visibility="hidden"');page.evaluate('window.scrollTo(0,0)')
    if width==1440:page.screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-workspace.png'),style='#toast{display:none!important}')

@@ -50,22 +50,19 @@ $('routeEvidence').onclick=e=>{const tg=e.target.closest('[data-approach-toggle]
 function selectStation(id,scroll=true){
  const view=window.SimLSPresets.get(id);if(!view)return;id=view.station;
  if(!N.catalog[id]?.controlled)return;
- if($('actionDialog').open){toast('제어 확인창을 닫은 뒤 역을 변경하세요.',true);$('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedView;return;}
+ if($('actionDialog').open){toast('제어 확인창을 닫은 뒤 역을 변경하세요.',true);$('stationSelect').value=selectedStation;return;}
  window.SimLSUI.stationChanged();stationStates[selectedStation]=state;
  selectedStation=id;selectedView=view.id;state=session.select(id);C=session.core(id);
- $('stationSelect').value=id;showViewOption(view);
+ $('stationSelect').value=id;
  fields();render();taskView();
 }
-// 역간 감시 화면은 하단 목록에 없으므로, 노란 화살표로 들어온 동안만 임시 항목으로 보여 준다.
-function showViewOption(view){const el=$('lsStationSelect');el.querySelectorAll('option[data-transient]').forEach(o=>{if(o.value!==view.id)o.remove();});if(![...el.options].some(o=>o.value===view.id)){const o=document.createElement('option');o.value=view.id;o.textContent=view.name;o.dataset.transient='1';el.appendChild(o);}el.value=view.id;}
 const stationOptions=N.stations.filter(st=>st.controlled).map(st=>`<option value="${st.id}">${st.name}${st.controlled?' ['+st.code+']':' · 비연동'}</option>`).join('');
-$('stationSelect').innerHTML=stationOptions;$('lsStationSelect').innerHTML=lsViews.filter(v=>!v.monitor||v.id===selectedView).map(v=>`<option value="${v.id}">${v.name}${v.id===v.station?' ['+N.catalog[v.station].code+']':''}</option>`).join('');
-$('stationSelect').value=selectedStation;$('lsStationSelect').value=selectedView;
-window.SimPreferred&&window.SimPreferred.apply();
-$('stationSelect').onchange=e=>selectStation(e.target.value);$('lsStationSelect').onchange=e=>selectStation(e.target.value);
+$('stationSelect').innerHTML=stationOptions;
+$('stationSelect').value=selectedStation;
+$('stationSelect').onchange=e=>selectStation(e.target.value);
 $('stationTabs').innerHTML=lsViews.filter(v=>!v.monitor).map(v=>`<button data-station="${v.station}" data-view="${v.id}"><i class="tab-dot auto" aria-hidden="true"></i>${v.name}<b class="tab-count"></b></button>`).join('');
+window.SimPreferred&&window.SimPreferred.apply();
 $('stationTabs').onclick=e=>{const button=e.target.closest('[data-view]');if(button)selectStation(button.dataset.view);};
-for(const [id,step]of [['previousStation',-1],['nextStation',1]])$(id).onclick=()=>{const next=lsViews[lsViews.findIndex(v=>v.id===selectedView)+step];if(next)selectStation(next.id);};
 function renderLogs(){$('logCount').textContent=state.logs.length+' events';$('logList').innerHTML=state.logs.length?state.logs.slice(0,100).map(l=>`<div class="log-row"><span class="log-time">${time(l.time)}</span><div><p>${escapeHTML(l.message)}</p><div class="log-meta">${escapeHTML(l.source)} · <span class="${['완료','접수'].includes(l.result)?'result-ok':'result-bad'}">${l.result}</span></div></div></div>`).join(''):'<p class="empty">첫 조작을 기다리고 있습니다.</p>';}
 var drawnVersion=-1;   // 마지막으로 그린 엔진 상태 (그 뒤 바뀐 것이 없으면 1초 주기에서 다시 그리지 않는다)
 function render(){
@@ -79,12 +76,9 @@ function render(){
  SimDOM.document.querySelectorAll('#stationTabs [data-station]').forEach(b=>{const s=stationStates[b.dataset.station],monitor=!!window.SimLSPresets.get(b.dataset.view).monitor,n=monitor?0:Object.keys(s.routes).length;b.classList.toggle('selected',b.dataset.view===selectedView);b.querySelector('.tab-dot').className='tab-dot '+(monitor?'monitor':s.mode.toLowerCase());b.querySelector('.tab-count').textContent=n?n:'';b.title=monitor?window.SimLSPresets.get(b.dataset.view).name+' · 역간 운행 감시':`${N.catalog[b.dataset.station].name} · ${s.mode} · ${n}개 진로`;});
  SimDOM.document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
  const monitor=!!window.SimLSPresets.get(selectedView).monitor;$('topStation').textContent=window.SimLSPresets.get(selectedView).name;$('topCode').textContent=monitor?'':st.code;
- if($('drawerBtn'))$('drawerBtn').hidden=monitor;$('resetBtn').hidden=monitor;if(monitor&&window.SimShell)window.SimShell.drawer(false);
+ if($('drawerBtn'))$('drawerBtn').hidden=monitor;if(monitor&&window.SimShell)window.SimShell.drawer(false);
  SimDOM.document.querySelector('.fidelity-note').innerHTML=monitor?`${viewInfo.name} LS<b>역간 운행 감시 · ${viewInfo.plates.join(' · ')}</b>`:`${viewInfo.name} LS<b>${(ownIntermediate.length?'관할 '+ownIntermediate.join(' · ')+' · ':'')+'접근쇄정·오버랩 연습'}</b>`;
  SimDOM.document.querySelector('.fidelity-note').insertAdjacentHTML('beforeend','<span class="platform-legend" aria-label="승강장 범례"><span><i class="platform-key orange"></i>고상홈</span><span><i class="platform-key cyan"></i>저상홈</span></span>');
- const controlled=lsViews,index=controlled.findIndex(s=>s.id===selectedView);
- $('previousStation').textContent=index>0?'◀ '+controlled[index-1].name:'시점';$('previousStation').disabled=index===0;
- $('nextStation').textContent=index<controlled.length-1?controlled[index+1].name+' ▶':'종점';$('nextStation').disabled=index===controlled.length-1;
  window.SimAssessmentUI?.render();$('stateMode').textContent=st.controlled?state.mode:'비연동';$('stateOwner').textContent=state.mode==='LOCAL'?'현장역':'관제실';$('stateRoutes').textContent=Object.keys(state.routes).length+'개 설정';$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';
  $('lsStatus').textContent=monitor?'역간 운행 감시 · 열번창: 열차번호 제어 · 폐색·점유 표시':'CCM → 신호기 클릭 → 진로 선택 · 우클릭: 화면 메뉴 · 열번창: 열차번호 제어';
  $('mmiState').textContent=`현재 ${state.mode} · LS와 같은 상태 · ${Object.keys(state.routes).length}개 진로 설정`;
@@ -151,15 +145,18 @@ $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('cont
  if(type==='scan')run({type,scope:checked('mmiScope'),source:'MMI'});
 };
 $('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!paused;window.SimRemote.command({type:'clock',paused});$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
-$('resetBtn').onclick=()=>{if(!confirm('현재 상태와 조작 기록을 초기화할까요?'))return;window.SimRemote.reset(selectedStation);state=stationStates[selectedStation];window.SimMMI?.rebase?.(selectedStation);   // 초기화는 해정이 아니다 — 로그에 남기지 않는다
-window.SimLSUI.reset(selectedStation);window.SimMMI?.syncAll(stationStates);if(taskTimerKey)window.SimAssessmentUI.cancel(taskTimerKey);taskTimerKey=null;activeTask=null;paused=false;window.SimRemote.command({type:'clock',paused:false});$('pauseBtn').textContent='Ⅱ 일시정지';fields();render();taskView();};
+$('resetBtn').onclick=async()=>{
+ if(!confirm('프로그램을 완전히 초기화할까요?\n\n모든 역의 진로·열차번호·설비, 교육 진행·결과, 추가한 문제·상황·시나리오·스케줄, 사용자·환경설정을 삭제합니다. 기본 시간표와 내장 시나리오로 돌아가며 저장된 자동 복구 백업도 새 상태로 교체합니다. 이 작업은 되돌릴 수 없습니다.'))return;
+ const button=$('resetBtn');button.disabled=true;window.SimResetting=true;
+ try{const r=await window.OrpheiaEngine.reset();if(!r?.ok)throw Error(r?.message||'초기화하지 못했습니다.');}
+ catch(error){window.SimResetting=false;button.disabled=false;toast('전체 초기화 실패: '+error.message,true);}
+};
 $('startTask').onclick=startTask;$('nextTask').onclick=()=>{taskIndex=(taskIndex+1)%tasks.length;taskView();};
 $('checkTask').onclick=()=>{if(selectedStation!=='underground-seoul')return toast('지하서울로 전환해 과제를 확인하세요.',true);if(activeTask!==taskIndex)return toast('먼저 이 과제를 시작하세요.',true);const ok=tasks[taskIndex].check(state.events.slice(taskStart),state);if(ok){window.SimAssessmentUI.complete(taskTimerKey);if(!completed.includes(taskIndex))completed.push(taskIndex);try{localStorage.setItem('ctclab-v03-completed',JSON.stringify(completed));}catch{}taskView();$('taskResult').className='complete-banner';$('taskResult').textContent='✓ 목표 조작과 경로 확인을 완료했습니다.';render();}else $('taskResult').textContent='필수 조작과 경로 확인을 다시 확인하세요.';toast(ok?'과제 달성':'아직 과제를 완료하지 않았습니다.',!ok);};
-$('guideBtn').onclick=()=>$('guideDialog').showModal();$('closeGuide').onclick=()=>$('guideDialog').close();
+
 $('fieldMenu').onclick=()=>toast('현장제어 · 확인된 경로 및 설비 구성');$('systemMenu').onclick=()=>window.SimShell?.drawer(true);
-$('exportBtn').onclick=()=>{const data={app:'CTC LAB v0.37.1',exportedAt:new Date().toISOString(),sources:C.sources,routeCatalog:C.routes,interlockingVerified:false,networkAudit:window.SimNetworkTopology.audit(),actualTrainPositions:window.SimDiagram.getModel().trains.map(t=>({train:t.id,position:window.SimAutoUI.position(t,state.clock)})),selectedStation,stations:stationStates,state,lsDisplay:window.SimLSUI.getModel(),assessment:window.SimAssessmentUI.snapshot(),scenario:window.SimScenarioUI?.snapshot?.(),timetable:window.SimDiagram.getModel(),mmiLogs:window.SimMMI.getLogs(),mmiHistory:window.SimMMI.history(),notes:window.SimNotes?.export()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ctc-lab-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 // 화면은 엔진(데스크톱: 별도 프로세스, 브라우저: page-engine)의 상태를 1초마다 받아 그린다. 시계는 엔진이 진행한다.
-setInterval(()=>{try{window.SimRemote.poll();}catch(error){if(error.message==='Engine offline')return;throw error;}   // 종료 중 엔진이 먼저 멈추면 조용히 넘어간다
+setInterval(()=>{if(window.SimResetting)return;try{window.SimRemote.poll();}catch(error){if(error.message==='Engine offline')return;throw error;}   // 종료 중 엔진이 먼저 멈추면 조용히 넘어간다
  window.SimScenarioUI?.stepMotion();
  if(window.SimRemote.version===drawnVersion)return;drawnVersion=window.SimRemote.version;   // 엔진 상태가 그대로면 다시 그리지 않는다
  window.SimAutoUI?.step();window.SimMMI.syncAll(stationStates);render();window.SimDiagram.render();},1000);

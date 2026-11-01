@@ -218,14 +218,31 @@ function render(st,def,core,model,neighbours={}){
  for(const c of cells){
   const state=onRoute(c)?.state||'clear';
   sections+=`<g class="track-cell ${state}" data-track-section="${st.id}-${c.index}" data-track-circuit="${esc(c.label)}" data-track-state="${state}"><rect class="cell-bed" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/><title>${esc(c.label||'원본 무기명 구간')} · ${state}</title></g>`;
+ }
+ // Adjacent extraction fragments may belong to one named circuit. Consolidate text only;
+ // every original circuit rectangle, hit target and interlocking resource stays intact.
+ const fragments=cells.flatMap(c=>{
+  const atomic=c.label.replaceAll(' · ',''),tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
+  return tokens.map((label,i)=>({...c,label,x:c.x+c.width*i/tokens.length,width:c.width/tokens.length}));
+ });
+ const labelRuns=[];
+ for(const c of fragments.sort((a,b)=>a.y-b.y||a.x-b.x)){
+  const prev=labelRuns.at(-1);
+  if(prev&&prev.label===c.label&&Math.abs(prev.y-c.y)<2&&c.x<=prev.x+prev.width+10)prev.width=Math.max(prev.width,c.x+c.width-prev.x);
+  else labelRuns.push({...c});
+ }
+ for(const c of labelRuns){
   const atomic=c.label.replaceAll(' · ','');
   const tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   tokens.forEach((label,i)=>{
-   let x=c.x+c.width*(i+.5)/tokens.length;const width=c.width/tokens.length;
-   if(visibleWindows.some(w=>w.side==='inline'&&w.code===label)){const box=occupiedBoxes.find(b=>x>b[0]&&x<b[2]&&c.y>b[1]&&c.y<b[3]);if(box)x=box[2]+label.length*3.6+4;}
-   const fit=label.length*7.2>width-6?` textLength="${Math.max(12,width-6)}" lengthAdjust="spacingAndGlyphs"`:'';
+   const left=c.x+c.width*i/tokens.length,right=c.x+c.width*(i+1)/tokens.length;
+   let intervals=[[left+3,right-3]];
+   for(const box of windowBoxes.filter(b=>b.inline&&Math.abs(b.cy-c.y)<4))intervals=intervals.flatMap(([a,b])=>box.x>=b||box.x+box.width<=a?[[a,b]]:[[a,Math.min(b,box.x-5)],[Math.max(a,box.x+box.width+5),b]].filter(([l,r])=>r-l>6));
+   if(!intervals.length)intervals=[[left+3,right-3]];
+   const [a,b]=intervals.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0],x=(a+b)/2,width=Math.max(6,b-a),textWidth=Math.min(width,label.length*7.2);
+   const fit=label.length*7.2>width?` textLength="${Math.max(6,width)}" lengthAdjust="spacingAndGlyphs"`:'';
    labels+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${x}" y="${c.y+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
-   occupiedBoxes.push([x-Math.min(width-3,label.length*7)/2,c.y-8,x+Math.min(width-3,label.length*7)/2,c.y+8]);
+   occupiedBoxes.push([x-textWidth/2,c.y-8,x+textWidth/2,c.y+8]);
   });
  }
  // Source aliases such as B615T1T represent adjoining identifiers, not an extra overlapping label.
@@ -334,7 +351,7 @@ function render(st,def,core,model,neighbours={}){
   preferred=[Math.max(20,Math.min(WIDTH-20,preferred[0])),Math.max(20,Math.min(L.H-20,preferred[1]))];
   let [x,y]=preferred;
   const offsets=[[0,0]];
-  for(let d=12;d<=36;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
+  for(let d=12;d<=72;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
   for(const [dx,dy]of offsets){
    const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-7,xx+width/2,yy+7];
    if(xx<width/2+8||xx>WIDTH-width/2-8)continue;

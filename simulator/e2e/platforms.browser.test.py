@@ -11,7 +11,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)));T
 try:
  with sync_playwright() as p:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page(viewport={'width':1920,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-  page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.select_option('#lsStationSelect','seoul');expect(page.locator('.platform-legend')).to_contain_text('고상홈');expect(page.locator('.platform-legend')).to_contain_text('저상홈')
+  page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');page.evaluate('(id)=>selectStation(id)','seoul');expect(page.locator('.platform-legend')).to_contain_text('고상홈');expect(page.locator('.platform-legend')).to_contain_text('저상홈')
   # 승강장은 LS의 정적 표시다: 클릭해도 대화상자를 열지 않고, 마우스를 올리면 색과 높이만 알려 준다.
   high=page.locator('#trackSvg [data-platform-height=high]').first;low=page.locator('#trackSvg [data-platform-height=low]').first
   expect(high.locator('title')).to_have_text('황색 승강장 · 고상홈');expect(low.locator('title')).to_have_text('청색 승강장 · 저상홈')

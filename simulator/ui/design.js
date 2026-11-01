@@ -12,7 +12,7 @@ const paths={
  ledger:'M5 3h14v18H5z M8 7h2 M13 7h3 M8 11h2 M13 11h3 M8 15h2 M13 15h3'
 };
 function init(){
- const ids={workspaceNav:'workspace',guideBtn:'guide',exportBtn:'export',resetBtn:'reset',mmiScenarioBtn:'scenario',mmiEquipBtn:'equipment',mmiCdrsBtn:'cdrs',mmiLedgerBtn:'ledger'};
+ const ids={workspaceNav:'workspace',resetBtn:'reset',mmiScenarioBtn:'scenario',mmiEquipBtn:'equipment',mmiCdrsBtn:'cdrs',mmiLedgerBtn:'ledger'};
  for(const [id,key]of Object.entries(ids)){
   const b=document.getElementById(id);if(!b)continue;
   const label=b.textContent.replace(/^[\s▦▤↓↻]+/,'').replace(/01$/,'').trim();

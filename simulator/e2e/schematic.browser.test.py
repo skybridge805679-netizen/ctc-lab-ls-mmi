@@ -20,13 +20,13 @@ try:
    page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    stations=page.locator('#stationSelect option').evaluate_all('(os)=>os.map(o=>o.value)')
    for station in stations:
-    page.select_option('#lsStationSelect',station)
+    page.evaluate('(id)=>selectStation(id)',station)
     expect(page.locator('#lsStage image, #lsStage img, #lsStage canvas')).to_have_count(0)
     assert page.locator('[data-track-section]').count()>0
     assert page.locator('[data-circuit-label]').count()>0
     expect(page.locator('[data-equipment]')).to_have_count(11)
     if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.18.0-{station}.png'))
-   page.select_option('#lsStationSelect','underground-seoul')
+   page.evaluate('(id)=>selectStation(id)','underground-seoul')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="1A"]').click();page.locator('[data-route-choice="1A-1T"]').click()
    assert page.locator('[data-track-state="set"]').count()>0

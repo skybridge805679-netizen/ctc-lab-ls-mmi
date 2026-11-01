@@ -1,20 +1,19 @@
 (function(root){
 'use strict';
 // 운영자 선호화면 설정 (교통관제운영 4권 p.374-376): L/S 3개 모니터별로 표시할 역을 추가·삭제·위/아래 이동하고 [확인]으로 적용.
-// This simulator has one L/S, so the chosen monitor's list is shown first in the L/S station selector (optgroup "운영자 선호화면").
+// The chosen monitor orders the direct station buttons; corridor screens remain on the yellow arrows.
 const doc=SimDOM.document,$=id=>doc.getElementById(id),N=root.SimNetwork,KEY='orpheia.preferred';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const stations=root.SimLSPresets.list();
+const stations=root.SimLSPresets.list().filter(s=>!s.monitor);
 let cfg={1:[],2:[],3:[]},mon=1,sel=null,pool=null;
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d[1])cfg=d;}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d[1])for(const n of [1,2,3])cfg[n]=[...new Set(Array.isArray(d[n])?d[n]:[])].filter(id=>stations.some(s=>s.id===id));}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(cfg));}catch(e){}}
 const label=id=>{const v=root.SimLSPresets.get(id);return v?(v.id===v.station?`${v.name} [${N.catalog[v.station].code}]`:v.name):id;};
 function apply(){
- const el=$('lsStationSelect');if(!el)return;const cur=el.value,list=cfg[mon]||[];
- const opt=s=>`<option value="${s.id}">${esc(label(s.id))}</option>`;
- const pref=list.map(id=>stations.find(s=>s.id===id)).filter(Boolean);
- el.innerHTML=(pref.length?`<optgroup label="운영자 선호화면 (모니터 ${mon})">${pref.map(opt).join('')}</optgroup><optgroup label="전체 LS 화면">`:'')+stations.filter(s=>!s.monitor||s.id===cur).map(opt).join('')+(pref.length?'</optgroup>':'');   // 역간 감시 화면은 노란 화살표로 연다(선호화면에 넣은 경우만 목록에 보임)
- el.value=cur;
+ const tabs=$('stationTabs');if(!tabs)return;
+ const list=cfg[mon]||[],buttons=[...tabs.querySelectorAll('[data-view]')];
+ const rank=id=>{const at=list.indexOf(id);return at<0?list.length+stations.findIndex(s=>s.id===id):at;};
+ buttons.sort((a,b)=>rank(a.dataset.view)-rank(b.dataset.view)).forEach(button=>tabs.appendChild(button));
 }
 function draw(){
  const list=cfg[mon];
@@ -24,7 +23,7 @@ function draw(){
 }
 function init(){
  const m=root.SimMMI;load();apply();
- const w=m.createWindow('preferredScreen',{title:'운영자선호화면 설정',x:200,y:90,width:560,body:`<div class="rpt pref"><div class="idm-buttons" role="group" aria-label="L/S 모니터">${[1,2,3].map(n=>`<button type="button" class="sched-btn" data-pref-mon="${n}">L/S ${n}</button>`).join('')}</div><div class="pref-cols"><div><b>L/S 화면 목록</b><ul id="prefList" class="pref-ul"></ul></div><div class="pref-mid"><button type="button" class="sched-btn" id="prefAdd">◀ 추가</button><button type="button" class="sched-btn" id="prefDel">삭제 ▶</button><button type="button" class="sched-btn" id="prefUp">▲</button><button type="button" class="sched-btn" id="prefDown">▼</button></div><div><b>전체 LS 화면</b><ul id="prefPool" class="pref-ul"></ul></div></div><div class="idm-note">모니터를 고르고 역을 추가·삭제·이동한 뒤 [확인]을 누르면 L/S 역 선택 목록 맨 위에 선호 역이 나타납니다. 선택한 모니터의 선호 목록을 현재 LS 창에 적용합니다.</div><div id="prefMsg" class="trc-msg" role="status"></div><div class="idm-buttons"><button type="button" class="sched-btn primary" id="prefOk">확인</button><button type="button" class="sched-btn" id="prefClose">닫기</button></div></div>`});
+ const w=m.createWindow('preferredScreen',{title:'운영자선호화면 설정',x:200,y:90,width:560,body:`<div class="rpt pref"><div class="idm-buttons" role="group" aria-label="L/S 모니터">${[1,2,3].map(n=>`<button type="button" class="sched-btn" data-pref-mon="${n}">L/S ${n}</button>`).join('')}</div><div class="pref-cols"><div><b>L/S 화면 목록</b><ul id="prefList" class="pref-ul"></ul></div><div class="pref-mid"><button type="button" class="sched-btn" id="prefAdd">◀ 추가</button><button type="button" class="sched-btn" id="prefDel">삭제 ▶</button><button type="button" class="sched-btn" id="prefUp">▲</button><button type="button" class="sched-btn" id="prefDown">▼</button></div><div><b>전체 LS 화면</b><ul id="prefPool" class="pref-ul"></ul></div></div><div class="idm-note">모니터를 고르고 역을 추가·삭제·이동한 뒤 [확인]을 누르면 L/S 역 하단 역 버튼 앞쪽에 선호 역이 나타납니다. 선택한 모니터의 선호 목록을 현재 LS 창에 적용합니다.</div><div id="prefMsg" class="trc-msg" role="status"></div><div class="idm-buttons"><button type="button" class="sched-btn primary" id="prefOk">확인</button><button type="button" class="sched-btn" id="prefClose">닫기</button></div></div>`});
  const say=t=>{$('prefMsg').textContent=t;};
  doc.querySelectorAll('[data-pref-mon]').forEach(b=>b.onclick=()=>{mon=+b.dataset.prefMon;sel=null;draw();});
  $('prefList').onclick=e=>{const li=e.target.closest('li[data-i]');if(li){sel=+li.dataset.i;draw();}};

@@ -24,7 +24,7 @@ try:
     assert metrics['left']>=0 and metrics['right']<=width+1 and metrics['top']>=0 and metrics['bottom']<=height+1,(station,width,metrics)
     assert abs(metrics['x']-metrics['y'])<.00001,(station,width,metrics)
     assert page.locator('.top-actions button').evaluate_all('es=>es.every(e=>e.getBoundingClientRect().right<=innerWidth+1)'),(station,width)
-   page.select_option('#lsStationSelect','geumcheon');page.locator('[data-mode="CCM"]').click()
+   page.evaluate('(id)=>selectStation(id)','geumcheon');page.locator('[data-mode="CCM"]').click()
    expect(page.locator('#actionDialog')).to_be_visible();box=page.locator('#actionDialog').bounding_box()
    assert box['x']>=0 and box['x']+box['width']<=width+1 and box['y']>=0 and box['y']+box['height']<=height+1,box
    page.keyboard.press('Escape')

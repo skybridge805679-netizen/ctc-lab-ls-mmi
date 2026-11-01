@@ -1,7 +1,7 @@
 {
-  "version": "0.32.1",
-  "backupDate": "2026-10-31",
-  "scope": "작업 트리의 루트·desktop·docs·simulator·tools. references는 references/MANIFEST.json과 원본 보존 브랜치 참조; 버전 ZIP 재생성 없음.",
+  "version": "0.38.0",
+  "backupDate": "2026-11-01",
+  "scope": "현재 작업 트리. references는 references/MANIFEST.json 및 보존 브랜치 참조. 버전 ZIP 재생성 없음.",
   "files": [
     {
       "path": ".github/workflows/desktop.yml",
@@ -10,18 +10,18 @@
     },
     {
       "path": ".gitignore",
-      "bytes": 400,
-      "sha256": "265e360daa9c342026af4441a0d4c86c8fc0d2bdca51d47b37059b4d5255e931"
+      "bytes": 399,
+      "sha256": "284cda53edf6281c793bb79a6e94c7ab1f3a49c278fdcf89b459a098d5353e79"
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 56556,
-      "sha256": "a02b31308558666cde0478b9dadb5bbc8304af9681eee09f849119352191953d"
+      "bytes": 61991,
+      "sha256": "6c2a47490788a44edbe9e4256d1e8b5205a39cab186ad894e54f74fa8d9d53ec"
     },
     {
       "path": "README.md",
-      "bytes": 21756,
-      "sha256": "0188d830318fb0f5173322a26299b3ad5b5929672cc8f1fd44dbd449c8062af9"
+      "bytes": 22438,
+      "sha256": "83db712515c65a8c27aef708abb5784724f891a0d21ef06fd2caf8aa6d641adb"
     },
     {
       "path": "desktop/check-package.cjs",
@@ -35,23 +35,23 @@
     },
     {
       "path": "desktop/engine-process.cjs",
-      "bytes": 2530,
-      "sha256": "f33625107e454d095a5934313a0ed633ac585f5794312fe89b309e8fca78f6b0"
+      "bytes": 3277,
+      "sha256": "684856b6347f9b6fc4fd62aafb6c8f2663a30010b5ff2c658729d5e429ac1dee"
     },
     {
       "path": "desktop/engine-process.test.cjs",
-      "bytes": 2011,
-      "sha256": "d29f5bb480f0fc1d0c98768dc1bf5f737ab13a1d6bb92627f69f29e11dbdcd21"
+      "bytes": 4597,
+      "sha256": "2b0f875fa7924564ab6e3d312efe5014069ed903408c4210b771312ffdac98d8"
     },
     {
       "path": "desktop/engine-smoke.cjs",
-      "bytes": 8270,
-      "sha256": "e3e7037feca59c4b53d4230a1fdc050008098de84fabc0cb088d387ff1b050eb"
+      "bytes": 8269,
+      "sha256": "51702c5ca3c8ac6dccc08f9c7a5efa8e298488927a7c6c86a316df492ba27ec3"
     },
     {
       "path": "desktop/fts-smoke.cjs",
-      "bytes": 6227,
-      "sha256": "60abf4f99aeee0b63385d00ebb7058134c9bba9cb2ef2ceeed8a936afcd0003d"
+      "bytes": 8693,
+      "sha256": "e2aec96ec9724cf2a1a04492d155c5346589872061bf24905ceb6dc20b1f9e73"
     },
     {
       "path": "desktop/install-electron.cjs",
@@ -65,13 +65,13 @@
     },
     {
       "path": "desktop/ls-windows-smoke.cjs",
-      "bytes": 7406,
-      "sha256": "86a6544fed6cd1b4f5b1eca8f49b50323f217a53507740ef81b3a18d65bda51c"
+      "bytes": 7554,
+      "sha256": "6502ead3c5213e6531d75d3453c757a6406d36fd6fbb908aae6a4324c1a44d17"
     },
     {
       "path": "desktop/main.cjs",
-      "bytes": 12342,
-      "sha256": "0155065c8e03b8f94bf1f66c39c1f038c91c6e114183b904b6650a2db632046f"
+      "bytes": 15563,
+      "sha256": "9b48ce4327f557be1ce72037cbfcd119c25031d3b1920c2a435c04b1a878da73"
     },
     {
       "path": "desktop/package-audit.cjs",
@@ -85,13 +85,18 @@
     },
     {
       "path": "desktop/preload.cjs",
-      "bytes": 293,
-      "sha256": "a7bd14213f3ff256205a9031bf70435283e4d05891caa6ff04999a5e52774ee9"
+      "bytes": 339,
+      "sha256": "634815395aa7a8abf92c9500bfa16f06f6300a3ebac79335451b2833786942ea"
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 10942,
-      "sha256": "c156966002a77a87914ac82dbecb20540ed7b9b53fa209ca38dba895499d0bf6"
+      "bytes": 13439,
+      "sha256": "7ba3c0c5257710fd2e04e494a0d3c5863ba3b2f782f5e88b2ae8c732eda818a6"
+    },
+    {
+      "path": "desktop/reset-smoke.cjs",
+      "bytes": 4474,
+      "sha256": "1a7d96b01f2e7528f2fa6ebdbebf1b13843ac4d78cec2d1043bbf5b828296deb"
     },
     {
       "path": "desktop/resources/MANIFEST.json",
@@ -130,8 +135,8 @@
     },
     {
       "path": "desktop/smoke.cjs",
-      "bytes": 7360,
-      "sha256": "a20f03f38a02023266e45d0b30345c83978e08905715b287b9358ff7f24c74ee"
+      "bytes": 7576,
+      "sha256": "1a8f855fabe673806984f14e024946082aa076292d00ff91bdc1225b86c7e591"
     },
     {
       "path": "desktop/window-state.cjs",
@@ -145,8 +150,8 @@
     },
     {
       "path": "docs/FTS-시나리오-형식.md",
-      "bytes": 7620,
-      "sha256": "015aaa9402c0ab1ee127d4a12b7d048b3c15ae7bd8e5466584440fa2e5ab3792"
+      "bytes": 16703,
+      "sha256": "05851b10cff41e674b2f98e1e9e9b02ad0a6d6559093b51f7a6e9fada1754b78"
     },
     {
       "path": "docs/LS재작성.md",
@@ -187,6 +192,46 @@
       "path": "docs/benchmarks/engine-v0.24.0.json",
       "bytes": 339,
       "sha256": "fcd6dceb5ed2bc7bb77d0b493a63656fdcf46a43d47631c8e7b576e53a51a96b"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/README.md",
+      "bytes": 4956,
+      "sha256": "c951833c9edc93d7f055b8ac87277bbdd24bea7191ff637dd87119005ce69cb9"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/audit.json",
+      "bytes": 7166,
+      "sha256": "785264e21495360e10c5f82f20ba54eedca571afc25753119a7cbf670db7e329"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/index.html",
+      "bytes": 472023,
+      "sha256": "dcffcd11770cc8cd39319c7ed2b22450f938c6f9686eb5feaf503c787869e2e1"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/network-full.png",
+      "bytes": 1168358,
+      "sha256": "f95bee5048a7bc646816c20ebbde272d475ef23ab0b333e97a988c3dc25967c7"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/network-full.svg",
+      "bytes": 468233,
+      "sha256": "b3b8a358311c9f6cf353d8656c4f68b3a613edb70ffd86f3b0259208e3670839"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/network-overview.png",
+      "bytes": 989868,
+      "sha256": "f4e37f311fc98e0cbcb1bb4877386acdcc9c1238a81735b05ca262a18209a2c8"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/network-overview.svg",
+      "bytes": 1403179,
+      "sha256": "9155ae6e8085aaf02a28e62df497340e7ba5d28ba24bd11a3d9362f0395958ea"
+    },
+    {
+      "path": "docs/code-network-2026-11-01/network-preview.png",
+      "bytes": 286868,
+      "sha256": "0695b22c2b85ee062b3d9bb8e97d858a6925117f2e10c2165b51756aa8b70c65"
     },
     {
       "path": "docs/design/README.md",
@@ -1664,6 +1709,16 @@
       "sha256": "3f26ad93f0a859df20131e3c5338dfa1605b2138f534a19cec0b25e67a8509f1"
     },
     {
+      "path": "docs/preview-v0.38.0-ls.png",
+      "bytes": 173868,
+      "sha256": "29eb6430f4c48653aff7a6fe78466212563c50313ff4acfbf1eb55c4f075834a"
+    },
+    {
+      "path": "docs/preview-v0.38.0-mmi.png",
+      "bytes": 133521,
+      "sha256": "5615e6cc0a30f917a3182500bb5c994affdc3b29de9100a06a401e43eb7f9a9b"
+    },
+    {
       "path": "docs/preview-v0.5-diagram.png",
       "bytes": 132631,
       "sha256": "99f2e7f79e0222125bdc6e423b004262c5bacf182da59631b1508dfadcc974af"
@@ -2034,6 +2089,36 @@
       "sha256": "a913a8be79d3c3049b2cda18d75d18c5cc65754bb5902580756e168eef483a0d"
     },
     {
+      "path": "docs/v0.33.0-능동형시나리오.md",
+      "bytes": 3731,
+      "sha256": "3893eb5cf77ccf424b4ebb925589c7eed49cc16ad937a29b613c8d8b117769ba"
+    },
+    {
+      "path": "docs/v0.34.0-상황변경·창분리.md",
+      "bytes": 7344,
+      "sha256": "8a64133503a2ecd24ef6405954c299111b16889d639360c65c151dd7e3495206"
+    },
+    {
+      "path": "docs/v0.35.0-엔진경로일원화.md",
+      "bytes": 3498,
+      "sha256": "e934da1d31903c95ec044c2ac7bcc766754edd59f7ab91b4b1700e30a07c9c78"
+    },
+    {
+      "path": "docs/v0.36.0-컴퓨터사용검수반영.md",
+      "bytes": 5492,
+      "sha256": "d6f86874f5e0d862066c91c609129f8e1b26d6aa05c11d7485a88d69d02eb68c"
+    },
+    {
+      "path": "docs/v0.37.0-실제열차운행.md",
+      "bytes": 7319,
+      "sha256": "b48b87ac82fbab4db209925f4720fa067a65af67b13c73e4d7c44d384043315a"
+    },
+    {
+      "path": "docs/v0.38.0-화면정리와전체초기화.md",
+      "bytes": 4246,
+      "sha256": "02d362f92f914e9b4597e92108923ae3485ff168f38ba79220839336b1956348"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -2042,6 +2127,11 @@
       "path": "docs/개발인수인계.md",
       "bytes": 8321,
       "sha256": "ba3d9ad8cbb9ecb839399e57d0cccc722c004da16260f60962894405577640ea"
+    },
+    {
+      "path": "docs/검수-컴퓨터사용-인수인계.md",
+      "bytes": 11227,
+      "sha256": "fe0ec860532825e0f612a7be52af7db627e53b92b0587b8b103fe7b0b7160837"
     },
     {
       "path": "docs/구조-엔진과-화면.md",
@@ -2126,17 +2216,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "e20f17ac1f74f1defdcb31aefaf72f8b8fca3da093c335836af98e6a89294834"
+      "sha256": "5f0409d5322fdd12ecda94e5cc218f54cda968df956d29093be6dec74bfe93b1"
     },
     {
       "path": "package.json",
-      "bytes": 2216,
-      "sha256": "613205057582f02950d8b7ab6adf4347c812833bd634c688a707fb84ed4f067f"
+      "bytes": 2248,
+      "sha256": "13d985aa0077afe310c9f7e4c858e20d06b8804d3ad77deb355824ebe33fa8c5"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 11023,
-      "sha256": "19d883857872608ab659579dfe7528b5720f3fc7c9aa7b17bb7a90667a6689f3"
+      "bytes": 11288,
+      "sha256": "645e8bbf1b27c1a372e0285c5ef692ee34d950d01f388a3edf4e088466d06e1f"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2310,13 +2400,13 @@
     },
     {
       "path": "simulator/e2e/assessment.browser.test.py",
-      "bytes": 3971,
-      "sha256": "58e3eadd3bfc3ab615d1456f31c3c8e3c112e4c69017b38a60b15d4033d8f574"
+      "bytes": 3973,
+      "sha256": "4e84122fe9c9a3be8aecf2bff7f2f7e0671bb77ae85d38c1c6ad59010a428d1d"
     },
     {
       "path": "simulator/e2e/autocontrol.browser.test.py",
-      "bytes": 4690,
-      "sha256": "f7ecf6bd684045534f3d80311b2d9a06028b562a9a2e29690031fd4c6570fc90"
+      "bytes": 4625,
+      "sha256": "95b52a6e2ec90a7c5a38e2d6636902eac599ee990d62d313e360584e2728ee47"
     },
     {
       "path": "simulator/e2e/browser.test.py",
@@ -2325,23 +2415,23 @@
     },
     {
       "path": "simulator/e2e/cdrs.browser.test.py",
-      "bytes": 2929,
-      "sha256": "576a9b6ee21897d7970bda61b9e90a52f316d3891e1fa709e29267bca402f670"
+      "bytes": 2930,
+      "sha256": "8f15846bb9b52c8eaeeb351e5d2dcc36a949c423b236426ad0323d72cde4cc5e"
     },
     {
       "path": "simulator/e2e/design.browser.test.py",
-      "bytes": 3967,
-      "sha256": "c208d9b5ce43dd4f2e658d09dbb13b0631763bd00ea07f7418081512d5b702b3"
+      "bytes": 3700,
+      "sha256": "1155a41d98e8e2a7fe85a9c35a5cf9eecc5c8df7189580663c62bfc9ae6e9e85"
     },
     {
       "path": "simulator/e2e/desktop-resize.browser.test.py",
-      "bytes": 2547,
-      "sha256": "b867d44b5e93f9b3b02c75736e00c32b0fcc89b337dd89fecac87e231821d721"
+      "bytes": 2549,
+      "sha256": "6f887b9b9a94e94e3960015cd5beb67d1c149fd54ef7a2fbc21f2fc671cbb5e9"
     },
     {
       "path": "simulator/e2e/docking.browser.test.py",
-      "bytes": 8924,
-      "sha256": "b0a7355ef567da8aa339786f2537d614cc0352c32046cd3a2338ce381151e43a"
+      "bytes": 8969,
+      "sha256": "4f00014ab18e83818703eb1b06e08fed5fcb3932a18ea477294cbe3c9c1d281e"
     },
     {
       "path": "simulator/e2e/emergency-ctc.browser.test.py",
@@ -2350,13 +2440,13 @@
     },
     {
       "path": "simulator/e2e/emergency.browser.test.py",
-      "bytes": 7165,
-      "sha256": "2d7cfce05672e98a201ad3487de298dfb1f36b5a8ee7e7f63ac9eb810b5a9606"
+      "bytes": 7420,
+      "sha256": "e8cf7bb22f8a6cef54e357f383d5ed5f8bcfa2a0186154a9018410706da84a65"
     },
     {
       "path": "simulator/e2e/equipment.browser.test.py",
-      "bytes": 3728,
-      "sha256": "798b8099b6e8caff6c22a039dc2c1d4b57fabe763f3fe18fd1965481c086a639"
+      "bytes": 3957,
+      "sha256": "0317178affdfffd0500d5cc85223c1ef6b03249bf03872c58d9c26f33e89a4ff"
     },
     {
       "path": "simulator/e2e/fixed-symbols.browser.test.py",
@@ -2364,9 +2454,14 @@
       "sha256": "95eb6f6f7ac15160a997379b381020e8c47bcec8266bfb02978d94d399ba2c02"
     },
     {
+      "path": "simulator/e2e/fts-active.browser.test.py",
+      "bytes": 7091,
+      "sha256": "d0c13bd967b34480dfba4f40f2e80402cc03f8821113c6d5b2bdb2ed1911046c"
+    },
+    {
       "path": "simulator/e2e/fts-briefing.browser.test.py",
-      "bytes": 4119,
-      "sha256": "05a5e8c852f7e11c7d007069332dce0442b8490465a191d44800a88adef4672d"
+      "bytes": 4087,
+      "sha256": "db620907cb6e924ce289e17d241ec7ea10188f64abfc9d9997029289aa435180"
     },
     {
       "path": "simulator/e2e/fts-editors.browser.test.py",
@@ -2375,23 +2470,23 @@
     },
     {
       "path": "simulator/e2e/fts.browser.test.py",
-      "bytes": 9081,
-      "sha256": "ab4f391c714a4958ad17e23a9b607b0350a5755edc6f9afc1b6e8eddc9d997db"
+      "bytes": 9108,
+      "sha256": "992e082d5275fe911692cc86f484265b62040e736bdac6c04cade7279d99e184"
     },
     {
       "path": "simulator/e2e/interlocking.browser.test.py",
-      "bytes": 4749,
-      "sha256": "f28924679527c0278d90e3b25814420a2c7820d50c2a6a672ff5a84222b33c39"
+      "bytes": 4868,
+      "sha256": "f8ada12f3f8495586f9ecf1702aba26ea539da13fa1c9db6898fc44146a2e2bd"
     },
     {
       "path": "simulator/e2e/ledger.browser.test.py",
-      "bytes": 1804,
-      "sha256": "b55119063efd0a974b3f79462144f57c51aa135a123e69acb21a2f9a48b09eea"
+      "bytes": 1805,
+      "sha256": "8513739758bed05974b573f36618fd1384e9d1e97368026b06e8ec0b369b975a"
     },
     {
       "path": "simulator/e2e/line-block.browser.test.py",
-      "bytes": 3355,
-      "sha256": "62f0f27fde9864364b1918f7f92f01f32bac377c9106d5911fd935535052be73"
+      "bytes": 3866,
+      "sha256": "0f460c7fcddd52b16e25e785b103a0a580c2b6191309c53452d393373f23bd6c"
     },
     {
       "path": "simulator/e2e/line.browser.test.py",
@@ -2400,8 +2495,8 @@
     },
     {
       "path": "simulator/e2e/ls-boards.browser.test.py",
-      "bytes": 7438,
-      "sha256": "1f20d3ff3804515e55d1a9ea871ad3a27e1abc0c4555ce0bacb4c1af99d50294"
+      "bytes": 7752,
+      "sha256": "3b84219540e513f04f69883ea246077cb81d584429293182f3a980ea276b621b"
     },
     {
       "path": "simulator/e2e/ls-context.browser.test.py",
@@ -2415,8 +2510,8 @@
     },
     {
       "path": "simulator/e2e/ls-header.browser.test.py",
-      "bytes": 4541,
-      "sha256": "843128f953cacf8b54e4600162029bc916ceaaaec13f1045a1bbdfed0fcf77da"
+      "bytes": 4542,
+      "sha256": "c746c3b9d092e1a66c675900f8227b677e85a401014fa1929928cd60b0f502d8"
     },
     {
       "path": "simulator/e2e/ls-layout.browser.test.py",
@@ -2425,8 +2520,8 @@
     },
     {
       "path": "simulator/e2e/ls-presets.browser.test.py",
-      "bytes": 8287,
-      "sha256": "36b0ed342255396e7c5dce7de40d2c2d551d2b8f8e549b75e4e7ee2fe13c11d1"
+      "bytes": 8461,
+      "sha256": "cf3b1eac56219db7b4cadaea04121fafa9fa238284bb064b0cfd00998f9c8c50"
     },
     {
       "path": "simulator/e2e/ls-switches.browser.test.py",
@@ -2435,13 +2530,13 @@
     },
     {
       "path": "simulator/e2e/ls.browser.test.py",
-      "bytes": 7450,
-      "sha256": "fcc46b3bb15cdf9f53d3d35041aecc5c48b85d7c56406be53e4d1e6180baa95a"
+      "bytes": 7484,
+      "sha256": "dca4deec83ee32d720998e1d71d50db0b7d12fdf6bace59d6ebed3c8e69813bd"
     },
     {
       "path": "simulator/e2e/mmi-drill.browser.test.py",
-      "bytes": 6361,
-      "sha256": "abeb6970dee061c9a8354bdfd9e1581af538b06a0f367ca974b7c4c15b6965ca"
+      "bytes": 6713,
+      "sha256": "4181fabe35dafdc6b32fb3927ab7b08a90613024aa918535cc12e4c6def937d2"
     },
     {
       "path": "simulator/e2e/mmi-notes.browser.test.py",
@@ -2450,8 +2545,8 @@
     },
     {
       "path": "simulator/e2e/mmi-pref.browser.test.py",
-      "bytes": 2494,
-      "sha256": "ee577f87d0cda6dbfc9db3aba4edc3cb3cd73681314e8ee1653fb16b49774489"
+      "bytes": 2536,
+      "sha256": "702c83ea527d68bd68009ef27c30d336ae23f4bc9a4780cf624677e40bb6de4b"
     },
     {
       "path": "simulator/e2e/mmi-replay.browser.test.py",
@@ -2465,13 +2560,13 @@
     },
     {
       "path": "simulator/e2e/mmi-scenario-cast.browser.test.py",
-      "bytes": 4612,
-      "sha256": "9d137547e7021f1ec4196f57813883314d0f469cd01f6b5ec6c797635607689f"
+      "bytes": 4620,
+      "sha256": "c29aa7c00ee216c625544b16196f8fdfd6c2fcfbb9aafd6853e3ec9c93fda875"
     },
     {
       "path": "simulator/e2e/mmi-scenarios.browser.test.py",
-      "bytes": 7678,
-      "sha256": "86054bc5a9d4c1229aecc89a3aa41f76ac223b56a2c2a63bce48473da1e208be"
+      "bytes": 7854,
+      "sha256": "c506199d096380a61232dafdd80a2100c78fd1d32193ed39392a2e0e0c9b570e"
     },
     {
       "path": "simulator/e2e/mmi-windows.browser.test.py",
@@ -2480,38 +2575,38 @@
     },
     {
       "path": "simulator/e2e/mmi.browser.test.py",
-      "bytes": 6868,
-      "sha256": "7fd91ab4026d2548a2bdf3d5c893fdefb4d32f07cbbff63669286bd560cdade0"
+      "bytes": 6976,
+      "sha256": "37de5f4c3880907376f00e2f9ae444968b93827d59d24eccf17be0afe0a036bd"
     },
     {
       "path": "simulator/e2e/network-unified.browser.test.py",
-      "bytes": 5294,
-      "sha256": "aaeef5b8d46a433551bd76f7151adfe188a7756ac7e495bbb231c503956b9dc4"
+      "bytes": 5119,
+      "sha256": "44ae16350a0c3a504249230ff1ee964c976880644a1abc348e748664faf8647c"
     },
     {
       "path": "simulator/e2e/network.browser.test.py",
-      "bytes": 15840,
-      "sha256": "b2fac3a3eaabe376159146163f93d2b0f50fe4e92859f3ccef8510e63879ccba"
+      "bytes": 15833,
+      "sha256": "e8d68b75091492627604f34e4963e348d4ad31527a8fa949a151f3a7e8d706a9"
     },
     {
       "path": "simulator/e2e/oral-functions.browser.test.py",
-      "bytes": 3653,
-      "sha256": "b4bde9f768c0eb777062b46682afc5e77d9356869f534aa33660dfec81370d71"
+      "bytes": 3644,
+      "sha256": "404535e2a666aac0fe98ed64214df8e12d0914cc8f6bc9322d4b65d90484413b"
     },
     {
       "path": "simulator/e2e/physical-network.browser.test.py",
-      "bytes": 4739,
-      "sha256": "1b141a6f8dbca857d2ed6cdeddcc6acc6b5b7f9ec424d2beb8776cf16da1585a"
+      "bytes": 4906,
+      "sha256": "4f987586999d5b404d58d24544cd782d8ad2335255e32c1a7d80a53bdfc35179"
     },
     {
       "path": "simulator/e2e/platforms.browser.test.py",
-      "bytes": 2748,
-      "sha256": "a64dd0fbe9edae46aaa72b9d75819e98145a7ad4ba772f3bc96fe347208faa12"
+      "bytes": 2750,
+      "sha256": "3dc4b13e4cc1945b425f62c8e938b5b5f5a443860006ef94bcf7df4117feefd6"
     },
     {
       "path": "simulator/e2e/program-features.browser.test.py",
-      "bytes": 4303,
-      "sha256": "79fab3e783790c89df653057ac65386129996b0bfa19cf3c4564f9213b0be0c5"
+      "bytes": 4298,
+      "sha256": "2070ca6d3fb7784223ee258c62ba5afe33acccf7801d88d9c961629c2504de91"
     },
     {
       "path": "simulator/e2e/route-conflicts.browser.test.py",
@@ -2520,8 +2615,8 @@
     },
     {
       "path": "simulator/e2e/scenario-motion.browser.test.py",
-      "bytes": 4680,
-      "sha256": "7aadaec22c8b273163023a3288564ee0a3023910a0b0058b925f277f86bca81d"
+      "bytes": 4682,
+      "sha256": "343f81dcf44882fe2fde026026cc529401e5e37d8af4fbb5add890a6bb5a1d64"
     },
     {
       "path": "simulator/e2e/schedule-dialogs.browser.test.py",
@@ -2535,8 +2630,8 @@
     },
     {
       "path": "simulator/e2e/schematic.browser.test.py",
-      "bytes": 2859,
-      "sha256": "bd331a1c030df27304c5692decd0ebab65ea6e3c68d94ad1673a3cde83435b33"
+      "bytes": 2863,
+      "sha256": "c7f14c35f55c86ddfb7767ee55d115d80eb3f4986cffed7b37e334068c1619c7"
     },
     {
       "path": "simulator/e2e/source-equipment.browser.test.py",
@@ -2550,8 +2645,13 @@
     },
     {
       "path": "simulator/e2e/train-occupancy.browser.test.py",
-      "bytes": 3188,
-      "sha256": "4239124955cf5451fb13aaf293d5c3d65d9741729fbc5cf29ebe2c0e0862e702"
+      "bytes": 3303,
+      "sha256": "fbfc248bcc519e4f61729d6d9fe4281d1e1cd1fcb2190017811f2fa6e07bf1df"
+    },
+    {
+      "path": "simulator/e2e/ui-cleanup.browser.test.py",
+      "bytes": 4283,
+      "sha256": "8e759d080644a918f87019e42d7bdb3520cbaf65bf4f70a0399943217919ace4"
     },
     {
       "path": "simulator/e2e/wiring.alignment.test.py",
@@ -2560,8 +2660,8 @@
     },
     {
       "path": "simulator/e2e/workspace-windows.browser.test.py",
-      "bytes": 8243,
-      "sha256": "94b6a7432574472732e5a8abd207aaf6fa0a1a33287fe875319994d2e4966042"
+      "bytes": 8323,
+      "sha256": "9bc7f2fe9a0fc76c07a92ee847d74e82b7bddb6e52ff680918739e99584ca585"
     },
     {
       "path": "simulator/engine/anyang-routes.test.cjs",
@@ -2590,8 +2690,8 @@
     },
     {
       "path": "simulator/engine/autocontrol.js",
-      "bytes": 12891,
-      "sha256": "aa1a71f223e39d5632e120af8876f099a81bc795aa5dc610cedbd9a4bf752ae8"
+      "bytes": 12869,
+      "sha256": "2c879e44e5ab1a1a36fd0093476af23446f533b52e7923948ac8e121be0a5a91"
     },
     {
       "path": "simulator/engine/autocontrol.test.cjs",
@@ -2635,13 +2735,18 @@
     },
     {
       "path": "simulator/engine/core.js",
-      "bytes": 15755,
-      "sha256": "54e1866aef61a2ec190d60bcfabf90fbde94369d30537ab9c9bd3b36f65eebf0"
+      "bytes": 16172,
+      "sha256": "d4bf8e8b3dbdcbf38afc38b8082ea44be9a362d502007a22b9af560c09a5c53b"
     },
     {
       "path": "simulator/engine/core.test.cjs",
       "bytes": 2563,
       "sha256": "f7b5346b381819c521144a317f402b529d3e7a58fab98555cd79190d62035e22"
+    },
+    {
+      "path": "simulator/engine/emergency-branches.js",
+      "bytes": 14967,
+      "sha256": "9d709b2195ca65fdd7495d9ed7cf5afbc7548444db93b9b972d7345454ff15ea"
     },
     {
       "path": "simulator/engine/emergency-data.js",
@@ -2650,8 +2755,8 @@
     },
     {
       "path": "simulator/engine/emergency.js",
-      "bytes": 17985,
-      "sha256": "2040997bea9e2b01bacde818be26e3eb34118e2a98716eb211aa2fd540af0101"
+      "bytes": 18361,
+      "sha256": "cad450a924e6ee7e8142f412b6578df27f57d90e0a920cbb3d897425689fb126"
     },
     {
       "path": "simulator/engine/emergency.test.cjs",
@@ -2669,9 +2774,19 @@
       "sha256": "7af9136dd69a0da4624d8dd7fdd86cc575439c6816409f2ccb5b330e3eef34ba"
     },
     {
+      "path": "simulator/engine/fts-builtins.js",
+      "bytes": 20425,
+      "sha256": "f4749e00370a88f9688dfa17e1c0efe367eb25ae7081f002241ce83fc3f67034"
+    },
+    {
+      "path": "simulator/engine/fts-builtins.test.cjs",
+      "bytes": 12968,
+      "sha256": "8032f18358fbc82e1883e8d8929a306a63da03f9bf00b13f7e205873ea41fd3d"
+    },
+    {
       "path": "simulator/engine/fts-controller.cjs",
-      "bytes": 12503,
-      "sha256": "5754319104123496308b89f29deb93233a00cbeb132a47f40479ffb2cb48a534"
+      "bytes": 17210,
+      "sha256": "ab7d2400a20697c718294be8df14a92d2d0d5bcc9965375c5fea8edfa582650a"
     },
     {
       "path": "simulator/engine/fts-runtime.test.cjs",
@@ -2680,13 +2795,13 @@
     },
     {
       "path": "simulator/engine/fts.js",
-      "bytes": 28086,
-      "sha256": "505cb80f225ffd069ea88313655732baeefd0f4f60a6f281c240520cac438377"
+      "bytes": 44383,
+      "sha256": "b069c9957e57227d0048addaf4cfeaf325657364dc4a955cec76438c9725cc0e"
     },
     {
       "path": "simulator/engine/fts.test.cjs",
-      "bytes": 4436,
-      "sha256": "b59c0233c734b29dce31fa59019e99a8d1c89fa2f359a0946bba88491f02b37a"
+      "bytes": 7181,
+      "sha256": "d6c53e69de380392db70f40421b6f36f6f892d77cc1a66477d5b3a7697099a08"
     },
     {
       "path": "simulator/engine/interlocking-rules.test.cjs",
@@ -2695,8 +2810,8 @@
     },
     {
       "path": "simulator/engine/interlocking.js",
-      "bytes": 6537,
-      "sha256": "736ca77f56fd734687eedcbebca2fa6a7a4bbd88572bd46756282b1b9cedb7d2"
+      "bytes": 7948,
+      "sha256": "f6d580d4ef09afd07092ed1ec43a6ee064feb0500152b0189a3561eb710a6dcd"
     },
     {
       "path": "simulator/engine/interlocking.test.cjs",
@@ -2715,13 +2830,13 @@
     },
     {
       "path": "simulator/engine/line.js",
-      "bytes": 11715,
-      "sha256": "a2aef1b39493d3387c7382513bb045988f18d3bcc4faa162c803038c97d9c0ea"
+      "bytes": 14556,
+      "sha256": "9f8c0bdbdf61f089459aedacb6df6262c35cbed3bf5b1750348116978bf8df10"
     },
     {
       "path": "simulator/engine/line.test.cjs",
-      "bytes": 5966,
-      "sha256": "69056708bfedd4e60e550f6020b537db713fb2f2e39bc7b2b957869a9c3738bb"
+      "bytes": 7192,
+      "sha256": "13b77be5aef490f9e11034ceaac2fa8ae1b46ed75d634c12938f1f4a7aa48ae2"
     },
     {
       "path": "simulator/engine/ls-operations.js",
@@ -2825,8 +2940,8 @@
     },
     {
       "path": "simulator/engine/runtime.cjs",
-      "bytes": 17154,
-      "sha256": "fcb11875a865835d817e266ad5ac98e8b0f077877f24b6803515ec0528149db5"
+      "bytes": 18702,
+      "sha256": "a8337e33a0cba4713458288ab97e90a0b668333785e8a8484a5f964a0028de1d"
     },
     {
       "path": "simulator/engine/runtime.test.cjs",
@@ -2840,8 +2955,8 @@
     },
     {
       "path": "simulator/engine/scenario-controller.cjs",
-      "bytes": 6809,
-      "sha256": "edbfc94006dae3727fde30058618d3aeae6c6eeb0a9dc4e2471e0ec3682649ef"
+      "bytes": 7220,
+      "sha256": "596f3e72753d69ef05ca3eaee06d16bfefd4f4ca1b0f14292f09b0533eb7fe6d"
     },
     {
       "path": "simulator/engine/scenario-flow.js",
@@ -2850,8 +2965,8 @@
     },
     {
       "path": "simulator/engine/scenario-motion.js",
-      "bytes": 11620,
-      "sha256": "f991442d981e6ac26ab01113d7c1e4f72d4d346aaeb0482df0cec4459e9da89c"
+      "bytes": 12441,
+      "sha256": "e1bba308d3df8ffea5bc080f02795447c4dfacfd7f9d23e2e92e8eed5b830e21"
     },
     {
       "path": "simulator/engine/scenario-motion.test.cjs",
@@ -2860,8 +2975,8 @@
     },
     {
       "path": "simulator/engine/scenarios.js",
-      "bytes": 19889,
-      "sha256": "ac5cf1f13af3109cd5993f56de8e8ba17c9aecffc99f86b5ee62c7576ef633f0"
+      "bytes": 20613,
+      "sha256": "09048692574cd4f4380cf1136f0d3df7a1de166f738b7b4188eb5adf0a7b932f"
     },
     {
       "path": "simulator/engine/scenarios.test.cjs",
@@ -2880,8 +2995,8 @@
     },
     {
       "path": "simulator/engine/schedule-scenarios.js",
-      "bytes": 9331,
-      "sha256": "81553b59e4982d90fc57c5e5726989f3829dce4031fb3cf876b736ebcb0224fe"
+      "bytes": 9361,
+      "sha256": "c475891a1f19ae58a289d58999dc20bd18f0018c4945a349a91159216cfddcd5"
     },
     {
       "path": "simulator/engine/schedule-scenarios.test.cjs",
@@ -2935,8 +3050,8 @@
     },
     {
       "path": "simulator/engine/timetable.js",
-      "bytes": 14733,
-      "sha256": "fa165ca4e2924979586a68e893c57b2f7c9592de1ee42da7f6f216582db8bbc5"
+      "bytes": 15478,
+      "sha256": "07b58725d5d982fc8c0a73b8b84de1ddfa0f494f3670f2365337519afb5f2e39"
     },
     {
       "path": "simulator/engine/track-geometry.js",
@@ -2947,6 +3062,11 @@
       "path": "simulator/engine/track-network.js",
       "bytes": 3488,
       "sha256": "019955e1db26b0873d113d2006adfa91628c6cf5fbe022d35f3e54693183aa75"
+    },
+    {
+      "path": "simulator/engine/train-run.test.cjs",
+      "bytes": 8284,
+      "sha256": "f39e0fdfc8271908c46b1ff4205d2406f09ebbcb09ceacdffa43522f09857c18"
     },
     {
       "path": "simulator/engine/train-status.js",
@@ -2980,28 +3100,28 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 22716,
-      "sha256": "fdc2a10c421251ebf3438223b480f9dd29aad4e07e807dbcb31be6aacdf34daf"
+      "bytes": 17949,
+      "sha256": "1ef26469eae94197ff0694f7a0451e39c4c28de56032e17d49cb410bd5b1cf75"
     },
     {
       "path": "simulator/ui/app.js",
-      "bytes": 34667,
-      "sha256": "1e8163cada3e39a2c2f3612d6a317c915bedda5403dfe9046bc5db9122befc36"
+      "bytes": 30974,
+      "sha256": "3f9e1a5a74c81183887977051a5f8c74990babff99f7e01982929e28a3bc4c92"
     },
     {
       "path": "simulator/ui/assessment-ui.js",
-      "bytes": 6151,
-      "sha256": "c5bbd9d1f0d1bbe610c12c4bf28de98b8c979ab957639c0eeee8ee17eaa3979d"
+      "bytes": 5716,
+      "sha256": "6cc7a5e16e51fbaae4f978efe525f46944e688a19d33577054c6995b07e42294"
     },
     {
       "path": "simulator/ui/autocontrol-ui.js",
-      "bytes": 11846,
-      "sha256": "51b942acabd678eeaf57d2e2c9d9897bb2d269ff711054a0db81bfb3f5d8291a"
+      "bytes": 4299,
+      "sha256": "34bc4fcca03b04fd7bb61df2d526992cb3a8a04e740d922bd6276a7307dc1731"
     },
     {
       "path": "simulator/ui/design.js",
-      "bytes": 1618,
-      "sha256": "a10f900e6cf3ee258b5a3dec7a4292ab3881e32159497e9f6bb84232b1fcf2ba"
+      "bytes": 1582,
+      "sha256": "4af359e6a3743977384fd4f5b778db4c19ce64fcbcd0b43f79b8812f111e35c1"
     },
     {
       "path": "simulator/ui/diagram-ui.js",
@@ -3010,8 +3130,8 @@
     },
     {
       "path": "simulator/ui/equipment.js",
-      "bytes": 6098,
-      "sha256": "4f5605629e59d3ffd7f56555e2b865a929b05b120a3ae617611a7af36cd8feec"
+      "bytes": 5058,
+      "sha256": "254937e0f64f66d27ccc4a2283d6a8206b4d5e1243503b097b55717aa62b1f99"
     },
     {
       "path": "simulator/ui/fixed-symbols.js",
@@ -3020,13 +3140,13 @@
     },
     {
       "path": "simulator/ui/fts.css",
-      "bytes": 14019,
-      "sha256": "25f6df731d9f3c07ac2d5a6ac40567e339e0c7ab968b76b7137ead7146272648"
+      "bytes": 16240,
+      "sha256": "509d3833052a115b356168ccd3d0810b10257c8b1ca050f231f0494134370a4a"
     },
     {
       "path": "simulator/ui/fts.js",
-      "bytes": 67595,
-      "sha256": "2aab170bb52fced4c014f7cbfbc65106c80f36fad6317789f16f2d72707abbdf"
+      "bytes": 77216,
+      "sha256": "8838ca2d00a263dce10489e66641d995ec8c30034b2ae49047cf352016d04313"
     },
     {
       "path": "simulator/ui/ls-block-signals.js",
@@ -3040,8 +3160,8 @@
     },
     {
       "path": "simulator/ui/ls-context.js",
-      "bytes": 19720,
-      "sha256": "f073f216ac17c919d5484e4d5d3ee0efff4759d70e970ffc314920a5a05ff3cb"
+      "bytes": 20104,
+      "sha256": "ef150b21737be6da8d1f09bf652d39b347d33955fdf7845a631075fe8348e638"
     },
     {
       "path": "simulator/ui/ls-corridor-source.js",
@@ -3080,13 +3200,13 @@
     },
     {
       "path": "simulator/ui/ls-view.js",
-      "bytes": 36208,
-      "sha256": "e85261d93f2d4c3a561f4a8577f415fcf3894734ba4320352bf4e8b85cae5312"
+      "bytes": 36975,
+      "sha256": "5875d009904292a70d9b04e02f4e7444f13f8093c30f4e61bd863312db1cf1d1"
     },
     {
       "path": "simulator/ui/ls-view.test.cjs",
-      "bytes": 6481,
-      "sha256": "ad496ebba21f5179611ee54fd45adb59ebd3263727c1c52e3bbf5a2bb68098b2"
+      "bytes": 6488,
+      "sha256": "4b4a019a2c08f8602d03f9924123ab15fef3bbc5b567c11b018121415a05f17e"
     },
     {
       "path": "simulator/ui/lsdialogs.css",
@@ -3100,18 +3220,13 @@
     },
     {
       "path": "simulator/ui/mmi-drill.js",
-      "bytes": 10239,
-      "sha256": "08c430113e84f89f065d406bd40d127ace22d9f6f6690edec6fd6d4705fc8395"
+      "bytes": 4527,
+      "sha256": "694897269105cbda2d799447fa7a949addf716e7f9cade9b8fa9b7667d54c3ea"
     },
     {
       "path": "simulator/ui/mmi-ledger.js",
       "bytes": 2808,
       "sha256": "070c0799835bbdfe811868f92c849ac2c6a6a66b87cad7e739aae6711af89a43"
-    },
-    {
-      "path": "simulator/ui/mmi-line.js",
-      "bytes": 4799,
-      "sha256": "64863d5f3a2ba7d564693f956c6e1a92874af8cccc487aa84563ccfa269be5f8"
     },
     {
       "path": "simulator/ui/mmi-notes.js",
@@ -3120,13 +3235,13 @@
     },
     {
       "path": "simulator/ui/mmi-pref.js",
-      "bytes": 4734,
-      "sha256": "d2b8748236aea429cb1c414cbf6cba435725715237ea5116f9356073d68abc4e"
+      "bytes": 4559,
+      "sha256": "cfa4a3ff5f24d11ac324842adf1698838ae5a744b907ddfbdce4868fe31d1f2f"
     },
     {
       "path": "simulator/ui/mmi-replay.js",
-      "bytes": 7924,
-      "sha256": "a72ce1eb15c5c7d78756c957995548eb7838d5198d9edf39568e439cf311ff15"
+      "bytes": 7888,
+      "sha256": "71a7a073783f5ea308c5261eea725087bc089b92eaf93cd74a9ac2020bb01c8c"
     },
     {
       "path": "simulator/ui/mmi-reports.js",
@@ -3135,8 +3250,8 @@
     },
     {
       "path": "simulator/ui/mmi-scenarios.js",
-      "bytes": 19041,
-      "sha256": "6117a59fe0bfba42284ea5f6992ec31ca6f4268032cc836fa91fd2860b1b9ecb"
+      "bytes": 11136,
+      "sha256": "9b5c9fb12f4ea6c39c82d2265d7fbdd6ff3586bc5b3833ff80d09841da46f693"
     },
     {
       "path": "simulator/ui/mmi-trains.js",
@@ -3155,13 +3270,18 @@
     },
     {
       "path": "simulator/ui/mmi.js",
-      "bytes": 28253,
-      "sha256": "b36191e4c241ced0bb3975627a6c3bd6063671bca4f776d778cd1873564fa76c"
+      "bytes": 27865,
+      "sha256": "6b388d78b2d83d477b0a8264a30a6f053a0a894d25236cd05ed1f52323e95565"
     },
     {
       "path": "simulator/ui/orpheia.css",
-      "bytes": 33020,
-      "sha256": "2c4d0da268ea60049d4e58b642d08305222863bb4a14807956fc874a0de0464f"
+      "bytes": 32994,
+      "sha256": "dc8749ad43826f2bcb28853bab9eb026902361d39baced67948b5334f38ffa1b"
+    },
+    {
+      "path": "simulator/ui/page-engine.js",
+      "bytes": 3095,
+      "sha256": "b6fd2fc9c169b44b352c85fc39b126385a18c083d5bf6f515c431636b89f1f58"
     },
     {
       "path": "simulator/ui/platform-tracks.test.cjs",
@@ -3170,8 +3290,8 @@
     },
     {
       "path": "simulator/ui/remote-engine.js",
-      "bytes": 3974,
-      "sha256": "86963dc35a6873eb4ea4b3074523ae7b479b7123ebf5892a8f2ffba242131195"
+      "bytes": 4086,
+      "sha256": "a3ca4596060de1bdc8301269ff99de1f8f7fef2b61f06c78214f2a6fedf3390a"
     },
     {
       "path": "simulator/ui/schedule-dialogs.js",
@@ -3185,18 +3305,18 @@
     },
     {
       "path": "simulator/ui/shell.css",
-      "bytes": 7167,
-      "sha256": "b58142ab702c90a3a1544e922f6beb5835dd2a2b2055f2a77acb48b6677bafe5"
+      "bytes": 7724,
+      "sha256": "29a6d1a53260c4a3c40f813284f29b1c873252b4f4759c79c03a9b149097e9eb"
     },
     {
       "path": "simulator/ui/shell.js",
-      "bytes": 1199,
-      "sha256": "127da8d1de50d4fc88dfea36d84dd0fdbf792a7881700ac72257e0338c053bb3"
+      "bytes": 1344,
+      "sha256": "8c63a09f87de170477a87cbd3c7d2db1ee3304e9fb41c6615d38f7f8ebab0d36"
     },
     {
       "path": "simulator/ui/style.css",
-      "bytes": 34758,
-      "sha256": "bc41d2a5738381331474f5385ac7587017a24e62b40327badc82dbdf81667358"
+      "bytes": 34588,
+      "sha256": "cd236a7cc078cc26713b720daec7d0db5785e63b3a95150fe7c87a21f4165c7e"
     },
     {
       "path": "simulator/ui/tg-tools.js",
@@ -3245,8 +3365,8 @@
     },
     {
       "path": "simulator/ui/workspace-windows.js",
-      "bytes": 6947,
-      "sha256": "f3a5d5d517c33b3618dff26bcce64a3486156657ef8ecde25d61210a8eea8e32"
+      "bytes": 9283,
+      "sha256": "48099642283aac2e37b043b828d35c13730f86a00504fce2f4d49ff7169f221a"
     },
     {
       "path": "simulator/검증결과.md",
@@ -3397,6 +3517,16 @@
       "path": "tools/parse-popup-screenshots.py",
       "bytes": 3845,
       "sha256": "6d6d0980070702acd10961cbb67a01b41a82c581964e9b803a1222027c59bfe0"
+    },
+    {
+      "path": "tools/rasterize-code-network.py",
+      "bytes": 1644,
+      "sha256": "1f24c67492337998149c4905b4a0b9ce558da57f8645f7459c27bfa891736e17"
+    },
+    {
+      "path": "tools/render-code-network.cjs",
+      "bytes": 15230,
+      "sha256": "f7b358f1fd7acadd98105a839117ed2ef9579842bd2f85bc999b10598990ba14"
     }
   ]
 }

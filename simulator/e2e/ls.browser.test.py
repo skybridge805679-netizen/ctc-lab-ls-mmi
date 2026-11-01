@@ -70,10 +70,10 @@ try:
                 print(f'PASS {width}px {station}: {len(signals)} signals set / visible path / release, fills and centres', flush=True)
             assert tested == 246
             # Navigation arrows and select stay in sync.
-            page.select_option('#lsStationSelect', 'cheongnyangni')
-            expect(page.locator('#previousStation')).to_be_disabled()
-            page.click('#nextStation'); expect(page.locator('#stationSelect')).to_have_value('dongmyo')
-            page.click('#previousStation'); expect(page.locator('#stationSelect')).to_have_value('cheongnyangni')
+            page.evaluate('(id)=>selectStation(id)','cheongnyangni')
+            expect(page.locator('[data-nav-view]')).to_have_count(1)
+            page.locator('[data-nav-view]').last.click(); expect(page.locator('#stationSelect')).to_have_value('dongmyo')
+            page.locator('[data-nav-view]').first.click(); expect(page.locator('#stationSelect')).to_have_value('cheongnyangni')
             # Refuge route with continuous control and occupancy colours.
             page.locator('#stationSelect').select_option('anyang')
             page.locator('#controlSelect').select_option('route')
@@ -89,7 +89,7 @@ try:
             expect(page.locator('#stateRoutes')).to_have_text('0개 설정')
             if width == 1440:
                 for station in ['underground-seoul', 'geumcheon', 'yongsan', 'seoul']:
-                    page.select_option('#lsStationSelect', station)
+                    page.evaluate('(id)=>selectStation(id)',station)
                     page.locator('#lsDisplay').screenshot(path=str(ROOT.parent / f'docs/preview-v0.18.0-{station}.png'))
             assert not errors, errors
             context.close()

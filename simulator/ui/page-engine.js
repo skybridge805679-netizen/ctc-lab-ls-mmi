@@ -20,7 +20,8 @@ function load(id,dir){
  new Function('module','exports','require','process',text+'\n//# sourceURL='+url)(module,module.exports,next=>{if(/^node:/.test(next))throw new Error('브라우저 엔진에서 쓸 수 없는 모듈: '+next);return load(next,here);},shim);
  return module.exports;
 }
-const runtime=load('./engine/runtime.cjs',document.baseURI).create();
+let runtime=load('./engine/runtime.cjs',document.baseURI).create();
+if(sessionStorage.getItem('orpheia.fresh-start')){sessionStorage.removeItem('orpheia.fresh-start');runtime.command({type:'clock',paused:true});}
 function request(action,since=0,version=-1){
  try{
   let result;
@@ -37,5 +38,5 @@ function openView(kind){
  else if(kind==='fts')root.SimFTSUI?.open?.();
 }
 root.setInterval(()=>{try{runtime.pulse();}catch(error){console.error(error);}},1000);
-root.OrpheiaEngine={request,openView,native:false};
+root.OrpheiaEngine={reset:async()=>{runtime.command({type:'clock',paused:true});runtime=load('./engine/runtime.cjs',document.baseURI).create();runtime.command({type:'clock',paused:true});localStorage.clear();sessionStorage.clear();sessionStorage.setItem('orpheia.fresh-start','1');root.location.reload();return {ok:true};},request,openView,native:false};
 })(window);

@@ -230,7 +230,7 @@ function init(){
  const old=doc.querySelector('.mmi-panel');if(!old)return;
  const field=old.querySelector('.mmi-window'),graph=$('graphPanel'),schedule=$('schedulePanel');
  const shell=doc.createElement('section');shell.className='panel mmi-shell';shell.id='mmiShell';
- shell.innerHTML=`<div class="mmi-appbar"><span class="mmi-appicon" aria-hidden="true"></span><b>ORPHEIA MMI</b><span class="mmi-appnote">철도관제 실습 · ORPHEIA CONTROL SYSTEM</span></div>`;
+ shell.setAttribute('aria-label','ORPHEIA MMI');
  shell.appendChild(buildMenu());
  desktop=doc.createElement('div');desktop.className='mmi-desktop';desktop.id='mmiDesktop';
  desktop.innerHTML=brand();

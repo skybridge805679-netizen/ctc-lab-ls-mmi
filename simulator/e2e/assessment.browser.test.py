@@ -17,7 +17,7 @@ try:
   page.click('#assessmentBtn');page.fill('#assessmentMinutes','2');page.select_option('#assessmentSubject','integrated');page.click('#assessmentStart');expect(page.locator('#actionDialog')).not_to_be_visible();page.click('#pauseBtn')
   remain=lambda:page.evaluate('SimAssessmentUI.snapshot().session.remaining')
   before=remain();page.click('#skipBtn');assert remain()==before-10
-  page.select_option('#lsStationSelect','guro');assert remain()==before-10
+  page.evaluate('(id)=>selectStation(id)','guro');assert remain()==before-10
   page.evaluate("SimMMI.open('scenario')");page.select_option('#scSelect','em-05-1');expect(page.locator('#scTimeLimit option')).to_have_count(3);page.select_option('#scTimeLimit','420');page.click('#scStart');page.click('#pauseBtn')
   assert page.evaluate('SimAssessmentUI.snapshot().task.limitSeconds')==420
   assert remain()<=before-10 and remain()>before-13

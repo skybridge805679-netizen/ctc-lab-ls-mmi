@@ -34,7 +34,7 @@ try:
    assert pair
    for route in pair:page.evaluate('id=>SimMMI.run({type:"route",id,source:"LS"})',route)
    expect(mmi.locator('.mmi-alarm')).to_be_visible();expect(page.locator('.mmi-alarm')).to_have_count(0)
-   page.select_option('#lsStationSelect','suwon')
+   page.evaluate('(id)=>selectStation(id)','suwon')
    expect(mmi.locator('#stationSelect')).to_have_value('suwon')
    page.locator('[data-mode="CCM"]').click()
    expect(page.locator('#actionDialog')).to_be_visible();expect(mmi.locator('#actionDialog')).to_have_count(0)
@@ -43,11 +43,11 @@ try:
    # MMI modal confirmation is confined to MMI's document.
    mmi.select_option('#controlSelect','stopAll');mmi.click('#mmiApply',position={'x':12,'y':12})
    expect(mmi.locator('.mmi-shield[open]')).to_be_visible()
-   page.select_option('#lsStationSelect','guro')
+   page.evaluate('(id)=>selectStation(id)','guro')
    mmi.click('#mmiConfirmYes')
    page.wait_for_function('SimField.state("suwon").logs[0].action==="stopAll"')
    assert page.evaluate('SimField.state("guro").logs.every(r=>r.action!=="stopAll")')
-   expect(page.locator('#lsStationSelect')).to_have_value('guro')
+   expect(page.locator('#lsStage')).to_have_attribute('data-preset','guro')
    # A visible MMI alarm does not stop the session clock either.
    before=page.evaluate('SimField.state("guro").clock');page.click('#pauseBtn');page.clock.run_for(1200);page.click('#pauseBtn')
    assert page.evaluate('SimField.state("guro").clock')>before

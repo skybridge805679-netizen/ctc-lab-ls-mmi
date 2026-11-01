@@ -69,8 +69,9 @@ try:
    bounds=w.bounding_box();desktop=page.locator('#mmiDesktop').bounding_box();assert bounds['x']>=desktop['x']-1 and bounds['x']+bounds['width']<=desktop['x']+desktop['width']+1
    w.locator('.mmi-dock').click();expect(w).to_have_class(__import__('re').compile('docked'))
    w.locator('.mmi-close').click();graph();expect(page.locator('#graphTrain')).to_have_value('K1131')
-   with page.expect_download() as download:page.click('#exportBtn')
-   saved=json.loads(Path(download.value.path()).read_text());assert saved['timetable']['trains'];assert saved['mmiLogs']['event'];assert saved['lsDisplay']['stations']['anyang']['windows']['1T'][0]['number']=='K1133'
+   expect(page.locator('#exportBtn')).to_have_count(0)
+   saved=page.evaluate('({timetable:SimDiagram.getModel(),mmiLogs:SimMMI.getLogs(),lsDisplay:SimLSUI.getModel()})')
+   assert saved['timetable']['trains'];assert saved['mmiLogs']['event'];assert saved['lsDisplay']['stations']['anyang']['windows']['1T'][0]['number']=='K1133'
    assert not errors,errors
    if width==1440:
     page.evaluate("window.getSelection().removeAllRanges()")
