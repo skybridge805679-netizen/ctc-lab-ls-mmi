@@ -50,7 +50,7 @@ test('route lines, approach trains and overlap rings are drawn from the same sta
  const st=N.catalog.geumcheon,C=Core.forStation('geumcheon'),s=C.initial();
  C.dispatch(s,{type:'mode',value:'CCM'});C.dispatch(s,{type:'route',id:'2B-6T'});C.dispatch(s,{type:'approach',signal:'2B'});C.dispatch(s,{type:'stop',id:'2B'});
  const svg=LS.render(st,W.data.geumcheon,C,s).svg;
- assert(/data-route-state="locked"/.test(svg));assert(/data-approach-train="2B"/.test(svg));assert(/data-overlap-point="26"/.test(svg));
+ assert(/data-route-state="locked"/.test(svg));assert(/data-train-occupied="접근 2B"/.test(svg));assert(/data-overlap-point="26"/.test(svg));
 });
 test('all 710 routes update track-section state and preserve state through occupancy',()=>{
  let count=0;

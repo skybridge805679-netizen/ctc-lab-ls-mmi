@@ -56,7 +56,7 @@ def exercise(page, url, width):
     click_svg('[data-signal="2B"]')
     page.locator('[data-route-choice="2B-6T"]').click()
     page.locator('[data-approach-toggle="2B"]').click()
-    expect(page.locator('[data-approach-train="2B"]')).to_have_count(1)
+    expect(page.locator('[data-train-occupied="접근 2B"]')).to_have_count(1)   # 접근 열차는 신호기 바깥 회로 점유(빨강)로만 보인다 — 원본 LS에 "열차" 표식은 없다
     click_svg('[data-signal="2B"]')
     confirm()
     expect(row.locator('.chip.locked')).to_have_text('접근쇄정')

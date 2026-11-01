@@ -95,7 +95,7 @@
 .ls-svg .nb-tag{fill:#b8d0e1;font-size:14px;font-weight:600;paint-order:stroke;stroke:#101c27;stroke-width:3px}
 .ls-svg .capsule{fill:none;stroke:#547084;stroke-width:5;stroke-linecap:round}.ls-svg .capsule-stop{fill:none;stroke:#92aabd;stroke-width:1}
 .ls-svg .sp-board{fill:#dc4c44;stroke:#11202c;stroke-width:1}.ls-svg .board-label{fill:#edf4f9;font-size:10px;font-weight:600}.ls-svg .ss-board{fill:#edf2f6;stroke:#101c27;stroke-width:1}.ls-svg .ss-stripe{fill:none;stroke:#e75449;stroke-width:5}
-.ls-svg .approach-train rect{fill:#3c7eae;stroke:#d5e9f5;stroke-width:1.5}.ls-svg .approach-train text{fill:#fff;font-size:12px;font-weight:600}
+
 .ls-bottom{background:#172631;color:#a8bdcd;border-top:1px solid #2b3f4e}.ls-bottom .text-btn{color:#c4dbea}
 .station-tabs button{position:relative;display:inline-flex;align-items:center;gap:6px}
 .tab-dot{width:9px;height:9px;border-radius:50%;background:#35dc82;border:1.5px solid #fff;box-shadow:0 0 0 1px #8aa0b3}.tab-dot.ccm{background:#f2dc57}.tab-dot.local{background:#f1b35a}

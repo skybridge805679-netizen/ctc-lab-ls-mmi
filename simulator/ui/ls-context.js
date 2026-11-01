@@ -86,7 +86,8 @@ function openMenu(items,x,y,target){
 function decorate(svg=$('trackSvg'),station=ctx().station,readonly=false){
  if(!svg)return;const monitor=svg.dataset.monitor==='true';const layer=document.createElementNS('http://www.w3.org/2000/svg','g');layer.classList.add('ls-manual-layer');
  for(const g of svg.querySelectorAll('[data-train-slot]')){
-  const slot=g.dataset.trainSlot,box=g.querySelector('rect').getBBox(),ts=rows(station,slot).filter(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[station],t.uid)),all=ts.map(t=>(t.direction==='up'?'<':'>')+t.number).join(' + '),text=ts.length>1?(ts[0].direction==='up'?'<':'>')+ts[0].number+' +'+(ts.length-1):all,label=g.dataset.windowCode+' '+(all||(readonly?'열차 없음':'열차번호 입력'));
+  const slot=g.dataset.trainSlot,box=g.querySelector('rect').getBBox(),ts=rows(station,slot).filter(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[station],t.uid)),all=ts.map(t=>(t.direction==='up'?'<':'>')+t.number).join(' + '),text=ts.length?(ts[0].direction==='up'?'<':'>')+ts[0].number:'',   // 원본 LS처럼 번호 하나만 (겹친 번호는 설명·MMI 중복 알람으로)
+  label=g.dataset.windowCode+' '+(all||(readonly?'열차 없음':'열차번호 입력'));
   g.classList.toggle('multiple',ts.length>1);g.classList.toggle('has-train',ts.length>0);g.setAttribute('aria-label',label);g.querySelector('title').textContent=label;
   if(text)g.insertAdjacentHTML('beforeend',`<text x="${box.x+box.width/2}" y="${box.y+box.height/2+4}" text-anchor="middle" ${text.length*7>box.width-4?`textLength="${box.width-4}" lengthAdjust="spacingAndGlyphs"`:''}>${esc(text)}</text>`);
   if(readonly){g.removeAttribute('role');g.removeAttribute('tabindex');}

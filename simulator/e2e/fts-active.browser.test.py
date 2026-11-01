@@ -15,7 +15,7 @@ try:
   # 기본 문제는 대본이 아니라 능동형 데이터: 목표 탭이 먼저 열리고 대본의 조작이 순서 없는 목표로 보인다
   fts.locator('[data-fts-page=problems]').first.click()
   row=page.locator('#pTable tr[data-key="P-em-02"]');expect(row).to_contain_text('능동형');row.click()
-  expect(page.locator('[data-ptab="obj"]')).to_have_class('on');expect(page.locator('#pTabs tbody tr')).to_have_count(17)
+  expect(page.locator('[data-ptab="obj"]')).to_have_class('on');expect(page.locator('#pTabs tbody tr')).to_have_count(19)
   expect(page.locator('#pTabs')).to_contain_text('순서 없이');expect(page.locator('#pActions')).to_have_value(__import__('re').compile('참고 순서'))
   # 상황별 대응 요령: 비상 04에는 원문 분기 5개가 붙어 있다
   page.locator('#pTable tr[data-key="P-em-04"]').click();page.click('[data-ptab="branch"]');expect(page.locator('#pTabs tbody tr')).to_have_count(5);expect(page.locator('#pTabs')).to_contain_text('사고조치 지연')
@@ -23,16 +23,16 @@ try:
   # 복사 (응용): 새 문제로 열리고 목표·통보·반응을 그대로 가져온다
   page.click('#pCopy');expect(page.locator('#pName')).to_have_value(__import__('re').compile(r'\(복사\)$'));page.fill('#pName','응용 · 동묘앞역 충돌 + 구로역 CCM')
   page.fill('#pfLabel','구로역 CCM 전환 (응용)');page.select_option('#pfType','mode');page.dispatch_event('#pfType','change');page.select_option('#pf-station','guro');page.fill('#pf-value','CCM');page.fill('#pfDeadline','120');page.select_option('#pfPre','rename-G0602');page.click('#pfAdd')
-  expect(page.locator('#pTabs tbody tr')).to_have_count(18);expect(page.locator('#pTabs tbody tr').last).to_contain_text('기한 120초')
+  expect(page.locator('#pTabs tbody tr')).to_have_count(20);expect(page.locator('#pTabs tbody tr').last).to_contain_text('기한 120초')
   page.click('[data-ptab="comm"]');expect(page.locator('#pTabs tbody tr')).to_have_count(28);page.fill('#pfLabel','구로역 CCM 통보');page.fill('#pfText','구로역, 관제 이상! CCM 전환합니다.');page.click('#pfAdd');expect(page.locator('#pTabs tbody tr')).to_have_count(29)
-  page.click('[data-ptab="react"]');page.fill('#pfLabel','구로역 경보');page.select_option('#pfWhen','objective:o18');page.fill('#pfAfter','5');page.select_option('#pfType','alarm');page.dispatch_event('#pfType','change');page.fill('#pf-text','응용 상황: 구로역 선로 장애물');page.click('#pfAdd')
+  page.click('[data-ptab="react"]');page.fill('#pfLabel','구로역 경보');page.select_option('#pfWhen','objective:o20');page.fill('#pfAfter','5');page.select_option('#pfType','alarm');page.dispatch_event('#pfType','change');page.fill('#pf-text','응용 상황: 구로역 선로 장애물');page.click('#pfAdd')
   expect(page.locator('#pTabs tbody tr').last).to_contain_text('5초 뒤')
   page.click('[data-ptab="setup"]');setup_rows=page.locator('#pTabs tbody tr').count();page.select_option('#pfType','resetStation');page.dispatch_event('#pfType','change');page.select_option('#pf-station','guro');page.click('#pfAdd');expect(page.locator('#pTabs tbody tr')).to_have_count(setup_rows+1)
   # 잘못된 항목은 등록 전에 거른다
   page.click('[data-ptab="react"]');page.select_option('#pfType','runTrain');page.dispatch_event('#pfType','change');page.fill('#pf-number','K0602');page.fill('#pf-legs','dongmyo:없는창');page.click('#pfAdd');expect(page.locator('.mmi-alert')).to_contain_text('없는 열번창');page.click('#mmiAlertOk')
   page.click('#pSave');page.click('#mmiConfirmYes');page.click('#mmiAlertOk')
   made=page.evaluate("(()=>{const p=SimFTSUI.library().problems.find(x=>x.name==='응용 · 동묘앞역 충돌 + 구로역 CCM');return p&&{id:p.id,obj:p.objectives.length,comm:p.communications.length,react:p.reactions.length,reset:p.setup.reset,pre:p.objectives.at(-1).condition.conditions[0].id,errors:SimFTS.validate(SimFTSUI.library(),{drafts:true,scripts:SimScheduleScenarios.list.map(s=>s.id)})}})()")
-  assert made and made['obj']==18 and made['comm']==29 and made['react']==6 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
+  assert made and made['obj']==20 and made['comm']==29 and made['react']==6 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
   # 교육: 비상시 조치 종합 → 첫 문제(em-01)는 초기 상태가 LS에 놓이고, 통보를 아무 순서로나 확인할 수 있다
   fts.locator('[data-fts-page=setup]').first.click();page.click('#suPick');page.locator('#pkScen tr[data-key="SC-04"]').click();page.click('#pkOk');page.uncheck('#suAuto');page.click('#suStart')
   fts.locator('[data-fts-page=monitor]').first.click()
