@@ -83,6 +83,11 @@
  function update(model,id,draft){
   const train=model.trains.find(t=>t.id===id);
   if(!train||!draft||draft.id!==id||!valid(draft)||draft.calls.length!==train.calls.length||draft.calls.some((c,i)=>c.station!==train.calls[i].station))return {ok:false,message:'역별 시각·차량수·속성을 확인하세요. 기존 열차번호는 복사로 변경하세요.'};
+  // 손으로 바꾼 도착·출발진로는 그 역에 실제로 있는 진로여야 한다 (검수: 진로 칸이 아무 문자열이나 받던 문제)
+  const SR=typeof module!=='undefined'?require('./schedule-routes.js'):root.SimScheduleRoutes;
+  for(const [i,c] of draft.calls.entries())for(const [key,kind,label] of [['arrivalRoute','arrival','도착진로'],['departureRoute','departure','출발진로']]){
+   if((c[key]??'')!==(train.calls[i][key]??'')&&SR&&!SR.validate(c.station,c[key]||'',kind)){const opts=SR.options(c.station,kind)||[];return {ok:false,message:`${N.catalog[c.station]?.name||c.station}역 ${label} ${c[key]}은(는) 그 역에 없는 진로입니다.${opts.length?' 가능한 진로: '+opts.join(', '):''}`};}
+  }
   // what the edit touched, for the 운전정리 대장 (운전명령 / 관제승인 / 단순 운전정리)
   const flags=[];
   if(draft.calls.some((c,i)=>c.arrival!==train.calls[i].arrival||c.departure!==train.calls[i].departure))flags.push('time');

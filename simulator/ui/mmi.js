@@ -70,6 +70,8 @@ function renderAlarm(){
   const ack=()=>{
    const done=alarms.filter(a=>a.checked);if(!done.length)return;
    for(const a of done)record('ack',{occurred:a.time,level:a.level,station:a.station,text:`${a.text}${a.state?` [${a.state}]`:''}`,operator:'관제사',console:'MMI-1'});
+   // 알람 확인은 엔진에도 알린다 — FTS가 "열차번호 중복 알람 확인" 같은 조치를 채점한다
+   try{root.SimRemote?.command({type:'alarm:ack',texts:done.map(a=>a.text)});}catch{}
    for(let i=alarms.length-1;i>=0;i--)if(alarms[i].checked)alarms.splice(i,1);
    if(!alarms.length)mute();renderAlarm();
   };
@@ -172,7 +174,11 @@ function fitDesktop(){
  const base=split?Math.max(360,owner.defaultView.innerHeight-chrome):760;
  desktop.style.minHeight=Math.max(base,bottom+16)+'px';
 }
-function place(w,x=parseFloat(w.el.style.left)||0,y=parseFloat(w.el.style.top)||0){const area=w.area||desktop;if(w.docked||!area.clientWidth||!area.ownerDocument.defaultView||area.ownerDocument.defaultView.closed)return;w.el.style.left=Math.max(0,Math.min(area.clientWidth-w.el.offsetWidth,x))+'px';w.el.style.top=Math.max(0,y)+'px';}
+function place(w,x=parseFloat(w.el.style.left)||0,y=parseFloat(w.el.style.top)||0){const area=w.area||desktop;if(w.docked||!area.clientWidth||!area.ownerDocument.defaultView||area.ownerDocument.defaultView.closed)return;w.el.style.left=Math.max(0,Math.min(area.clientWidth-w.el.offsetWidth,x))+'px';
+ // 창이 화면 아래로 잘리지 않게: 보이는 높이에 맞춰 본문 높이를 줄이고(안에서 스크롤) 아래쪽이 화면 안에 들어오게 올린다 (검수: 스케줄관리 창의 편집적용 버튼이 안 보이던 문제)
+ const view=area.ownerDocument.defaultView,visible=Math.max(240,view.innerHeight-Math.max(0,area.getBoundingClientRect().top)-8),body=w.el.querySelector('.mmi-win-body');
+ if(body&&!w.el.querySelector('#diaSvg')){body.style.maxHeight='';const chrome=w.el.offsetHeight-body.offsetHeight;body.style.maxHeight=Math.max(160,Math.min(700,visible-chrome))+'px';}
+ w.el.style.top=Math.max(0,Math.min(y,visible-w.el.offsetHeight))+'px';}
 function dock(id,on=true){const w=windows[id];if(!w)return;if(w.area!==desktop){w.docked=false;return;}w.docked=on;w.el.classList.toggle('docked',on);w.el.querySelector('.mmi-dock').textContent=on?'자유 배치':'창 고정';desktop.classList.toggle('has-docked',Object.values(windows).some(w=>w.docked&&!w.el.hidden));if(!on)place(w);fitDesktop();}
 function open(id){
  if(id==='graph'&&root.SimWorkspace?.openGraph())return windows.graph;
@@ -206,7 +212,8 @@ function buildMenu(){
  bar.addEventListener('click',e=>{
   const top=e.target.closest('.mmi-top-btn');
   if(top){const wrap=top.parentElement,was=wrap.classList.contains('open');closeAll();if(!was){wrap.classList.add('open');openTop=wrap;}return;}
-  const sub=e.target.closest('.has-sub>button');if(sub){const li=sub.parentElement;const was=li.classList.contains('open');li.parentElement.querySelectorAll(':scope>.open').forEach(x=>x.classList.remove('open'));if(!was)li.classList.add('open');return;}
+  // 하위 메뉴 라벨을 누르면 언제나 연다(마우스를 올려 이미 보이는 상태에서 눌러도 닫히지 않게). 닫기는 다른 곳을 누를 때.
+  const sub=e.target.closest('.has-sub>button');if(sub){const li=sub.parentElement;li.parentElement.querySelectorAll(':scope>.open').forEach(x=>{if(x!==li)x.classList.remove('open');});li.classList.add('open');return;}
   const item=e.target.closest('[data-mmi-open]');if(item){closeAll();open(item.dataset.mmiOpen);return;}
   const act=e.target.closest('[data-mmi-act]');if(act){closeAll();root.SimMMIWindows?.act(act.dataset.mmiAct,act);}
  });

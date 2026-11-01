@@ -29,7 +29,7 @@ function render(){
  if(!doOpen&&!sayOpen&&(busy||run.queue?.length))$('scStatus').textContent='조작·구술 완료 — 열차 이동과 도착을 기다리고 있습니다.';
  else if(!doOpen&&!sayOpen){const timing=root.SimAssessmentUI?.snapshot()?.task,late=timing?.key===run.assessmentKey&&(timing.timely===false||timing.overtime>0);$('scStatus').textContent=late?'조작·구술 완료 · 대본 제한시간 초과':'합격: 조작과 구술 항목을 모두 마쳤습니다. 이상입니다!';}
  else if(!doOpen)$('scStatus').textContent='조작은 모두 끝났습니다. 통보·구술 대본이 자동으로 진행됩니다.';
- else $('scStatus').textContent='진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
+ else $('scStatus').textContent=run.sc.unordered?'진행 중 — 남은 조작(○)을 순서와 상관없이 하세요.':'진행 중 — ▶ 표시된 조작을 하세요. 조작은 위에서부터 순서대로 인식됩니다.';
 }
 function renderMotion(){
  const el=$('scMotionStatus');if(!el)return;

@@ -150,6 +150,9 @@ function blockedExits(ls,slotsOf,states={}){
 function refresh(states,ls,slotsOf){
  state.auto=autoSingle(states,ls,slotsOf);
  const occupied=circuitOccupancy(ls,states,slotsOf),blocked=state.enforce?blockedExits(ls,slotsOf,states):{};
+ // 역 안 선로(승강장 5T 등)는 폐색 회로가 아니라 LS 열번창으로 점유를 안다 — 본선 신호로 점유된 선로에 진행을 내지 않게 한다
+ const WR=isNode?require('./wiring.js'):root.SimWiring;
+ for(const [id,s]of Object.entries(states)){const rails=new Set((WR?.data?.[id]?.rails||[]).map(r=>r[0])),occ={};for(const [slot,rows]of Object.entries(ls?.stations?.[id]?.windows||{}))if(rows.length&&rails.has(slot))occ[slot]=rows.map(r=>r.number);if(Object.keys(occ).length)s.platformOccupied=occ;else delete s.platformOccupied;}
  for(const [id,s]of Object.entries(states))s.circuitOccupied=Object.fromEntries(Object.entries(occupied).filter(([code])=>graph.circuits[code].sources.some(src=>src.station===id)));
  // Reserve a single-line section as soon as an outbound route is set, before the number enters.
  // An empty section must never permit opposing departure routes at the same time.

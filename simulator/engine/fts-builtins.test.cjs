@@ -26,13 +26,15 @@ function solve(p0,{log=false,branches=[]}={}){
  const ccm=st=>S().states[st].mode==='CCM'||control(st,{type:'mode',value:'CCM'}).ok;
  const order=[];let commsDone=false;
  const done=()=>item().obj||{};
- const ready=o=>{const d=done();if(refs(o.condition).some(id=>d[id]==null))return false;if(waits(o.condition).some(id=>!item().reactions?.[id]?.fired))return false;
+ const ready=o=>{const d=done();if(refs(o.condition).some(id=>d[id]==null))return false;if(waits(o.condition).some(id=>!item().reactions?.[id]?.fired))return false;if(o.condition.type==='alarmAck'&&o.condition.afterObjective&&d[o.condition.afterObjective]==null)return false;
   if(o.final)return p.objectives.every(x=>x.final||d[x.id]!=null);
   const k=gated(o.condition),st=k.station;
   if(k.type==='route')return p.objectives.filter(x=>x.condition.station===st&&['signalCancelled','signalStop'].includes(x.condition.type)).every(x=>d[x.id]!=null);
   if(o.condition.type==='signalStop')return p.objectives.filter(x=>x.condition.type==='signalCancelled'&&x.condition.station===st&&x.condition.signal===o.condition.signal).every(x=>d[x.id]!=null);
   return true;};
  function perform(o){
+  // MMI 알람을 체크하고 [확인] (열차번호 중복 알람)
+  if(o.condition.type==='alarmAck')return r.command({type:'alarm:ack',texts:['열차번호 중복 알람']}).ok;
   const c=gated(o.condition);
   // 열차가 스스로 지나가야 하는 목표(상황 반응의 열차 운행)는 진로를 내 주고 기다린다
   if(o.condition.type==='all'&&o.condition.conditions[0].type==='reaction'&&c.type==='trainGone')return false;

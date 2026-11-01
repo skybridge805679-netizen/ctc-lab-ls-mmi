@@ -2,7 +2,8 @@
 'use strict';
 // 기본 시나리오 → FTS 능동형 문제 데이터.
 // 부본선 대피 5종(scenarios.js)과 비상시 조치 9종(emergency.js)의 대본을, 순서를 강제하지 않는 문제 데이터로 바꾼다.
-//   setup          : 대본이 시작할 때의 LS (역 초기화 · 진로 · 접근 열차 · 열번창 열차)
+//   setup          : 대본이 시작할 때의 LS (역 초기화 · 진로 · 접근 열차 · 열번창 열차). 시간표는 비운다 — 기본 시간표 열차가
+//                    사고 구간에 들어오면 안 된다(관제사의 열차통제 지시는 말이라 시뮬레이터가 세우지 못한다). 대본 열차만 남는다.
 //   objectives     : 대본의 조작 단계 하나하나 = 순서 없는 목표 (AUTO 복귀는 끝날 때 유지되어야 하는 final 목표)
 //   communications : 대본의 통보·지시(구술) 단계 = 교수가 확인하는 통보
 //   reactions      : 대본에서 어떤 단계가 끝나면 일어나던 열차 이동 · 열번 변화 = 그 목표/통보가 처음 이루어졌을 때의 상황 반응
@@ -17,6 +18,8 @@ const T=()=>node?require('./timetable.js'):root.SimTimetable;
 const VB=()=>node?require('./emergency-branches.js'):root.SimEmergencyBranches;
 const nm=id=>N().catalog[id]?.name||id;
 const OP_POINTS=2,COMM_POINTS=1;
+// 원문 HWP 글머리 기호(사용자 정의 문자)는 화면에서 깨지므로 가운뎃점으로 바꾼다 (예: 112·119)
+const clean=s=>String(s).replace(/[\uE000-\uF8FF]/g,'·');
 const short=(s,n=48)=>{s=String(s).replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1)+'…':s;};
 const exists=number=>({type:'not',condition:{type:'trainGone',number}});
 const deductions=()=>[{label:'거부된 조작 3회 이상 (연동 조건을 확인하지 않은 취급)',condition:{type:'failedOp',count:3},points:10}];
@@ -45,16 +48,26 @@ function objectiveBook(){
 }
 
 // 대본 진로 seed와 같은 방식으로 신호기마다 첫 진로를 고르고, 실제로 설정되는 진로만 남긴다
-function seedRoutes(station,signals,approach=[]){
+function seedRoutes(station,signals,approach=[],occupied=new Set()){
  const c=Core().forStation(station),s=c.initial(),out=[];
  c.dispatch(s,{type:'mode',value:'CCM',source:'SCENARIO'});
  for(const sig of signals){
   const departure=c.signals[sig]?.kind==='출발';
   const L=node?require('./line.js'):root.SimLine,wrong=r=>!!L?.wrongDirection?.(station,c.routes[r].destination);   // 반대 방향(단선 운전) 진로는 고르지 않는다
-  const id=typeof sig==='string'&&c.routes[sig]?sig:Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig);
+  // 처음부터 열번창에 열차가 서 있는 선로로 들어가는 진로는 고르지 않는다 (본선 신호는 점유 선로에 진행을 내지 않는다)
+  const id=typeof sig==='string'&&c.routes[sig]?sig:Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure&&!occupied.has(c.routes[r].destination)).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig&&!occupied.has(c.routes[r].destination));
   if(id&&c.dispatch(s,{type:'route',id,source:'SCENARIO'}).ok)out.push({station,route:id});
  }
  return {routes:out,approach:approach.map(signal=>({station,signal}))};
+}
+// 시작할 때 이미 서 있는 신호를 다시 내는 진로 목표는, 그 신호를 먼저 취소(정지)한 뒤에만 인정한다
+// (그러지 않으면 문제 시작 순간 자동으로 달성된다 — 예: 비상 03 안양 3B-B655T)
+function gateRoutes(list){
+ for(const o of list){
+  if(o.condition.type!=='route')continue;const {station,route}=o.condition,sig=Core().forStation(station).routes[route]?.signal;
+  const stop=list.find(x=>x.condition.type==='signalCancelled'&&x.condition.station===station&&x.condition.signal===sig);
+  if(stop&&stop!==o)o.condition={type:'all',conditions:[{type:'objective',id:stop.id},o.condition]};
+ }
 }
 const reference=steps=>'참고 순서(예시 — 실제 순서는 관제사가 상황을 보고 판단):\n'+steps.map((s,i)=>`${i+1}. ${s}`).join('\n');
 
@@ -64,20 +77,26 @@ function emergency({limits={}}={}){
  return E.list.map(sc=>{
   const book=objectiveBook(),comms=[],reactions=[],order=[],tagTo={};
   // 대본 seed 가운데 연동 조건으로 설정되지 않는 진로의 신호기는 처음부터 정지 상태라 취소할 신호가 없다
-  const setupRoutes=Object.entries(sc.seeds).flatMap(([st,sigs])=>seedRoutes(st,sigs).routes);
+  const castAt=st=>new Set(E.castFor(sc).filter(c=>c.station===st).map(c=>c.slot));
+  const setupRoutes=Object.entries(sc.seeds).flatMap(([st,sigs])=>seedRoutes(st,sigs,[],castAt(st)).routes);
   const proceeding=new Set(setupRoutes.map(r=>r.station+'|'+(Core().forStation(r.station).routes[r.route]?.signal)));
   for(const st of sc.steps){
-   if(st.kind==='say'){const id='n'+st.no;comms.push({id,label:short(`${st.no}. ${st.heading}`,60),text:st.lines.join('\n'),points:COMM_POINTS});tagTo[st.tag]={type:'communication',id};order.push(`[통보] ${st.no}. ${st.heading}`);continue;}
+   if(st.kind==='say'){const id='n'+st.no;comms.push({id,label:short(clean(`${st.no}. ${st.heading}`),60),text:clean(st.lines.join('\n')),points:COMM_POINTS});tagTo[st.tag]={type:'communication',id};order.push(`[통보] ${st.no}. ${st.heading}`);continue;}
    const a=st.act;let id;
    if(a.type==='mode')id=book.mode(a.station,a.value);
    else if(a.type==='stop')id=a.ids.filter(sig=>proceeding.has(a.station+'|'+sig)).map(sig=>book.cancel(a.station,sig)).at(-1);
-   else if(a.type==='route')id=book.route(a.station,a.id,/입환/.test(st.text)?'입환표지 진로설정':/출발/.test(st.text)?'출발 진행':'장내 진행');
+   else if(a.type==='route')id=book.route(a.station,a.id,st.text.split(a.id).slice(1).join(a.id).trim()||'진로 설정');   // 대본 단계의 목적(예: K0456 상1선 운행선 변경)을 목표 이름에 남긴다
    else if(a.type==='rename')id=book.rename(a.from,a.to);
-   else if(a.type==='move')id=book.move(a.number,a.station,a.slot,st.text);
+   else if(a.type==='move'){id=book.move(a.number,a.station,a.slot,st.text);
+    // 구원연결로 한 열번창에 번호가 겹치면 "열차번호 중복 알람"을 확인해야 한다 (대본)
+    if(/중복 알람/.test(st.text))book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});}
    else if(a.type==='delete')id=book.remove(a.number);
    if(st.tag&&id)tagTo[st.tag]={type:'objective',id};
    order.push(`[조작] ${st.text}`);
   }
+  // 사고 발생 보고와 함께 한 열번창에 두 번호가 겹치면(충돌·추돌) 그 중복 알람을 확인해야 한다
+  if(Object.values(sc.autos).flat().some(a=>a.op==='insert'))book.list.unshift({id:'ack-incident',label:'사고 열차번호 중복 알람 확인 (MMI 알람 체크 → [확인])',condition:{type:'alarmAck',contains:'중복'},points:OP_POINTS});
+  gateRoutes(book.list);
   // 상황 반응: 대본에서 단계 tag가 끝나면 일어나던 변화. 첫 조작 전 단계(사고 발생 보고)의 변화는 문제 시작과 함께 일어난다.
   const opening=new Set([sc.steps.find(s=>s.kind==='say')?.tag].filter(Boolean));
   for(const [tag,actions] of Object.entries(sc.autos)){
@@ -95,7 +114,7 @@ function emergency({limits={}}={}){
   return {id:'P-'+sc.id,subject:'비상 시 조치',name:`비상시 조치 ${sc.title}`,limit:limits[sc.id]||900,score:100,voice:sc.problem,
    situation:[sc.problem,...sc.trains,...sc.notes].join('\n'),actions:reference(order),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
-   setup:{reset:[...sc.stations],clear:E.numbersOf(sc),routes:setupRoutes,approach:[],modes:sc.stations.map(station=>({station,value:'AUTO'})),
+   setup:{clearTimetable:true,reset:[...sc.stations],clear:E.numbersOf(sc),routes:setupRoutes,approach:[],modes:sc.stations.map(station=>({station,value:'AUTO'})),
     trains:E.castFor(sc).map(c=>({station:c.station,slot:c.slot,number:c.number,direction:c.dir}))},
    objectives:book.list,communications:[...comms,...(VB()?.proactiveFor(sc.key)||[])],reactions,
    // 상황별 대응 요령: 감독관이 상황을 바꾸는 분기 (교수가 모니터링에서 주입)
@@ -124,6 +143,7 @@ function evacuation({limits={}}={}){
    if(st.tag)tagTo[st.tag]={type:'objective',id};
    order.push(`[조작] ${fill(st.text)}`);
   }
+  gateRoutes(book.list);
   // 고장열차의 출발 진로(§out§)는 그 열차가 부본선에 들어간 뒤(§route§ 장내 진로)에만 의미가 있다
   if(tagTo.out?.type==='objective'&&tagTo.route?.type==='objective'){const o=book.list.find(x=>x.id===tagTo.out.id);o.condition={type:'all',conditions:[{type:'objective',id:tagTo.route.id},o.condition]};}
   // 열번창 열차: 고장열차는 교재 번호, 나머지는 대본의 예비 번호
@@ -146,7 +166,7 @@ function evacuation({limits={}}={}){
    situation:[fill(sc.problem),...cast.map(c=>`${c.id} : ${{fault:'고장열차',other:c.label||'다른 선 열차'}[c.key]||c.label||'후속열차'} (${nm(sc.station)}역 ${c.slot})`)].join('\n'),
    actions:reference(order)+'\n\n'+sc.notes.join('\n'),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
-   setup:{reset:[sc.station],clear:cast.map(c=>c.id),routes:seeded.routes,approach:seeded.approach,modes:[{station:sc.station,value:'AUTO'}],
+   setup:{clearTimetable:true,reset:[sc.station],clear:cast.map(c=>c.id),routes:seeded.routes,approach:seeded.approach,modes:[{station:sc.station,value:'AUTO'}],
     trains:cast.map(c=>({station:sc.station,slot:c.slot,number:c.id,direction:c.dir}))},
    objectives:book.list,communications:comms,reactions};
  });

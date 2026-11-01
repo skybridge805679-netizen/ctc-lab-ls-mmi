@@ -11,7 +11,8 @@
 const node=typeof module!=='undefined';
 const D=node?require('./emergency-data.js'):root.SimEmergencyData;
 const L=()=>D.variants.lines;
-const RESCUE={'05':['rename-G1210','move-G1210','delete-G1210','rename-G1208','n16','n17','n18'],'06':['rename-G0454','move-G0454','delete-G0454','rename-G0452'],'06-1':['rename-G0454','move-G0454','delete-G0454','rename-G0452']};
+// 구원이 필요 없어지면 구원 관련 목표(번호 수정·구원연결 이동·중복 알람 확인·삭제)도 빠진다
+const RESCUE={'05':['rename-G1210','move-G1210','ack-G1210','delete-G1210','rename-G1208','n16','n17','n18'],'06':['rename-G0454','move-G0454','ack-G0454','delete-G0454','rename-G0452'],'06-1':['rename-G0454','move-G0454','ack-G0454','delete-G0454','rename-G0452']};
 const FIRE=key=>[
  {id:'v-change-after-control',label:'열차통제 종료 후 운행선 변경 지시',at:[209,212],head:'열차통제 종료 후 운행선 변경지시'},
  {id:'v-change-during-rescue',label:'구원준비 중 운행선 변경 지시 (기존 순서 변경)',at:[212,214],head:'구원준비 중 운행선 변경 지시'},

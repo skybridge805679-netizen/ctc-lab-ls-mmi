@@ -67,7 +67,7 @@ const OVERLAY={
          g0450:[{op:'delete',number:'G0450'}]},
   before:{
    17:[rename('K0450','G0450','geumcheon','g0450')],
-   22:[mode('anyang','CCM'),stop('anyang',['3B','3C','2B']),mode('geumcheon','CCM'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행 (상1선 방면)'),mode('anyang','AUTO')],
+   22:[mode('anyang','CCM'),stop('anyang',['3B','3C','2B']),mode('geumcheon','CCM'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행 (K0456 상1선 운행선 변경 · 원문 275행)'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행 (K0456 상1선 방면)'),mode('anyang','AUTO')],
    24:[rename('K0454','G0454','anyang')],
    26:[move('G0454','geumcheon',SEOKSU_UP2,'G0454 열차번호를 K0452가 있는 석수역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G0454','geumcheon')],
    27:[rename('K0452','G0452','geumcheon')]}},
@@ -124,7 +124,7 @@ const MOTION={
  '02':{n25:exit('K0608')},
  '03':{n14:exit('A1001','K0401','A1002'),n23:north('K0456'),n27:exit('G0452')},
  '04':{n12:exit('A1003','K1114'),n17:trip('K0811',[['anyang','B660T'],['gunpo','B678T',true],['gunpo','1T']]),n20:exit('G0809')},
- '05':{n15:guroTrip('K1212'),n18:exit('G1208')},
+ '05':{n1:exit('A0168'),n15:guroTrip('K1212'),n18:exit('G1208')},       // 원문 "A0168열차 : 구로역 발차" — 사고 때 이미 출발한다
  '05-1':{n12:guroTrip('K1210')},
  '06':{n13:exit('A1001','K0401','A1004'),n21:north('K0456'),n25:exit('G0452')},
  '06-1':{n13:exit('A1001','K0401','A1004'),n21:north('K0456'),n25:exit('G0452')},

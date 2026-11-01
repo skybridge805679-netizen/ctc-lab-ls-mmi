@@ -31,7 +31,7 @@ function conflictScenario(p){
   doStep('경합 해소 확인 (다른 열차와의 3차 경합 없음)',ctx=>{const t=train(ctx,id);return !!t&&T.conflicts(ctx.model).filter(involves).length===0&&diff(t)>=0;},'그래프에서 십자선보기로 다른 열차와 겹치는 곳이 남지 않았는지 확인',
    ctx=>{const left=T.conflicts(ctx.model).filter(involves);return left.length?`경합이 ${left.length}건 남아 있습니다 (${nm(left[0].station)}역 부근부터). 3차 경합이 생기지 않았는지 확인하세요.`:'';}),
   say('1차 경합 해소하였습니다. 이상입니다!')];
- return {id:'sch-conflict',group:'schedule',title:'경합 해소 (경합 시나리오)',source:'경합 시나리오.hwpx',station:'yongsan',stations:[],cast:[],autos:{},
+ return {id:'sch-conflict',group:'schedule',unordered:true,title:'경합 해소 (경합 시나리오)',source:'경합 시나리오.hwpx',station:'yongsan',stations:[],cast:[],autos:{},
   problem:`${leader}열차와 ${id}열차 사이에 경합이 발생했습니다. 온라인 열차그래프에서 경합을 찾아 해소하세요. (${id}는 이 연습을 위해 만든 임시열차입니다. 경합 위치와 해소역은 직접 판단합니다)`,
   trains:[],notes:['※ 경합해소는 경합지에서 가장 최근 해소역에서 해야 합니다.','※ 해소역: 용산역, 영등포역, 금천구청역, 안양역, 군포역, 의왕역.'],steps};
 }
@@ -59,7 +59,7 @@ function createScenario(p){
   doStep(`연계열차 ${p.related||'(없음)'}, 차량수 ${p.carCount}량, 열차등급 ${p.kind}, 운행구분 ${p.service}, 기능열차 ${p.flag} 로 수정 후 편집적용`,props,'선택열차정보에서 값을 바꾸고 편집적용 (분할합병은 이 시뮬레이터에서 지원하지 않습니다)',
    ctx=>{const t=t0(ctx);if(!t||t.plan===undefined)return '';const w=[];if(t.carCount!==p.carCount)w.push('차량수');if(t.kind!==p.kind)w.push('열차등급');if(t.service!==p.service)w.push('운행구분');if(!(t.flags||[]).includes(p.flag))w.push('기능열차');if(p.related&&t.relatedTrain!==p.related)w.push('연계열차');return w.length&&T.valid(t)?`아직 문제와 다른 항목: ${w.join('·')} (편집적용을 눌러야 반영됩니다)`:'';}),
   say('이상입니다!')];
- return {id:'sch-create',group:'schedule',title:'스케줄 생성 (스케줄생성 시나리오)',source:'스케줄생성 시나리오.hwpx',station:'yongsan',stations:[],cast:[],autos:{},
+ return {id:'sch-create',group:'schedule',unordered:true,title:'스케줄 생성 (스케줄생성 시나리오)',source:'스케줄생성 시나리오.hwpx',station:'yongsan',stations:[],cast:[],autos:{},
   problem:`${p.dir==='down'?'하행':'상행'} 전동열차 ${p.id}를 ${nm(p.from)}~${nm(p.to)} 구간으로 시작시각 ${T.clock(p.start)} 정각에 생성한 뒤, 연계열차 ${p.related||'(없음)'} · 차량수 ${p.carCount}량 · 열차등급 ${p.kind} · 운행구분 ${p.service} · 기능열차 ${p.flag}로 수정하세요.`,
   trains:[],notes:['※ 분할합병 항목은 이 시뮬레이터에서 지원하지 않아 문제에서 제외했습니다.'],steps};
 }

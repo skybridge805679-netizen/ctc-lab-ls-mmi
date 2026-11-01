@@ -73,3 +73,5 @@ body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter
 .fts-branches li.ok{border-color:#9cd3b2;background:#eef8f1}
 .fts-branches details summary{cursor:pointer;color:#4d6f66;font-size:11px}
 .fts-branches pre{white-space:pre-wrap;font:12px/1.5 inherit;margin:6px 0 0;max-height:220px;overflow:auto}
+.fts-remaining{margin:4px 0 8px;padding:6px 8px;border-radius:6px;background:#fff7e3;border:1px solid #ecd59a;color:#6a4b0c;font-weight:600}
+.fts-remaining small{font-weight:400;color:#7d6a3e}

@@ -188,7 +188,7 @@ function advance(run,ctx){
  const c={...ctx,events:run.events,train:run.train};let changed=false;
  for(let i=0;i<run.sc.steps.length;i++){
   const s=run.sc.steps[i];if(s.kind!=='do'||run.done[i])continue;
-  if(s.check(c)){run.done[i]=true;(run.completedAt??={})[i]=ctx.state?.clock??0;changed=true;}else break;     // the first unmet do-step blocks the later ones
+  if(s.check(c)){run.done[i]=true;(run.completedAt??={})[i]=ctx.state?.clock??0;changed=true;}else if(!run.sc.unordered)break;     // the first unmet do-step blocks the later ones — 스케줄 대본(unordered)은 각 단계를 순서와 상관없이 인정
  }
  return changed;
 }

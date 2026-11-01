@@ -11,6 +11,9 @@
 const node=typeof module!=='undefined';
 const N=node?require('./network.js'):root.SimNetwork;
 const VERSION=1;
+// 내장(기본) 문제·상황·시나리오의 판. 앱이 바뀌어 이 값이 달라지면, 저장된 라이브러리의 같은 id 내장 항목을 새 것으로 바꾼다
+// (사용자가 만든 문제·응용 복사본은 id가 달라 그대로 남는다).
+const BUILTIN='2026-11-01';
 const SUBJECTS=['철도관제시스템 운용','운행선 관리','열차 운행 계획','비상 시 조치'];
 const nm=id=>N.catalog[id]?.name||id;
 const stationIds=()=>N.stations.map(s=>s.id);
@@ -41,6 +44,8 @@ const CONDITIONS={
  signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll'))),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
  failedOp:{label:'실패한 조작',fields:[],test:(c,x)=>(x.events||[]).filter(e=>e.ok===false&&(!c.station||e.station===c.station)&&(!c.eventType||e.type===c.eventType)).length>=(c.count||1),text:c=>`${c.station?nm(c.station)+'역 ':''}거부된 조작${c.count>1?` ${c.count}회`:''}`},
  objective:{label:'목표 달성',fields:['id'],test:(c,x)=>x.objectives?.[c.id]!=null,text:c=>`목표 ${c.id} 달성`},
+ // MMI 알람 확인(체크 후 [확인]). contains: 알람 문구에 들어 있어야 할 말, afterObjective: 그 목표를 이룬 뒤의 확인만 인정
+ alarmAck:{label:'알람 확인',fields:[],test:(c,x)=>{const from=c.afterObjective!=null?x.objectives?.[c.afterObjective]:0;if(from==null)return false;const start=(x.now??0)-(x.elapsed??0);return (x.events||[]).some(e=>e.type==='alarmAck'&&e.ok!==false&&(!c.contains||String(e.text||'').includes(c.contains))&&(e.at==null||e.at-start>=from));},text:c=>`알람 확인${c.contains?` ("${c.contains}")`:''}${c.afterObjective?` · 목표 ${c.afterObjective} 뒤`:''}`},
  reaction:{label:'상황 반응 발생',fields:['id'],test:(c,x)=>!!x.reactions?.[c.id]?.fired,text:c=>`상황 반응 ${c.id} 발생`},
  branch:{label:'상황 변경 발생',fields:['id'],test:(c,x)=>x.branches?.[c.id]!=null,text:c=>`상황 변경 ${c.id} 발생`},
  communication:{label:'통보 확인',fields:['id'],test:(c,x)=>x.manual?.['comm:'+c.id]===true,text:c=>`통보 ${c.id} 확인`},
@@ -67,6 +72,7 @@ const PHENOMENA={
  moveTrain:{label:'열차번호 이동',fields:['number','station','slot']},
  runTrain:{label:'열차 운행 (진로를 기다려 이동)',fields:['number','legs']},
  resetStation:{label:'역 상태 초기화',fields:['station']},
+ clearTimetable:{label:'시간표 비우기 (대본 열차만 남김)',fields:[]},
  alarm:{label:'알람 발생',fields:['text']},
  notice:{label:'안내 메시지',fields:['text']}
 };
@@ -135,7 +141,7 @@ function checkActive(p,w,errors){
  objectives.forEach((o,i)=>{const where=`${w} 목표 ${i+1}`;if(!idOk(o,where))return;if(typeof o.label!=='string'||!o.label.trim())errors.push(`${where}: 이름이 없습니다`);checkCondition(o.condition,where,errors);if(o.points!==undefined&&!finite(o.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(o.deadline!==undefined&&!finite(o.deadline,1))errors.push(`${where}: 기한은 1~86400초`);for(const f of ['final','optional'])if(o[f]!==undefined&&typeof o[f]!=='boolean')errors.push(`${where}: ${f}는 true/false`);});
  comms.forEach((c,i)=>{const where=`${w} 통보 ${i+1}`;if(!idOk(c,where))return;if(typeof c.label!=='string'||!c.label.trim())errors.push(`${where}: 이름이 없습니다`);if(c.text!==undefined&&typeof c.text!=='string')errors.push(`${where}: 문안은 문자열`);if(c.points!==undefined&&!finite(c.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(c.deadline!==undefined&&!finite(c.deadline,1))errors.push(`${where}: 기한은 1~86400초`);});
  const known={objective:new Set(objectives.map(o=>o?.id)),communication:new Set(comms.map(c=>c?.id)),branch:new Set(branches.map(b=>b?.id)),reaction:new Set(reactions.map(r=>r?.id))};
- const refs=(c,where)=>{if(!object(c))return;if(['objective','communication','branch','reaction'].includes(c.type)&&!known[c.type].has(c.id))errors.push(`${where}: 없는 ${{objective:'목표',communication:'통보',branch:'상황 변경',reaction:'상황 반응'}[c.type]} ${c.id}`);(c.conditions||[]).forEach(k=>refs(k,where));if(c.condition)refs(c.condition,where);};
+ const refs=(c,where)=>{if(!object(c))return;if(c.type==='alarmAck'&&c.afterObjective!=null&&!known.objective.has(c.afterObjective))errors.push(`${where}: 없는 목표 ${c.afterObjective}`);if(['objective','communication','branch','reaction'].includes(c.type)&&!known[c.type].has(c.id))errors.push(`${where}: 없는 ${{objective:'목표',communication:'통보',branch:'상황 변경',reaction:'상황 반응'}[c.type]} ${c.id}`);(c.conditions||[]).forEach(k=>refs(k,where));if(c.condition)refs(c.condition,where);};
  objectives.forEach((o,i)=>refs(o.condition,`${w} 목표 ${i+1}`));
  reactions.forEach((r,i)=>{const where=`${w} 상황반응 ${i+1}`;if(!idOk(r,where))return;if(r.when!=null){checkCondition(r.when,where,errors);refs(r.when,where);}if(r.after!==undefined&&!finite(r.after))errors.push(`${where}: 지연은 0~86400초`);if(!Array.isArray(r.do)||!r.do.length||r.do.length>50)errors.push(`${where}: 현상(do)은 1~50개`);else r.do.forEach((k,j)=>checkPhenomenon(k,`${where}.${j+1}`,errors));});
  const base={objective:new Set((p.objectives||[]).map(o=>o?.id)),communication:new Set((p.communications||[]).map(c=>c?.id)),reaction:new Set((p.reactions||[]).map(r=>r?.id))};
@@ -148,6 +154,7 @@ function checkActive(p,w,errors){
   const st=p.setup,where=`${w} 초기상태`;if(!object(st)){errors.push(`${where}: 객체여야 합니다`);return;}
   (st.reset||[]).forEach((x,i)=>checkStation(x,`${where} 초기화 ${i+1}`,errors));
   for(const k of ['reset','modes','routes','approach','trains','clear'])if(st[k]!==undefined&&(!Array.isArray(st[k])||st[k].length>200))errors.push(`${where}: ${k}는 배열`);
+  if(st.clearTimetable!==undefined&&typeof st.clearTimetable!=='boolean')errors.push(`${where}: clearTimetable은 true/false`);
   (st.modes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'mode'},`${where} 모드 ${i+1}`,errors));
   (st.routes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'route'},`${where} 진로 ${i+1}`,errors));
   (st.approach||[]).forEach((x,i)=>checkPhenomenon({...x,type:'approach'},`${where} 접근열차 ${i+1}`,errors));
@@ -200,7 +207,7 @@ const problemOf=(lib,item)=>lib.problems.find(p=>p.id===item.problem);
 // 초기 상태 → 현상 목록 (지울 번호 → 진로 → 접근 열차 → 제어모드 → 열번 표시)
 function setupActions(st){
  if(!st)return [];
- return [...(st.reset||[]).map(station=>({type:'resetStation',station})),...(st.clear||[]).map(number=>({type:'deleteTrain',number})),...(st.routes||[]).map(x=>({...x,type:'route'})),...(st.approach||[]).map(x=>({...x,type:'approach'})),
+ return [...(st.clearTimetable?[{type:'clearTimetable'}]:[]),...(st.reset||[]).map(station=>({type:'resetStation',station})),...(st.clear||[]).map(number=>({type:'deleteTrain',number})),...(st.routes||[]).map(x=>({...x,type:'route'})),...(st.approach||[]).map(x=>({...x,type:'approach'})),
   ...(st.modes||[]).map(x=>({...x,type:'mode'})),...(st.trains||[]).map(x=>({...x,type:'insertTrain'}))];
 }
 // 상황 변경(분기): 교수가 주입하거나(조건 키 branch:<id>) when 조건이 맞으면 켜진다. 켜진 분기의 목표·통보·반응이 더해지고
@@ -299,7 +306,9 @@ function seed({scripts=[],limits={}}={}){
  const B=node?require('./fts-builtins.js'):root.SimFTSBuiltins,data=id=>{const p=P.find(x=>x.id===id);return p;};
  const active=B?B.all({limits}):[];for(const p of active)prob(p);
  const evac=active.filter(p=>p.subject==='운행선 관리').map(p=>p.id);
- const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`));
+ const SITUATION={'sch-conflict':'임시열차 B0000이 선행 하행열차를 따라잡아 경합이 생깁니다. 온라인 열차그래프에서 경합 구간을 찾고, 가장 가까운 앞쪽 해소역에서 B0000의 시각(+2분)과 도착·출발진로를 수정해 해소하시오.','sch-create':'지금 시간표에 새 열차를 만들어야 합니다. 패턴을 불러와 열차를 생성하고 편집적용하시오.'};
+ const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`);P.find(x=>x.id===id).situation=SITUATION[s];return id;});
+
  const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
  const s4=sit({id:'S-04',name:'시나리오 상황#4',scheduleId:'01178',limit:3600,problems:[c1,c2,c3,c4,c5]});
@@ -312,9 +321,17 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
+ for(const x of [...P,...S,...SC])x.builtin=BUILTIN;
  return {version:VERSION,problems:P,situations:S,scenarios:SC};
 }
+// 저장된 라이브러리의 내장 항목을 지금 앱의 내장 항목으로 갱신한다. 사용자 항목은 건드리지 않는다.
+function upgrade(lib,defaults){
+ if(!object(lib)||!object(defaults))return lib;const next=structuredClone(lib);let changed=0;
+ for(const kind of ['problems','situations','scenarios']){const list=next[kind]=Array.isArray(next[kind])?next[kind]:[];
+  for(const d of defaults[kind]||[]){const i=list.findIndex(x=>x?.id===d.id);if(i<0){list.push(structuredClone(d));changed++;}else if(list[i].builtin!==d.builtin){list[i]=structuredClone(d);changed++;}}}
+ return changed?next:lib;
+}
 
-const api={VERSION,SUBJECTS,CONDITIONS,PHENOMENA,test,describe,validate,view,createSession,advance,endCurrent,finish,grade,summary,seed,stationIds,setupActions};
+const api={VERSION,BUILTIN,upgrade,SUBJECTS,CONDITIONS,PHENOMENA,test,describe,validate,view,createSession,advance,endCurrent,finish,grade,summary,seed,stationIds,setupActions};
 if(node)module.exports=api;else root.SimFTS=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

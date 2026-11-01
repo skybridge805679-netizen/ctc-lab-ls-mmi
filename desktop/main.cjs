@@ -29,7 +29,7 @@ else{
    if(!message||typeof message.action?.type!=='string'||message.action.type.startsWith('session:')||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
-  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='mmi')script('SimWorkspace.detach()');else if(kind==='graph')script('SimWorkspace.openGraph()');else if(kind==='fts')script('SimFTSUI.open()');});
+  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='problem'){if(alive(problem)){if(problem.isMinimized())problem.restore();problem.showInactive();}}else showView(kind);});
   installMenu();createLS();
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
@@ -59,6 +59,16 @@ function protect(win){
   if(quitting||details.reason==='clean-exit')return;
   dialog.showMessageBox({type:'error',title:'관제 화면 실행 오류',message:'화면이 종료되었지만 별도 엔진의 운행 상태는 유지됩니다.',detail:'화면을 다시 불러오면 현재 엔진 상태로 연결합니다.',buttons:['화면 다시 열기','나중에'],defaultId:0}).then(({response})=>{const target=extraLS.has(win)?win:ls;if(response===0&&target&&!target.isDestroyed())target.reload();});
  });
+}
+// 창을 앞으로: 이미 열려 있으면(뒤에 있거나 최소화돼 있어도) 복원해 앞으로 가져오고, 없으면 연다
+const alive=w=>!!w&&!w.isDestroyed();
+function raise(w){if(!alive(w))return false;if(w.isMinimized())w.restore();w.show();w.focus();return true;}
+function showView(kind){
+ if(kind==='ls'){raise(ls);return;}
+ if(kind==='mmi'){if(!raise(mmi))script('SimWorkspace.detach()');return;}
+ if(kind==='graph'){if(!raise(graph))script('SimWorkspace.openGraph()');return;}
+ if(kind==='fts'){if(!raise(fts))script('SimFTSUI.open()');return;}
+ if(kind==='problem'){if(!raise(problem))script('SimFTSUI.showProblem()');}
 }
 function createLS(){
  ls=new BrowserWindow({...savedBounds('ls'),show:false,title:'ORPHEIA · LS',backgroundColor:'#edf4f1',icon:appIcon,webPreferences:prefs});
@@ -100,11 +110,12 @@ function createExtraLS(station){
 function script(code){if(ls&&!ls.isDestroyed())ls.webContents.executeJavaScript(code,true).catch(error=>console.error(error.message));}
 function installMenu(){
  const workspace={label:'실습 화면',submenu:[
-  {label:'LS 창으로',accelerator:'CmdOrCtrl+1',click:()=>{ls?.show();ls?.focus();}},
+  {label:'LS 창으로',accelerator:'CmdOrCtrl+1',click:()=>showView('ls')},
   {label:'LS 추가 창',submenu:require('../simulator/ui/ls-presets').list().map(st=>({label:st.name,click:()=>createExtraLS(st.id)}))},
-  {label:'MMI 창으로 / 분리',accelerator:'CmdOrCtrl+2',click:()=>script('window.SimWorkspace.detach()')},
-  {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>script('window.SimWorkspace.openGraph()')},
-  {label:'FTS 제어통제 창',accelerator:'CmdOrCtrl+4',click:()=>script('window.SimFTSUI.open()')},
+  {label:'MMI 창으로',accelerator:'CmdOrCtrl+2',click:()=>showView('mmi')},
+  {label:'열차 그래프 창',accelerator:'CmdOrCtrl+3',click:()=>showView('graph')},
+  {label:'FTS 제어통제 창',accelerator:'CmdOrCtrl+4',click:()=>showView('fts')},
+  {label:'문제 발생 창',accelerator:'CmdOrCtrl+5',click:()=>showView('problem')},
   {type:'separator'},
   {label:'실습 세션 저장…',accelerator:'CmdOrCtrl+Shift+S',click:()=>sessionFile(false)},
   {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>sessionFile(true)},
@@ -116,7 +127,7 @@ function installMenu(){
  ]};
  const menu=[...(process.platform==='darwin'?[{label:app.name,submenu:[{role:'about',label:'ORPHEIA 정보'},{type:'separator'},{role:'hide',label:'숨기기'},{role:'hideOthers',label:'다른 앱 숨기기'},{type:'separator'},{role:'quit',label:'종료'}]}]:[]),workspace,
   {label:'편집',submenu:[{label:'실행 취소',accelerator:'CmdOrCtrl+Z',click:()=>editHistory(false)},{label:'다시 실행',accelerator:'CmdOrCtrl+Shift+Z',click:()=>editHistory(true)},{type:'separator'},{role:'cut',label:'잘라내기'},{label:'복사',accelerator:'CmdOrCtrl+C',click:()=>editKey('copy','copy')},{label:'붙여넣기',accelerator:'CmdOrCtrl+V',click:()=>editKey('paste','paste')},{label:'모두 선택',accelerator:'CmdOrCtrl+A',click:()=>editKey('selectAll','create')}]},
-  {label:'창',submenu:[{role:'minimize',label:'최소화'},...(process.platform==='darwin'?[{role:'front',label:'모두 앞으로'}]:[{role:'quit',label:'프로그램 종료'}])]}
+  {label:'창',submenu:[{role:'minimize',label:'최소화'},{type:'separator'},{label:'LS',click:()=>showView('ls')},{label:'MMI',click:()=>showView('mmi')},{label:'열차 그래프',click:()=>showView('graph')},{label:'FTS 제어통제',click:()=>showView('fts')},{label:'문제 발생',click:()=>showView('problem')},{type:'separator'},...(process.platform==='darwin'?[{role:'front',label:'모두 앞으로'}]:[{role:'quit',label:'프로그램 종료'}])]}
  ];
  if(!app.isPackaged)menu.push({label:'개발',submenu:[{role:'toggleDevTools'}]});
  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));

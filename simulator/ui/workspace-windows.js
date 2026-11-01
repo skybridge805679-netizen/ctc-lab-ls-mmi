@@ -105,7 +105,7 @@ function closeProblem(){
 }
 function openProblem(){
  // 이미 떠 있으면 그대로 내용만 바뀐다 — 교육생이 LS·MMI에서 조작 중일 때 포커스를 빼앗지 않는다
- if(prob&&!prob.closed)return true;
+ if(prob&&!prob.closed){if(root.OrpheiaEngine?.native!==false)root.OrpheiaEngine?.openView?.('problem');return true;}   // 데스크톱: 최소화돼 있으면 포커스 없이 다시 보이게
  const panel=root.SimDOM.document.getElementById('problemPanel');if(!panel)return false;
  const next=root.open('about:blank','orpheia-problem-'+sessionId,'popup,width=1120,height=900,resizable=yes,scrollbars=yes');
  if(!next)return false;
