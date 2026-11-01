@@ -47,7 +47,10 @@ function create(host){
    for(let pass=0;pass<4&&active(session);pass++){
     const out=F.advance(runLibrary,session,(x,e)=>context(x,e),now());if(!out.length)break;let again=false;
     for(const o of out){
-     if(o.kind==='activate'){host.clearAlarms?.();o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
+     if(o.kind==='activate'){host.clearAlarms?.();
+      // 기본 시간표에서 출제하는 문제(경합해소·스케줄생성): 앞 문제가 시간표를 비웠거나 바꿨어도 기본 시간표로 되돌린 뒤 대본이 문제를 만든다
+      if(o.problem.setup?.baseTimetable&&!(o.problem.setup?.clearTimetable))error(host.apply({type:'timetable',method:'import',args:[require('./timetable').initial()]}));
+      o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
      if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
      if(o.kind==='branch'){const said=String(o.branch.text||o.branch.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||o.branch.label;announce('branch','상황 변경 · '+said,'상황 변경 · '+o.branch.label);again=true;}
      if(o.kind==='end'){ended(o.item,o.status);again=false;}

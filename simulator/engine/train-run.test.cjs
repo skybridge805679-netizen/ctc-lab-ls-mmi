@@ -53,3 +53,24 @@ test('a 관제시스템 운용 problem that asks to move a train number (checks:
  const last=r.snapshot().fts.logs.find(l=>/열번 수동 이동|수동 열번 이동/.test(l.text));assert.match(last.text,/문제가 요구한 열번 이동/);
  assert.equal(r.snapshot().fts.history[0]?.got,100);
 });
+test('a schedule problem after an emergency problem that emptied the timetable restores the base timetable before the script builds the conflict',()=>{
+ const r=R.create(),lib=r.snapshot().ftsLibrary;lib.situations.push({id:'S-A',name:'a',problems:['P-em-03']},{id:'S-B',name:'b',problems:['P-sch-conflict']});lib.scenarios.push({id:'SC-AB',name:'ab',situations:['S-A','S-B']});
+ assert.ok(r.command({type:'fts',op:'library',library:lib}).ok);assert.ok(r.command({type:'fts',op:'start',scenario:'SC-AB',professor:'001',student:'tester',autoRun:false}).ok);r.command({type:'tick',seconds:1});
+ assert.ok(r.snapshot().timetable.trains.length<10,'비상 문제는 대본 열차만');
+ assert.ok(r.command({type:'fts',op:'next'}).ok);r.command({type:'fts',op:'ui',ui:{windows:[]}});r.command({type:'tick',seconds:1});
+ const it=r.snapshot().fts.session.items[1];assert.equal(it.error,undefined,it.error);assert.equal(it.status,'진행');
+ assert.ok(r.snapshot().timetable.trains.some(t=>t.id==='B0000'),'경합 임시열차 B0000');
+});
+test('비상 03 in the inspector order: 통보 14 before stopping 2B closes 2B as missed (0점) instead of blocking; after 합병 출발 the 회송 trains leave',()=>{
+ const r=start('P-em-03'),c=id=>assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+id,checked:true}).ok);
+ ctl(r,'anyang',{type:'mode',value:'CCM'});ctl(r,'anyang',{type:'stop',id:'3B'});ctl(r,'geumcheon',{type:'mode',value:'CCM'});ctl(r,'geumcheon',{type:'stop',id:'2A'});
+ c('n14');tick(r,120);
+ assert.equal(item(r).obj['stop-anyang-2B'],undefined);assert.notEqual(item(r).missed['stop-anyang-2B'],undefined,'2B 취소는 놓침으로 닫힌다');
+ assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);assert.ok(ctl(r,'geumcheon',{type:'route',id:'2B-5T'}).ok);
+ rename(r,'K0450','G0450');rename(r,'K0454','G0454');c('n24');tick(r,60);
+ assert.ok(r.command({type:'alarm:ack',texts:['열차번호 중복']}).ok);
+ const g=row(r,'G0454');assert.ok(r.command({type:'numbers',action:{op:'delete',...g}}).ok);rename(r,'K0452','G0452');
+ ctl(r,'anyang',{type:'mode',value:'AUTO'});ctl(r,'geumcheon',{type:'mode',value:'AUTO'});c('n27');
+ tick(r,400);
+ assert.equal(row(r,'K0456'),null,'K0456은 B963T에 서지 않고 관제구간 밖으로');assert.equal(row(r,'G0450'),null,'G0450 회송');assert.equal(row(r,'G0452'),null,'G0452 회송');
+});

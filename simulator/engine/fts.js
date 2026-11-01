@@ -139,11 +139,11 @@ function checkActive(p,w,errors){
  // 상황 변경(분기)의 목표·통보·반응도 같은 문제 안의 id로 검사한다
  const sub=(b,key)=>object(b)&&Array.isArray(b[key])?b[key]:[];
  const objectives=[...list('objectives'),...branches.flatMap(b=>sub(b,'objectives'))],comms=[...list('communications'),...branches.flatMap(b=>sub(b,'communications'))],reactions=[...list('reactions'),...branches.flatMap(b=>sub(b,'reactions'))];
- objectives.forEach((o,i)=>{const where=`${w} 목표 ${i+1}`;if(!idOk(o,where))return;if(typeof o.label!=='string'||!o.label.trim())errors.push(`${where}: 이름이 없습니다`);checkCondition(o.condition,where,errors);if(o.points!==undefined&&!finite(o.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(o.deadline!==undefined&&!finite(o.deadline,1))errors.push(`${where}: 기한은 1~86400초`);for(const f of ['final','optional'])if(o[f]!==undefined&&typeof o[f]!=='boolean')errors.push(`${where}: ${f}는 true/false`);});
+ objectives.forEach((o,i)=>{const where=`${w} 목표 ${i+1}`;if(!idOk(o,where))return;if(typeof o.label!=='string'||!o.label.trim())errors.push(`${where}: 이름이 없습니다`);checkCondition(o.condition,where,errors);if(o.points!==undefined&&!finite(o.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(o.deadline!==undefined&&!finite(o.deadline,1))errors.push(`${where}: 기한은 1~86400초`);for(const f of ['final','optional'])if(o[f]!==undefined&&typeof o[f]!=='boolean')errors.push(`${where}: ${f}는 true/false`);if(o.missedWhen!=null)checkCondition(o.missedWhen,where+' 놓침 조건',errors);});
  comms.forEach((c,i)=>{const where=`${w} 통보 ${i+1}`;if(!idOk(c,where))return;if(typeof c.label!=='string'||!c.label.trim())errors.push(`${where}: 이름이 없습니다`);if(c.text!==undefined&&typeof c.text!=='string')errors.push(`${where}: 문안은 문자열`);if(c.points!==undefined&&!finite(c.points,0,100000))errors.push(`${where}: 점수는 0 이상`);if(c.deadline!==undefined&&!finite(c.deadline,1))errors.push(`${where}: 기한은 1~86400초`);});
  const known={objective:new Set(objectives.map(o=>o?.id)),communication:new Set(comms.map(c=>c?.id)),branch:new Set(branches.map(b=>b?.id)),reaction:new Set(reactions.map(r=>r?.id))};
  const refs=(c,where)=>{if(!object(c))return;if(c.type==='alarmAck'&&c.afterObjective!=null&&!known.objective.has(c.afterObjective))errors.push(`${where}: 없는 목표 ${c.afterObjective}`);if(['objective','communication','branch','reaction'].includes(c.type)&&!known[c.type].has(c.id))errors.push(`${where}: 없는 ${{objective:'목표',communication:'통보',branch:'상황 변경',reaction:'상황 반응'}[c.type]} ${c.id}`);(c.conditions||[]).forEach(k=>refs(k,where));if(c.condition)refs(c.condition,where);};
- objectives.forEach((o,i)=>refs(o.condition,`${w} 목표 ${i+1}`));
+ objectives.forEach((o,i)=>{refs(o.condition,`${w} 목표 ${i+1}`);if(o.missedWhen!=null)refs(o.missedWhen,`${w} 목표 ${i+1} 놓침 조건`);});
  reactions.forEach((r,i)=>{const where=`${w} 상황반응 ${i+1}`;if(!idOk(r,where))return;if(r.when!=null){checkCondition(r.when,where,errors);refs(r.when,where);}if(r.after!==undefined&&!finite(r.after))errors.push(`${where}: 지연은 0~86400초`);if(!Array.isArray(r.do)||!r.do.length||r.do.length>50)errors.push(`${where}: 현상(do)은 1~50개`);else r.do.forEach((k,j)=>checkPhenomenon(k,`${where}.${j+1}`,errors));});
  const base={objective:new Set((p.objectives||[]).map(o=>o?.id)),communication:new Set((p.communications||[]).map(c=>c?.id)),reaction:new Set((p.reactions||[]).map(r=>r?.id))};
  branches.forEach((b,i)=>{const where=`${w} 상황변경 ${i+1}`;if(!idOk(b,where))return;
@@ -156,6 +156,7 @@ function checkActive(p,w,errors){
   (st.reset||[]).forEach((x,i)=>checkStation(x,`${where} 초기화 ${i+1}`,errors));
   for(const k of ['reset','modes','routes','approach','trains','clear'])if(st[k]!==undefined&&(!Array.isArray(st[k])||st[k].length>200))errors.push(`${where}: ${k}는 배열`);
   if(st.clearTimetable!==undefined&&typeof st.clearTimetable!=='boolean')errors.push(`${where}: clearTimetable은 true/false`);
+  if(st.baseTimetable!==undefined&&typeof st.baseTimetable!=='boolean')errors.push(`${where}: baseTimetable은 true/false`);
   (st.modes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'mode'},`${where} 모드 ${i+1}`,errors));
   (st.routes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'route'},`${where} 진로 ${i+1}`,errors));
   (st.approach||[]).forEach((x,i)=>checkPhenomenon({...x,type:'approach'},`${where} 접근열차 ${i+1}`,errors));
@@ -222,7 +223,9 @@ function view(p,item){
 function latch(p0,item,ctx){
  const p=view(p0,item);
  // final:true = a state that must hold when the problem ends (e.g. AUTO 복귀): not latched, re-checked every tick
- for(const o of p.objectives||[]){if(o.final){const ok=test(o.condition,{...ctx,objectives:item.obj||{}});if(ok&&item.obj?.[o.id]==null)(item.obj??={})[o.id]=ctx.elapsed??0;else if(!ok&&item.obj?.[o.id]!=null)delete item.obj[o.id];continue;}if(item.obj?.[o.id]==null&&test(o.condition,{...ctx,objectives:item.obj||{}}))(item.obj??={})[o.id]=ctx.elapsed??0;}
+ for(const o of p.objectives||[]){if(o.final){const ok=test(o.condition,{...ctx,objectives:item.obj||{}});if(ok&&item.obj?.[o.id]==null)(item.obj??={})[o.id]=ctx.elapsed??0;else if(!ok&&item.obj?.[o.id]!=null)delete item.obj[o.id];continue;}if(item.obj?.[o.id]!=null||item.missed?.[o.id]!=null)continue;const c2={...ctx,objectives:item.obj||{}};if(test(o.condition,c2))(item.obj??={})[o.id]=ctx.elapsed??0;
+  // missedWhen: 이룰 기회가 지나간 목표 (예: 정지시켜야 할 열차가 이미 그 신호로 지나감) — 0점으로 닫고 완료를 막지 않는다
+  else if(o.missedWhen!=null&&test(o.missedWhen,c2))(item.missed??={})[o.id]=ctx.elapsed??0;}
  for(const c of p.communications||[])if(item.comm?.[c.id]==null&&ctx.manual?.['comm:'+c.id]===true)(item.comm??={})[c.id]=ctx.elapsed??0;
 }
 function credit(task,doneAt){if(doneAt==null)return 0;const pts=task.points??1;return task.deadline!==undefined&&doneAt>task.deadline?pts/2:pts;}
@@ -230,7 +233,7 @@ function grade(p0,item,ctx){
  const p=view(p0,item),checks=p.checks||[],met=checks.map(k=>test(k.condition,ctx));
  const objectives=p.objectives||[],comms=p.communications||[];
  latch(p0,item,ctx);
- const required=[...objectives.filter(o=>!o.optional).map(o=>item.obj?.[o.id]),...comms.filter(c=>!c.optional).map(c=>item.comm?.[c.id])];
+ const required=[...objectives.filter(o=>!o.optional).map(o=>item.obj?.[o.id]??item.missed?.[o.id]),...comms.filter(c=>!c.optional).map(c=>item.comm?.[c.id])];
  const total=checks.reduce((s,k)=>s+(k.points??1),0)+objectives.reduce((s,o)=>s+(o.points??1),0)+comms.reduce((s,c)=>s+(c.points??1),0);
  const got=checks.reduce((s,k,i)=>s+(met[i]?(k.points??1):0),0)+objectives.reduce((s,o)=>s+credit(o,item.obj?.[o.id]),0)+comms.reduce((s,c)=>s+credit(c,item.comm?.[c.id]),0);
  const deducted=(p.deductions||[]).map((k,i)=>!!item.deducted?.[i]||test(k.condition,ctx));
@@ -248,7 +251,7 @@ function advance(lib,session,ctxFor,now){
   const since=now-session.readyAt,ctx={...ctxFor(item,since),elapsed:since};
   const at=p.trigger?.useTime?Number(p.trigger.at)||0:0;
   item.triggerTimeMet=since>=at;item.triggerMet=(p.trigger?.conditions||[]).map(c=>test(c,ctx));
-  if(item.triggerTimeMet&&item.triggerMet.every(Boolean)){item.status='진행';item.startedAt=now;item.fired=[];item.obj={};item.comm={};item.reactions={};item.branch={};out.push({kind:'activate',item,problem:p});for(const ph of setupActions(p.setup))out.push({kind:'phenomenon',item,phenomenon:ph,setup:true});return out;}
+  if(item.triggerTimeMet&&item.triggerMet.every(Boolean)){item.status='진행';item.startedAt=now;item.fired=[];item.obj={};item.missed={};item.comm={};item.reactions={};item.branch={};out.push({kind:'activate',item,problem:p});for(const ph of setupActions(p.setup))out.push({kind:'phenomenon',item,phenomenon:ph,setup:true});return out;}
   else return out;
  }
  const elapsed=now-item.startedAt,ctx={...ctxFor(item,elapsed),elapsed,objectives:item.obj||{},branches:item.branch||{},reactions:item.reactions||{}};
@@ -275,7 +278,7 @@ function finish(session,item,status,now,out=[]){
 function endCurrent(session,now){const item=session.items[session.current];if(!item||session.finished)return [];if(item.status==='대기'){item.status='진행';item.startedAt=now;}return finish(session,item,'종료',now);}
 function summary(lib,session){
  const rows=session.items.map(it=>{const p0=problemOf(lib,it),p=view(p0,it);return {problem:p?.name||it.problem,subject:p?.subject||'',status:it.status,score:it.score,full:p?.score??100,seconds:it.endedAt!=null&&it.startedAt!=null?it.endedAt-it.startedAt:null,error:it.error||null,checks:(p?.checks||[]).map((k,i)=>({label:k.label||describe(k.condition),met:!!it.met?.[i],points:k.points??1})),deductions:(p?.deductions||[]).map((k,i)=>({label:k.label||describe(k.condition),applied:!!it.deducted?.[i],points:k.points??0})),
-  objectives:(p?.objectives||[]).map(o=>({id:o.id,label:o.label,doneAt:it.obj?.[o.id]??null,late:o.deadline!==undefined&&it.obj?.[o.id]>o.deadline,points:o.points??1})),
+  objectives:(p?.objectives||[]).map(o=>({id:o.id,label:o.label,doneAt:it.obj?.[o.id]??null,missedAt:it.missed?.[o.id]??null,late:o.deadline!==undefined&&it.obj?.[o.id]>o.deadline,points:o.points??1})),
   communications:(p?.communications||[]).map(c=>({id:c.id,label:c.label,doneAt:it.comm?.[c.id]??null,points:c.points??1})),
   branches:(p0?.branches||[]).filter(b=>it.branch?.[b.id]!=null).map(b=>({id:b.id,label:b.label,at:it.branch[b.id]}))};});
  const got=rows.reduce((s,r)=>s+r.score,0),full=rows.reduce((s,r)=>s+r.full,0);
@@ -310,7 +313,7 @@ function seed({scripts=[],limits={}}={}){
  // 상황은 교육생에게 보이는 사실만: 해소 방법(해소역 · +2분 · 진로 변경)은 조치사항에 둔다 (조치사항 표시를 끄면 보이지 않음)
  const SITUATION={'sch-conflict':['임시열차 B0000 운행 요청이 들어와 시간표에 추가되었습니다. 경합을 확인하고 해소하시오.','온라인 열차그래프에서 경합 구간을 찾고, 경합지에서 가장 가까운 앞쪽 해소역(용산·영등포·금천구청·안양·군포·의왕)에서 B0000의 시각을 +2분 늦추고 도착·출발진로를 바꿔 해소합니다. 3차 경합이 생기지 않게 하고 최소 운전시격은 120초입니다.'],
   'sch-create':['지금 시간표에 새 열차를 만들어야 합니다. 열차를 생성하고 편집적용하시오.','열차스케줄 → 패턴을 불러와 열차를 생성 → 편집적용']};
- const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');return id;});
+ const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');x.setup={baseTimetable:true};return id;});
 
  const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};

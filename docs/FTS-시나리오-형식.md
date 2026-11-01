@@ -154,3 +154,7 @@ FTS 제어통제 시스템(LS 상단 **↗ FTS** · 실습 화면 → FTS 제어
  "situations":[{"id":"AI-S2","name":"용산 대피 (능동형)","limit":600,"problems":["AI-2"]}],
  "scenarios":[{"id":"AI-C2","name":"능동형 연습","situations":["AI-S2"]}]}
 ```
+
+### 놓침 조건과 기본 시간표 (v0.37.1)
+- 목표의 `missedWhen`(조건): 목표를 아직 이루지 못한 채 이 조건이 맞으면, 그 목표는 **놓침**으로 닫힌다. 점수는 0이고 완료를 막지 않는다. 예: `{"type":"all","conditions":[{"type":"reaction","id":"r-n14"},{"type":"signalStop","station":"anyang","signal":"2B"}]}`.
+- 초기상태의 `baseTimetable:true`: 문제가 시작될 때(대본이 문제를 만들기 전에) 앱의 기본 시간표로 되돌린다. 경합해소·스케줄생성처럼 기본 시간표에서 출제하는 문제에 쓴다.

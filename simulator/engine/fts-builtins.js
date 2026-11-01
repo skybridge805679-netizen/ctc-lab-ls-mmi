@@ -85,7 +85,7 @@ function emergency({limits={}}={}){
   const castAt=st=>new Set(E.castFor(sc).filter(c=>c.station===st).map(c=>c.slot));
   const setupRoutes=Object.entries(sc.seeds).flatMap(([st,sigs])=>seedRoutes(st,sigs,[],castAt(st)).routes);
   const proceeding=new Set(setupRoutes.map(r=>r.station+'|'+(Core().forStation(r.station).routes[r.route]?.signal)));
-  for(const st of sc.steps){
+  for(let st of sc.steps){
    if(st.kind==='say'){const id='n'+st.no;comms.push({id,label:short(clean(`${st.no}. ${st.heading}`),60),text:clean(st.lines.join('\n')),points:COMM_POINTS});tagTo[st.tag]={type:'communication',id};order.push(`[통보] ${st.no}. ${st.heading}`);continue;}
    const a=st.act;let id;
    if(a.type==='mode')id=book.mode(a.station,a.value);
@@ -96,7 +96,9 @@ function emergency({limits={}}={}){
     // 구원열차는 "구원열차 … 지시" 통보(그 앞 마지막 것)와 구원열차 번호 수정 뒤에 출발해 전령법으로 사고 열차까지 운행한다
     const order=comms.filter(c=>/구원/.test(c.label)&&/지시|출발/.test(c.label)).at(-1)||comms.at(-1);
     reactions.push({id:'r-rescue-'+a.number,label:`${a.number} 구원열차 출발 (통보 ${order?.id||'-'} 확인 후 전령법 운행)`,when:{type:'all',conditions:[...(order?[{type:'communication',id:order.id}]:[]),...(before?[{type:'objective',id:before}]:[]),exists(a.number)]},do:[{type:'runTrain',number:a.number,legs:[{station:a.station,slot:a.slot,rescue:true}]}]});
-    book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});}
+    book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});
+    // 조치사항(참고 순서)도 채점과 같게: 원문의 「열번 이동」 대신 구원 지시와 실제 운행을 적는다
+    st={...st,text:`${a.number} 구원열차 출발 지시(통보 ${order?.id?.replace(/^n/,'')||'-'}) → ${a.number}가 전령법으로 ${nm(a.station)} ${a.slot}(사고 열차)까지 스스로 운행·구원연결 — 열번을 손으로 옮기지 않는다 → 열차번호 중복 알람 확인`};}
    else if(a.type==='move'){id=book.move(a.number,a.station,a.slot,st.text);
     // 구원연결로 한 열번창에 번호가 겹치면 "열차번호 중복 알람"을 확인해야 한다 (대본)
     if(/중복 알람/.test(st.text))book.list.push({id:'ack-'+a.number,label:`열차번호 중복 알람 확인 (${a.number} 구원연결 후 MMI 알람 체크 → [확인])`,condition:{type:'alarmAck',contains:'중복',afterObjective:id},points:OP_POINTS});}
@@ -116,6 +118,10 @@ function emergency({limits={}}={}){
     const r=runs.get(a.number)||{type:'runTrain',number:a.number,legs:[]};runs.set(a.number,r);
     if(a.op==='move')r.legs.push({station:a.station,slot:a.slot,...(a.handover?{handover:true}:{})});else r.exit=true;
    }
+   // 마지막 구간이 역간 폐색(승강장이 아닌 열번창)에서 끝나고 그 뒤로 다룰 목표가 없는 열차는 관제구간 밖으로 계속 간다
+   // (안 그러면 폐색에 서서 뒤 열차를 막는다 — 비상 03 K0456이 B963T에 서서 G0450·G0452가 못 나가던 문제)
+   const Wd=(node?require('./wiring.js'):root.SimWiring).data,named=new Set(JSON.stringify(book.list.map(o=>o.condition)).match(/[A-Z]\d{4}/g)||[]);
+   for(const r of runs.values()){const last=r.legs.at(-1);if(!r.exit&&last&&!Wd[last.station]?.rails.some(x=>x[0]===last.slot)&&!named.has(r.number))r.exit=true;}
    dos.push(...runs.values());
    const trigger=opening.has(tag)?null:tagTo[tag];if(!opening.has(tag)&&!trigger)continue;
    // 진로를 기다려 달리는 열차(운행선 변경 등)는 관제사가 그 구간 진로를 내면 바로 출발 준비를 한다 — 통보 확인만 기다리지 않는다
@@ -124,6 +130,13 @@ function emergency({limits={}}={}){
    const guards=[...runs.keys()].map(exists),when=[...(start?[start]:[]),...guards];
    reactions.push({id:'r-'+tag,label:trigger?`${trigger.type==='communication'?'통보':'목표'} ${trigger.id}${routeGoals.length?' 또는 '+routeGoals.map(g=>g.id).join('·'):''} 이후 열차 변화`:'사고 발생 시점의 열차 변화',...(when.length?{when:when.length===1?when[0]:{type:'all',conditions:when}}:{}),do:dos});
   }
+  // 정지시켜야 할 신호 앞의 열차가 상황 반응(운행 재개 등)으로 이미 그 신호를 지나가 버리면, 그 신호 취소 목표는 이룰 기회가 지난 것이다:
+  // 0점으로 닫혀 완료를 막지 않는다 (예: 비상 03 — 통보 14 뒤 A1002가 안양 2B로 출발하면 2B 취소는 놓침)
+  const W=node?require('./wiring.js'):root.SimWiring,cast=E.castFor(sc);
+  for(const o of book.list){if(o.condition.type!=='signalCancelled')continue;const {station,signal}=o.condition,rail=W.data[station]?.signals.find(x=>x[0]===signal)?.[1];
+   const standing=cast.filter(c=>c.station===station&&c.slot===rail).map(c=>c.number);
+   const runs=reactions.filter(r=>r.do.some(d=>d.type==='runTrain'&&standing.includes(d.number)));
+   if(runs.length)o.missedWhen={type:'all',conditions:[{type:'any',conditions:runs.map(r=>({type:'reaction',id:r.id}))},{type:'signalStop',station,signal}]};}
   return {id:'P-'+sc.id,subject:'비상 시 조치',name:`비상시 조치 ${sc.title}`,limit:limits[sc.id]||900,score:100,voice:sc.problem,
    situation:[sc.problem,...sc.trains,...sc.notes].join('\n'),actions:reference(order),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
