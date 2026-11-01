@@ -40,3 +40,9 @@ test('a saved session with automatic control state restores (started is a Map) a
  const bad=structuredClone(saved);bad.auto.engine.started=[1];const keep=R.create(),before=JSON.stringify(keep.snapshot().states);
  try{keep.restore(bad);}catch{}assert.equal(JSON.stringify(keep.snapshot().states).length>0,true);assert.ok(before.length>0);
 });
+test('a manual number move the script prescribes (단선지령식 반대선 운행) is logged as the normal procedure, not as a display correction',()=>{
+ const r=start('P-em-02'),f=row(r,'K0608');assert.ok(f);
+ assert.ok(r.command({type:'numbers',action:{op:'move',...f,targetStation:'dongmyo',targetSlot:'B011T'}}).ok);tick(r,1);
+ const last=r.snapshot().fts.logs.find(l=>/열번 이동|열번 수동 이동/.test(l.text));assert.match(last.text,/대본에 명시된 수동 이동/);
+ assert.notEqual(item(r).obj['move-K0608'],undefined);
+});
