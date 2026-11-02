@@ -1,0 +1,758 @@
+[
+  {
+    "view": "cheongnyangni",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1920,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "cheongnyangni",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1920,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "cheongnyangni",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1440,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "cheongnyangni",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1440,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "cheongnyangni",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1280,
+    "state": "N",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "cheongnyangni",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "dongmyo",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "jonggak",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "underground-seoul",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "seoul",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yongsan",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "noryangjin",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "yeongdeungpo",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "guro",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumcheon",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "anyang-geumjeong",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "geumjeong",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "gunpo-uiwang",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "uiwang-suwon",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  },
+  {
+    "view": "suwon",
+    "viewport": 1280,
+    "state": "R",
+    "issues": 0,
+    "types": {}
+  }
+]

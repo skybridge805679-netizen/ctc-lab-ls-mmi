@@ -23,7 +23,7 @@ try:
    page.select_option('#stationSelect','geumcheon')
    def win(slot): return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
    def action(name): return page.locator(f'.ls-context-menu [data-context-action="{name}"]')
-   def background(): page.locator('.fidelity-note').click(button='right')
+   def background(): page.locator('.ls-head').click(button='right',position={'x':12,'y':12})
    def confirm(): page.click('#dialogConfirm'); expect(page.locator('#actionDialog')).not_to_be_visible(); page.wait_for_function('dialogAction===null')
    def cancel(): page.locator('#actionDialog [value="cancel"]').click(); expect(page.locator('#actionDialog')).not_to_be_visible(); page.wait_for_function('dialogAction===null')
    def entries(slot,station='geumcheon'): return page.evaluate('([s,k])=>SimLSUI.getModel().stations[s].windows[k]||[]',[station,slot])

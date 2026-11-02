@@ -1,12 +1,12 @@
 {
-  "version": "0.39.0",
+  "version": "0.39.1",
   "backupDate": "2026-11-02",
   "scope": "현재 작업 트리. references는 references/MANIFEST.json 및 보존 브랜치 참조. 버전 ZIP 재생성 없음.",
   "files": [
     {
       "path": ".github/workflows/desktop.yml",
-      "bytes": 3305,
-      "sha256": "54f7031e99b1a826f16835813676bf7277c384b859f83dec801ce6e439444c76"
+      "bytes": 3369,
+      "sha256": "e43cb531f1650bfdb88126bb1a4f160aafeca52b8cbb8b0766d408fa9318eb7e"
     },
     {
       "path": ".gitignore",
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 63287,
-      "sha256": "b4cd238612c4a871757559ee9be3f517f8db78b82eb8d3450f93200a06065550"
+      "bytes": 63792,
+      "sha256": "e2e9bc750ede61030de1c1f93b22c6dc564640700ef4ff488eaa94441a934a0c"
     },
     {
       "path": "README.md",
-      "bytes": 23769,
-      "sha256": "43497d46616d7211a16621d52b45ec80929633af69aebadbb8f0542fb8aca6f3"
+      "bytes": 24286,
+      "sha256": "4a245bd216a9405e5281b36a1d7f6b13c15fbe70a6bd3d11dd04f912bdb5a591"
     },
     {
       "path": "desktop/check-package.cjs",
@@ -90,8 +90,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 14468,
-      "sha256": "06f9ddd628f031b9c321171f2a1c008279bcfe57666e7cbcfd64b50f2f4c459c"
+      "bytes": 14893,
+      "sha256": "cbcf4234f540755e58925e6c10aa09700d5f27e60b2cb9038e68f1d2a2a6c70d"
     },
     {
       "path": "desktop/reset-smoke.cjs",
@@ -617,6 +617,361 @@
       "path": "docs/layout-review-v0.39.0/yongsan.png",
       "bytes": 168832,
       "sha256": "b888ce6d954d8e245f497e4f305f5e6b31d8aeda40d6a65deb45eda85785014f"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-cheongnyangni-NN.png",
+      "bytes": 10273,
+      "sha256": "72926c532c3314a2773b12080131f83d7374073f72b24d3d6bd3acd6c4fc69db"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-cheongnyangni-NR.png",
+      "bytes": 11428,
+      "sha256": "d2c660d8d19d740c8f0d9f4bce577850655bab9a1e2da04294bfbe99a106b91f"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-cheongnyangni-RN.png",
+      "bytes": 12738,
+      "sha256": "f9b5142f147510c3312a5c7dcae62fcb4ebad10d0ccf98f30326214be1ee5971"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-cheongnyangni-RR.png",
+      "bytes": 14097,
+      "sha256": "3bd643605f5a10c706eb7eb91eb1588abee7fe0d94477264187e051cf650c1e0"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-corner.png",
+      "bytes": 2660,
+      "sha256": "8e11b3e252c85ca10f455286463c70b265e772e3fe992df1f030150f9a837229"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-geumcheon-NN.png",
+      "bytes": 5973,
+      "sha256": "5d23cc64d86a2dc19ca74862e5da146a7a40c7b62cc82896b26f8d3029ebe113"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-geumcheon-NR.png",
+      "bytes": 6401,
+      "sha256": "91bd38338f18b2f631f20e752e42fab4ed6e588e9b3ea850295689c94ae540e0"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-geumcheon-RN.png",
+      "bytes": 9349,
+      "sha256": "806d522de40c4fa8576a58888a2ed097f8d6f8c4ea42e1111d2e19dfb7dad77a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-geumcheon-RR.png",
+      "bytes": 9625,
+      "sha256": "7b35354851236dc8243ca13ad69827160819ad977e2f0976b5dabf1ecaf27cd3"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-guro-NN.png",
+      "bytes": 4165,
+      "sha256": "f73ce0e48139456606420b16ed9e353089d28e20cd160f720fd3655690a80c80"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-guro-NR.png",
+      "bytes": 4526,
+      "sha256": "dc3e411857fdd2aa5ea67b550475a0e352975047c6eb64ad524dc222be87afbe"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-guro-RN.png",
+      "bytes": 7094,
+      "sha256": "b795fe892fc4f8e62efcac940285cdaf9439ad47ffadcdfdfa717aa651a8b4db"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-guro-RR.png",
+      "bytes": 7265,
+      "sha256": "5aee74d5ef394e1834e21d6405cb91650d51e71d591c1397138d01a03818e778"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-jonggak-NN.png",
+      "bytes": 13699,
+      "sha256": "5ee0ee993b1ac3e0059f75fd3e8c957bd4200da8ea3723b457f36a9aa83a8d7b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-jonggak-NR.png",
+      "bytes": 13355,
+      "sha256": "458b0c9e1b8bbaa3e7c4603b36786fd060a7d15c0acf9cdeeeb16c9f07b3e3b6"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-jonggak-RN.png",
+      "bytes": 14688,
+      "sha256": "bbf1aada9564772022f6cd3d19678a7b4fa083e45611a61de809bf5575a7c231"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-jonggak-RR.png",
+      "bytes": 14218,
+      "sha256": "cfe500d96ca5627ef24fc88b2548852ccd62ead8b844e37d84e0c428551b89f4"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-ordinary-crossover.png",
+      "bytes": 5609,
+      "sha256": "9c3808532eed47bafe6cdc8dbb9803c8abfb262da071b9fcfd80111f6399981b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-seoul-NN.png",
+      "bytes": 6305,
+      "sha256": "f250cb7d4d863be868799ea70783ea16e96089e644a864c0c6cde292b6220c26"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-seoul-NR.png",
+      "bytes": 7109,
+      "sha256": "0c299cb9daaa92e0729f897448cc78006e4b2fdc54a98cbaa1e0d27982918b4f"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-seoul-RN.png",
+      "bytes": 9454,
+      "sha256": "f2a403b8613aeb7068df03f2444369cff5a3877f63a043aee7060ecd17c00e04"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/after-seoul-RR.png",
+      "bytes": 9513,
+      "sha256": "10c7011e00246d401633328ab990452bb2baf96f790516f9036ffd39882eb851"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/anyang-geumjeong.png",
+      "bytes": 68363,
+      "sha256": "6734d7e1c2b9559b1172e4821f93bffdb0ab5712c72e00142b3b8d9412b5d6f7"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/anyang.png",
+      "bytes": 151610,
+      "sha256": "fc5d0b699b812ddb97f0a89a0ec5cc878d35c8b7e5877ab9a9a64c79e0e3394b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/audit.json",
+      "bytes": 255017,
+      "sha256": "8baf6e6ec2dafdfd10cfeec88faabff4ab4e7beafdc1701402adea8377864ea0"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/cheongnyangni.png",
+      "bytes": 102534,
+      "sha256": "81603e285c56b9bb0a5007add1292971edf2b903345dbfda7788db94b00e5fd4"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/dongmyo.png",
+      "bytes": 119950,
+      "sha256": "d2877292fe9078ac6719b29e41d4225f33ce2e84f499cd386a9c911cfe040335"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/geumcheon.png",
+      "bytes": 159720,
+      "sha256": "9f0b6ebff16806ba9fb254786fdf16e884373bb047770246a88490fe4986ab3b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/geumjeong.png",
+      "bytes": 103443,
+      "sha256": "5b299bc15933863ca863157b0e52505855b0aab298ffe3c081b8bdbc12023ecb"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/gunpo-uiwang.png",
+      "bytes": 71883,
+      "sha256": "e44bbffce86cc8ff779ed8c6376f2e32ac6ffbd802f39913c74b5f4afa6b6b89"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/gunpo.png",
+      "bytes": 109827,
+      "sha256": "cf59fceec25c8b4a6187f12689663d0f19d4dc4c1340e1938c6769ea3519abb3"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/guro.png",
+      "bytes": 159804,
+      "sha256": "35819aa1166e9c53cb0b4aa8fbd861943dddf78640ad30a275dec700e9fbd6f0"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/jonggak.png",
+      "bytes": 115471,
+      "sha256": "a2cbe80f5294b45db0db47d060b4a6ef1a1088f36ce6b95259e8586b7b4818bb"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/noryangjin.png",
+      "bytes": 134564,
+      "sha256": "90e3e3e2c053e2d517479d4a1e6b2c4242dcbae1109118646d37667c9bde9511"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/seoul.png",
+      "bytes": 146563,
+      "sha256": "d7f5fa9a8df6cfc7bc15dcd8a6e3ac5068aee9ef4d4ee88b00415622ba8b9b7d"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/summary.json",
+      "bytes": 11559,
+      "sha256": "70021c23eccc30dd439582d6535418266e5d51aabe0aa2af614f518fcb051c06"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/suwon.png",
+      "bytes": 130163,
+      "sha256": "f5461f89e221ba4572ae9332dcb9ec85ce1e70940e4f54c99c421e081687d85d"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/uiwang-suwon.png",
+      "bytes": 101139,
+      "sha256": "5545a7acf96f1464e7652d8d2474a547929966891c09cb1b2822e94e391ad904"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/uiwang.png",
+      "bytes": 146507,
+      "sha256": "c717bb208ce40c1dd5a432072dd822cf146b34edcb9c980acb2127a10d2cdfbb"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/underground-seoul.png",
+      "bytes": 108063,
+      "sha256": "9dfbbc45b8e23e31533bab4369bc9827d74c8bb92a674036c63a414873dd43ae"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/yeongdeungpo.png",
+      "bytes": 154922,
+      "sha256": "57d07563d645eb73f7965875c8a4324247197e1fe3fc421e0b1c8e810599bab2"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/all-stations/yongsan.png",
+      "bytes": 165136,
+      "sha256": "76baf1e9a0df657f3c48daf425bc41fe5c155e969f684dce751820dd533a5c82"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-cheongnyangni-NN.png",
+      "bytes": 14609,
+      "sha256": "5013d54b1b08e4afd4cb223daeacc129f7c696853c8b50a36c2d07e8d127ac76"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-cheongnyangni-NR.png",
+      "bytes": 14829,
+      "sha256": "7b46bfd9a4e11efddc83e79e2ac974aa0ef701aec829ce3219239eac6be0d876"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-cheongnyangni-RN.png",
+      "bytes": 14848,
+      "sha256": "b7e0cef64e3ebe8f45a9e9baedf6eb3d5c3aa98cd787094089362a5f9f517674"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-cheongnyangni-RR.png",
+      "bytes": 15020,
+      "sha256": "c60ee34f80cadc798ec06a6607084def2d1f97af163484608a5ca02b482b5c3f"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-corner.png",
+      "bytes": 2482,
+      "sha256": "f551f72ea51f4fbdabeabfd38dab319abc9266ef560df904f08a047688da0138"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-geumcheon-NN.png",
+      "bytes": 10094,
+      "sha256": "2c1a652a1a3422ef920c55ef4e5d3021be29b1a778aeb7a77f3d5cb6c79902d1"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-geumcheon-NR.png",
+      "bytes": 10237,
+      "sha256": "39eb1122e611fdb81a03c35bfc1e103377cffcf59207007e3ba2de56ab1d7c2a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-geumcheon-RN.png",
+      "bytes": 10231,
+      "sha256": "b5a93c59ec982073c3626f2045b5c42662dc24869865b095ebfd47b544ee5b1b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-geumcheon-RR.png",
+      "bytes": 10256,
+      "sha256": "1c84d81bb0b76a1e2c6e5eba2f7d6808852c7aacd995ac842cb8715b9b9c6e80"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-guro-NN.png",
+      "bytes": 7318,
+      "sha256": "0c73e7298806c28013a5ecaecf0718c6c3004e1f98d9dcc9520b48e00b64a532"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-guro-NR.png",
+      "bytes": 7451,
+      "sha256": "88395273b1fb39a4eb7fa6b53cabb186e717f8e3de3c0b2b3b49db9983deabbb"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-guro-RN.png",
+      "bytes": 7441,
+      "sha256": "cd1a1f8cfe7eea57b8389b67147bd52a15b46c71ada8bb396f7ac93ff7554e9b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-guro-RR.png",
+      "bytes": 7482,
+      "sha256": "390af71705b9c1533bdcaddde096861de68bcace44c61b3bbc68e399483279ab"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-jonggak-NN.png",
+      "bytes": 16776,
+      "sha256": "7443bc6b2481a38e17eac6f1af86b197388ead5cdadfb2ec5c8fc4ec4b49e6e2"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-jonggak-NR.png",
+      "bytes": 17007,
+      "sha256": "6cf0e8c2051aca026f90137feeb6de3d90c510ebf48ffc516a80061fd6e638c3"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-jonggak-RN.png",
+      "bytes": 17004,
+      "sha256": "ecedc4fcf6fc0d37e2a45ef66ce9fcd7368f65a26b64491f03ff9528e0e2ee84"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-jonggak-RR.png",
+      "bytes": 17176,
+      "sha256": "62a27ad50e22beabe20741d1bcc4e6cf7e9aea40c07e5339ff25971e8c4abe42"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-ordinary-crossover.png",
+      "bytes": 6334,
+      "sha256": "90e54307e908077fcb2c67e0ee3dba2bf888474599eae74b66cb6c10a5dd1933"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-seoul-NN.png",
+      "bytes": 9292,
+      "sha256": "4589616d3dfe99fb0508579a7c85bdd3e65d9681ed011beb6522668c41b9d341"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-seoul-NR.png",
+      "bytes": 9624,
+      "sha256": "13e1606b397d842dfdd8ae73c2ee7a32313b10874306e1615994650975ca0e4d"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-seoul-RN.png",
+      "bytes": 9724,
+      "sha256": "db2597e26d9481ecdcd1e2dd0a020017730ce2bacd77a7ae858a4858507d056a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/before-seoul-RR.png",
+      "bytes": 9435,
+      "sha256": "77183ce8e96bf0ad46dca479f5173e13beee9041babfdea2dbeb23a114cb603a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/comparison.png",
+      "bytes": 365364,
+      "sha256": "07ee16336c50867ed99bfb5821a6c756b3e0e2ae42c84f7aa86061c0ce19318c"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/crossing-pixels.json",
+      "bytes": 25731,
+      "sha256": "bd14721081d8a857775e845d3a26fbada5b718132ed50cfe5c3efd1593c7a6d9"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/metadata.json",
+      "bytes": 1542,
+      "sha256": "383635325f79616b5d92445880981413c3b13a37ffb7ecdb5e7cab4420fed01a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/overview.png",
+      "bytes": 261213,
+      "sha256": "e93e6a11545c707bd9513ee5d256984eab2fc81d5be66ad8d411b7acf047abad"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/reference-shape.png",
+      "bytes": 46370,
+      "sha256": "067ed40f2984e99b29c96b135e6d82c98ee2605f19f4877541744c773fd073a0"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/selected-route.png",
+      "bytes": 149861,
+      "sha256": "4f42de9fface251c1be4cd50f790e3a375bc1c2086c872b9a91b6a249985c313"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/trim-details.png",
+      "bytes": 35120,
+      "sha256": "53f04c35649b7f3e1d83a7c909b392c17c9dd879db8a693d646876f0858d84e4"
     },
     {
       "path": "docs/network-audit-v0.19.3.json",
@@ -2544,6 +2899,11 @@
       "sha256": "1a95bbce1343ecda4eece00fb47057431c69a9a8aff56bc4d49414c7778928c4"
     },
     {
+      "path": "docs/v0.39.1-배선트림과연속오버뷰.md",
+      "bytes": 5236,
+      "sha256": "a3494df1163c0972f873e9d974ab6053b90d6cfff4c2f59a32b22fa080324934"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -2641,17 +3001,17 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "45e3e8bea9cdb57358f4a76cf89fd08ae5952e7aeb0c798b8c2e114d16d43876"
+      "sha256": "87ff62dee049d4bbaa8a8197c23f7c7c623b3e40d2ccff6957d785b3aa51d0db"
     },
     {
       "path": "package.json",
       "bytes": 2288,
-      "sha256": "e98190d6fc64508f5ae9ba209324d38fb584e91a427e32aed0737df34d995cb7"
+      "sha256": "e813fa878e2b2893723f702c956181235e904035dfe3c1d058a69d11534b3fe8"
     },
     {
       "path": "simulator/README.md",
-      "bytes": 11934,
-      "sha256": "13f2abace1613014056a35f928b50e0a7857fb205205665a0c5258805af7ae37"
+      "bytes": 12150,
+      "sha256": "9969183025f14c6d9f347c7561a768d23738d3b081c6c53fb03cb39442786c9a"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -2849,6 +3209,16 @@
       "sha256": "8f15846bb9b52c8eaeeb351e5d2dcc36a949c423b236426ad0323d72cde4cc5e"
     },
     {
+      "path": "simulator/e2e/continuous-overview.browser.test.py",
+      "bytes": 3854,
+      "sha256": "d9a6bd7cfacaa97b39f136977c376ee61d8d8c83264cce3fe99a0e62c94f7b49"
+    },
+    {
+      "path": "simulator/e2e/crossover-trim.browser.test.py",
+      "bytes": 6893,
+      "sha256": "d91de199d9d395fcf8d5d4e176d417680d1f1530896a6eae9f2c061229b52809"
+    },
+    {
       "path": "simulator/e2e/design.browser.test.py",
       "bytes": 3700,
       "sha256": "1155a41d98e8e2a7fe85a9c35a5cf9eecc5c8df7189580663c62bfc9ae6e9e85"
@@ -2935,8 +3305,8 @@
     },
     {
       "path": "simulator/e2e/ls-context.browser.test.py",
-      "bytes": 10812,
-      "sha256": "2d5c687ad3bdb3065a899a6f7920ac557f86895a921c712c4d3978544931fe87"
+      "bytes": 10831,
+      "sha256": "890375aba75f0bc14750844fbfb92ce48e29df1d35869149ba50086bfdd69e11"
     },
     {
       "path": "simulator/e2e/ls-continuity.browser.test.py",
@@ -3560,8 +3930,8 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 17916,
-      "sha256": "1e1f0b869dcc01ad7c1c29c40d07ce87bd2f2b0c15a1adb4de905201f5774da8"
+      "bytes": 17957,
+      "sha256": "95e111c1f0be1e181524050868bf012bd2ab3718b81b13b0c54c6c9895b256ec"
     },
     {
       "path": "simulator/ui/app.js",
@@ -3620,13 +3990,23 @@
     },
     {
       "path": "simulator/ui/ls-context.js",
-      "bytes": 20104,
-      "sha256": "ef150b21737be6da8d1f09bf652d39b347d33955fdf7845a631075fe8348e638"
+      "bytes": 19833,
+      "sha256": "d24383dc07e6d9ce587eadf7cfed121f592e76754a227eeba1babc496c25a51b"
     },
     {
       "path": "simulator/ui/ls-corridor-source.js",
       "bytes": 4549,
       "sha256": "55f42e8f1759c441a5dde891a9cd553291cb25bb4ff1c28682bfc85a748988d2"
+    },
+    {
+      "path": "simulator/ui/ls-overview.js",
+      "bytes": 5877,
+      "sha256": "e2a8367707b8a896ac8a65ec48a3dd0d89daf23597e4c0abdda601a40e7973d4"
+    },
+    {
+      "path": "simulator/ui/ls-overview.test.cjs",
+      "bytes": 1893,
+      "sha256": "f192a7228f857d6cbba6adce916e60ae2b4d2782c7c4e674930f30087892ba15"
     },
     {
       "path": "simulator/ui/ls-presets.js",
@@ -3650,18 +4030,18 @@
     },
     {
       "path": "simulator/ui/ls-switches.js",
-      "bytes": 5479,
-      "sha256": "1f24f86f6d24955432f7ae42d4f06c25f0389f25da4767d636819900e5d46989"
+      "bytes": 10073,
+      "sha256": "b670dc4fe76b609ce5a34a625700bd9c262c9bf33c7235516f73e07be53a0d7d"
     },
     {
       "path": "simulator/ui/ls-switches.test.cjs",
-      "bytes": 3263,
-      "sha256": "a819ff7a6ec1427db4d074cdfcd73f22ef43655486eecef7f831f3f278dda202"
+      "bytes": 4965,
+      "sha256": "081766ed7f6dcce724223962ce7186d1f9d647f934d32cc26f5edd5ffdc270f6"
     },
     {
       "path": "simulator/ui/ls-view.js",
-      "bytes": 38886,
-      "sha256": "cbf8609defd354fae52d735dbd72817852f93544179a1f3532d56b865275fee9"
+      "bytes": 40220,
+      "sha256": "8d1fa4ee4ed76eea745803d5965c9877161533e8963d40e6f57af0e849fc4b38"
     },
     {
       "path": "simulator/ui/ls-view.test.cjs",
@@ -3775,8 +4155,8 @@
     },
     {
       "path": "simulator/ui/style.css",
-      "bytes": 34588,
-      "sha256": "cd236a7cc078cc26713b720daec7d0db5785e63b3a95150fe7c87a21f4165c7e"
+      "bytes": 36342,
+      "sha256": "1de5213f1d5e10b11f6b544ef502444260581d3cf181a8196a40beb3ecb7764e"
     },
     {
       "path": "simulator/ui/tg-tools.js",

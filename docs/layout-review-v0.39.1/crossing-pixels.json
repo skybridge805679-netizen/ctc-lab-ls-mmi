@@ -1,0 +1,1730 @@
+[
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1280,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1440,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "cheongnyangni",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "jonggak",
+    "points": [
+      "51",
+      "52"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "underground-seoul",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "58",
+      "59"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "seoul",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "yeongdeungpo",
+    "points": [
+      "52",
+      "53"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "guro",
+    "points": [
+      "53",
+      "54"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RN",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "NR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  },
+  {
+    "station": "geumcheon",
+    "points": [
+      "21",
+      "22"
+    ],
+    "state": "RR",
+    "viewport": 1920,
+    "centreWhitePixels": 0,
+    "quarterWhitePixels": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "samplesPerPatch": 9,
+    "trapezoids": 4
+  }
+]

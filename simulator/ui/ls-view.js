@@ -37,7 +37,7 @@ function wingOf(st,def){
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
-function layout(def,wing,aspect,top=108){   // top: 원본 노란 화살표 자리
+function layout(def,wing,aspect,top=108,native=false){   // top: 원본 노란 화살표 자리
  const xs=[],ys=[];
  for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);}
  for(const signal of def.signals)ys.push(signal[3]);
@@ -50,6 +50,7 @@ function layout(def,wing,aspect,top=108){   // top: 원본 노란 화살표 자�
  for(const b of wing.fixed?.brackets||[]){const [x,y,w,h]=b.bounds;xs.push(x,x+w);ys.push(y,y+h);}
  for(const c of wing.fixed?.captions||[]){xs.push(c.at[0]-55,c.at[0]+55);ys.push(c.at[1]-10,c.at[1]+10);}
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ if(native)return {sx:1,sy:1,width:maxX-minX+PADDING*2,H:maxY-minY+top+64,pt:([x,y])=>[+(x-minX+PADDING).toFixed(2),+(y-minY+top).toFixed(2)]};
  // Use vertical desktop space for readable rail and signal lanes; preserve every connection.
  const railRows=[...new Set(def.rails.flatMap(r=>r[1].slice(1).filter((p,i)=>Math.abs(p[1]-r[1][i][1])<2).map(p=>p[1])))].sort((a,b)=>a-b);
  const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
@@ -71,8 +72,9 @@ function render(st,def,core,model,neighbours={}){
  const prepared=presets.prepare(st,def,sceneOf(st),wingOf(st,def),neighbours.preset),{data,wing}=prepared;def=prepared.def;
  if(prepared.corridor)model={...model,routes:{},approach:{},scenarioMotions:[]};
  const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor,prepared.slide);
- const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 역판·열번창 위 여백을 유지한다
+ const L=layout(def,wing,neighbours.aspect,neighbours.overview?80:prepared.corridor?150:108,!!neighbours.overview)   // 역판·열번창 위 여백을 유지한다
 ,T=L.pt;
+ const WIDTH=neighbours.overview?Math.max(1600,L.width):1600;
  const plateGap=prepared.corridor?128:94;
  const edgePorts=seams.ports(st,def,data);
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
@@ -122,7 +124,7 @@ function render(st,def,core,model,neighbours={}){
  // Keep bottom captions within the same comfortable canvas inset as the upper bays.
  L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
  const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
- const switches=switchView.build(st,def,core,model,T);
+ const switches=switchView.build(st,def,core,model,T,{width:WIDTH});
  const projectRoute=(points,destination)=>{
   const out=[points[0]],near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<.1;
   for(let i=1;i<points.length;i++){
@@ -140,7 +142,8 @@ function render(st,def,core,model,neighbours={}){
  };
  const active=Object.entries(model.routes).map(([id,state])=>({id,state:state.occupied?'occupied':state.lock?'locked':'set',points:projectRoute(routePoints(core.routes[id].path),core.routes[id].destination)}));
  const onRoute=cell=>active.find(route=>route.points.slice(1).some((b,i)=>{const a=route.points[i];return Math.abs(a[1]-b[1])<.5&&Math.abs(a[1]-cell.y)<5&&Math.min(a[0],b[0])<cell.x+cell.width-2&&Math.max(a[0],b[0])>cell.x+2;}));
- const paths=[...def.rails.map(r=>r[1].map(T)),...(data.joins||[]).map(poly=>poly.map(T))];
+ const snapJoin=([x,y])=>{const nearest=rows.filter(row=>Math.abs(row-y)<2).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y))[0];return T([x,nearest??y]);};
+ const paths=[...def.rails.map(r=>r[1].map(T)),...(data.joins||[]).map(poly=>poly.map(snapJoin))];
  const pointAnchors={};
  for(const [id,a,x,b,z]of def.links){const p=T([x,railY(def,a,x)]),q=T([z,railY(def,b,z)]);pointAnchors[id]=[(p[0]+q[0])/2,(p[1]+q[1])/2];}
  // Adjacent source cells form continuous rail runs; circuit boundaries are drawn once as ticks, never nested boxes.
@@ -160,7 +163,7 @@ function render(st,def,core,model,neighbours={}){
  let platforms='',rails='',sections='',labels='',routes='',symbols='',plates='',pointSymbols='',signalSymbols='',trains='',leaders='',annotations='';
  const occupiedBoxes=fixedObstacles.map(b=>[...b]);
  let trainShapes='';
- const layoutKey=st.id+':'+(neighbours.preset||'')+':'+L.H+':'+L.sy;
+ const layoutKey=st.id+':'+!!neighbours.overview+':'+(neighbours.preset||'')+':'+L.H+':'+L.sy;
  let cached=windowLayouts.get(def)?.get(layoutKey);
  if(!cached){
  const windowBoxes=[];
@@ -409,7 +412,9 @@ function render(st,def,core,model,neighbours={}){
  const navigation={left:arrow(neighbours.left===undefined?around.left:neighbours.left,'left'),right:arrow(neighbours.right===undefined?around.right:neighbours.right,'right')};
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
  const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
- return {width:WIDTH,height:L.H,navigation,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ // Trim route colour to the same rail/quarter silhouette; preserve its continuous centre bridge.
+ const routeMaskId='route-trim-'+st.id,routeMask=`<defs><mask id="${routeMaskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${WIDTH+80}" height="2400"><rect x="-40" y="-40" width="${WIDTH+80}" height="2400" fill="black"/><g mask="url(#${switches.maskId})" fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="miter" stroke-miterlimit="2" stroke-linecap="butt">${rails.replaceAll(/ data-reviewed-join="[^"]*"/g,'')}</g><g fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="bevel" stroke-linecap="butt">${switches.paint}${switches.bridges}</g></mask></defs>`;
+ return {width:WIDTH,height:L.H,contentWidth:L.width||WIDTH,sourcePoint:T,ports:edgePorts.map(p=>({...p,at:T([p.x,p.y])})),navigation,svg:`${neighbours.overview?'':seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routeMask}<g class="route-network" mask="url(#${routeMaskId})">${routes}</g>${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

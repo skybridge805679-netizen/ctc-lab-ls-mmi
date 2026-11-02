@@ -168,3 +168,17 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 .ls-svg .nb-arrow-dir,.ls-svg .nb-arrow .nb-tag{fill:#111;stroke:none;font-size:13px;font-weight:700;letter-spacing:1px}
 .ls-svg .nb-arrow:hover .nb-arrow-shape,.ls-svg .nb-arrow:focus .nb-arrow-shape{fill:#fffb6a}
 .ls-svg .nb-arrow:focus{outline:none}.ls-svg .nb-arrow:focus .nb-arrow-shape{stroke:#173b40;stroke-width:2}
+
+.ls-svg .switch-quarter{fill:#f4f4ef;stroke:none;pointer-events:none}
+
+/* Keep right-angle yard returns square; acute switch strokes retain their own join rule. */
+.ls-svg .rail-network path{stroke-linejoin:miter;stroke-miterlimit:2}
+
+.ls-overview{max-width:none;width:98vw;height:94vh;background:#686d68;padding:10px 14px;overflow:hidden;color:#f4f4ef}
+.ls-overview[open]{display:flex;flex-direction:column}.ls-overview header{flex:none;height:36px;margin:0}.ls-overview h2{font-size:15px;margin:0}.ls-overview header button{padding:4px 18px;background:#e5efeb;color:#173b40}
+.ls-overview-canvas{flex:1;min-height:0;overflow:hidden}.ls-overview-canvas>.overview-network{width:100%;height:100%;min-width:0;display:block}
+.overview-link{fill:none;stroke:#f4f4ef;stroke-width:18;stroke-linejoin:miter;stroke-miterlimit:2;stroke-linecap:butt}
+.overview-hit{fill:transparent;stroke:none;cursor:pointer}[data-overview-station]:focus{outline:none}[data-overview-station]:hover>.overview-header .overview-name,[data-overview-station]:focus>.overview-header .overview-name{stroke:#bee3e3;stroke-width:3}
+.overview-header text,.overview-monitor-title{font-family:Arial,'Apple SD Gothic Neo',sans-serif;font-size:16px;fill:#111}.overview-mode{fill:#f4f4ef}.overview-mode.auto{fill:#18df00}.overview-mode.ccm{fill:#f4ec00}.overview-name{fill:#080b08}.overview-header .overview-name-text{fill:#fff}.overview-header .overview-code{font-size:13px;fill:#fff}.overview-monitor-title{fill:#f4f4ef}
+
+.overview-stop{fill:#f4f4ef}.overview-name.metro{fill:#2068e6}.overview-equipment{fill:#18df00}.overview-equipment.idle{fill:#f4f4ef}.overview-equipment.standby{fill:#f4ec00}.overview-equipment.fault{fill:#bc3027}.overview-header .overview-equipment-label{font-size:9px}

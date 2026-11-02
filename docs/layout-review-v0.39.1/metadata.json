@@ -1,0 +1,56 @@
+{
+  "version": "0.39.1",
+  "date": "2026-11-02",
+  "baseline": "e57da49",
+  "reviewBranch": "codex/ls-trim-overview",
+  "mergedIntoMain": false,
+  "crossingPairs": 8,
+  "pointGroups": 119,
+  "crossingStates": [
+    "NN",
+    "RN",
+    "NR",
+    "RR"
+  ],
+  "crossingPixelCases": 96,
+  "viewports": [
+    [
+      1280,
+      800
+    ],
+    [
+      1440,
+      1000
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "referenceEndGapChecks": 6,
+  "referenceSquareCornerChecks": 6,
+  "selectedRouteBridgeChecks": 3,
+  "overviewPanels": 15,
+  "overviewNavigationTargets": 18,
+  "overviewBoundaryLinksWithinRows": 40,
+  "nodeTests": 168,
+  "nodeFailures": 0,
+  "svgLayoutCases": 108,
+  "measuredLayoutIssues": 0,
+  "nativeExecution": "Linux x64 Electron 45 / Xvfb",
+  "crossPackages": [
+    "Linux x64",
+    "Windows x64",
+    "Mac ARM64"
+  ],
+  "physicalAndRouteGraphsUnchanged": true,
+  "sourceSha256": {
+    "simulator/ui/ls-switches.js": "b670dc4fe76b609ce5a34a625700bd9c262c9bf33c7235516f73e07be53a0d7d",
+    "simulator/ui/ls-view.js": "8d1fa4ee4ed76eea745803d5965c9877161533e8963d40e6f57af0e849fc4b38",
+    "simulator/ui/ls-overview.js": "e2a8367707b8a896ac8a65ec48a3dd0d89daf23597e4c0abdda601a40e7973d4",
+    "simulator/ui/ls-context.js": "d24383dc07e6d9ce587eadf7cfed121f592e76754a227eeba1babc496c25a51b",
+    "simulator/ui/style.css": "1de5213f1d5e10b11f6b544ef502444260581d3cf181a8196a40beb3ecb7764e",
+    "simulator/index.html": "95e111c1f0be1e181524050868bf012bd2ab3718b81b13b0c54c6c9895b256ec"
+  },
+  "sourceMatchedFilesPerAsar": 128
+}

@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let host,ops,model,menu,dialog,pending=null,lastFocus=null,drag=null,menuOpenedAt=0,overviewTimer=null;
+let host,ops,model,menu,dialog,pending=null,lastFocus=null,drag=null,menuOpenedAt=0,overviewTimer=null,overviewIds=[];
 const ctx=()=>host.context(),norm=s=>s.replaceAll(' · ','');
 const rows=(station,slot)=>ops.entries(model,station,slot);
 function closeMenu(){if(menu){const old=menu;menu=null;old.remove();}if(lastFocus?.isConnected)lastFocus.focus?.({preventScroll:true});}
@@ -53,15 +53,17 @@ function boardMenu(id){const station=ctx().station,b=model.stations[station].boa
 function deleteBoard(id){confirm('표지판 삭제','표지판을 삭제하시겠습니까?',{op:'boardDelete',station:ctx().station,id});}
 function scan(scope){cancelPending();closeMenu();host.openAction('베이스스캔',`<p>설정과 열차번호를 유지하고 상태를 재수신합니다.</p><select id="lsScope"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>`,()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));$('lsScope').value=scope;}
 function refreshOverview(){
- for(const button of dialog.querySelectorAll('[data-overview-station]')){
-  const view=root.SimLSPresets.get(button.dataset.overviewStation),id=view.station,st=root.SimNetwork.catalog[id],C=root.SimCore.forStation(id),s=ctx().stationStates[id],v=root.SimLS.render(st,root.SimWiring.data[id],C,s,{preset:view.id,occupied:new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(s,t.uid))).map(([slot])=>slot))}),count=Object.values(model.stations[id].windows).flat().length;
-  const svg=v.svg.replace(/ id="/g,' id="ov-').replace(/url\(#/g,'url(#ov-').replace(/ tabindex="0"/g,'').replace(/data-signal="/g,'data-overview-signal="');
-  button.innerHTML=`<b>${esc(view.name)} · ${s.mode} · ${Object.keys(s.routes).length}개 진로 · 열차번호 ${count}개</b><svg class="ls-svg" data-monitor="${!!view.monitor}" viewBox="0 0 ${v.width} ${v.height}">${svg}</svg>`;decorate(button.querySelector('svg'),id,true);
- }
+ const occupied=Object.fromEntries(overviewIds.map(id=>[id,new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[id],t.uid))).map(([slot])=>slot))]));
+ const focused=document.activeElement?.closest('[data-overview-station]')?.dataset.overviewStation;
+ const view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied);dialog.querySelector('.ls-overview-canvas').innerHTML=view.svg;
+ for(const svg of dialog.querySelectorAll('[data-overview-detail]'))decorate(svg,svg.dataset.overviewDetail,true);
+ if(focused)dialog.querySelector(`[data-overview-station="${focused}"]`)?.focus({preventScroll:true});
 }
 function overview(ids){
- cancelPending();closeMenu();clearInterval(overviewTimer);dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-grid">'+root.SimLSPresets.list().filter(v=>ids.includes(v.station)).map(v=>`<button class="ls-overview-station" data-overview-station="${v.id}" data-overview-control-station="${v.station}"></button>`).join('')+'</div>';
- $('lsOverviewClose').onclick=()=>dialog.close();dialog.querySelectorAll('[data-overview-station]').forEach(b=>b.onclick=()=>{dialog.close();host.selectStation(b.dataset.overviewStation);});refreshOverview();dialog.showModal();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
+ cancelPending();closeMenu();clearInterval(overviewTimer);overviewIds=ids;dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-canvas"></div>';
+ $('lsOverviewClose').onclick=()=>dialog.close();const canvas=dialog.querySelector('.ls-overview-canvas');
+ const select=e=>{const target=e.target.closest('[data-overview-station]');if(target){dialog.close();host.selectStation(target.dataset.overviewStation);}};canvas.onclick=select;canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}};
+ refreshOverview();dialog.showModal();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
 }
 function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id);return [
  {label:'현재역 베이스스캔',id:'scan-current',action:()=>scan('current')},
