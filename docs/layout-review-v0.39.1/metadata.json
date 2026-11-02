@@ -47,10 +47,44 @@
   "sourceSha256": {
     "simulator/ui/ls-switches.js": "b670dc4fe76b609ce5a34a625700bd9c262c9bf33c7235516f73e07be53a0d7d",
     "simulator/ui/ls-view.js": "8d1fa4ee4ed76eea745803d5965c9877161533e8963d40e6f57af0e849fc4b38",
-    "simulator/ui/ls-overview.js": "e2a8367707b8a896ac8a65ec48a3dd0d89daf23597e4c0abdda601a40e7973d4",
-    "simulator/ui/ls-context.js": "d24383dc07e6d9ce587eadf7cfed121f592e76754a227eeba1babc496c25a51b",
+    "simulator/ui/ls-overview.js": "6dae0349aa020ac5b2190ac6044ceeac21126fd1a466a5cf8da75f6f2133f9f4",
+    "simulator/ui/ls-context.js": "4e39c0356ddeba883c3e8e2fd2585a5da1fd45594c3188789c3115865840b65f",
     "simulator/ui/style.css": "1de5213f1d5e10b11f6b544ef502444260581d3cf181a8196a40beb3ecb7764e",
     "simulator/index.html": "95e111c1f0be1e181524050868bf012bd2ab3718b81b13b0c54c6c9895b256ec"
   },
-  "sourceMatchedFilesPerAsar": 128
+  "sourceMatchedFilesPerAsar": 134,
+  "overviewRegions": [
+    {
+      "id": "north",
+      "range": "청량리–영등포",
+      "rowStations": [
+        5,
+        3
+      ],
+      "targets": 8,
+      "links": 16
+    },
+    {
+      "id": "south",
+      "range": "구로–수원",
+      "rowStations": [
+        4,
+        3
+      ],
+      "targets": 10,
+      "links": 20
+    },
+    {
+      "id": "central",
+      "range": "노량진–금천구청",
+      "rowStations": [
+        4
+      ],
+      "targets": 4,
+      "links": 12
+    }
+  ],
+  "overviewRowWidthCoverageMinimum": 0.95,
+  "overviewViewportAspectAndVerticalPlacementChecked": true,
+  "asarMatchScope": "All packaged files with matching local source paths except builder-normalized package.json"
 }

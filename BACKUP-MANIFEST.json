@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 63792,
-      "sha256": "e2e9bc750ede61030de1c1f93b22c6dc564640700ef4ff488eaa94441a934a0c"
+      "bytes": 63950,
+      "sha256": "54e3527a74312df41c2119b99c9d5c8873aabe0625cf94ffb9b1c3060fe78aea"
     },
     {
       "path": "README.md",
-      "bytes": 24286,
-      "sha256": "4a245bd216a9405e5281b36a1d7f6b13c15fbe70a6bd3d11dd04f912bdb5a591"
+      "bytes": 24444,
+      "sha256": "dc64cdd5cb04b2865acc6ffd454aab2944656f3bdcb2ea43cf057dd7e04e47df"
     },
     {
       "path": "desktop/check-package.cjs",
@@ -90,8 +90,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 14893,
-      "sha256": "cbcf4234f540755e58925e6c10aa09700d5f27e60b2cb9038e68f1d2a2a6c70d"
+      "bytes": 14876,
+      "sha256": "3d6778d40b3307dbcf46c20d508f3918f2b3fb3142876a75ce4e0ba4fbead327"
     },
     {
       "path": "desktop/reset-smoke.cjs",
@@ -950,13 +950,28 @@
     },
     {
       "path": "docs/layout-review-v0.39.1/metadata.json",
-      "bytes": 1542,
-      "sha256": "383635325f79616b5d92445880981413c3b13a37ffb7ecdb5e7cab4420fed01a"
+      "bytes": 2271,
+      "sha256": "9ed83d8130cf0bc0dcbe45a9d1412d91cf86f510f541c79f30dd428723d7295b"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/overview-central.png",
+      "bytes": 133485,
+      "sha256": "6887a74e5c784b5fd81598cb34420d91800e3869884b29a45fac2960e34c4b0a"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/overview-north.png",
+      "bytes": 197554,
+      "sha256": "e38cac3a34935f2906b267f08e368ddf0b5232af831b3b2db65b6b45294456ee"
+    },
+    {
+      "path": "docs/layout-review-v0.39.1/overview-south.png",
+      "bytes": 204358,
+      "sha256": "5ac10c4e79aaf28a30d2cfccfd367afaf4a38cf29c590f43d9872631b8646b49"
     },
     {
       "path": "docs/layout-review-v0.39.1/overview.png",
-      "bytes": 261213,
-      "sha256": "e93e6a11545c707bd9513ee5d256984eab2fc81d5be66ad8d411b7acf047abad"
+      "bytes": 262964,
+      "sha256": "b1b974b1ac5ff65541c5465c09a12ed750c90eac57f2065841f706494d560b77"
     },
     {
       "path": "docs/layout-review-v0.39.1/reference-shape.png",
@@ -2900,8 +2915,8 @@
     },
     {
       "path": "docs/v0.39.1-배선트림과연속오버뷰.md",
-      "bytes": 5236,
-      "sha256": "a3494df1163c0972f873e9d974ab6053b90d6cfff4c2f59a32b22fa080324934"
+      "bytes": 6169,
+      "sha256": "14f8a986c133a8ed5c29af7e0cc9a9df180866581653d1d6b1280f82e6b7b0ac"
     },
     {
       "path": "docs/개발로드맵.md",
@@ -3010,8 +3025,8 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 12150,
-      "sha256": "9969183025f14c6d9f347c7561a768d23738d3b081c6c53fb03cb39442786c9a"
+      "bytes": 12187,
+      "sha256": "668c5ff99e1d6fa3ab7be9cf46b5790c41df18176804144dba2f2b2111fecafa"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -3210,8 +3225,8 @@
     },
     {
       "path": "simulator/e2e/continuous-overview.browser.test.py",
-      "bytes": 3854,
-      "sha256": "d9a6bd7cfacaa97b39f136977c376ee61d8d8c83264cce3fe99a0e62c94f7b49"
+      "bytes": 5675,
+      "sha256": "e281befa03efd66d849b154ef3fd7f8496b0557eb0b06a4445858e4f7383e0e4"
     },
     {
       "path": "simulator/e2e/crossover-trim.browser.test.py",
@@ -3990,8 +4005,8 @@
     },
     {
       "path": "simulator/ui/ls-context.js",
-      "bytes": 19833,
-      "sha256": "d24383dc07e6d9ce587eadf7cfed121f592e76754a227eeba1babc496c25a51b"
+      "bytes": 19964,
+      "sha256": "4e39c0356ddeba883c3e8e2fd2585a5da1fd45594c3188789c3115865840b65f"
     },
     {
       "path": "simulator/ui/ls-corridor-source.js",
@@ -4000,13 +4015,13 @@
     },
     {
       "path": "simulator/ui/ls-overview.js",
-      "bytes": 5877,
-      "sha256": "e2a8367707b8a896ac8a65ec48a3dd0d89daf23597e4c0abdda601a40e7973d4"
+      "bytes": 7348,
+      "sha256": "6dae0349aa020ac5b2190ac6044ceeac21126fd1a466a5cf8da75f6f2133f9f4"
     },
     {
       "path": "simulator/ui/ls-overview.test.cjs",
-      "bytes": 1893,
-      "sha256": "f192a7228f857d6cbba6adce916e60ae2b4d2782c7c4e674930f30087892ba15"
+      "bytes": 2577,
+      "sha256": "445ab46a3404bdc16002efcec1a005ac74a79c2c8f0e0877b020d6e0fe291ad4"
     },
     {
       "path": "simulator/ui/ls-presets.js",

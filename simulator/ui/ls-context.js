@@ -55,7 +55,7 @@ function scan(scope){cancelPending();closeMenu();host.openAction('베이스스�
 function refreshOverview(){
  const occupied=Object.fromEntries(overviewIds.map(id=>[id,new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[id],t.uid))).map(([slot])=>slot))]));
  const focused=document.activeElement?.closest('[data-overview-station]')?.dataset.overviewStation;
- const view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied);dialog.querySelector('.ls-overview-canvas').innerHTML=view.svg;
+ const canvas=dialog.querySelector('.ls-overview-canvas'),view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied,{aspect:canvas.clientWidth/canvas.clientHeight});canvas.innerHTML=view.svg;dialog.querySelector('h2').textContent='L/S Overview · '+(root.SimLSOverview.REGIONS.find(r=>r.id===view.region)?.name||'전체 관제구간');
  for(const svg of dialog.querySelectorAll('[data-overview-detail]'))decorate(svg,svg.dataset.overviewDetail,true);
  if(focused)dialog.querySelector(`[data-overview-station="${focused}"]`)?.focus({preventScroll:true});
 }
@@ -63,7 +63,7 @@ function overview(ids){
  cancelPending();closeMenu();clearInterval(overviewTimer);overviewIds=ids;dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-canvas"></div>';
  $('lsOverviewClose').onclick=()=>dialog.close();const canvas=dialog.querySelector('.ls-overview-canvas');
  const select=e=>{const target=e.target.closest('[data-overview-station]');if(target){dialog.close();host.selectStation(target.dataset.overviewStation);}};canvas.onclick=select;canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}};
- refreshOverview();dialog.showModal();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
+ dialog.showModal();refreshOverview();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
 }
 function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id);return [
  {label:'현재역 베이스스캔',id:'scan-current',action:()=>scan('current')},
@@ -71,7 +71,7 @@ function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.co
  {label:'전체역 베이스스캔',id:'scan-all',action:()=>scan('all')},
  {label:'L/S 재실행',id:'restart',action:()=>{closeMenu();host.render();host.toast('L/S 화면 재표시 · 설정된 진로·열차번호·표지판 유지');}},
  {label:'L/S 표지판',id:'boards',children:root.SimLSOperations.boardTypes.map((kind,i)=>({label:kind,id:'board-'+i,action:()=>editBoard(kind,point)}))},
- {label:'L/S Overview',id:'overview',children:[{label:'전체 관제구간',id:'overview-all',action:()=>overview(ids)},{label:'청량리 ~ 서울',id:'overview-north',action:()=>overview(ids.slice(0,5))},{label:'용산 ~ 금천구청',id:'overview-central',action:()=>overview(ids.slice(5,10))},{label:'안양 ~ 수원',id:'overview-south',action:()=>overview(ids.slice(10))}]}
+ {label:'L/S Overview',id:'overview',children:[{label:'전체 관제구간',id:'overview-all',action:()=>overview(ids)},...root.SimLSOverview.REGIONS.map(r=>({label:r.name,id:'overview-'+r.id,action:()=>overview(r.rows.flat())}))]}
  ];}
 function openMenu(items,x,y,target){
  closeMenu();lastFocus=target?.closest('[tabindex]')||target;menu=document.createElement('div');menu.className='ls-context-menu';menu.dataset.lsContext='';menu.setAttribute('role','menu');menu.setAttribute('aria-label','LS 우클릭 메뉴');
@@ -105,7 +105,7 @@ function decorate(svg=$('trackSvg'),station=ctx().station,readonly=false){
 }
 function init(h){
  host=h;const catalog={};for(const st of root.SimNetwork.stations.filter(s=>s.controlled))catalog[st.id]=root.SimTrainWindows.data[st.id].map(w=>w.slot);ops=root.SimLSOperations.create(catalog);model=root.SimRemote.snapshot.ls;   // 열번창 상태는 엔진의 것 (ops는 읽기 도우미)
- dialog=document.createElement('dialog');dialog.id='lsOverview';dialog.className='ls-overview';document.body.append(dialog);
+ dialog=document.createElement('dialog');dialog.id='lsOverview';dialog.className='ls-overview';document.body.append(dialog);root.addEventListener('resize',()=>{if(dialog.open)refreshOverview();});
  $('lsDisplay').oncontextmenu=e=>{e.preventDefault();if(drag)return;if(ctx().monitor){const slot=e.target.closest('[data-train-slot]');openMenu(slot?numberMenu(slot.dataset.trainSlot):[{label:'화면인쇄',id:'print',action:()=>{closeMenu();root.print();}},{label:'전체 LS 보기',id:'overview-all',action:()=>overview(root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id))}],e.clientX,e.clientY,e.target);return;}const board=e.target.closest('[data-ls-board]'),slot=e.target.closest('[data-train-slot]'),circuit=e.target.closest('[data-track-circuit],[data-circuit-label]');const id=slot?.dataset.trainSlot||norm(circuit?.dataset.trackCircuit||circuit?.dataset.circuitLabel||'');let point={x:30,y:30};if($('trackSvg').contains(e.target))point=svgPoint(e);openMenu(board?boardMenu(board.dataset.lsBoard):slot&&catalog[ctx().station].includes(id)?numberMenu(id):backgroundMenu(point),e.clientX,e.clientY,e.target);};
  $('lsDisplay').addEventListener('click',e=>{const close=e.target.closest('[data-board-close]');if(close&&!ctx().monitor){e.stopPropagation();deleteBoard(close.dataset.boardClose);return;}const slot=e.target.closest('[data-train-slot]');if(slot&&pending){e.stopPropagation();target(slot.dataset.trainSlot);}},true);
  $('lsDisplay').addEventListener('keydown',e=>{const slot=e.target.closest('[data-train-slot]');if(slot&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(pending)target(slot.dataset.trainSlot);else editTrain(slot.dataset.trainSlot,rows(ctx().station,slot.dataset.trainSlot)[0]?.uid);}},true);
