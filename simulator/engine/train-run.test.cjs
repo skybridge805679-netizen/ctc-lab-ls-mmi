@@ -74,3 +74,13 @@ test('비상 03 in the inspector order: 통보 14 before stopping 2B closes 2B a
  tick(r,400);
  assert.equal(row(r,'K0456'),null,'K0456은 B963T에 서지 않고 관제구간 밖으로');assert.equal(row(r,'G0450'),null,'G0450 회송');assert.equal(row(r,'G0452'),null,'G0452 회송');
 });
+test('[CA028_01] 오프라인ID 실시간변경 loads the selected schedule ID into today\'s timetable; tomorrow only sets the ID; reservations and the setting survive restore',()=>{
+ const r=R.create(),s=()=>r.snapshot();assert.equal(s().timetable.trains.length,0,'빈 시작');
+ assert.ok(s().scheduleIds.list.some(x=>x.id==='90011'));
+ assert.equal(r.command({type:'scheduleId',op:'realtime',id:'없음',day:'today'}).ok,false);
+ const x=r.command({type:'scheduleId',op:'realtime',id:'90011',day:'today'});assert.ok(x.ok,x.message);assert.equal(x.trains,6);
+ assert.deepEqual(s().timetable.trains.map(t=>t.id).sort(),['A1001','A1002','K0401','K0450','K0454','K0456']);assert.equal(s().scheduleIds.today.id,'90011');
+ assert.ok(r.command({type:'scheduleId',op:'realtime',id:'90004',day:'tomorrow'}).ok);assert.equal(s().timetable.trains.length,6,'내일 설정은 오늘 운행을 바꾸지 않음');
+ assert.ok(r.command({type:'scheduleId',op:'reserve',id:'90004',days:['20261110']}).ok);
+ const c=R.create();c.restore(r.checkpoint());assert.equal(c.snapshot().scheduleIds.today.id,'90011');assert.equal(c.snapshot().scheduleIds.tomorrow.id,'90004');assert.equal(c.snapshot().scheduleIds.reserved['20261110'].id,'90004');
+});

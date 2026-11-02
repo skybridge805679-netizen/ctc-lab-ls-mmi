@@ -1,5 +1,6 @@
 """FTS 제어통제 시스템: 문제·상황·시나리오 관리, 교육 시작 → 문제 발생 → 채점 → 교육이력, JSON 가져오기 (Chromium)."""
 import json
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -18,7 +19,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle'); insert_sample_timetable(page)   # 앱은 빈 시간표로 시작한다 — 「현재 시간표로 스케줄 만들기」 시험용 표본
     ok = lambda: page.locator('#mmiAlertOk').click()
     yes = lambda: page.locator('#mmiConfirmYes').click()
     page.locator('#ftsWinBtn').click()

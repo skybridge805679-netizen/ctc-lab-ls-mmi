@@ -1,0 +1,56 @@
+{
+  "version": "0.39.3",
+  "date": "2026-11-02",
+  "branch": "codex/ls-trim-overview",
+  "displayWorkParent": "eca3293",
+  "releaseParent": "14cc6bd",
+  "mergedIntoMain": false,
+  "nodeTests": 174,
+  "nodeFailures": 0,
+  "sourceInventoryAndLayoutCases": 108,
+  "measuredLayoutIssues": 0,
+  "labelPixelChecks": 168,
+  "mmiBrowserViewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "overviewViewports": [
+    [
+      1280,
+      800
+    ],
+    [
+      1440,
+      1000
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "nativeExecution": "Linux x64 Electron 45 / Xvfb: complete desktop suite",
+  "crossPackages": [
+    "Linux x64",
+    "Windows x64",
+    "Mac ARM64"
+  ],
+  "sourceMatchedFilesPerAsar": 135,
+  "sourceSha256": {
+    "package.json": "6c690561ad059aa8b6c2cca33000d83f869f34635030ec898c9c22309c88192d",
+    "simulator/engine/runtime.cjs": "b8c5ab4b3623a34d36207d45e320b789635f949cedf9a634d9b15902a95fc5c6",
+    "simulator/engine/wiring.js": "586465f087411b0f5102ba281c5dac949ce7ff2485016bbc1d153f343cc93ed3",
+    "simulator/ui/mmi-windows.js": "ac3d7223c0ede1da7281206a688d9ae1f60a408008819459acb6837fa02ca274",
+    "simulator/ui/mmi.css": "d96a288554f6266a33d56034b8376107f66d2929bd0b3dac1fd21979cee6ec40",
+    "simulator/ui/ls-view.js": "9ec5c12fba44c207daa341f3087e6722a283d122a85fadc70794ddef86f91b97",
+    "simulator/ui/ls-switches.js": "b670dc4fe76b609ce5a34a625700bd9c262c9bf33c7235516f73e07be53a0d7d",
+    "simulator/ui/circuit-label-review.js": "62cc723496c3a79c4d72070cc1c12b7944fcdcddada262eb2e61ef0519f16f3b",
+    "simulator/ui/ls-overview.js": "6dae0349aa020ac5b2190ac6044ceeac21126fd1a466a5cf8da75f6f2133f9f4",
+    "simulator/ui/ls-context.js": "4e39c0356ddeba883c3e8e2fd2585a5da1fd45594c3188789c3115865840b65f"
+  }
+}
