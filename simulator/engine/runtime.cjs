@@ -3,6 +3,7 @@ const Session=require('./session'),Core=require('./core'),Network=require('./net
 function create(){
  const session=Session.create(),states=session.states,model=Timetable.initial();
  const assessment=require('./assessment').create(),now=()=>states[session.selected].clock;
+ let scheduleIds={today:null,tomorrow:null,reserved:{}};
  const ops=Operations.create(Object.fromEntries(Object.entries(Windows.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),ls=ops.initial();
  let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;let ftsLibrarySource=null,ftsRunSource=null,ftsLibraryCache=null,ftsRunCache=null;const published=new Map();const events=[];
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
@@ -62,6 +63,16 @@ function create(){
   if(type==='numbers:validate')return root.SimLSUI.validate(action.action);
   if(type==='numbers:reset'){ls.stations[action.station]={windows:{},boards:[]};refresh();return {ok:true};}
   if(type==='station:reset'){const clock=states[action.station].clock;Object.assign(states[action.station],session.core(action.station).initial(),{clock});return {ok:true};}
+  // [CA028_01] 온라인열차스케줄ID관리: 스케줄 ID 목록(FTS 열차 스케줄)에서 골라 오늘/내일에 설정하거나 날짜에 예약한다.
+  // 「오프라인ID 실시간변경」은 오늘 설정이면 그 스케줄을 지금 운행 중인 열차스케줄로 바로 올린다 (원본: 이후 온라인 열차스케줄관리에서 확인)
+  if(type==='scheduleId'){
+   const list=scheduleIdList(),sch=list.find(s=>s.id===String(action.id||''));
+   if(action.op==='realtime'){if(!sch)return {ok:false,message:'열차스케줄 ID를 목록에서 선택하세요.'};const day=action.day==='tomorrow'?'tomorrow':'today';
+    if(day==='today'){const r=command({type:'timetable',method:'import',args:[F.scheduleTable({timetable:sch.timetable,relative:sch.relative},now(),model.serviceDate)]});if(r?.ok===false)return r;}
+    scheduleIds[day]={id:sch.id,name:sch.name};revision++;cache=null;emit('log',{channel:'event',text:`오프라인ID 실시간변경 · ${day==='today'?'오늘':'내일'} [${sch.id}] ${sch.name}`,level:'I'});return {ok:true,id:sch.id,name:sch.name,trains:day==='today'?model.trains.length:null};}
+   if(action.op==='reserve'){if(!sch)return {ok:false,message:'예약할 열차스케줄 ID를 목록에서 선택하세요.'};const days=(Array.isArray(action.days)?action.days:[]).map(String).filter(d=>/^\d{8}$/.test(d)).slice(0,400);if(!days.length)return {ok:false,message:'스케줄을 적용할 운행일을 달력에서 선택하세요.'};for(const d of days)scheduleIds.reserved[d]={id:sch.id,name:sch.name};revision++;cache=null;return {ok:true,days};}
+   return {ok:false,message:'지원하지 않는 스케줄 ID 조작'};
+  }
   if(type==='timetable'){
    const allowed=['delay','cancel','setCancelled','create','update','remove','copy','import','undo','redo'];if(!allowed.includes(action.method))throw new Error('Unknown timetable operation');
    const r=Timetable[action.method](model,...action.args);const id=typeof action.args[0]==='string'?action.args[0]:action.args[0]?.id;fts.event({type:'schedule',id,method:action.method,ok:r.ok!==false,source:action.fts?'FTS':'MMI'});root.SimScenarioUI.step();return r;
@@ -80,6 +91,8 @@ function create(){
   throw new Error('Unknown engine command: '+type);
  }
  function command(action){const result=execute(action);if(action.type!=='poll'&&(action.type!=='fts'||['start','manual','next','reload','ui'].includes(action.op)))fts.step();updateAssessment();if(!['poll','numbers:validate'].includes(action.type)){revision++;cache=null;if(['timetable','scenario:start','drill:create','drill:reset','auto','fts'].includes(action.type))tableDirty=true;}return result;}
+  // 스케줄 ID 목록 = FTS 열차 스케줄(문제별 교육 시간표 + 교수가 FTS 스케줄관리에서 만든 것). 앱은 빈 시간표로 시작한다.
+  function scheduleIdList(){return (fts.library().schedules||[]).map(s=>({id:s.id,name:s.name,relative:!!s.relative,timetable:s.timetable}));}
  function current(){
   if(cache)return cache;
 
@@ -87,7 +100,7 @@ function create(){
   // 시나리오 열차(시간표 밖 예약 번호)의 실제 위치도 엔진이 낸다 — 화면은 계산하지 않는다
   for(const id of root.SimScenarioUI.reservedNumbers?.()||[])if(!(id in positions))positions[id]=root.SimScenarioUI.position({id});
   if(ftsLibrarySource!==fts.library()){ftsLibrarySource=fts.library();ftsLibraryCache=structuredClone(ftsLibrarySource);}if(ftsRunSource!==fts.runLibrary()){ftsRunSource=fts.runLibrary();ftsRunCache=structuredClone(ftsRunSource);}
-  const value={fts:fts.snapshot(),editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},assessment:assessment.snapshot(now()),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],events};
+  const value={fts:fts.snapshot(),editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},assessment:assessment.snapshot(now()),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],scheduleIds:{...scheduleIds,list:scheduleIdList().map(s=>({id:s.id,name:s.name,trains:s.timetable?.trains?.length||0}))},events};
   if(tableDirty||!tableCache){tableCache=JSON.parse(JSON.stringify(model));tableDirty=false;}
   cache=JSON.parse(JSON.stringify(value,(_key,v)=>typeof v==='function'?undefined:v instanceof Set?[...v]:v));cache.timetable=tableCache;cache.ftsLibrary=ftsLibraryCache;cache.ftsRunLibrary=ftsRunCache;
   for(const [key,v]of Object.entries(cache)){if(key==='events')continue;const previous=published.get(key);if(previous?.value===v)continue;const hash=JSON.stringify(v);if(previous?.hash!==hash)published.set(key,{at:revision,hash,value:v});}
@@ -95,7 +108,7 @@ function create(){
  }
  function snapshot(since=0){const copy=structuredClone(current());copy.events=events.filter(e=>e.seq>since).map(e=>structuredClone(e));return copy;}
  function transport(version=-1,since=0){const data=current(),delta=Number.isInteger(version)&&version>=0&&version<=revision,out={delta,version:revision,seq,events:events.filter(e=>e.seq>since)};for(const [key,value]of Object.entries(data))if(key!=='events'&&(!delta||published.get(key)?.at>version))out[key]=value;return out;}
- function checkpoint(){return structuredClone({format:'ORPHEIA-SESSION',schema:1,fts:fts.checkpoint(),selected:session.selected,states,ls,timetable:model,clock:{paused,speed},assessment:assessment.checkpoint(),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single],journeys:[...root.SimLine.journeys]},equipment:root.SimEquipment.checkpoint(),auto:root.SimAutoUI.checkpoint(),scenario:root.SimScenarioUI.checkpoint(),drill:root.SimDrill.snapshot(),seq,events});}
+ function checkpoint(){return structuredClone({format:'ORPHEIA-SESSION',schema:1,fts:fts.checkpoint(),selected:session.selected,states,ls,timetable:model,clock:{paused,speed},assessment:assessment.checkpoint(),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single],journeys:[...root.SimLine.journeys]},equipment:root.SimEquipment.checkpoint(),auto:root.SimAutoUI.checkpoint(),scenario:root.SimScenarioUI.checkpoint(),drill:root.SimDrill.snapshot(),scheduleIds,seq,events});}
  function restore(saved){const before=checkpoint();try{restoreInto(saved);}catch(error){try{restoreInto(before);}catch{}throw error;}}
  function restoreInto(saved){
   if(saved?.format!=='ORPHEIA-SESSION'||saved.schema!==1||!states[saved.selected]||!Array.isArray(saved.timetable?.trains)||saved.timetable.trains.some(t=>!Timetable.valid(t))||new Set(saved.timetable.trains.map(t=>t.id)).size!==saved.timetable.trains.length)throw new Error('Invalid saved session');
@@ -107,7 +120,7 @@ function create(){
   Object.assign(ls,data.ls);Object.assign(model,data.timetable);session.select(data.selected);paused=true;speed=data.clock.speed;replay=false;
   root.SimLine.state.enforce=data.line.enforce;root.SimLine.state.single.clear();for(const key of data.line.single)root.SimLine.state.single.add(key);root.SimLine.journeys.clear();for(const [key,value]of data.line.journeys)root.SimLine.journeys.set(key,value);
   fts.restore(data.fts);
-  assessment.restore(data.assessment);root.SimEquipment.restore(data.equipment);root.SimAutoUI.restore(data.auto);root.SimDrill.restore(data.drill);root.SimScenarioUI.restore(data.scenario);seq=data.seq;events.length=0;events.push(...data.events);emit('log',{channel:'event',text:'저장된 실습 세션을 복원했습니다. 일시정지 상태에서 시작합니다.',level:'I'});refresh();revision++;cache=null;tableDirty=true;published.clear();
+  assessment.restore(data.assessment);root.SimEquipment.restore(data.equipment);root.SimAutoUI.restore(data.auto);root.SimDrill.restore(data.drill);root.SimScenarioUI.restore(data.scenario);scheduleIds=data.scheduleIds&&typeof data.scheduleIds==='object'?{today:data.scheduleIds.today||null,tomorrow:data.scheduleIds.tomorrow||null,reserved:{...(data.scheduleIds.reserved||{})}}:{today:null,tomorrow:null,reserved:{}};seq=data.seq;events.length=0;events.push(...data.events);emit('log',{channel:'event',text:'저장된 실습 세션을 복원했습니다. 일시정지 상태에서 시작합니다.',level:'I'});refresh();revision++;cache=null;tableDirty=true;published.clear();
  }
  // 실시간 맞춤: 타이머가 늦게 와도(창이 뒤에 있거나 macOS App Nap) 실제로 흐른 시간만큼 진행한다. 한 번에 최대 30초까지 따라잡는다.
  let wall=null,carry=0;

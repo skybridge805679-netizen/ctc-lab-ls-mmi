@@ -130,7 +130,7 @@
 .idm-month button:hover{border-color:#316ac5}.idm-month button.set{background:#f3e24a}.idm-month button.pick{outline:2px solid #316ac5}.idm-month button.today{font-weight:800;text-decoration:underline}
 .sun{color:#c22}.sat{color:#24c}
 .idm-note{grid-column:1/-1;color:#55607e;font-size:11px;padding:2px 0}
-.idm-buttons{grid-column:1/-1;display:flex;justify-content:center;gap:10px;padding:4px 0}
+.idm-buttons{grid-column:1/-1;display:flex;justify-content:center;gap:10px;padding:6px 0;position:sticky;bottom:0;background:#ecebe6;border-top:1px solid #c9c9c4;z-index:1}
 .idm-hint{color:#55607e;margin-left:auto}
 .ent{display:grid;grid-template-columns:minmax(0,1.5fr) 240px 230px;gap:8px}
 .ent select[size]{width:100%}.ent .ent-table{height:290px}

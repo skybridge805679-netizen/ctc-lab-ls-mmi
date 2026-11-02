@@ -14,27 +14,31 @@ const pad=n=>String(n).padStart(2,'0');
 const close=id=>mmi().close(id);
 
 // ---------------------------------------------------------------- [CA028_01] 온라인열차스케줄ID관리
-const SCHEDULES=[{id:'01001',name:'교육용 기본 시각표'},{id:'01002',name:'교육용 지연 연습'},{id:'01999',name:'시험용 시각표'}];
-const assigned=new Map(),picked=new Set();let idmSchedule=null;
+// 원본 순서: 온라인열차스케줄 ID 검색 → 열차스케줄 ID 목록에서 선택 → 설정일자(오늘/내일) → 「오프라인ID 실시간변경」(확인창)
+// → 온라인 열차스케줄관리에서 그 ID의 열차스케줄 확인. 스케줄 ID 목록과 설정 상태는 엔진(snapshot.scheduleIds)이 가진다.
+const picked=new Set();let idmSchedule=null,idmShown=false;
 const keyOf=(y,m,d)=>`${y}${pad(m)}${pad(d)}`;
+const ids=()=>root.SimRemote?.snapshot?.scheduleIds||{list:[],reserved:{},today:null,tomorrow:null};
 function serviceDay(offset=0){const d=new Date(model().serviceDate+'T00:00:00');d.setDate(d.getDate()+offset);return keyOf(d.getFullYear(),d.getMonth()+1,d.getDate());}
+function assignedDays(){const s=ids(),out=new Map(Object.entries(s.reserved||{}));if(s.today)out.set(serviceDay(),s.today);if(s.tomorrow)out.set(serviceDay(1),s.tomorrow);return out;}
 function idmRender(){
- const year=Number($('idmYear').value),month=Number($('idmMonth').value),today=serviceDay();
- $('idmCal').innerHTML=Array.from({length:6},(_,i)=>{
+ const year=Number($('idmYear').value),month=Number($('idmMonth').value),today=serviceDay(),assigned=assignedDays();
+ // 원본처럼 선택한 달부터 4개월(2×2)
+ $('idmCal').innerHTML=Array.from({length:4},(_,i)=>{
   const y=year+Math.floor((month-1+i)/12),m=(month-1+i)%12+1,first=new Date(y,m-1,1).getDay(),days=new Date(y,m,0).getDate();
   const cells=Array.from({length:42},(_,c)=>{const d=c-first+1;if(d<1||d>days)return '<td></td>';const k=keyOf(y,m,d),cls=[assigned.has(k)?'set':'',picked.has(k)?'pick':'',k===today?'today':'',c%7===0?'sun':c%7===6?'sat':''].join(' ');return `<td><button type="button" class="${cls}" data-date="${k}">${d}</button></td>`;});
   const rows=Array.from({length:6},(_,r)=>`<tr>${cells.slice(r*7,r*7+7).join('')}</tr>`).join('');
   return `<table class="idm-month"><caption>${y}년 ${m}월</caption><thead><tr>${'일월화수목금토'.split('').map((n,k)=>`<th class="${k===0?'sun':k===6?'sat':''}">${n}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
  }).join('');
- const rows=[...assigned].sort().map(([k,v])=>`<tr class="${picked.has(k)?'sel':''}" data-date="${k}"><td>${k}</td><td>[${v.id}]${esc(v.name)}</td><td>ORPHEIA</td><td>${k}</td></tr>`).join('');
- $('idmRows').innerHTML=rows||'<tr class="empty"><td colspan="4">예약된 스케줄 ID가 없습니다</td></tr>';
- const day=doc.querySelector('input[name="idmDay"]:checked').value==='tomorrow'?serviceDay(1):today,cur=assigned.get(day);
+ const rows=[...assigned].sort().map(([k,v])=>`<tr class="${picked.has(k)?'sel':''}" data-date="${k}"><td>${k}</td><td>[${esc(v.id)}]${esc(v.name)}</td><td>${esc(root.SimRemote?.snapshot?.fts?.session?.professor||'C0101')}</td><td>${k}</td></tr>`).join('');
+ $('idmRows').innerHTML=rows||'<tr class="empty"><td colspan="4">설정된 스케줄 ID가 없습니다</td></tr>';
+ const day=doc.querySelector('input[name="idmDay"]:checked').value==='tomorrow'?'tomorrow':'today',cur=ids()[day];
  $('idmSetId').value=cur?.id??'';$('idmSetName').value=cur?.name??'';
- $('idmList').innerHTML=SCHEDULES.map(s=>`<tr class="${idmSchedule===s.id?'sel':''}" data-sid="${s.id}"><td>${s.id}</td><td>${esc(s.name)}</td></tr>`).join('');
+ const list=idmShown?ids().list:[];
+ $('idmList').innerHTML=list.length?list.map(s=>`<tr class="${idmSchedule===s.id?'sel':''}" data-sid="${esc(s.id)}"><td>${esc(s.id)}</td><td title="${esc(s.name)} · 열차 ${s.trains}개">${esc(s.name)}</td></tr>`).join(''):`<tr class="empty"><td colspan="2">${idmShown?'등록된 열차스케줄 ID가 없습니다 (FTS 열차스케줄 관리에서 만듭니다)':'[검색]을 누르면 열차스케줄 ID 목록이 나옵니다'}</td></tr>`;
 }
 function initScheduleId(){
  const now=new Date(model().serviceDate+'T00:00:00');
- assigned.set(serviceDay(),SCHEDULES[0]);
  mmi().createWindow('scheduleId',{title:'[CA028_01] 온라인열차스케줄ID관리',x:80,y:50,width:980,body:`<div class="idm">
 <div class="idm-left"><fieldset><legend>운행일 선택</legend><div class="idm-row"><label><input id="idmYear" type="number" min="2020" max="2040" value="${now.getFullYear()}" aria-label="년"></label><select id="idmMonth" aria-label="월">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i===now.getMonth()?'selected':''}>${i+1}월</option>`).join('')}</select></div>
 <div class="idm-row">표시정보 <i class="idm-key set"></i>설정 <i class="idm-key"></i>비설정</div><label class="idm-row">노선<select aria-label="노선"><option>경부선</option></select></label></fieldset>
@@ -44,22 +48,33 @@ function initScheduleId(){
 <label class="idm-row">설정된 스케줄ID<input id="idmSetId" readonly></label><label class="idm-row">설정된 스케줄명<input id="idmSetName" readonly></label>
 <div class="idm-search"><div>검색조건</div><label class="idm-row"><input type="checkbox" checked disabled>노선<select aria-label="검색 노선"><option>01-경부선</option></select></label><label class="idm-row"><input type="checkbox" checked disabled>구분<select aria-label="검색 구분"><option>9-응시자</option></select></label><button type="button" class="sched-btn" id="idmSearch">검색</button></div></fieldset>
 <div class="idm-cap">열차스케줄 ID 목록</div><div class="idm-table"><table><thead><tr><th>스케줄ID</th><th>스케줄명</th></tr></thead><tbody id="idmList"></tbody></table></div></div>
-<div class="idm-note">${esc(SAMPLE_NOTE)} 예약된 ID는 이 창의 달력에만 기록되며 실행 중인 시각표는 바꾸지 않습니다.</div>
-<div class="idm-buttons"><button type="button" class="sched-btn" id="idmFind">온라인열차스케줄 ID 검색</button><button type="button" class="sched-btn primary" id="idmApply">온라인 ID 예약적용</button><button type="button" class="sched-btn" id="idmOffline">오프라인ID 실시간변경</button><button type="button" class="sched-btn" id="idmClose">닫기</button></div></div>`});
+<div class="idm-buttons"><button type="button" class="sched-btn" id="idmFind">온라인열차스케줄 ID 검색</button><button type="button" class="sched-btn" id="idmApply">온라인 ID 예약적용</button><button type="button" class="sched-btn primary" id="idmOffline">오프라인ID 실시간변경</button><button type="button" class="sched-btn" id="idmClose">닫기</button></div></div>`});
  $('idmYear').onchange=$('idmMonth').onchange=idmRender;
  for(const el of doc.querySelectorAll('input[name="idmDay"]'))el.onchange=idmRender;
  $('idmCal').onclick=e=>{const b=e.target.closest('[data-date]');if(!b)return;const k=b.dataset.date;picked.has(k)?picked.delete(k):picked.add(k);idmRender();};
  $('idmRows').onclick=e=>{const r=e.target.closest('[data-date]');if(!r)return;const k=r.dataset.date;picked.has(k)?picked.delete(k):picked.add(k);idmRender();};
  $('idmList').onclick=e=>{const r=e.target.closest('[data-sid]');if(r){idmSchedule=r.dataset.sid;idmRender();}};
- $('idmSearch').onclick=$('idmFind').onclick=()=>{idmRender();mmi().log('event','온라인 스케줄 ID 목록 조회');};
+ $('idmSearch').onclick=()=>{idmShown=true;idmRender();mmi().log('event','열차스케줄 ID 목록 검색 · '+ids().list.length+'건');};
+ $('idmFind').onclick=()=>{idmRender();mmi().log('event','온라인 열차스케줄 ID 목록 조회');};
+ const send=a=>root.SimRemote.command({type:'scheduleId',...a});
  $('idmApply').onclick=()=>{
   if(!idmSchedule){mmi().alertBox('예약할 열차스케줄 ID를 목록에서 선택하세요.');return;}
   if(!picked.size){mmi().alertBox('스케줄을 적용할 운행일을 달력에서 선택하세요.');return;}
-  const sch=SCHEDULES.find(s=>s.id===idmSchedule),days=[...picked].sort();for(const k of days)assigned.set(k,sch);picked.clear();idmRender();
-  mmi().log('event',`온라인 ID 예약적용 [${sch.id}] ${days.join(',')}`);mmi().record('schedule',{type:'idReserve',train:'',text:JSON.stringify({id:sch.id,days}),console:'MMI-1'});mmi().alertBox(`[${sch.id}] ${sch.name} 예약적용 완료 (${days.length}일)`);
+  const days=[...picked].sort(),r=send({op:'reserve',id:idmSchedule,days});if(!r?.ok){mmi().alertBox(r?.message||'예약적용 실패');return;}
+  picked.clear();root.SimRemote.poll?.();idmRender();mmi().log('event',`온라인 ID 예약적용 [${idmSchedule}] ${days.join(',')}`);mmi().record('schedule',{type:'idReserve',train:'',text:JSON.stringify({id:idmSchedule,days}),console:'MMI-1'});mmi().alertBox(`[${idmSchedule}] 예약적용 완료 (${days.length}일)`);
  };
- $('idmOffline').onclick=()=>mmi().alertBox('오프라인 ID 실시간변경은 구현하지 않았습니다. 원본 화면을 확인하지 못했습니다.');
+ $('idmOffline').onclick=()=>{
+  if(!idmSchedule){mmi().alertBox('열차스케줄 ID 목록에서 스케줄을 선택하세요. (먼저 [검색])');return;}
+  const day=doc.querySelector('input[name="idmDay"]:checked').value==='tomorrow'?'tomorrow':'today';
+  mmi().confirmBox('정말 온라인상(오늘/내일)에 올라가 있는 DATA를 수정하시겠습니까?',()=>{
+   const r=send({op:'realtime',id:idmSchedule,day});if(!r?.ok){mmi().alertBox(r?.message||'실시간변경 실패');return;}
+   root.SimRemote.poll?.();idmRender();mmi().record('schedule',{type:'idRealtime',train:'',text:JSON.stringify({id:r.id,day}),console:'MMI-1'});
+   mmi().alertBox(`[${r.id}] ${r.name}\n${day==='today'?`오늘 운행 스케줄로 변경했습니다 (열차 ${r.trains}개). 온라인 열차스케줄관리에서 확인하세요.`:'내일 스케줄 ID로 설정했습니다.'}`);
+  });
+ };
  $('idmClose').onclick=()=>close('scheduleId');
+ // 창을 다시 열 때마다 엔진의 설정 상태를 다시 읽는다
+ const win=doc.querySelector('[data-mmi-window="scheduleId"]');if(win)new MutationObserver(()=>{if(!win.hidden)idmRender();}).observe(win,{attributes:true,attributeFilter:['hidden']});
  idmRender();
 }
 
