@@ -33,7 +33,7 @@
   "overviewPanels": 15,
   "overviewNavigationTargets": 18,
   "overviewBoundaryLinksWithinRows": 40,
-  "nodeTests": 168,
+  "nodeTests": 173,
   "nodeFailures": 0,
   "svgLayoutCases": 108,
   "measuredLayoutIssues": 0,
@@ -46,13 +46,14 @@
   "physicalAndRouteGraphsUnchanged": true,
   "sourceSha256": {
     "simulator/ui/ls-switches.js": "b670dc4fe76b609ce5a34a625700bd9c262c9bf33c7235516f73e07be53a0d7d",
-    "simulator/ui/ls-view.js": "8d1fa4ee4ed76eea745803d5965c9877161533e8963d40e6f57af0e849fc4b38",
+    "simulator/ui/ls-view.js": "9ec5c12fba44c207daa341f3087e6722a283d122a85fadc70794ddef86f91b97",
     "simulator/ui/ls-overview.js": "6dae0349aa020ac5b2190ac6044ceeac21126fd1a466a5cf8da75f6f2133f9f4",
     "simulator/ui/ls-context.js": "4e39c0356ddeba883c3e8e2fd2585a5da1fd45594c3188789c3115865840b65f",
     "simulator/ui/style.css": "1de5213f1d5e10b11f6b544ef502444260581d3cf181a8196a40beb3ecb7764e",
-    "simulator/index.html": "95e111c1f0be1e181524050868bf012bd2ab3718b81b13b0c54c6c9895b256ec"
+    "simulator/index.html": "5c1ead1e3d238e94480b4219777d1343fc7b149f641cd2de654c456ef52fb794",
+    "simulator/ui/circuit-label-review.js": "62cc723496c3a79c4d72070cc1c12b7944fcdcddada262eb2e61ef0519f16f3b"
   },
-  "sourceMatchedFilesPerAsar": 134,
+  "sourceMatchedFilesPerAsar": 135,
   "overviewRegions": [
     {
       "id": "north",
@@ -86,5 +87,20 @@
   ],
   "overviewRowWidthCoverageMinimum": 0.95,
   "overviewViewportAspectAndVerticalPlacementChecked": true,
-  "asarMatchScope": "All packaged files with matching local source paths except builder-normalized package.json"
+  "asarMatchScope": "All packaged files with matching local source paths except builder-normalized package.json",
+  "circuitLabelReview": {
+    "inventory": "references/transcriptions/circuit-label-review.json",
+    "inventorySha256": "ce723b738d61ad7a557df1df8c7b3c33cddc45380a106d5e2388671042979fc6",
+    "stations": 15,
+    "corridors": 3,
+    "stationsCorrected": 11,
+    "sourceLabelOccurrencesInCompleteStationScenes": 700,
+    "blankCellReviews": 106,
+    "correctedCellTexts": 27,
+    "additionalSourceLabels": 1,
+    "aliasDeduplicationFix": "B615T1T must not suppress separate 1T",
+    "sourceInventoryMatches": 108,
+    "reviewedLabelPixelChecks": 168,
+    "scope": "Visible circuit names checked against supplied PPT/PDF; source IDs, resources and geometry unchanged."
+  }
 }

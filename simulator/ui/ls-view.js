@@ -9,6 +9,7 @@ const seams=typeof module!=='undefined'?require('./ls-seams'):root.SimLSSeams;
 const blockView=typeof module!=='undefined'?require('./ls-block-signals'):root.SimLSBlockSignals;
 const presets=typeof module!=='undefined'?require('./ls-presets'):root.SimLSPresets;
 const platformInfo=typeof module!=='undefined'?require('../engine/platforms'):root.SimPlatforms;
+const labelReview=typeof module!=='undefined'?require('./circuit-label-review'):root.SimCircuitLabelReview;
 const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
@@ -225,7 +226,8 @@ function render(st,def,core,model,neighbours={}){
  }
  // Adjacent extraction fragments may belong to one named circuit. Consolidate text only;
  // every original circuit rectangle, hit target and interlocking resource stays intact.
- const fragments=cells.flatMap(c=>{
+ const labelCells=cells.map(c=>({...c,label:labelReview.labelFor(st.id,c.source)}));
+ const fragments=labelCells.flatMap(c=>{
   const atomic=c.label.replaceAll(' · ',''),tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   return tokens.map((label,i)=>({...c,label,x:c.x+c.width*i/tokens.length,width:c.width/tokens.length}));
  });
@@ -250,7 +252,7 @@ function render(st,def,core,model,neighbours={}){
   });
  }
  // Source aliases such as B615T1T represent adjoining identifiers, not an extra overlapping label.
- const hasName=name=>cells.some(c=>c.label.split(' · ').includes(name)||c.label.replaceAll(' · ','')===name);
+ const hasName=name=>fragments.some(c=>c.label===name);
  const addRailName=(name,anchor,poly,offset=0)=>{
   if(!name||hasName(name))return;
   const [baseX,y]=T(anchor),width=name.length*7.2+6;
@@ -272,6 +274,8 @@ function render(st,def,core,model,neighbours={}){
   addRailName(left,poly[0],poly,42);addRailName(right,poly.at(-1),poly,-42);
   for(const name of [left,right])if(name&&cells.some(c=>c.label.replaceAll(' · ','')===name))labels+=`<g data-circuit-alias="${esc(name)}"><title>${esc(name)}</title></g>`;
  }
+ // Some source labels sit on rails whose white cell was missed by extraction.
+ for(const item of labelReview.additionalLabels[st.id]||[]){const rail=def.rails.find(r=>r[0]===item.rail);if(rail)addRailName(item.name,item.at,rail[1]);}
  // FTS: a train running over a route reddens only the circuits it is on, from the tail to the head, and moves on with the clock
  const lenOf=pts=>pts.slice(1).reduce((t,p,i)=>t+Math.hypot(p[0]-pts[i][0],p[1]-pts[i][1]),0);
  const slicePath=(pts,d0,d1)=>{const out=[];let acc=0;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],seg=Math.hypot(b[0]-a[0],b[1]-a[1]);if(!seg)continue;const s0=acc,s1=acc+seg;if(s1>d0&&s0<d1){const t0=Math.max(0,(d0-s0)/seg),t1=Math.min(1,(d1-s0)/seg);if(!out.length)out.push([a[0]+(b[0]-a[0])*t0,a[1]+(b[1]-a[1])*t0]);out.push([a[0]+(b[0]-a[0])*t1,a[1]+(b[1]-a[1])*t1]);}acc=s1;}return out;};

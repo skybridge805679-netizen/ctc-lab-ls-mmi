@@ -1,5 +1,8 @@
 """Measure real SVG text and controls over every LS preset; capture desktop evidence."""
 import argparse,json
+from collections import Counter
+from io import BytesIO
+from PIL import Image
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -35,6 +38,8 @@ MEASURE=r'''()=>{
  const ctm=svg.getScreenCTM();
  return {screenTransform:{a:ctm.a,d:ctm.d,e:ctm.e,f:ctm.f},circuitHighlights:texts.filter(t=>t.kind==='circuit'&&['30T','80T'].includes(t.id)).map(({el,...t})=>t),preset:document.querySelector('#lsStage').dataset.preset,width:v.width,height:v.height,texts:texts.map(({el,...rest})=>rest),signalOffsets:[...svg.querySelectorAll('[data-label-kind=signal]')].map(e=>({id:e.dataset.labelId,dx:+e.dataset.labelOffsetX||0,dy:+e.dataset.labelOffsetY||0})).filter(p=>p.dx||p.dy),blocks:[...svg.querySelectorAll('[data-block-id]')].map(e=>({id:e.dataset.blockId,code:e.dataset.blockCode,number:e.dataset.blockNumber})),windows,signals:svg.querySelectorAll('[data-signal]').length,parts:[...svg.querySelectorAll('[data-point-control]')].map(e=>e.dataset.pointControl),rawPolygons:svg.querySelectorAll('.rail-join').length,issues};
 }'''
+inventory_path=ROOT/'references/transcriptions/circuit-label-review.json'
+inventory=json.loads(inventory_path.read_text()) if inventory_path.exists() else None
 report=[]
 try:
  with sync_playwright() as p:
@@ -49,7 +54,23 @@ try:
     for view in views:
      page.evaluate('([id,st,pos])=>{selectStation(id);SimRemote.command({type:"control",station:st,action:{type:"mode",value:"CCM"}});for(const point of Object.keys(SimCore.forStation(st).points)){const r=SimRemote.command({type:"control",station:st,action:{type:"point",id:point,value:pos}});if(!r.ok)throw Error(st+" "+point+" "+r.message);}if(Object.values(SimField.state(st).points).some(p=>p!==pos))throw Error("point position mismatch");render()}',[view['id'],view['station'],state])
      page.evaluate('document.fonts.ready')
-     data=page.evaluate(MEASURE);data.update(viewport=width,state=state,name=view['name']);report.append(data)
+     data=page.evaluate(MEASURE);data.update(viewport=width,state=state,name=view['name'])
+     data['circuitLabels']=[t['id'] for t in data['texts'] if t['kind']=='circuit']
+     if inventory:
+      expected=page.evaluate("([v,p])=>v.monitor?p.corridors[v.id].rows.flat():[...p.stations[v.station].coreLabels,...p.stations[v.station].blockLabels.filter(code=>SimLSPresets.circuitView(v.station,code)===v.id)]",[view,inventory])
+      actual=Counter(data['circuitLabels']);wanted=Counter(expected)
+      assert actual==wanted, f"{view['id']} {width} {state}: missing {wanted-actual}, extra {actual-wanted}"
+      data['sourceInventoryMatched']=True
+      proof=inventory['stations'][view['station']]
+      changed=[] if view.get('monitor') else list({f[4] for f in proof['corrections']}|{f['name'] for f in proof.get('additionalLabels',[])})
+      if changed:
+       image=Image.open(BytesIO(page.screenshot(animations='disabled'))).convert('RGB')
+       for name in changed:
+        box=page.locator('#trackSvg text[data-circuit-label="'+name+'"]').bounding_box();assert box and box['width']>1 and box['height']>1
+        crop=image.crop((int(box['x']),int(box['y']),int(box['x']+box['width']+1),int(box['y']+box['height']+1)))
+        assert sum(max(rgb)<90 for rgb in crop.get_flattened_data())>=3, f"{view['id']} {name}: missing rendered ink"
+      data['reviewedLabelPixelChecks']=len(changed)
+     report.append(data)
      if args.capture and width==1920 and state=='N':
       page.screenshot(path=str(out/(view['id']+'.png')),animations='disabled')
     print('MEASURED',width,state,'presets',len(views),flush=True)
