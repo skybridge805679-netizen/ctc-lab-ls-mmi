@@ -27,7 +27,9 @@ def run(page, url, width, height):
     page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     # brand: parody, never the school logo
     body = page.locator('body').inner_text()
-    assert 'ORPHEIA MMI' in body and '송원' not in body and 'SONGWON' not in body.upper() and 'SWU' not in body and 'SWON' not in body
+    assert page.locator('#mmiShell').get_attribute('aria-label') == 'ORPHEIA MMI'
+    assert page.locator('.mmi-appbar').count() == 0
+    assert '송원' not in body and 'SONGWON' not in body.upper() and 'SWU' not in body and 'SWON' not in body
     expect(page.locator('.mmi-brand-text b').first).to_have_text('ORPHEIA')
     # menu bar exactly as photographed
     tops = page.locator('.mmi-top-btn').all_inner_texts()

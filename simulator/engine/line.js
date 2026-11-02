@@ -40,6 +40,16 @@ function build(){
  return {order,stations,sections,NAMES};
 }
 const line=build();
+// Resolve a display designation through actual station transitions, not local track IDs (1T/2T).
+function mainLineOf(trunk){
+ const standard=new Set(['GD','GU','ED','EU']),seen=new Set([trunk]),queue=[trunk],found=new Set();
+ for(let i=0;i<queue.length;i++){const current=queue[i];if(standard.has(current))found.add(current);
+  for(const st of Object.values(line.stations))for(const t of st.transitions){const next=t.from===current?t.to:t.to===current?t.from:null;if(next&&!seen.has(next)){seen.add(next);queue.push(next);}}
+ }
+ return found.size===1?[...found][0]:trunk;
+}
+function lineNameOf(trunk){const label={GD:'하1선',GU:'상1선',ED:'하2선',EU:'상2선'};return label[mainLineOf(trunk)]||NAMES[trunk]||trunk;}
+
 const Track=isNode?require('./track-network'):root.SimTrackNetwork;
 const graph=Track.build(line.sections);
 const journeys=new Map();
@@ -178,6 +188,6 @@ function refresh(states,ls,slotsOf){
  for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
  return blocked;
 }
-const api={graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,autoSingle,isSingle,wrongDirection,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
+const api={mainLineOf,lineNameOf,graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,autoSingle,isSingle,wrongDirection,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

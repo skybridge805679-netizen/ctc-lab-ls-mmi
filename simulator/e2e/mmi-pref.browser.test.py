@@ -28,13 +28,13 @@ def run(page, url):
     assert page.locator('#prefList li[data-i]').count() == 2
     page.locator('#prefUp').click()
     page.locator('#prefOk').click(); expect(page.locator('#prefMsg')).to_contain_text('적용')
-    ids = page.evaluate("[...document.querySelectorAll('#lsStationSelect optgroup:first-child option')].map(o=>o.value)")
+    ids = page.evaluate("[...document.querySelectorAll('#stationTabs [data-view]')].slice(0,2).map(o=>o.dataset.view)")
     assert ids == [first, third], ids
     # monitor 2 is independent
     page.locator('[data-pref-mon="2"]').click(); expect(page.locator('#prefList .empty')).to_have_count(1)
     assert page.evaluate("JSON.parse(localStorage.getItem('orpheia.preferred'))[1].length") == 2
     page.reload(wait_until='networkidle')
-    assert page.evaluate("document.querySelectorAll('#lsStationSelect optgroup').length") == 2
+    assert page.evaluate("[...document.querySelectorAll('#stationTabs [data-view]')].slice(0,2).map(o=>o.dataset.view)") == [first, third]
     assert not errors, errors
     print('mmi-pref: ok')
 

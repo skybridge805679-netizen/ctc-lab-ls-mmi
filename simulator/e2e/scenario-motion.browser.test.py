@@ -41,7 +41,7 @@ try:
      if page.evaluate('SimScenarioUI.motionJobs().length'):break
      action=page.evaluate("id=>{const s=SimEmergency.list.find(s=>s.id===id),r=SimScenarioUI.snapshot();return s.steps.find((step,i)=>step.kind==='do'&&!r.done[i])?.act}",sid)
      if not action:continue
-     page.select_option('#lsStationSelect',action['station'])
+     page.evaluate('(id)=>selectStation(id)',action['station'])
      if action['type']=='mode':run({'type':'mode','value':action['value'],'source':'MMI'})
      elif action['type']=='stop':
       for sig in action['ids']:run({'type':'stop','id':sig,'source':'LS'})

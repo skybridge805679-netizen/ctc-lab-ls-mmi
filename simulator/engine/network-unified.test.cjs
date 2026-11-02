@@ -9,7 +9,7 @@ assert.equal(L.handoff('guro','F1T',id=>TW.data[id].map(w=>w.slot)),null,'yard b
 console.log('PASS composite graph: 33 stops, 46 main-line sections, all 708 local nodes / 751 edges and 710 route-resource paths');
 const states=()=>Object.fromEntries(N.stations.filter(s=>s.controlled).map(s=>[s.id,C.forStation(s.id).initial()]));
 for(const reflect of [false,true]){
- const model=T.initial();model.trains=model.trains.slice(0,1);const train=model.trains[0],plan=structuredClone(train),s=states(),engine=A.create({core:C,stations:N.stations}),seen=[],handoffs=[];
+ const model=require('./sample-timetable.test-fixture.cjs')();model.trains=model.trains.slice(0,1);const train=model.trains[0],plan=structuredClone(train),s=states(),engine=A.create({core:C,stations:N.stations}),seen=[],handoffs=[];
  const nums={place:(st,slot,t)=>seen.push([st,t.id]),depart(){},remove(){},handoff:(st,t,dest,delay)=>handoffs.push({st,delay})};
  C.forStation('cheongnyangni').dispatch(s.cheongnyangni,{type:'fault',kind:'signal',id:'4A',on:true});
  const tick=seconds=>{for(const [id,x]of Object.entries(s))C.forStation(id).dispatch(x,{type:'tick',seconds});return engine.run({states:s,model,numbers:nums,reflect});};

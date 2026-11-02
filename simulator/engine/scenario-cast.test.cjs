@@ -12,11 +12,11 @@ for(const sc of S.list){
  // every tag used in the steps has text without the marker
  assert.ok(sc.steps.every(s=>!s.text.includes('§')));
  // the cast follows the CURRENT timetable: the fault train is the chosen one, nobody is listed twice
- const model=T.initial(),fault=S.candidates(sc,model)[0],cast=S.pickCast(sc,model,fault);
+ const model=require('./sample-timetable.test-fixture.cjs')(),fault=S.candidates(sc,model)[0],cast=S.pickCast(sc,model,fault);
  assert.strictEqual(cast[0].id,fault);assert.strictEqual(new Set(cast.map(c=>c.id)).size,cast.length);
  assert.ok(cast.filter(c=>c.source==='timetable').every(c=>model.trains.find(t=>t.id===c.id)));
  // a timetable with other numbers and only the fault train: fall back to the script's numbers
- const m2=T.initial();m2.trains=m2.trains.filter(t=>t.id===fault);
+ const m2=require('./sample-timetable.test-fixture.cjs')();m2.trains=m2.trains.filter(t=>t.id===fault);
  const c2=S.pickCast(sc,m2,fault);assert.ok(c2.slice(1).every(c=>c.source==='fallback'&&c.id),sc.id+' fallback');
 }
 console.log('scenario cast: ok',S.list.length);

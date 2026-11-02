@@ -24,7 +24,7 @@ let application;const errors=[];
  assert.equal(await ls.evaluate(()=>SimField.state('anyang').mode),'CCM');
  await ls.evaluate(()=>SimMMI.raiseAlarm('네이티브 두 창 검증'));
  await expect(mmi.locator('.mmi-alarm')).toBeVisible();await expect(ls.locator('.mmi-alarm')).toHaveCount(0);
- await ls.selectOption('#lsStationSelect','suwon');await expect(mmi.locator('#stationSelect')).toHaveValue('suwon');
+ await ls.evaluate(id=>selectStation(id),'suwon');await expect(mmi.locator('#stationSelect')).toHaveValue('suwon');
  await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');
  await ls.waitForFunction(()=>SimField.state('suwon').mode==='CCM');
  // 열차 그래프는 MMI에 종속되지 않은 독립 창으로 열린다
@@ -47,6 +47,7 @@ let application;const errors=[];
  await ls.waitForFunction(()=>SimFTSUI.session()?.items[0].status==='진행');
  await ls.evaluate(()=>{const t=SimTimetable.pattern({id:'C4201',from:'yongsan',to:'suwon',start:3600});return SimTimetable.create(SimDiagram.getModel(),t);});
  await ls.waitForFunction(()=>SimFTSUI.session().items[0].status==='완료',null,{timeout:10000});
+ await ls.evaluate(()=>SimRemote.command({type:'clock',paused:true}));
  const beforeClosedTick=await ls.evaluate(()=>SimField.state('suwon').clock);
  await ls.evaluate(()=>SimMMI.run({type:'tick',seconds:10}));
  assert.equal(await ls.evaluate(()=>SimField.state('suwon').clock),beforeClosedTick+10);

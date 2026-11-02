@@ -20,7 +20,7 @@ function verifyArchive(archive,{sourceRoot=path.join(__dirname,'..'),files}={}){
   assert.deepEqual(actual,fs.readFileSync(path.join(sourceRoot,nativeArchivePath(file))),`packaged file differs: ${file}`);
  }
  const entries=asar.listPackage(archive).map(portableArchivePath);
- assert.ok(!entries.some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')||f.startsWith('/simulator/e2e/')||/\.test\.(?:cjs|js|py)$/.test(f)),'reference archive or test runtime included');
+ assert.ok(!entries.some(f=>f.startsWith('/references/')||f.startsWith('/node_modules/playwright/')||f.startsWith('/simulator/e2e/')||/\.test(?:-fixture)?\.(?:cjs|js|py)$/.test(f)),'reference archive or test runtime included');
  return required.length;
 }
 module.exports={nativeArchivePath,portableArchivePath,verifyArchive};

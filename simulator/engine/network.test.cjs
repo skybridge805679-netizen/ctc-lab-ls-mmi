@@ -49,7 +49,7 @@ test('station state is independent and noninterlocked stations reject controls',
  assert.throws(()=>C.forStation('not-a-station'),RangeError);
 });
 test('train plans cover every station in opposite monotonic orders',()=>{
- const model=T.initial();assert.equal(model.trains.length,12);
+ const model=require('./sample-timetable.test-fixture.cjs')();assert.equal(model.trains.length,12);
  for(const t of model.trains){
   assert.equal(t.calls.length,33);
   for(let i=0;i<t.calls.length;i++){
@@ -61,7 +61,7 @@ test('train plans cover every station in opposite monotonic orders',()=>{
  }
 });
 test('delay affects selected and subsequent calls only, leaving plan and other trains intact',()=>{
- const model=T.initial(),before=structuredClone(model),train=model.trains[0];
+ const model=require('./sample-timetable.test-fixture.cjs')(),before=structuredClone(model),train=model.trains[0];
  assert(T.delay(model,train.id,train.calls[10].station,2).ok);
  train.calls.forEach((call,i)=>{assert.equal(call.arrival,before.trains[0].calls[i].arrival+(i<10?0:120));assert.equal(call.departure,before.trains[0].calls[i].departure+(i<10?0:120));});
  assert.deepEqual(train.plan,before.trains[0].plan);assert.deepEqual(model.trains.slice(1),before.trains.slice(1));
@@ -70,7 +70,7 @@ test('delay affects selected and subsequent calls only, leaving plan and other t
  assert.deepEqual(model,snapshot);
 });
 test('position interpolates in both directions, handles dwell and cancellation',()=>{
- const model=T.initial();
+ const model=require('./sample-timetable.test-fixture.cjs')();
  for(const train of [model.trains[0],model.trains[6]]){
   assert.equal(T.position(train,-1),null);assert.equal(T.position(train,10).status,'정차');
   const p=T.position(train,90);assert.equal(p.status,'운행');

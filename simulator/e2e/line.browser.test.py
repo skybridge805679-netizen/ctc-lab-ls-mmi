@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """선로망: 자동제어 열차가 역을 빠져나가면 다음 연동역의 진입 열번창에 나타나 붉게 표시된다 (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -16,7 +17,7 @@ class Quiet(SimpleHTTPRequestHandler):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page)
     page.evaluate("SimAutoUI.set(true)")
     seen = {}
     via = set()

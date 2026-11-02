@@ -1,0 +1,327 @@
+{
+  "commit": "f0b7c8712d5a5dc7c52b81342ccee5b680e9a966",
+  "generated": "2026-11-01",
+  "inputPolicy": "Executable JS/JSON engine data only; no LS image, screenshot, PDF or PPTX opened",
+  "audit": {
+    "circuits": 320,
+    "globalNodes": 1355,
+    "globalEdges": 1444,
+    "externalBoundaries": 7,
+    "numberGaps": [],
+    "stations": 33,
+    "controlled": 15,
+    "segments": 32,
+    "nodes": 708,
+    "edges": 751,
+    "routes": 710,
+    "branchBoundaries": 17,
+    "inferredCompositeRoutes": [],
+    "issues": []
+  },
+  "components": [
+    {
+      "nodes": 1355,
+      "stations": [
+        "cheongnyangni",
+        "dongmyo",
+        "jonggak",
+        "underground-seoul",
+        "seoul",
+        "yongsan",
+        "noryangjin",
+        "yeongdeungpo",
+        "guro",
+        "geumcheon",
+        "anyang",
+        "gunpo",
+        "uiwang",
+        "suwon",
+        "geumjeong"
+      ]
+    }
+  ],
+  "edgeKinds": {
+    "local": 751,
+    "circuit": 320,
+    "boundary-join": 92,
+    "circuit-join": 274,
+    "external-handover": 7
+  },
+  "drawnNodes": 1355,
+  "drawnEdges": 1444,
+  "sections": 46,
+  "bypasses": [
+    {
+      "id": "GD:anyang>gunpo",
+      "trunk": "GD",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B660T",
+      "eastSide": "B678T",
+      "skipped": [
+        "geumjeong"
+      ]
+    },
+    {
+      "id": "GU:anyang>gunpo",
+      "trunk": "GU",
+      "west": "anyang",
+      "east": "gunpo",
+      "westSide": "B657T",
+      "eastSide": "B673T",
+      "skipped": [
+        "geumjeong"
+      ]
+    }
+  ],
+  "outsideBoundaries": [
+    {
+      "station": "dongmyo",
+      "code": "CT",
+      "name": "군자기지 출고선",
+      "id": "external:dongmyo:CT",
+      "rail": "CT",
+      "node": "dongmyo:CT:383.000,328.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "dongmyo",
+      "code": "DT",
+      "name": "군자기지 입고선",
+      "id": "external:dongmyo:DT",
+      "rail": "DT",
+      "node": "dongmyo:DT:383.000,532.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "guro",
+      "code": "F1T",
+      "name": "구로 차량기지 입출고선",
+      "id": "external:guro:F1T",
+      "rail": "3T",
+      "node": "guro:3T:1009.000,729.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "guro",
+      "code": "F2T",
+      "name": "구로 차량기지 입출고선",
+      "id": "external:guro:F2T",
+      "rail": "4T",
+      "node": "guro:4T:1009.000,778.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "GT",
+      "name": "남부화물기지 A선",
+      "id": "external:uiwang:GT",
+      "rail": "1T",
+      "node": "uiwang:1T:201.000,339.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "FT",
+      "name": "남부화물기지 A선",
+      "id": "external:uiwang:FT",
+      "rail": "1T",
+      "node": "uiwang:1T:1195.000,339.000",
+      "outsideSurvey": true
+    },
+    {
+      "station": "uiwang",
+      "code": "ET",
+      "name": "남부화물기지 B선",
+      "id": "external:uiwang:ET",
+      "rail": "6T",
+      "node": "uiwang:6T:190.000,597.000",
+      "outsideSurvey": true
+    }
+  ],
+  "intermediate": {
+    "cityhall": {
+      "host": "jonggak",
+      "slots": {
+        "MD": "B060T",
+        "MU": "B055T"
+      }
+    },
+    "sinseoldong": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B012T",
+        "MU": "B011T"
+      }
+    },
+    "dongdaemun": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B020T",
+        "MU": "B021T"
+      }
+    },
+    "jongno5": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B026T",
+        "MU": "B025T"
+      }
+    },
+    "jongno3": {
+      "host": "dongmyo",
+      "slots": {
+        "MD": "B034T",
+        "MU": "B031T"
+      }
+    },
+    "namyeong": {
+      "host": "seoul",
+      "slots": {
+        "ED": "B908T",
+        "EU": "B909T",
+        "GD": "B602T",
+        "GU": "B601T"
+      }
+    },
+    "gasan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B956T",
+        "GD": "B632T",
+        "GU": "B631T",
+        "EU": "B953T"
+      }
+    },
+    "doksan": {
+      "host": "guro",
+      "slots": {
+        "ED": "B962T",
+        "GD": "B636T",
+        "GU": "B637T",
+        "EU": "B959T"
+      }
+    },
+    "seoksu": {
+      "host": "geumcheon",
+      "slots": {
+        "ED": "B974T",
+        "GD": "B650T",
+        "GU": "B643T",
+        "EU": "B967T"
+      }
+    },
+    "gwanak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B978T",
+        "GD": "B652T",
+        "GU": "B653T",
+        "EU": "B975T"
+      }
+    },
+    "myeonghak": {
+      "host": "anyang",
+      "slots": {
+        "ED": "B990T",
+        "GD": "B666T",
+        "GU": "B663T",
+        "EU": "B989T"
+      }
+    },
+    "dangjeong": {
+      "host": "gunpo",
+      "slots": {
+        "ED": "B1006T",
+        "GD": "B682T",
+        "GU": "B679T",
+        "EU": "B1005T"
+      }
+    },
+    "skku": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1022T",
+        "GD": "B700T",
+        "GU": "B693T",
+        "EU": "B1019T"
+      }
+    },
+    "hwaseo": {
+      "host": "uiwang",
+      "slots": {
+        "ED": "B1032T",
+        "GD": "B710T",
+        "GU": "B703T",
+        "EU": "B1029T"
+      }
+    },
+    "sindorim": {
+      "host": "yeongdeungpo",
+      "slots": {
+        "GD": "B622T",
+        "GU": "B623T",
+        "ED": "B946T",
+        "EU": "B945T"
+      }
+    },
+    "daebang": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B616T1T",
+        "ED": "B932T",
+        "GU": "B615T2T"
+      }
+    },
+    "singil": {
+      "host": "noryangjin",
+      "slots": {
+        "GD": "B618T2T",
+        "ED": "B938T",
+        "GU": "B619T1T"
+      }
+    },
+    "jegidong": {
+      "host": "cheongnyangni",
+      "slots": {
+        "MD": "B006T",
+        "MU": "B005T"
+      }
+    }
+  },
+  "sources": [
+    {
+      "path": "simulator/engine/line.js",
+      "sha256": "9f8c0bdbdf61f089459aedacb6df6262c35cbed3bf5b1750348116978bf8df10"
+    },
+    {
+      "path": "simulator/engine/network-topology.js",
+      "sha256": "f2cada52e82aca026c7f8be45c7a779f69ccdf0f9bcc2577da38bfdf9b7dd36e"
+    },
+    {
+      "path": "simulator/engine/network.js",
+      "sha256": "f37f33105605a397f08d58235cb09c7118c74c3ac29ca5e17c3e326b2ce3f5bf"
+    },
+    {
+      "path": "simulator/engine/schematic-details.js",
+      "sha256": "9745e146f29f13edaaef49cf238a60f8e5126d8dfa682f4eb08ce80953f76896"
+    },
+    {
+      "path": "simulator/engine/track-network.js",
+      "sha256": "019955e1db26b0873d113d2006adfa91628c6cf5fbe022d35f3e54693183aa75"
+    },
+    {
+      "path": "simulator/engine/train-windows.js",
+      "sha256": "f4a974278ede623bdf5243d6263a6da5a8ffb4785e3f3173dbda225d1f6aef99"
+    },
+    {
+      "path": "simulator/engine/wiring.js",
+      "sha256": "de22470da42eddc03f46bfce688be4fb41db2f9082b552832f863fe8a6ca7f56"
+    }
+  ],
+  "layout": {
+    "width": 23268.399999999998,
+    "height": 1230,
+    "note": "Local node coordinates retain uniform scale. Interstation lengths and join slopes are schematic, not surveyed distances. Crossing strokes connect only at graph nodes."
+  }
+}

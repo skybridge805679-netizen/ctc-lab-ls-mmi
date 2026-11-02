@@ -1,5 +1,5 @@
 'use strict';
-const {test}=require('node:test'),assert=require('node:assert/strict');const {create}=require('./runtime.cjs');
+const {test}=require('node:test'),assert=require('node:assert/strict');const create=require('./populated-runtime.test-fixture.cjs');
 test('the complete headless runtime owns controls, timetable, numbers and scenario movement',()=>{
  const r=create();r.command({type:'clock',paused:true});const model=r.snapshot().timetable,t=model.trains.find(t=>t.direction==='up'&&t.calls.some(c=>c.station==='yongsan'));
  assert.ok(r.command({type:'scenario:start',id:'yongsan-5',train:t.id}).ok);

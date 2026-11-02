@@ -284,8 +284,8 @@
       "path": "references/transcriptions/intermediate-circuits.json",
       "original_name": "intermediate-circuits.json",
       "source": "Reviewed transcription and display registration from user-provided 배선도(관제교육장).pptx; original assets preserved",
-      "bytes": 18451,
-      "sha256": "1f76d93309448a088213d0adea29ed7941c8e2d27c0ab456f9628b4fb9da263d"
+      "bytes": 18986,
+      "sha256": "152ebecc4e63b5506a631571d6827a22a987d4a3e96eca022b5b1b8ced573e8b"
     },
     {
       "path": "references/transcriptions/train-window-review.json",

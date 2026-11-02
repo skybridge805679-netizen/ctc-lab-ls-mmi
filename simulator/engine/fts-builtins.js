@@ -1,9 +1,9 @@
 (function(root){
 'use strict';
-// 기본 시나리오 → FTS 능동형 문제 데이터.
+// 선택용 FTS 프리셋 → 능동형 문제 데이터.
 // 부본선 대피 5종(scenarios.js)과 비상시 조치 9종(emergency.js)의 대본을, 순서를 강제하지 않는 문제 데이터로 바꾼다.
-//   setup          : 대본이 시작할 때의 LS (역 초기화 · 진로 · 접근 열차 · 열번창 열차). 시간표는 비운다 — 기본 시간표 열차가
-//                    사고 구간에 들어오면 안 된다(관제사의 열차통제 지시는 말이라 시뮬레이터가 세우지 못한다). 대본 열차만 남는다.
+//   setup          : 대본이 시작할 때의 LS (역 초기화 · 진로 · 접근 열차 · 열번창 열차).
+//                    FTS 선택 시 이 문제의 열차만 담은 시간표를 함께 적용한다.
 //   objectives     : 대본의 조작 단계 하나하나 = 순서 없는 목표 (AUTO 복귀는 끝날 때 유지되어야 하는 final 목표)
 //   communications : 대본의 통보·지시(구술) 단계 = 교수가 확인하는 통보
 //   reactions      : 대본에서 어떤 단계가 끝나면 일어나던 열차 이동 · 열번 변화 = 그 목표/통보가 처음 이루어졌을 때의 상황 반응
@@ -182,10 +182,6 @@ function evacuation({limits={}}={}){
    const when=[trigger,...[...runs.keys()].map(exists)];
    reactions.push({id:'r-'+tag,label:`${trigger.type==='communication'?'통보':'목표'} ${trigger.id} 이후 열차 이동`,when:{type:'all',conditions:when},do:[...runs.values()]});
   }
-  // 고장열차의 스케줄(출발진로를 수정할 대상): 지금부터 약 10분 뒤 대피역에 도착하도록 만든다
-  const down=sc.direction==='down',from=down?'seoul':'suwon',to=down?'suwon':'seoul';
-  const t=T().pattern({id:fault,from,to,start:0}),at=t?.calls.find(c=>c.station===sc.station);
-  reactions.unshift({id:'r-schedule',label:`${fault} 고장열차 스케줄`,do:[{type:'createTrain',train:fault,from,to,startIn:600-(at?.arrival||0),replace:true}]});
   const seeded=seedRoutes(sc.station,sc.seed.routes,sc.seed.approach);
   if(seeded.routes.length!==sc.seed.routes.length)throw new Error(`${sc.id}: 초기 진로를 설정할 수 없습니다`);
   return {id:'P-'+sc.id,subject:'운행선 관리',name:`${sc.title}를 시행하시오`,limit:limits[sc.id]||600,score:100,voice:fill(sc.problem),
@@ -198,6 +194,51 @@ function evacuation({limits={}}={}){
  });
 }
 
-const api={emergency,evacuation,all:o=>[...evacuation(o),...emergency(o)]};
+// Generated training schedules belong to a selected FTS preset, never to startup.
+// Source scripts specify train numbers/directions/starting positions, not absolute times.
+// Place the starting station at +10 minutes with 3-minute spacing in cast order.
+function castLine(c){
+ const Line=node?require('./line'):root.SimLine,W=node?require('./wiring'):root.SimWiring;
+ const rail=W.data[c.station]?.rails.find(r=>r[0]===c.slot||r[3]===c.slot||r[4]===c.slot);
+ const trunk=Line.trunkOf(c.slot)||Line.trunkOf(rail?.[c.direction==='down'?3:4])||Line.trunkOf(rail?.[3])||Line.trunkOf(rail?.[4]);
+ return trunk?Line.mainLineOf(trunk)[0]:c.number?.startsWith('A')?'G':'E';
+}
+function routesOnLine(station,direction,family,standingTrack){
+ const Line=node?require('./line'):root.SimLine,W=node?require('./wiring'):root.SimWiring,def=W.data[station];if(!def)return null;
+ const core=Core().forStation(station),dir=direction==='down'?1:-1;
+ const matches=code=>{const trunk=Line.trunkOf(code);return trunk&&Line.mainLineOf(trunk)[0]===family;};
+ const routes=Object.entries(core.routes).map(([id,r])=>({id,...r})),rank=r=>Object.values(r.pointPositions).filter(x=>x==='R').length;
+ const arrivals=routes.filter(r=>core.signals[r.signal].kind==='장내'&&core.signals[r.signal].dir===dir&&r.geometryRails.some(id=>{const rail=def.rails.find(x=>x[0]===id);return matches(rail?.[dir===1?3:4]);})).sort((a,b)=>rank(a)-rank(b));
+ const arr=arrivals.find(r=>r.destination===standingTrack)||arrivals[0];
+ const departures=routes.filter(r=>core.signals[r.signal].kind==='출발'&&core.signals[r.signal].dir===dir&&matches(r.destination)).sort((a,b)=>rank(a)-rank(b));
+ const dep=departures.find(r=>r.geometryRails[0]===(standingTrack||arr?.destination))||departures.find(r=>r.geometryRails[0]===arr?.destination);
+ if(!arr&&!dep)return {arrivalRoute:'',departureRoute:'',track:'',stopType:'통과',routeSource:'scenario-line'};
+ const linked=dep&&arrivals.find(r=>r.destination===dep.geometryRails[0]);
+ return {arrivalRoute:(linked||arr)?.id.replace('-','_')||'',departureRoute:dep?.id.replace('-','_')||'',track:(linked||arr)?.destination||standingTrack||'',routeSource:'scenario-line'};
+}
+function initialTrack(problem,c,family){
+ const W=node?require('./wiring'):root.SimWiring;if(W.data[c.station]?.rails.some(r=>r[0]===c.slot))return c.slot;
+ const core=Core().forStation(c.station),dir=c.direction==='down'?1:-1;
+ for(const x of problem.setup?.routes||[]){if(x.station!==c.station)continue;const r=core.routes[x.route];if(r&&core.signals[r.signal].kind==='장내'&&core.signals[r.signal].dir===dir){const first=r.geometryRails[0],rail=W.data[c.station]?.rails.find(r=>r[0]===first),code=rail?.[dir===1?3:4];if(castLine({station:c.station,slot:code,direction:c.direction})===family)return r.destination;}}
+ return undefined;
+}
+function timetableFor(problem){
+ const Tt=T(),network=N(),model={trains:[]},cast=problem.setup?.trains||[];
+ const specs=cast.map((c,i)=>{const family=castLine(c);return {id:c.number,direction:c.direction,station:c.station,slot:initialTrack(problem,c,family),family,arrival:600+i*180};});
+ if(problem.id==='P-TG-01')specs.push({id:'K1135',direction:'down',station:'yongsan',arrival:600});
+ if(problem.id==='P-sch-conflict')specs.push({id:'K1131',direction:'down',station:network.stations[0].id,arrival:600});
+ const seen=new Set();
+ for(const c of specs){
+  if(seen.has(c.id))continue;seen.add(c.id);
+  const down=c.direction==='down',family=c.family||'E',north=family==='G'?'seoul':network.stations[0].id,from=down?north:network.stations.at(-1).id,to=down?network.stations.at(-1).id:north;
+  const train=Tt.pattern({id:c.id,from,to,start:0,kind:c.id.startsWith('A')?'KTX':'전동열차'});
+  const at=train.calls.find(x=>x.station===c.station);if(!at)throw Error(problem.id+' timetable station missing: '+c.station);
+  const shift=c.arrival-at.arrival;for(const [i,call] of train.calls.entries()){call.arrival+=shift;call.departure+=shift;const routes=routesOnLine(call.station,c.direction,family,call.station===c.station?c.slot:undefined);if(routes)Object.assign(call,routes);if(i===0){call.arrivalRoute='';call.stopType='시발';}if(i===train.calls.length-1){call.departureRoute='';call.stopType='종착';}}
+  train.plan=structuredClone(train.calls);if(!Tt.valid(train))throw Error(problem.id+' timetable invalid: '+c.id);
+  model.trains.push(train);
+ }
+ return {serviceDate:'2000-01-01',trains:model.trains};
+}
+const api={emergency,evacuation,timetableFor,all:o=>[...evacuation(o),...emergency(o)]};
 if(node)module.exports=api;else root.SimFTSBuiltins=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

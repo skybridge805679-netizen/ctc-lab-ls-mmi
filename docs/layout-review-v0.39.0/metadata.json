@@ -1,0 +1,54 @@
+{
+  "version": "0.39.0",
+  "date": "2026-11-02",
+  "baseline": "48bd449",
+  "emptyStartupTrains": 0,
+  "emptyResetTrains": 0,
+  "ftsSchedules": 19,
+  "emptyFtsSchedules": 3,
+  "trainEntriesAcrossFtsSchedules": 69,
+  "retainedSelectionScenarios": 3,
+  "nodeTests": 166,
+  "nodeFailures": 0,
+  "desktopViewports": [
+    [
+      1280,
+      800
+    ],
+    [
+      1440,
+      1000
+    ],
+    [
+      1920,
+      1080
+    ]
+  ],
+  "arrowCases": 54,
+  "svgGeometryCases": 108,
+  "measuredGeometryIssues": 0,
+  "nativeExecution": "Linux x64 Electron 45 / Xvfb",
+  "crossPackageTargets": [
+    "Linux x64",
+    "Windows x64",
+    "Mac ARM64"
+  ],
+  "baselineGraphUnchanged": true,
+  "sourceSha256": {
+    "simulator/engine/timetable.js": "2fee32fef77a97ac440e5bde0a2a6eb91db937cb965d0119a8bf5ca03edcbb65",
+    "simulator/engine/fts.js": "9478d52f9d3c35c115829f2ad2c7c4c704e077ad9421960a49ad2ed10bdd0ad1",
+    "simulator/engine/fts-builtins.js": "97b9d5ebe94e05fd40e9cd52d7c73823432c8537d8badc4c48aa8a6601b327f4",
+    "simulator/engine/fts-controller.cjs": "47c26ac0f85a582283cc86741e05f9d9bee7ecf0084b83ff6649a3daaadd77e6",
+    "simulator/engine/line.js": "725116535da805d1c631d11ed5a008f03c3b3f7cf576fe7118d7a3f1d84bce49",
+    "simulator/engine/runtime.cjs": "3bfc9fecb17a2f2b1a2bc7cc020b0a1a81d0d2c62255adf84e0eda1c66e2aa83",
+    "simulator/engine/auto-controller.cjs": "92e152198d59f1f9b798304ac4907cf4e1c3aee6108c2f4d7eeed7fbbbfed2d5",
+    "simulator/ui/app.js": "895a2949c6bb8315287860d7366602c4a9805434f9a423a7950606e35edd89ab",
+    "simulator/ui/ls-view.js": "cbf8609defd354fae52d735dbd72817852f93544179a1f3532d56b865275fee9",
+    "simulator/ui/ls-seams.js": "3d4e59b16fdbe31c654d45248c918d00a30ad622bb6423e1f0d6688f85bfb4f8",
+    "simulator/ui/fts.js": "b61aa6c406c1d4a7de175914b1fef2673043a9a908e567fcb927f7c4448edce9",
+    "simulator/ui/shell.css": "ba773025f9828de70e99e281cb66b9cf2a8b3c28e4b21b7b318d6736ec48b352",
+    "simulator/index.html": "1e1f0b869dcc01ad7c1c29c40d07ce87bd2f2b0c15a1adb4de905201f5774da8"
+  },
+  "sourceMatchedFilesPerAsar": 127,
+  "sampleTimetableFixturesExcludedFromAllPackages": true
+}

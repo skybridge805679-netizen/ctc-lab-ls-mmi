@@ -71,9 +71,10 @@ function render(st,def,core,model,neighbours={}){
  const prepared=presets.prepare(st,def,sceneOf(st),wingOf(st,def),neighbours.preset),{data,wing}=prepared;def=prepared.def;
  if(prepared.corridor)model={...model,routes:{},approach:{},scenarioMotions:[]};
  const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor,prepared.slide);
- const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 노란 화살표 자리만큼 위를 비운다
+ const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 역판·열번창 위 여백을 유지한다
 ,T=L.pt;
  const plateGap=prepared.corridor?128:94;
+ const edgePorts=seams.ports(st,def,data);
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -213,19 +214,36 @@ function render(st,def,core,model,neighbours={}){
   platforms+=`<rect data-platform-height="${info.height}" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} 승강장 · ${info.label}</title></rect>`;
   occupiedBoxes.push([p.x-3,p.y-3,p.right+3,p.y+p.height+3]);
  }
- for(const points of paths)rails+=`<path d="${dpath(points)}"/>`;
+ for(const [i,points]of paths.entries())rails+=`<path${i>=def.rails.length&&i<def.rails.length+(data.joins||[]).length?` data-reviewed-join="${i-def.rails.length}"`:''} d="${dpath(points)}"/>`;
  for(const polygon of (data.joins?.length?[]:wing.diags))rails+=`<polygon class="rail-join" points="${polygon.map(p=>T(p).join(',')).join(' ')}"/>`;
  for(const c of cells){
   const state=onRoute(c)?.state||'clear';
   sections+=`<g class="track-cell ${state}" data-track-section="${st.id}-${c.index}" data-track-circuit="${esc(c.label)}" data-track-state="${state}"><rect class="cell-bed" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/><title>${esc(c.label||'원본 무기명 구간')} · ${state}</title></g>`;
+ }
+ // Adjacent extraction fragments may belong to one named circuit. Consolidate text only;
+ // every original circuit rectangle, hit target and interlocking resource stays intact.
+ const fragments=cells.flatMap(c=>{
+  const atomic=c.label.replaceAll(' · ',''),tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
+  return tokens.map((label,i)=>({...c,label,x:c.x+c.width*i/tokens.length,width:c.width/tokens.length}));
+ });
+ const labelRuns=[];
+ for(const c of fragments.sort((a,b)=>a.y-b.y||a.x-b.x)){
+  const prev=labelRuns.at(-1);
+  if(prev&&prev.label===c.label&&Math.abs(prev.y-c.y)<2&&c.x<=prev.x+prev.width+10)prev.width=Math.max(prev.width,c.x+c.width-prev.x);
+  else labelRuns.push({...c});
+ }
+ for(const c of labelRuns){
   const atomic=c.label.replaceAll(' · ','');
   const tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   tokens.forEach((label,i)=>{
-   let x=c.x+c.width*(i+.5)/tokens.length;const width=c.width/tokens.length;
-   if(visibleWindows.some(w=>w.side==='inline'&&w.code===label)){const box=occupiedBoxes.find(b=>x>b[0]&&x<b[2]&&c.y>b[1]&&c.y<b[3]);if(box)x=box[2]+label.length*3.6+4;}
-   const fit=label.length*7.2>width-6?` textLength="${Math.max(12,width-6)}" lengthAdjust="spacingAndGlyphs"`:'';
+   const left=c.x+c.width*i/tokens.length,right=c.x+c.width*(i+1)/tokens.length;
+   let intervals=[[left+3,right-3]];
+   for(const box of windowBoxes.filter(b=>b.inline&&Math.abs(b.cy-c.y)<4))intervals=intervals.flatMap(([a,b])=>box.x>=b||box.x+box.width<=a?[[a,b]]:[[a,Math.min(b,box.x-5)],[Math.max(a,box.x+box.width+5),b]].filter(([l,r])=>r-l>6));
+   if(!intervals.length)intervals=[[left+3,right-3]];
+   const [a,b]=intervals.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0],x=(a+b)/2,width=Math.max(6,b-a),textWidth=Math.min(width,label.length*7.2);
+   const fit=label.length*7.2>width?` textLength="${Math.max(6,width)}" lengthAdjust="spacingAndGlyphs"`:'';
    labels+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${x}" y="${c.y+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
-   occupiedBoxes.push([x-Math.min(width-3,label.length*7)/2,c.y-8,x+Math.min(width-3,label.length*7)/2,c.y+8]);
+   occupiedBoxes.push([x-textWidth/2,c.y-8,x+textWidth/2,c.y+8]);
   });
  }
  // Source aliases such as B615T1T represent adjoining identifiers, not an extra overlapping label.
@@ -233,11 +251,17 @@ function render(st,def,core,model,neighbours={}){
  const addRailName=(name,anchor,poly,offset=0)=>{
   if(!name||hasName(name))return;
   const [baseX,y]=T(anchor),width=name.length*7.2+6;
-  const intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
-  let x=baseX+offset;
+  let intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
+  // An unnamed boundary segment belongs beyond the local endpoint, on the existing
+  // horizontal screen continuation. Never push B607T back into the named YT circuit.
+  const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);
+  const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
+  if(extension){intervals=[[edgeX+4,WIDTH-12]];symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
+  const preferredX=extension?(edgeX+4+WIDTH-12)/2:baseX+offset;
+  let x=preferredX;
   const deltas=[0];for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
-  for(const dx of deltas){const candidate=baseX+offset+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
-  labels+=`<text class="rail-name" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
+  for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
+  labels+=`<text class="rail-name" data-label-placement="${extension?'edge-extension':'native-rail'}" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
   occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
  };
  for(const [id,poly,target,left,right]of def.rails){
@@ -319,14 +343,27 @@ function render(st,def,core,model,neighbours={}){
  });
  // Each signal stays at its surveyed mast and lamp coordinates. Paired signals retain their source stack.
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
+ // Give a tight stack of names its own minimum line spacing, without moving lamps.
+ const nameY=new Map(placed.map(s=>[s.id,T([0,s.lampY])[1]])),nameColumns=new Map();
+ for(const s of placed){const key=s.anchorX.toFixed(1)+'|'+s.dir;if(!nameColumns.has(key))nameColumns.set(key,[]);nameColumns.get(key).push(s);}
+ for(const column of nameColumns.values()){
+  column.sort((a,b)=>nameY.get(a.id)-nameY.get(b.id));let first=0;
+  while(first<column.length){let end=first+1;while(end<column.length&&nameY.get(column[end].id)-nameY.get(column[end-1].id)<18)end++;
+   const group=column.slice(first,end);
+   if(group.length>1){const base=group.reduce((sum,s,i)=>sum+nameY.get(s.id)-i*18,0)/group.length;group.forEach((s,i)=>nameY.set(s.id,base+i*18));}
+   first=end;
+  }
+ }
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
   const LY=T([0,s.lampY])[1],lampX=X+dir*18;
+  const labelY=nameY.get(id);
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
+  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8]);
   occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" x="${X-dir*8}" y="${LY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-dir*8}" y="${labelY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
   // Resolve dense labels locally only. Never detach an annotation from its turnout.
@@ -334,7 +371,7 @@ function render(st,def,core,model,neighbours={}){
   preferred=[Math.max(20,Math.min(WIDTH-20,preferred[0])),Math.max(20,Math.min(L.H-20,preferred[1]))];
   let [x,y]=preferred;
   const offsets=[[0,0]];
-  for(let d=12;d<=36;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
+  for(let d=12;d<=72;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
   for(const [dx,dy]of offsets){
    const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-7,xx+width/2,yy+7];
    if(xx<width/2+8||xx>WIDTH-width/2-8)continue;
@@ -365,14 +402,14 @@ function render(st,def,core,model,neighbours={}){
  }
  for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
  // 원본 LS의 노란 화살표: 위 글자는 방향(지하청량리/수원), 아래 글자는 눌렀을 때 열리는 이웃 화면.
- const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?12:WIDTH-12,dx=L?1:-1,body=12,head=26,len=140,cy=28;
+ const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?3:157,dx=L?1:-1,body=12,head=26,len=150,cy=28;
   const pts=[[0,0],[head,-head/2],[head,-body/2],[len,-body/2],[len,body/2],[head,body/2],[head,head/2]].map(([px,py])=>[x0+dx*px,cy+py].join(',')).join(' '),tx=x0+dx*(head+(len-head)/2);
-  return `<g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g>`;};
+  return `<svg class="ls-nav-arrow" viewBox="0 0 160 56" aria-label="${esc(view.name)} 화면"><g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g></svg>`;};
  const around=presets.neighbours?.(neighbours.preset||st.id)||{};
- plates+=arrow(neighbours.left===undefined?around.left:neighbours.left,'left')+arrow(neighbours.right===undefined?around.right:neighbours.right,'right');
+ const navigation={left:arrow(neighbours.left===undefined?around.left:neighbours.left,'left'),right:arrow(neighbours.right===undefined?around.right:neighbours.right,'right')};
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
- const ports=seams.ports(st,def,data).map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
- return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
+ return {width:WIDTH,height:L.H,navigation,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

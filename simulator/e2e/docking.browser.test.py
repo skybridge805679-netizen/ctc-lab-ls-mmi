@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """Shared LS/MMI/train-number/timetable state and real desktop docking workflows."""
 import json
 from functools import partial
@@ -18,7 +19,7 @@ try:
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.on('response',lambda r:errors.append(f'HTTP {r.status} {r.url}') if r.status>=400 else None)
    page.add_init_script('window.open=()=>null')  # popups blocked: T/G falls back to the MMI-hosted window
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    def menu(top,*items):
     page.locator('.mmi-top-btn',has_text=top).click()
     for item in items[:-1]:page.locator('.mmi-menu-list .has-sub > button',has_text=item).first.click()
@@ -69,8 +70,9 @@ try:
    bounds=w.bounding_box();desktop=page.locator('#mmiDesktop').bounding_box();assert bounds['x']>=desktop['x']-1 and bounds['x']+bounds['width']<=desktop['x']+desktop['width']+1
    w.locator('.mmi-dock').click();expect(w).to_have_class(__import__('re').compile('docked'))
    w.locator('.mmi-close').click();graph();expect(page.locator('#graphTrain')).to_have_value('K1131')
-   with page.expect_download() as download:page.click('#exportBtn')
-   saved=json.loads(Path(download.value.path()).read_text());assert saved['timetable']['trains'];assert saved['mmiLogs']['event'];assert saved['lsDisplay']['stations']['anyang']['windows']['1T'][0]['number']=='K1133'
+   expect(page.locator('#exportBtn')).to_have_count(0)
+   saved=page.evaluate('({timetable:SimDiagram.getModel(),mmiLogs:SimMMI.getLogs(),lsDisplay:SimLSUI.getModel()})')
+   assert saved['timetable']['trains'];assert saved['mmiLogs']['event'];assert saved['lsDisplay']['stations']['anyang']['windows']['1T'][0]['number']=='K1133'
    assert not errors,errors
    if width==1440:
     page.evaluate("window.getSelection().removeAllRanges()")

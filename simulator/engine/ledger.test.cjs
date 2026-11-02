@@ -1,5 +1,5 @@
 const assert=require('assert'),L=require('./ledger.js'),T=require('./timetable.js');
-const m=T.initial();
+const m=require('./sample-timetable.test-fixture.cjs')();
 assert.ok(T.delay(m,'K1131','seoul',3).ok);                               // 운전시각변경 -> 관제승인 1호
 assert.ok(T.setCancelled(m,'K1133','seoul','yongsan',true).ok);          // 구간운휴 -> 운전명령 1호
 assert.ok(T.cancel(m,'K1135').ok);                                        // 운휴 -> 운전명령 2호

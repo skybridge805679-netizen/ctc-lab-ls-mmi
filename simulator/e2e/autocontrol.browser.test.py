@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """열차자동제어 (AUTO) UI: switch, routes, train numbers following the virtual train, histories (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,7 +28,7 @@ def numbers(page, station):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     tick = lambda n: page.evaluate('n=>SimMMI.run({type:"tick",seconds:n})', n)
     page.locator('#stationSelect').select_option('cheongnyangni')
     # default OFF: AUTO mode alone changes nothing

@@ -1,0 +1,63 @@
+{
+  "version": "0.38.2",
+  "date": "2026-11-01",
+  "baseline": "cd23610",
+  "desktopViewports": [
+    [
+      1920,
+      1080
+    ],
+    [
+      1440,
+      1000
+    ],
+    [
+      1280,
+      800
+    ]
+  ],
+  "pointStates": [
+    "N",
+    "R"
+  ],
+  "casesPerPhase": 108,
+  "sourceSha256": {
+    "simulator/ui/ls-view.js": "8005d8861b41bc5c2d960697703d88fcf75f741d3269270802606a7e63abf21d",
+    "simulator/ui/ls-block-signals.js": "bd2c922f0e119b87825450defae14691417733b914e55bb2531aa6e7143a7a56",
+    "simulator/engine/track-geometry.js": "7fb17c073669453ec89ff2ec7423aebb7ae87eb24120534fcf5013815772efb9",
+    "simulator/engine/schematic-details.js": "b43d80ec602bc70acff4cf30ea37258dd0ccab708ef3b5c75467d231919cce33",
+    "references/transcriptions/intermediate-circuits.json": "152ebecc4e63b5506a631571d6827a22a987d4a3e96eca022b5b1b8ced573e8b",
+    "tools/audit-ls-layout.py": "571672ab1afeb3fa2ebbf110c962efe4ed7312083f0c258a9eb003e46fda4dc0"
+  },
+  "baselineIssues": 18,
+  "afterIssues": 0,
+  "scope": "Measured static SVG labels, windows and signal/block symbols; not every possible train/scenario state.",
+  "validation": {
+    "nodeTests": {
+      "passed": 159,
+      "failed": 0
+    },
+    "nativeRuntime": "Linux x64 Electron 45 / Xvfb",
+    "nativeSuites": [
+      "smoke",
+      "engine-smoke",
+      "ls-windows-smoke",
+      "fts-smoke",
+      "reset-smoke"
+    ],
+    "crossPackages": [
+      "Linux x64",
+      "Windows x64",
+      "Mac ARM64"
+    ],
+    "sourceMatchedFilesPerPackage": 127,
+    "graphComparison": {
+      "baseline": "cd23610",
+      "equal": true,
+      "circuits": 320,
+      "nodes": 1355,
+      "edges": 1444,
+      "routes": 710
+    }
+  }
+}

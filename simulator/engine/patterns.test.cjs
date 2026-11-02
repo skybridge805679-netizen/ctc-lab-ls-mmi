@@ -15,7 +15,7 @@ test('apply shifts the chosen stretch to the 시발시각 and builds a valid tra
  assert.equal(calls[0].station,'yongsan');assert.equal(calls[0].stopType,'시발');assert.equal(calls[0].arrivalRoute,'');assert.equal(calls[0].departure,start);
  assert.equal(calls.at(-1).station,'anyang');assert.equal(calls.at(-1).stopType,'종착');assert.equal(calls.at(-1).departureRoute,'');
  assert.equal(calls.at(-1).arrival,start+(26*60+30)-(3*60+30));
- const model=T.initial();
+ const model=require('./sample-timetable.test-fixture.cjs')();
  assert.ok(T.create(model,{id:'A1234',direction:'down',kind:'무궁화호',service:'정기',flags:[],carCount:8,relatedTrain:'',cancelled:false,calls}).ok);
  assert.equal(P.apply(p,{from:'anyang',to:'yongsan'}),null);
 });

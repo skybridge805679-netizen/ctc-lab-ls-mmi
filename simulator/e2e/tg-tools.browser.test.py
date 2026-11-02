@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """T/G chrome and functions (photos + 실기1 5장): menus, modes, Dia 보기, favourites, search (Chromium)."""
 import re
 from functools import partial
@@ -47,7 +48,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page)
     open_graph(page)
     expect(page.locator('#tgStatus')).to_have_text('준비')
     # menus: photographed 편집(E) plus the textbook's Dia 보기 / 화면설정 / 즐겨찾기 structure

@@ -33,7 +33,7 @@ test('Anyang~Geumjeong and Gunpo~Uiwang monitors take their circuits out of the 
   for(const code of codes){assert.ok(monitor.svg.includes('data-circuit-label="'+code+'"'),preset+' '+code);assert.ok(!main.svg.includes('data-circuit-label="'+code+'"'),station+' still draws '+code);}
   assert.ok(monitor.svg.includes(plate));assert.ok(!main.svg.includes('>'+plate+'<'));
   assert.equal(attrs(monitor,'data-signal').length,0);assert.equal(attrs(main,'data-signal').length,W[station].signals.length);
-  assert.ok(monitor.svg.includes('data-nav-view="'+station+'"'),'yellow arrow back to '+station);
+  assert.ok((monitor.navigation.left+monitor.navigation.right).includes('data-nav-view="'+station+'"'),'yellow arrow back to '+station);
  }
 });
 

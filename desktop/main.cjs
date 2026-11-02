@@ -10,6 +10,7 @@ const appIcon=path.join(__dirname,'resources',process.platform==='win32'?'icon.i
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
+let resetting=false;
 let ls=null,mmi=null,graph=null,fts=null,problem=null,stateFile,layout={},quitting=false,engine=null,tray=null;
 if(process.argv.includes('--orpheia-smoke-test')&&process.env.ORPHEIA_TEST_USER_DATA)app.setPath('userData',process.env.ORPHEIA_TEST_USER_DATA);
 const single=app.requestSingleInstanceLock();
@@ -29,9 +30,28 @@ else{
   ipcMain.on('orpheia:engine',(event,message)=>{
    if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame){event.returnValue={error:'Untrusted engine client'};return;}
    if(!message||typeof message.action?.type!=='string'||message.action.type.startsWith('session:')||!Number.isFinite(message.since)||message.since<0){event.returnValue={error:'Invalid engine request'};return;}
+   if(resetting){event.returnValue={error:'프로그램 전체 초기화 중입니다.'};return;}
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
-  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='problem'){if(alive(problem)){if(problem.isMinimized())problem.restore();problem.showInactive();}}else showView(kind);});
+  ipcMain.handle('orpheia:reset',async event=>{
+   if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)throw Error('Untrusted reset client');
+   if(resetting)return {ok:false,message:'이미 초기화 중입니다.'};resetting=true;
+   try{
+    const response=await new Promise(resolve=>engine.request({type:'session:reset'},0,resolve));
+    if(response.error)throw Error(response.error);
+    // Windows share UI in the LS renderer: close all old projections before clearing their storage.
+    for(const child of [mmi,graph,fts,problem,...extraLS])if(alive(child))child.destroy();
+    extraLS.clear();mmi=graph=fts=problem=null;
+    await ls.webContents.executeJavaScript('localStorage.clear();sessionStorage.clear();');
+    await session.defaultSession.clearStorageData({storages:['localstorage','indexdb','cachestorage']});
+    layout={};require('node:fs').rmSync(stateFile,{force:true});
+    if(ls.isMaximized())ls.unmaximize();ls.setBounds(savedBounds('ls'));ls.show();
+    // Return the IPC result first, then build a fresh LS/MMI workspace against the clean engine.
+    setTimeout(()=>{resetting=false;if(alive(ls))ls.loadURL(entryURL+'?desktop=1');},100);
+    return {ok:true};
+   }catch(error){resetting=false;return {ok:false,message:error.message};}
+  });
+  ipcMain.on('orpheia:view',(event,{kind,station}={})=>{if(resetting)return;if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)return;if(kind==='ls')createExtraLS(station);else if(kind==='problem'){if(alive(problem)){if(problem.isMinimized())problem.restore();problem.showInactive();}}else showView(kind);});
   installMenu();createLS();
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
@@ -66,6 +86,7 @@ function protect(win){
 const alive=w=>!!w&&!w.isDestroyed();
 function raise(w){if(!alive(w))return false;if(w.isMinimized())w.restore();w.show();w.focus();return true;}
 function showView(kind){
+ if(resetting)return;
  if(kind==='ls'){raise(ls);return;}
  if(kind==='mmi'){if(!raise(mmi))script('SimWorkspace.detach()');return;}
  if(kind==='graph'){if(!raise(graph))script('SimWorkspace.openGraph()');return;}
@@ -103,6 +124,7 @@ function createLS(){
  ls.loadURL(entryURL+'?desktop=1');
 }
 function createExtraLS(station){
+ if(resetting)return;
  if(!require('../simulator/ui/ls-presets').get(station))return;
  const win=new BrowserWindow({...savedBounds('ls:'+station),minWidth:320,minHeight:240,show:false,title:'ORPHEIA · LS',backgroundColor:'#686d68',icon:appIcon,webPreferences:prefs});
  extraLS.add(win);remember(win,'ls:'+station);protect(win);win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
@@ -121,7 +143,6 @@ function installMenu(){
   {type:'separator'},
   {label:'실습 세션 저장…',accelerator:'CmdOrCtrl+Shift+S',click:()=>sessionFile(false)},
   {label:'실습 세션 열기…',accelerator:'CmdOrCtrl+O',click:()=>sessionFile(true)},
-  {label:'조작 기록 저장',accelerator:'CmdOrCtrl+S',click:()=>script('document.getElementById("exportBtn").click()')},
   // T/G 파일 메뉴는 원본처럼 [OPN] 열기 · 인쇄만 두고, 시간표 JSON 파일은 여기서 다룬다
   {label:'시간표 JSON 열기…',click:()=>script('SimTimetableFiles.open()')},
   {label:'시간표 JSON 저장…',click:()=>script('SimTimetableFiles.save()')},
@@ -137,8 +158,9 @@ function installMenu(){
 }
 
 async function sessionFile(open){
+ if(resetting)return;
  const filters=[{name:'ORPHEIA 실습 세션',extensions:['orpheia']}],choice=open?await dialog.showOpenDialog({title:'실습 세션 열기',filters,properties:['openFile']}):await dialog.showSaveDialog({title:'실습 세션 저장',filters,defaultPath:path.join(app.getPath('downloads'),'orpheia-session.orpheia')});
- if(choice.canceled)return;const file=open?choice.filePaths[0]:choice.filePath;
+ if(choice.canceled||resetting)return;const file=open?choice.filePaths[0]:choice.filePath;
  engine.request({type:open?'session:open':'session:save',file},0,response=>{if(response.error)dialog.showErrorBox('실습 세션 파일 오류',response.error);else if(open)ls?.reload();});
 }
 

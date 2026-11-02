@@ -13,13 +13,13 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=browser.new_page(viewport={'width':1920,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
   assert page.locator('#stationSelect option').count()==15
-  assert page.locator('#lsStationSelect option').count()==15   # 역간 감시 화면은 하단 목록에 없다
+  assert page.locator('#stationTabs [data-view]').count()==15   # 역간 감시 화면은 하단 목록에 없다
   assert page.locator('#stationTabs [data-view]').count()==15
-  page.select_option('#lsStationSelect','uiwang');expect(page.locator('#lsStage')).not_to_contain_text('성균관대');main_signals=page.locator('[data-signal]').count();assert main_signals>0
-  page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm');page.click('#nextStation')
-  expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon');expect(page.locator('#stationSelect')).to_have_value('uiwang');expect(page.locator('#lsStage')).to_contain_text('성균관대');expect(page.locator('#lsStage')).to_contain_text('화서');assert page.locator('#lsStage [data-mode],#lsStage [data-stop-all],#lsStage [data-equipment]').count()==0
+  page.evaluate('(id)=>selectStation(id)','uiwang');expect(page.locator('#lsStage')).not_to_contain_text('성균관대');main_signals=page.locator('[data-signal]').count();assert main_signals>0
+  page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm');page.locator('[data-nav-view]').last.click()
+  expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang-suwon');expect(page.locator('#stationSelect')).to_have_value('uiwang');expect(page.locator('#lsStage')).to_contain_text('성균관대');expect(page.locator('#lsStage')).to_contain_text('화서');assert page.locator('#lsStage [data-mode],#lsStage [data-stop-all],#lsStage [data-equipment]').count()==0
   assert page.locator('#lsStage').get_attribute('data-control-station')==''
-  expect(page.locator('#resetBtn')).to_be_hidden()
+  expect(page.locator('#resetBtn')).to_be_visible()  # 전체 초기화는 역간 화면에서도 제공
   assert page.locator('[data-point-control]').count()==0
   def win(slot):return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
   def action(name):return page.locator(f'[data-context-action="{name}"]')
@@ -38,18 +38,18 @@ try:
   branch('B1032T','train-swap');win('B1022T').click();confirm();assert entries('B1032T')[0]['number']=='K252' and entries('B1022T')[0]['number']=='K254'
   branch('B1022T','train-delete');confirm();assert entries('B1022T')==[]
   # A pending move can cross the preset boundary in either direction.
-  branch('B1032T','train-move');page.click('#previousStation')
+  branch('B1032T','train-move');page.locator('[data-nav-view]').first.click()
   main_slot=page.locator('#trackSvg [data-train-slot]').first.get_attribute('data-train-slot');win(main_slot).click();confirm();assert entries(main_slot)[0]['number']=='K252'
-  branch(main_slot,'train-move');page.click('#nextStation');win('B1022T').focus();page.keyboard.press(' ');confirm()
+  branch(main_slot,'train-move');page.locator('[data-nav-view]').last.click();win('B1022T').focus();page.keyboard.press(' ');confirm()
   assert entries(main_slot)==[] and entries('B1022T')[0]['number']=='K252'
   win('B1022T').focus();page.keyboard.press('Shift+F10');action('train-properties').click();expect(page.locator('.ls-properties')).to_contain_text('K252');confirm()
   # Blank-space menu still has no field controls, scan or annotation editing.
   page.locator('.fidelity-note').click(button='right');assert page.locator('[data-context-action="scan-current"],[data-context-action="boards"]').count()==0;page.keyboard.press('Escape')
   assert page.evaluate('JSON.stringify({routes:state.routes,points:state.points,occupied:state.occupied,mode:state.mode})')==equipment
-  page.click('#previousStation');expect(page.locator('#lsStationSelect')).to_have_value('uiwang');assert page.locator('[data-signal]').count()==main_signals
-  page.click('#nextStation');expect(page.locator('#trackSvg')).to_contain_text('K252');page.click('#nextStation');expect(page.locator('#lsStationSelect')).to_have_value('suwon');page.click('#previousStation');expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon')
+  page.locator('[data-nav-view]').first.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang');assert page.locator('[data-signal]').count()==main_signals
+  page.locator('[data-nav-view]').last.click();expect(page.locator('#trackSvg')).to_contain_text('K252');page.locator('[data-nav-view]').last.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','suwon');page.locator('[data-nav-view]').first.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang-suwon')
   # Re-applying preferred screens must keep the new preset and current selection.
-  page.evaluate('SimPreferred.apply()');expect(page.locator('#lsStationSelect')).to_have_value('uiwang-suwon')
+  page.evaluate('SimPreferred.apply()');expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang-suwon')
   for width,height in [(1920,1080),(1440,1000),(960,720)]:
    page.set_viewport_size({'width':width,'height':height});page.wait_for_timeout(200);expect(page.locator('#trackSvg')).to_contain_text('K252');expect(page.locator('#trackSvg')).to_contain_text('화서')
    assert page.locator('[data-train-slot="B1022T"]').is_visible()

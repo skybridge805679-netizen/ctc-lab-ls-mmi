@@ -12,9 +12,9 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)));T
 try:
  with sync_playwright() as p:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=browser.new_page(viewport={'width':1920,'height':1080},accept_downloads=True);errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.add_init_script('window.open=()=>null');page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
-  stations=page.locator('#lsStationSelect option').evaluate_all('es=>es.map(e=>e.value)')
+  stations=page.evaluate('SimLSPresets.list().filter(v=>!v.monitor).map(v=>v.id)')
   for station in stations:
-   page.select_option('#lsStationSelect',station)
+   page.evaluate('(id)=>selectStation(id)',station)
    if station=='uiwang-suwon':
     assert page.locator('[data-point-control]').count()==0
     continue

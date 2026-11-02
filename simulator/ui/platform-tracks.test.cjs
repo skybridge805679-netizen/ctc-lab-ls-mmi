@@ -9,7 +9,7 @@ function servedHeights(stationId){const st=N.catalog[stationId],def=W[stationId]
   for(const r of [rows.filter(r=>r.y<=cy).sort((a,b)=>b.y-a.y)[0],rows.filter(r=>r.y>cy).sort((a,b)=>a.y-b.y)[0]])if(r&&Math.abs(r.y-cy)<45)(out[r.id]=out[r.id]||new Set()).add(P.describe(p[4]).height);}
  return out;}
 test('scheduled stopping tracks match the boarding height of the train class',()=>{
- const m=T.initial(),bad=[];let checked=0;
+ const m=require('../engine/sample-timetable.test-fixture.cjs')(),bad=[];let checked=0;
  for(const t of m.trains)for(const c of t.plan){if(c.stopType!=='정차'||!c.arrivalRoute)continue;const track=c.arrivalRoute.split('_')[1],served=W[c.station]&&servedHeights(c.station)[track];if(!served)continue;checked++;
   const need=P.boardingOf(t);if(need==='high'||need==='low'){if(!served.has(need))bad.push(t.id+' '+c.station+' '+c.arrivalRoute);}}
  assert.deepEqual(bad,[]);assert.ok(checked>50,checked);

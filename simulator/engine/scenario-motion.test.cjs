@@ -49,7 +49,7 @@ for(const sc of EM.list)for(const [tag,actions]of Object.entries(EM.MOTION[sc.ke
 console.log('PASS all nine emergency scripts: '+cueCount+' spoken resumption/reroute/departure journeys finish through interlocking and boundary handover');
 const T=require('./timetable');let sidingJourneys=0;
 for(const sc of SC.list){
- const model=T.initial(),cast=SC.pickCast(sc,model,SC.candidates(sc,model)[0]);
+ const model=require('./sample-timetable.test-fixture.cjs')(),cast=SC.pickCast(sc,model,SC.candidates(sc,model)[0]);
  for(const actor of cast){
   const moves=Object.values(sc.beats).flat().filter(m=>m[0]===actor.key);if(!moves.length)continue;
   const w=world(),uid=w.add(sc.station,actor.slot,actor.id,actor.dir);

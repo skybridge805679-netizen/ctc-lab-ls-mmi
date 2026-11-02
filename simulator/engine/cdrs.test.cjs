@@ -1,6 +1,6 @@
 const assert=require('assert'),T=require('./timetable.js'),C=require('./cdrs.js');
 function tight(){
- const m=T.initial(),lead=m.trains.find(t=>t.id==='K1131');
+ const m=require('./sample-timetable.test-fixture.cjs')(),lead=m.trains.find(t=>t.id==='K1131');
  // a follower 60초 behind the leader of the first down train: headway conflicts from the start
  const r=T.copy(m,'K1131','K9001',lead.calls[0].departure+60,{});assert.ok(r.ok);return m;
 }
@@ -18,5 +18,5 @@ assert.strictEqual(m.changes.at(-1).type,'cdrs');
 const dismissed=C.propose(m).map(p=>p.key);
 assert.strictEqual(C.propose(m,dismissed).length,0);
 // a timetable with no conflicts gives nothing
-assert.strictEqual(C.propose(T.initial()).length,T.conflicts(T.initial()).length);
+assert.strictEqual(C.propose(require('./sample-timetable.test-fixture.cjs')()).length,T.conflicts(require('./sample-timetable.test-fixture.cjs')()).length);
 console.log('cdrs: ok',plans.length,'proposals');

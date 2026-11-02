@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """시스템 조회 windows built from the 실기1 search conditions (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,7 +28,7 @@ def rows(page, rid):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     # 열차위치목록: 선/운행방향/구분/열차종별 + 열차번호찾기
     menu(page, '시스템 조회', '열차위치목록 조회')
     expect(rows(page, 'trainPositions')).to_have_count(12)

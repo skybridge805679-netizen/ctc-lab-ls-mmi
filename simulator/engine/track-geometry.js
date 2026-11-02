@@ -18,6 +18,8 @@ function sourceSceneOf(st){
 }
 function sceneOf(st){
  const data=sourceSceneOf(st);let cells=data.cells;
+ // Verified OCR corrections change display text, never circuit identities or engine resources.
+ for(const fix of data.labelCorrections||[])cells=cells.map(c=>c[3]===fix.from&&Math.abs(c[0]-fix.at[0])<1&&Math.abs(c[1]-fix.at[1])<1?[c[0],c[1],c[2],fix.to]:c);
  for(const [x,y]of data.ignoreCells||[])cells=cells.filter(c=>Math.abs(c[0]-x)>1||Math.abs(c[1]-y)>2);
  for(const strip of data.strips||[]){
   const {left,right,y,codes}=strip,next=[];

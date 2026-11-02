@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """Source circuit chains drive real movement and the corrected Anyang crossover."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
@@ -14,7 +15,7 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=browser.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect','cheongnyangni')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn');page.select_option('#stationSelect','cheongnyangni')
    page.evaluate("()=>{const m=structuredClone(SimRemote.snapshot.timetable);m.trains.splice(1);const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);SimAutoUI.set(true);}")
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    # Depart at 30 s, clear at 50 s; the number then progresses through actual B codes.

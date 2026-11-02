@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """경합 시나리오·스케줄생성 시나리오를 MMI와 열차그래프에서 수행 (Chromium)."""
 import re
 from functools import partial
@@ -25,7 +26,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     done = lambda: page.locator('#scSteps li.sc-do.done').count()
     # ------------------------------------------------------------ 경합 시나리오

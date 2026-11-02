@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """경합해소 실습 (경합 시나리오 + 실기3 경합 검지) (Chromium)."""
 import re
 from functools import partial
@@ -25,7 +26,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     page.locator('.mmi-top-btn', has_text='열차스케줄').click(); page.locator('.mmi-menu-list [data-mmi-open="graph"]').first.click()
     page.evaluate("SimMMI.open('conflictDrill')")
