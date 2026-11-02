@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """The full line shares actual train progression, block protection and scenario checks."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
@@ -14,7 +15,7 @@ try:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
   for width in [1440,1920]:
    page=b.new_page(viewport={'width':width,'height':1080});page.clock.install();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
+   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)");page.click('#pauseBtn')
    page.evaluate('''()=>{const m=structuredClone(SimRemote.snapshot.timetable);m.trains.splice(1);const r=SimRemote.command({type:'timetable',method:'import',args:[{serviceDate:m.serviceDate,trains:m.trains}]});if(r.ok===false)throw Error(r.message);const c=SimCore.forStation('cheongnyangni');c.dispatch(SimField.state('cheongnyangni'),{type:'fault',kind:'signal',id:'4A',on:true});SimAutoUI.set(true);}''')
    run=lambda a:page.evaluate('a=>SimMMI.run(a)',a)
    run({'type':'tick','seconds':600})

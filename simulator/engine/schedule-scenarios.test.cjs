@@ -4,7 +4,7 @@ const drive=(sc,ctx)=>{const run=S.newRun(sc,'');S.advance(run,ctx);return run;}
 // ---- 스케줄 생성: random problems on whatever the timetable is
 for(let seed=1;seed<=30;seed++){
  let k=seed;const pick=()=>{k=(k*16807)%2147483647;return k/2147483647;};
- const model=T.initial(),p=SS.planCreate(model,pick),sc=SS.createScenario(p);
+ const model=require('./sample-timetable.test-fixture.cjs')(),p=SS.planCreate(model,pick),sc=SS.createScenario(p);
  assert.ok(!model.trains.some(t=>t.id===p.id)&&p.start>=-28800&&p.start<57600,'plan is valid '+JSON.stringify(p));
  const ctx={model,ui:{...ui},events:[]},run=S.newRun(sc,'');
  const step=i=>sc.steps.filter(s=>s.kind==='do')[i];
@@ -21,15 +21,15 @@ for(let seed=1;seed<=30;seed++){
  S.advance(run,ctx);assert.ok(sc.steps.filter(s=>s.kind==='do').every(s=>run.done[sc.steps.indexOf(s)]),'all done '+seed);
 }
 // a wrongly created train is not accepted and the hint says what differs
-{const model=T.initial(),p=SS.planCreate(model,()=>0.5),sc=SS.createScenario(p);
+{const model=require('./sample-timetable.test-fixture.cjs')(),p=SS.planCreate(model,()=>0.5),sc=SS.createScenario(p);
  const wrong=T.pattern({id:p.id,from:p.from,to:p.to,start:p.start+60,kind:'전동열차'});T.create(model,wrong);
  const ctx={model,ui:{...ui,scheduleOpen:true,scheduleMode:'create'},events:[]},run=S.newRun(sc,'');S.advance(run,ctx);
  assert.ok(run.done[0]&&!run.done[2]);const st=sc.steps.filter(s=>s.kind==='do')[2];assert.ok(st.explain(ctx).includes('시작시각'));}
 // ---- 경합 해소: build the same kind of exercise as the 경합해소 실습 and solve it
 {let model,leaderId,nearest,baseline;
  // like the 경합해소 실습: try each down train as the leader until the +2분 at the nearest 해소역 really solves it
- for(const lead of T.initial().trains.filter(t=>t.direction==='down')){
-  const m=T.initial();T.copy(m,lead.id,'B0000',lead.calls[0].departure+240,{});
+ for(const lead of require('./sample-timetable.test-fixture.cjs')().trains.filter(t=>t.direction==='down')){
+  const m=require('./sample-timetable.test-fixture.cjs')();T.copy(m,lead.id,'B0000',lead.calls[0].departure+240,{});
   const b=m.trains.find(t=>t.id==='B0000'),a0=N.stations.findIndex(s=>s.id==='yeongdeungpo')+1;
   [50,100,150,150,150,100,50].forEach((sh,k)=>{const c=b.calls.find(x=>x.station===N.stations[a0+k]?.id);if(c){c.arrival-=sh;c.departure-=sh;}});b.plan=b.calls.map(c=>({...c}));
   const found=T.conflicts(m).filter(c=>c.trains.includes('B0000'));if(!found.length||T.conflicts(m).some(c=>c.trains.includes('B0000')&&!c.trains.includes(lead.id)))continue;

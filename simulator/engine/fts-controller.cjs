@@ -35,7 +35,11 @@ function create(host){
   case 'notice':session.notice=ph.text;break;
   default:throw Error('지원하지 않는 현상');
  }log('현상 발생 · '+F.PHENOMENA[ph.type].label);}
- function loadSituation(it){if(session.loadedEntry===it.situationIndex)return;host.stopScript();const s=runLibrary.situations.find(s=>s.id===it.situation),sch=runLibrary.schedules?.find(x=>x.id===s.scheduleId),t=s.timetable||sch?.timetable;if(t)error(host.apply({type:'timetable',method:'import',args:[t]}));session.loadedEntry=it.situationIndex;session.situationStartedAt=now();session.situationDeadline=s.limit?now()+s.limit:null;session.notice='';log('상황 시작 · '+s.name);}
+ function loadTimetable(t,relative=false){
+  const table=F.scheduleTable({timetable:t,relative},now(),host.context().model.serviceDate);
+  error(host.apply({type:'timetable',method:'import',args:[table]}));
+ }
+ function loadSituation(it){if(session.loadedEntry===it.situationIndex)return;host.stopScript();const s=runLibrary.situations.find(s=>s.id===it.situation),sch=runLibrary.schedules?.find(x=>x.id===s.scheduleId),t=s.timetable||sch?.timetable;if(t)loadTimetable(t,!s.timetable&&sch?.relative);session.loadedEntry=it.situationIndex;session.situationStartedAt=now();session.situationDeadline=s.limit?now()+s.limit:null;session.notice='';log('상황 시작 · '+s.name);}
  function close(reason){if(!session||session.closed)return;const t=now();host.stopScript();for(let i=session.current;i<session.items.length;i++){const it=session.items[i];if(it.status==='진행'){it.endedAt=t;it.status='종료';host.endTask(it.taskKey,'stopped');}else if(it.status==='대기'){it.status='미실시';it.endedAt=t;}}
   session.finished=true;session.closed=true;session.endedAt=t;session.reason=reason;const sum=F.summary(runLibrary,session);history.unshift({id:session.id,at:new Date().toISOString(),professor:session.professor,student:session.student,scenario:session.scenarioName,reason,duration:t-session.startedAt,overtime:Math.max(0,t-session.startedAt-(session.totalLimit||3600)),...sum,attempts:clone(session.attempts||[])});history=history.slice(0,200);host.finishAssessment();host.pause(true);announce('finished',`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
  }
@@ -48,8 +52,7 @@ function create(host){
     const out=F.advance(runLibrary,session,(x,e)=>context(x,e),now());if(!out.length)break;let again=false;
     for(const o of out){
      if(o.kind==='activate'){host.clearAlarms?.();
-      // 기본 시간표에서 출제하는 문제(경합해소·스케줄생성): 앞 문제가 시간표를 비웠거나 바꿨어도 기본 시간표로 되돌린 뒤 대본이 문제를 만든다
-      if(o.problem.setup?.baseTimetable&&!(o.problem.setup?.clearTimetable))error(host.apply({type:'timetable',method:'import',args:[require('./timetable').initial()]}));
+      if(o.problem.setup?.scheduleId){const sch=runLibrary.schedules?.find(s=>s.id===o.problem.setup.scheduleId);if(!sch)throw Error('문제 시간표를 찾을 수 없습니다: '+o.problem.setup.scheduleId);loadTimetable(sch.timetable,sch.relative);}
       o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
      if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
      if(o.kind==='branch'){const said=String(o.branch.text||o.branch.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||o.branch.label;announce('branch','상황 변경 · '+said,'상황 변경 · '+o.branch.label);again=true;}
@@ -84,7 +87,7 @@ function create(host){
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
  function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}
- return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,snapshot:()=>({session,history,users,revision,notice,logs})};
+ return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,reservedNumbers:()=>active(session)?(problem(current())?.setup?.trains||[]).map(t=>t.number):[],snapshot:()=>({session,history,users,revision,notice,logs})};
 }
 function validateCheckpoint(d,scripts){if(!d||!Number.isInteger(d.sequence)||d.sequence<0||!Number.isInteger(d.revision)||d.revision<0||F.validate(d.library,{scripts,drafts:true}).length||d.runLibrary&&F.validate(d.runLibrary,{scripts,drafts:true}).length||!Array.isArray(d.users)||d.users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'||!['교수','교육생'].includes(u.role))||!Array.isArray(d.history)||d.history.some(h=>!h||!Array.isArray(h.rows)||!Number.isFinite(h.got)||!Number.isFinite(h.full))||!Array.isArray(d.events)||!Number.isInteger(d.sequence)||!Number.isInteger(d.revision))throw Error('Invalid FTS checkpoint');if(d.session){const s=d.session;if(!d.runLibrary||!Array.isArray(s.items)||!Number.isInteger(s.current)||s.current<0||s.current>s.items.length||!Number.isFinite(s.startedAt)||!s.manual||s.items.some(it=>!d.runLibrary.problems.some(p=>p.id===it.problem)||!d.runLibrary.situations.some(x=>x.id===it.situation)||!Number.isInteger(it.situationIndex)||!Number.isFinite(it.score)||!Array.isArray(it.met)||!Array.isArray(it.deducted)||it.startedAt!==null&&!Number.isFinite(it.startedAt)||it.endedAt!==null&&!Number.isFinite(it.endedAt)||!['대기','진행','완료','시간초과','종료','미실시'].includes(it.status)))throw Error('Invalid FTS session');}}
 module.exports={create,validateCheckpoint};

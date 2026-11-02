@@ -21,7 +21,7 @@ const scriptIds=()=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.lis
 const scriptTitle=id=>[...(root.SimScenarios?.list||[]),...(root.SimEmergency?.list||[]),...(root.SimScheduleScenarios?.list||[])].find(s=>s.id===id)?.title||id;
 function defaults(){
  const limits=Object.fromEntries(scriptIds().map(id=>[id,root.SimAssessment?.limitsFor(id)?.[0]]).filter(([,v])=>v));
- return {...F().seed({scripts:scriptIds(),limits}),schedules:[]};
+ return F().seed({scripts:scriptIds(),limits});
 }
 function persist(){const r=remote({op:'library',library:lib});if(!r.ok){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);alert(r.message);return false;}save(KEY.lib,lib);return true;}
 const activeLibrary=()=>root.SimRemote.snapshot.ftsRunLibrary||lib;
@@ -121,7 +121,7 @@ function pEditor(){
   branch:`<label class="fts-wide">상황 변경 JSON<textarea id="pfJson" rows="5" placeholder='{"label":"사고조치 지연","text":"원문","drop":["n18"],"communications":[{"id":"v18","label":"조치지연 통보","text":"..."}]}'></textarea></label>`,
   setup:'',trig:''}[tab];
  return `<div class="fts-tabs">${PTABS.map(([k,l])=>`<button type="button" data-ptab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('')}</div>
-${HELP[tab]?`<p class="fts-help">${HELP[tab]}</p>`:''}<div class="fts-edit-row">${extra}${typeRow}<button type="button" class="sched-btn" id="pfAdd">등록</button></div>
+${HELP[tab]?`<p class="fts-help">${HELP[tab]}</p>`:''}${tab==='setup'?`<div class="fts-edit-row"><label>문제 시작 시간표<select id="pSetupSchedule"><option value="">상황 시간표·현재 시간표 유지</option>${opts((lib.schedules||[]).map(s=>[s.id,s.id+' · '+s.name]),p.setup?.scheduleId||'')}</select></label></div>`:''}<div class="fts-edit-row">${extra}${typeRow}<button type="button" class="sched-btn" id="pfAdd">등록</button></div>
 ${pList()}<div class="fts-row-btns"><button type="button" class="sched-btn" id="pfDel">선택삭제</button></div>`;
 }
 function problemForm(){
@@ -143,9 +143,10 @@ const freeId=(prefix,list)=>{let n=list.length+1;while(list.some(x=>x.id===prefi
 function probeErrors(item,where){
  const base={id:'x',subject:F().SUBJECTS[0],name:'x',limit:1,checks:[{condition:{type:'manual',label:'x'}}]};
  const p={...base,...item,objectives:[...(pDraft.objectives||[]),...(item.objectives||[])],communications:[...(pDraft.communications||[]),...(item.communications||[])],reactions:[...(pDraft.reactions||[]),...(item.reactions||[])]};
- return F().validate({problems:[p],situations:[],scenarios:[]}).filter(e=>where.some(w=>e.includes(w))).map(e=>e.replace(/^문제 x /,''));
+ return F().validate({problems:[p],situations:[],scenarios:[],schedules:lib.schedules||[]}).filter(e=>where.some(w=>e.includes(w))).map(e=>e.replace(/^문제 x /,''));
 }
 function bindTabs(){
+ if($('pSetupSchedule'))$('pSetupSchedule').onchange=()=>{pDraft.setup??={};if($('pSetupSchedule').value)pDraft.setup.scheduleId=$('pSetupSchedule').value;else delete pDraft.setup.scheduleId;};
  const redraw=()=>{readProblem();$('pTabs').innerHTML=pEditor();bindTabs();};
  for(const b of doc.querySelectorAll('[data-ptab]'))b.onclick=()=>{readProblem();pTab=b.dataset.ptab;$('pTabs').innerHTML=pEditor();bindTabs();};
  if($('pfType'))$('pfType').onchange=()=>{$('pfFields').innerHTML=editorFields('pf',['phen','setup','react'].includes(pTab)?'phen':'cond',$('pfType').value);};
@@ -190,7 +191,7 @@ PAGES.problems={
   $('pCopy').onclick=()=>{readProblem();pDraft={...structuredClone(pDraft),id:'',name:pDraft.name+' (복사)'};delete pDraft.builtin;pSel=null;go('problems');};
   $('pSave').onclick=()=>{
    const p=readProblem();if(!p.id)p.id=nextId('P-',lib.problems);
-   const probe={problems:[p],situations:[],scenarios:[]},bad=F().validate(probe,{scripts:scriptIds()});if(bad.length){alert(bad.join('\n'));return;}
+   const probe={problems:[p],situations:[],scenarios:[],schedules:lib.schedules||[]},bad=F().validate(probe,{scripts:scriptIds()});if(bad.length){alert(bad.join('\n'));return;}
    confirmBox('문제를 저장하시겠습니까?',()=>{const i=lib.problems.findIndex(x=>x.id===p.id);if(i>=0)lib.problems[i]=structuredClone(p);else lib.problems.push(structuredClone(p));persist();pSel=p.id;go('problems');alert('저장되었습니다.');});
   };
   $('pDelete').onclick=()=>{if(!pSel){alert('삭제할 문제를 선택하세요.');return;}const used=lib.situations.filter(s=>s.problems.includes(pSel));if(used.length){alert(`상황 ${used.map(s=>s.name).join(', ')}에서 쓰고 있어 삭제할 수 없습니다.`);return;}confirmBox('선택한 문제를 삭제하시겠습니까?',()=>{lib.problems=lib.problems.filter(p=>p.id!==pSel);persist();pSel=null;pDraft=blankProblem();go('problems');});};
@@ -216,7 +217,7 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
 <div class="fts-cap">• 열차스케줄ID 생성 조건</div><div class="fts-grid2"><label>스케줄ID<input id="schId" maxlength="3" placeholder="숫자3자리(사용자입력)"></label><label>구간<select id="schSection">${opts(SECTIONS)}</select></label><label>스케줄명<input id="schName"></label></div>
 <div class="fts-row-btns wrap"><button type="button" class="sched-btn" id="schCopy">열차스케줄 ID간 열차 복사</button><button type="button" class="sched-btn danger" id="schDelete">열차스케줄 ID 삭제</button><button type="button" class="sched-btn" id="schApplySit">선택 시나리오 상황에 적용</button><button type="button" class="sched-btn primary" id="schApply">편집 적용</button></div>
 <p class="idm-note">편집 적용: 수정 모드는 지금 온라인 시간표(MMI·T/G에서 고친 것)를 선택한 스케줄ID에 저장하고, 생성 모드는 새 스케줄ID로 저장합니다.</p></div>
-<div><div class="fts-cap">• 상행 열차 정보</div>${table('schUp',['열차번호','시발역','종착역','시발시간','종착시간'],trainRows(sch,'up'),{selected:schTrain})}
+<div>${sch?.relative?`<p class="idm-note">교육 시작 시각을 기준으로 적용하는 교육용 생성 시간표입니다. 대본에 없는 시각은 실습용으로 생성했습니다.</p>`:''}<div class="fts-cap">• 상행 열차 정보</div>${table('schUp',['열차번호','시발역','종착역','시발시간','종착시간'],trainRows(sch,'up'),{selected:schTrain})}
 <div class="fts-cap">• 하행 열차 정보</div>${table('schDown',['열차번호','시발역','종착역','시발시간','종착시간'],trainRows(sch,'down'),{selected:schTrain})}
 <div class="fts-row-btns"><button type="button" class="sched-btn" id="schEdit">열차스케줄 편집</button><button type="button" class="sched-btn danger" id="schTrainDel">열차스케줄 삭제</button></div><p class="idm-note">열차스케줄 편집: 선택한 스케줄ID의 열차를 온라인 시간표로 불러옵니다. MMI·T/G에서 고친 뒤 [편집 적용]으로 저장하세요.</p></div></div>`;
  },
@@ -237,22 +238,22 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
    const mode=doc.querySelector('input[name="schMode"]:checked').value,model=D().getModel(),snap={serviceDate:model.serviceDate,trains:structuredClone(model.trains)};
    if(mode==='create'){const n=$('schId').value.trim();if(!/^\d{3}$/.test(n)){alert('스케줄ID는 숫자 3자리로 입력하세요.');return;}const id='01'+n;if(schedules().some(x=>x.id===id)){alert(`${id}는 이미 있는 스케줄ID입니다.`);return;}
     schedules().push({id,name:$('schName').value.trim()||'스케줄_'+id,section:$('schSection').value,author:'MMI-1',createdAt:stamp(),timetable:snap});schSel=id;}
-   else{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('수정할 스케줄ID를 선택하세요.');return;}sch.timetable=snap;sch.createdAt=stamp();}
+   else{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('수정할 스케줄ID를 선택하세요.');return;}sch.timetable=snap;sch.createdAt=stamp();sch.relative=false;delete sch.generated;delete sch.timing;delete sch.builtin;}
    persist();go('situations');alert(`${schSel} 열차 스케줄에 ${snap.trains.length}개 열차를 저장했습니다.`);
   };
-  $('schDelete').onclick=()=>{const used=lib.situations.filter(x=>x.scheduleId===schSel);if(used.length){alert('상황에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
+  $('schDelete').onclick=()=>{const used=[...lib.situations.filter(x=>x.scheduleId===schSel),...lib.problems.filter(x=>x.setup?.scheduleId===schSel)];if(used.length){alert('상황·문제에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
   $('schApplySit').onclick=()=>{if(!sSel||!schSel){alert('상황과 스케줄ID를 모두 선택하세요.');return;}const s=lib.situations.find(x=>x.id===sSel);s.scheduleId=schSel;persist();go('situations');};
   $('schCopy').onclick=()=>{const sch=schedules().find(x=>x.id===schSel),t=sch?.timetable?.trains.find(x=>x.id===schTrain),targets=schedules().filter(x=>x.id!==schSel);if(!t){alert('복사할 열차를 선택하세요.');return;}if(!targets.length){alert('대상 스케줄ID를 먼저 생성하세요.');return;}
    if(!M().windowIds().includes('ftsCopy'))M().createWindow('ftsCopy',{container:panel(),title:'스케줄 간 열차 복사',x:180,y:80,width:470,body:'<div class="fts-picker" id="ftsCopyBody"></div>'});
    $('ftsCopyBody').innerHTML=`<p><b>${esc(t.id)}</b> · ${esc(sch.name)}</p><label class="fts-wide">대상 스케줄<select id="ftsCopyTarget">${opts(targets.map(x=>[x.id,x.id+' · '+x.name]))}</select></label><div class="fts-row-btns end"><button type="button" class="sched-btn" id="ftsCopyClose">닫기</button><button type="button" class="sched-btn primary" id="ftsCopyApply">복사</button></div>`;
-   $('ftsCopyClose').onclick=()=>M().close('ftsCopy');$('ftsCopyApply').onclick=()=>{const target=schedules().find(x=>x.id===$('ftsCopyTarget').value);if(target.timetable.trains.some(x=>x.id===t.id)){alert('대상에 같은 열차번호가 있습니다.');return;}target.timetable.trains.push(structuredClone(t));if(persist()){M().close('ftsCopy');alert(`${t.id} 열차를 ${target.id}에 복사했습니다.`);}};M().open('ftsCopy');
+   $('ftsCopyClose').onclick=()=>M().close('ftsCopy');$('ftsCopyApply').onclick=()=>{const target=schedules().find(x=>x.id===$('ftsCopyTarget').value);if(target.timetable.trains.some(x=>x.id===t.id)){alert('대상에 같은 열차번호가 있습니다.');return;}const copy=F().scheduleTable({timetable:{serviceDate:target.timetable.serviceDate,trains:[t]},relative:!!sch.relative!==!!target.relative},(sch.relative?1:-1)*D().clock(),target.timetable.serviceDate).trains[0];target.timetable.trains.push(copy);delete target.builtin;if(persist()){M().close('ftsCopy');alert(`${t.id} 열차를 ${target.id}에 복사했습니다.`);}};M().open('ftsCopy');
   };
-  $('schTrainDel').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch||!schTrain){alert('삭제할 열차를 선택하세요.');return;}confirmBox(`${schTrain} 열차를 ${sch.id}에서 삭제하시겠습니까?`,()=>{sch.timetable.trains=sch.timetable.trains.filter(t=>t.id!==schTrain);persist();schTrain=null;go('situations');});};
+  $('schTrainDel').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch||!schTrain){alert('삭제할 열차를 선택하세요.');return;}confirmBox(`${schTrain} 열차를 ${sch.id}에서 삭제하시겠습니까?`,()=>{sch.timetable.trains=sch.timetable.trains.filter(t=>t.id!==schTrain);delete sch.builtin;persist();schTrain=null;go('situations');});};
   $('schEdit').onclick=()=>{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('스케줄ID를 선택하세요.');return;}loadSchedule(sch,true);};
  }
 };
 function loadSchedule(sch,announce){
- const r=T().import(D().getModel(),sch.timetable);D().render();
+ const model=D().getModel(),table=F().scheduleTable(sch,D().clock(),model.serviceDate),r=T().import(model,table);D().render();
  if(announce)alert(r.ok?`${sch.id} 열차 스케줄을 온라인 시간표로 불러왔습니다. (${sch.timetable.trains.length}개 열차)`:r.message);
  return r;
 }

@@ -1,7 +1,7 @@
 {
   "name": "orpheia-ctc-lab",
   "productName": "ORPHEIA CTC LAB",
-  "version": "0.38.2",
+  "version": "0.39.0",
   "description": "오르페이아 철도관제 LS·MMI 데스크톱 실습",
   "private": true,
   "author": "CTC LAB",
@@ -35,6 +35,7 @@
       "desktop/resources/**",
       "simulator/**",
       "!simulator/**/*.test.*",
+      "!simulator/**/*.test-fixture.*",
       "!simulator/e2e/**",
       "!simulator/engine/route-conflict-audit.cjs",
       "package.json",

@@ -20,7 +20,7 @@ test('factory reset clears all training data and both recovery files survive res
   await engine.request({type:'tick',seconds:40});await engine.request({type:'session:persist'});await engine.request({type:'session:persist'});
   assert.equal(Store.read(file+'.bak').fts.library.scenarios[0].id,'SC-RESET');
   const reply=await engine.request({type:'session:reset'});assert.ok(reply.result.ok);assert.equal(reply.snapshot.delta,false);
-  function clean(s){assert.equal(s.clock.paused,true);assert.equal(s.states.anyang.mode,'AUTO');assert.equal(s.states.anyang.clock,0);assert.equal(s.fts.session,null);assert.equal(s.fts.history.length,0);assert.ok(!s.ftsLibrary.scenarios.some(x=>x.id==='SC-RESET'));assert.equal(s.equipment.faults.length,0);assert.equal(s.auto.enabled,false);assert.equal(s.scenario.run,null);assert.ok(Object.values(s.ls.stations).every(st=>Object.values(st.windows).every(rows=>rows.length===0)));assert.equal(s.timetable.trains.length,12);}
+  function clean(s){assert.equal(s.clock.paused,true);assert.equal(s.states.anyang.mode,'AUTO');assert.equal(s.states.anyang.clock,0);assert.equal(s.fts.session,null);assert.equal(s.fts.history.length,0);assert.ok(!s.ftsLibrary.scenarios.some(x=>x.id==='SC-RESET'));assert.equal(s.equipment.faults.length,0);assert.equal(s.auto.enabled,false);assert.equal(s.scenario.run,null);assert.ok(Object.values(s.ls.stations).every(st=>Object.values(st.windows).every(rows=>rows.length===0)));assert.equal(s.timetable.trains.length,0);}
   clean(reply.snapshot);
   for(const name of [file,file+'.bak']){const saved=Store.read(name);assert.ok(!saved.fts.library.scenarios.some(x=>x.id==='SC-RESET'));assert.equal(saved.states.anyang.clock,0);}
   await engine.stop();engine=null;

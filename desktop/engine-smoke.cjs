@@ -8,6 +8,8 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-engine-'));let app;c
  const ls=await app.firstWindow();ls.on('pageerror',e=>errors.push(String(e)));await ls.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());
  const pid=await ls.evaluate(()=>SimRemote.snapshot.pid),renderer=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].webContents.getOSProcessId());assert.notEqual(pid,renderer);
  await ls.evaluate(()=>SimRemote.command({type:'clock',paused:true}));
+ assert.equal(await ls.evaluate(()=>SimRemote.snapshot.timetable.trains.length),0);
+ await ls.evaluate(table=>SimRemote.command({type:'timetable',method:'import',args:[table]}),require('../simulator/engine/sample-timetable.test-fixture.cjs')());
  await ls.evaluate(id=>selectStation(id),'geumcheon');await ls.locator('[data-mode="CCM"]').click();await ls.click('#dialogConfirm');await ls.locator('[data-point-control="51A"]').click();await expect(ls.locator('#actionDialog')).toContainText('SW_51A');await ls.click('#dialogConfirm');await ls.waitForFunction(()=>SimRemote.snapshot.states.geumcheon.points['52']==='R');await expect(ls.locator('[data-switch-connection="52"]')).toHaveAttribute('data-connected','true');
  const t=await ls.evaluate(()=>SimRemote.snapshot.timetable.trains.find(t=>t.direction==='up'&&t.calls.some(c=>c.station==='yongsan')).id);
  let mmi=app.windows().find(p=>p!==ls);await ls.evaluate(()=>SimMMI.open('scenario'));await mmi.selectOption('#scSelect','yongsan-5');await mmi.fill('#scTrain',t);await mmi.click('#scStart');

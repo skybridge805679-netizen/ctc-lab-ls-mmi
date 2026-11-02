@@ -156,7 +156,7 @@ function checkActive(p,w,errors){
   (st.reset||[]).forEach((x,i)=>checkStation(x,`${where} 초기화 ${i+1}`,errors));
   for(const k of ['reset','modes','routes','approach','trains','clear'])if(st[k]!==undefined&&(!Array.isArray(st[k])||st[k].length>200))errors.push(`${where}: ${k}는 배열`);
   if(st.clearTimetable!==undefined&&typeof st.clearTimetable!=='boolean')errors.push(`${where}: clearTimetable은 true/false`);
-  if(st.baseTimetable!==undefined&&typeof st.baseTimetable!=='boolean')errors.push(`${where}: baseTimetable은 true/false`);
+  if(st.scheduleId!==undefined&&typeof st.scheduleId!=='string')errors.push(`${where}: scheduleId는 스케줄 ID 문자열`);
   (st.modes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'mode'},`${where} 모드 ${i+1}`,errors));
   (st.routes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'route'},`${where} 진로 ${i+1}`,errors));
   (st.approach||[]).forEach((x,i)=>checkPhenomenon({...x,type:'approach'},`${where} 접근열차 ${i+1}`,errors));
@@ -190,7 +190,8 @@ function validate(lib,{scripts=[],drafts=false}={}){
   if(Array.isArray(p.phenomena))p.phenomena.forEach((k,i)=>checkPhenomenon(k,`${w} 현상 ${i+1}`,errors));
  }
  const timetable=(t,w)=>{const date=t?.serviceDate,dateTime=Date.parse(date+'T00:00:00Z');if(!Number.isFinite(dateTime)||new Date(dateTime).toISOString().slice(0,10)!==date)errors.push(`${w}: 운행일을 확인하세요`);const T=node?require('./timetable'):root.SimTimetable;if(!object(t)||!Array.isArray(t.trains)||t.trains.length>20000||!/^\d{4}-\d{2}-\d{2}$/.test(t.serviceDate||'')||t.trains.some(x=>!T.valid(x))||new Set(t.trains.map(x=>x?.id)).size!==t.trains.length)errors.push(`${w}: 유효한 운행일·중복 없는 열차 스케줄이 필요합니다`);};
- if(Array.isArray(lib.schedules))for(const s of lib.schedules)if(object(s))timetable(s.timetable,`스케줄 ${s.id}`);
+ if(Array.isArray(lib.schedules))for(const s of lib.schedules)if(object(s)){timetable(s.timetable,`스케줄 ${s.id}`);if(s.relative!==undefined&&typeof s.relative!=='boolean')errors.push(`스케줄 ${s.id}: relative는 true/false`);}
+ for(const p of lib.problems)if(object(p)&&p.setup?.scheduleId&&!ids.get('schedules')?.has(p.setup.scheduleId))errors.push(`문제 ${p.id}: 없는 스케줄 ${p.setup.scheduleId}`);
  for(const s of lib.situations){if(!object(s))continue;const w=`상황 ${s.id}`;if(typeof s.name!=='string'||!s.name.trim())errors.push(`${w}: 상황명칭이 없습니다`);if(!Array.isArray(s.problems)||!drafts&&!s.problems.length)errors.push(`${w}: 문제가 없습니다`);else for(const id of s.problems)if(!ids.get('problems').has(id))errors.push(`${w}: 없는 문제 ${id}`);if(s.limit!==undefined&&!finite(s.limit))errors.push(`${w}: 제한시간은 0~86400초`);if(s.timetable!=null)timetable(s.timetable,w);}
  for(const s of lib.scenarios){if(!object(s))continue;const w=`시나리오 ${s.id}`;if(typeof s.name!=='string'||!s.name.trim())errors.push(`${w}: 시나리오 이름이 없습니다`);if(!Array.isArray(s.situations)||!drafts&&!s.situations.length)errors.push(`${w}: 상황이 없습니다`);else for(const id of s.situations)if(!ids.get('situations').has(id))errors.push(`${w}: 없는 상황 ${id}`);}
  return errors;
@@ -313,7 +314,7 @@ function seed({scripts=[],limits={}}={}){
  // 상황은 교육생에게 보이는 사실만: 해소 방법(해소역 · +2분 · 진로 변경)은 조치사항에 둔다 (조치사항 표시를 끄면 보이지 않음)
  const SITUATION={'sch-conflict':['임시열차 B0000 운행 요청이 들어와 시간표에 추가되었습니다. 경합을 확인하고 해소하시오.','온라인 열차그래프에서 경합 구간을 찾고, 경합지에서 가장 가까운 앞쪽 해소역(용산·영등포·금천구청·안양·군포·의왕)에서 B0000의 시각을 +2분 늦추고 도착·출발진로를 바꿔 해소합니다. 3차 경합이 생기지 않게 하고 최소 운전시격은 120초입니다.'],
   'sch-create':['지금 시간표에 새 열차를 만들어야 합니다. 열차를 생성하고 편집적용하시오.','열차스케줄 → 패턴을 불러와 열차를 생성 → 편집적용']};
- const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');x.setup={baseTimetable:true};return id;});
+ const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');x.setup={};return id;});
 
  const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
@@ -328,18 +329,32 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
- for(const x of [...P,...S,...SC])x.builtin=BUILTIN+'#'+stamp(x);
- return {version:VERSION,problems:P,situations:S,scenarios:SC};
+ const schedules=[];
+ // A problem may replace the timetable explicitly; follow-up edits of C4201 keep the work done before them.
+ const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict',...active.map(p=>p.id)]);
+ for(const p of P)if(starters.has(p.id)){
+  const id=String(90001+schedules.length);p.setup={...p.setup,scheduleId:id};delete p.setup.clearTimetable;delete p.setup.baseTimetable;
+  schedules.push({id,name:p.name+' · 교육 시간표',relative:true,generated:true,timing:'대본 열번·방향·초기 위치에 맞춘 교육용 생성 시각 (+10분, 열차 간격 3분)',timetable:B.timetableFor(p)});
+ }
+ for(const sit of S){const first=P.find(p=>p.id===sit.problems[0]);sit.scheduleId=first?.setup?.scheduleId||'';}
+ for(const x of [...P,...S,...SC,...schedules])x.builtin=BUILTIN+'#'+stamp(x);
+ return {version:VERSION,problems:P,situations:S,scenarios:SC,schedules};
 }
 // 저장된 라이브러리의 내장 항목을 지금 앱의 내장 항목으로 갱신한다. 사용자 항목은 건드리지 않는다.
 function stamp(x){const j=JSON.stringify(x);let h=2166136261;for(let i=0;i<j.length;i++){h^=j.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(36);}
 function upgrade(lib,defaults){
  if(!object(lib)||!object(defaults))return lib;const next=structuredClone(lib);let changed=0;
- for(const kind of ['problems','situations','scenarios']){const list=next[kind]=Array.isArray(next[kind])?next[kind]:[];
-  for(const d of defaults[kind]||[]){const i=list.findIndex(x=>x?.id===d.id);if(i<0){list.push(structuredClone(d));changed++;}else if(list[i].builtin!==d.builtin){list[i]=structuredClone(d);changed++;}}}
+ for(const kind of ['problems','situations','scenarios','schedules']){const list=next[kind]=Array.isArray(next[kind])?next[kind]:[];
+  for(const d of defaults[kind]||[]){const i=list.findIndex(x=>x?.id===d.id);if(i<0){list.push(structuredClone(d));changed++;}else if(kind==='schedules'&&!list[i].builtin){continue;}else if(list[i].builtin!==d.builtin){list[i]=structuredClone(d);changed++;}}}
  return changed?next:lib;
 }
 
-const api={VERSION,BUILTIN,upgrade,SUBJECTS,CONDITIONS,PHENOMENA,test,describe,validate,view,createSession,advance,endCurrent,finish,grade,summary,seed,stationIds,setupActions};
+// Pure conversion: browser timetable.initial() can be a live view, so never use it for templates.
+function scheduleTable(schedule,now=0,serviceDate){
+ const table=structuredClone(schedule.timetable);
+ if(schedule.relative){table.serviceDate=serviceDate;const shift=Math.round(now);for(const train of table.trains)for(const calls of new Set([train.calls,train.plan].filter(Boolean)))for(const call of calls){call.arrival+=shift;call.departure+=shift;}}
+ return table;
+}
+const api={scheduleTable,VERSION,BUILTIN,upgrade,SUBJECTS,CONDITIONS,PHENOMENA,test,describe,validate,view,createSession,advance,endCurrent,finish,grade,summary,seed,stationIds,setupActions};
 if(node)module.exports=api;else root.SimFTS=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

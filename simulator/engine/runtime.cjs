@@ -23,7 +23,7 @@ function create(){
  root.SimAutoUI=require('./auto-controller.cjs').create(root,host);
  host.moved=m=>fts.event({type:'trainRun',...m,ok:true,source:'motion'});
  const F=require('./fts'),FTS=require('./fts-controller.cjs'),scripts=[...root.SimScenarios.list,...root.SimEmergency.list,...root.SimScheduleScenarios.list].map(s=>s.id);
- const fts=FTS.create({scripts,defaults:()=>({...F.seed({scripts,limits:Object.fromEntries(scripts.map(id=>[id,require('./assessment').limitsFor(id)[0]]).filter(([,v])=>v))}),schedules:[]}),context:()=>({states,ls,model,now:now()}),pattern:Timetable.pattern,
+ const fts=FTS.create({scripts,defaults:()=>F.seed({scripts,limits:Object.fromEntries(scripts.map(id=>[id,require('./assessment').limitsFor(id)[0]]).filter(([,v])=>v))}),context:()=>({states,ls,model,now:now()}),pattern:Timetable.pattern,
   apply:a=>{const r=execute({...a,fts:true});if(['timetable','scenario:start'].includes(a.type))tableDirty=true;return r;},
   alarm:text=>emit('alarm',{text,state:'교육 현상',level:'W',station:''}),
   clearAlarms:()=>emit('alarmClear',{}),
@@ -33,6 +33,7 @@ function create(){
   startScript:(id,number,key,ui)=>{const sc=root.SimScenarios.list.find(s=>s.id===id);if(!number&&sc)number=root.SimScenarios.candidates(sc,model)[0];const r=root.SimScenarioUI.start(id,number,ui);if(r.ok){const run=root.SimScenarioUI.snapshot().run;run.assessmentKey=key;tableDirty=true;}return r;},
   scriptStatus:id=>{const r=root.SimScenarioUI.snapshot().run;return r?.sc.id===id?{done:r.done.filter(Boolean).length,total:r.done.length,complete:!!r.passed}:{done:0,total:0,complete:false};}
  });
+ host.reservedNumbers=()=>fts.reservedNumbers();
  function refresh(){root.SimLine.refresh(states,ls);for(const station of Object.keys(states))checkDuplicates(station);}
  function updateAssessment(){const task=assessment.snapshot(now()).task;if(task&&Number.isInteger(task.practiceIndex)&&['running','expired'].includes(task.status)){const s=states['underground-seoul'],p=require('./practice').tasks[task.practiceIndex];if(p?.check(s.events,s))assessment.finishTask(now(),'completed',task.key);}
  const run=root.SimScenarioUI.snapshot().run;if(run?.passed&&run.assessmentKey)assessment.finishTask(now(),'completed',run.assessmentKey);for(const e of assessment.update(now()))emit('log',{channel:'event',text:e.text,level:'W'});}

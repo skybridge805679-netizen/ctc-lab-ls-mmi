@@ -71,7 +71,7 @@ function render(st,def,core,model,neighbours={}){
  const prepared=presets.prepare(st,def,sceneOf(st),wingOf(st,def),neighbours.preset),{data,wing}=prepared;def=prepared.def;
  if(prepared.corridor)model={...model,routes:{},approach:{},scenarioMotions:[]};
  const visibleWindows=presets.windows(trainWindows.data[st.id]||[],def,data.cells,prepared.split,prepared.corridor,prepared.slide);
- const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 노란 화살표 자리만큼 위를 비운다
+ const L=layout(def,wing,neighbours.aspect,prepared.corridor?150:108)   // 역판·열번창 위 여백을 유지한다
 ,T=L.pt;
  const plateGap=prepared.corridor?128:94;
  const edgePorts=seams.ports(st,def,data);
@@ -402,14 +402,14 @@ function render(st,def,core,model,neighbours={}){
  }
  for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
  // 원본 LS의 노란 화살표: 위 글자는 방향(지하청량리/수원), 아래 글자는 눌렀을 때 열리는 이웃 화면.
- const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?12:WIDTH-12,dx=L?1:-1,body=12,head=26,len=140,cy=28;
+ const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?3:157,dx=L?1:-1,body=12,head=26,len=150,cy=28;
   const pts=[[0,0],[head,-head/2],[head,-body/2],[len,-body/2],[len,body/2],[head,body/2],[head,head/2]].map(([px,py])=>[x0+dx*px,cy+py].join(',')).join(' '),tx=x0+dx*(head+(len-head)/2);
-  return `<g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g>`;};
+  return `<svg class="ls-nav-arrow" viewBox="0 0 160 56" aria-label="${esc(view.name)} 화면"><g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g></svg>`;};
  const around=presets.neighbours?.(neighbours.preset||st.id)||{};
- plates+=arrow(neighbours.left===undefined?around.left:neighbours.left,'left')+arrow(neighbours.right===undefined?around.right:neighbours.right,'right');
+ const navigation={left:arrow(neighbours.left===undefined?around.left:neighbours.left,'left'),right:arrow(neighbours.right===undefined?around.right:neighbours.right,'right')};
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.
  const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
- return {width:WIDTH,height:L.H,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ return {width:WIDTH,height:L.H,navigation,svg:`${seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routes}${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;

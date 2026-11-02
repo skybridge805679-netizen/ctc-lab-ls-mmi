@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """Oral reference 1/7/13/19: real berth beats plan, manual trains, shared properties and unknown engine positions."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
@@ -12,7 +13,7 @@ server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(ROOT)));T
 try:
  with sync_playwright() as p:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page(viewport={'width':1920,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-  page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn')
+  page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');insert_sample_timetable(page);page.click('#pauseBtn')
   page.evaluate("""()=>{for(const [slot,number,direction]of [['B950T','K1131','up'],['F1T','Z123','down']])SimMMI.run({type:'lsOperation',operation:{op:'insert',station:'guro',slot,number,direction},source:'LS'});SimMMI.open('trainPositions');}""")
   row=page.locator('#trainPositionsBody tr').filter(has=page.locator('td',has_text='Z123'));expect(row).to_contain_text('수동 등록');expect(row).to_contain_text('F1T');expect(row).to_contain_text('하행')
   scheduled=page.locator('#trainPositionsBody tr').filter(has=page.locator('td',has_text='K1131'));expect(scheduled).to_contain_text('구로');expect(scheduled).to_contain_text('B950T');expect(scheduled).to_contain_text('열번 표시')

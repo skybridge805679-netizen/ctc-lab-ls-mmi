@@ -6,7 +6,7 @@ const make=()=>A.create({core:Core,stations:N.stations});
 const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',st,slot,tr.id]),depart:(st,slot,tr)=>numbersLog.push(['depart',st,slot,tr.id]),remove:(st,tr)=>numbersLog.push(['remove',st,tr.id])};
 
 // 1) the sample timetable runs through every controlled station without leaving anything behind
-{const model=T.initial(),states=fresh(),a=make();const kinds={};
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();const kinds={};
  for(let t=0;t<7200;t+=5){tick(states,5);for(const e of a.run({states,model,numbers})){kinds[e.type]=(kinds[e.type]||0)+1;}}
  assert.strictEqual(kinds.arrived+kinds.terminated>0,true);
  const calls=model.trains.flatMap(t=>t.calls.filter(c=>N.catalog[c.station].controlled));
@@ -16,25 +16,25 @@ const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',
  assert.strictEqual(a.troubles().length,0,'all troubles resolved');}
 
 // 2) a station that is not in AUTO at the request time gets no request; switching to AUTO makes the controller continue
-{const model=T.initial(),states=fresh(),a=make();
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();
  const st='cheongnyangni';Core.forStation(st).dispatch(states[st],{type:'mode',value:'CCM',source:'x'});
  for(let t=0;t<20;t+=5){tick(states,5);a.run({states,model});}
  assert.strictEqual(Object.keys(states[st].routes).length,0,'CCM: no automatic route');
  // back to AUTO while K1131 still waits at the platform (its departure time passed): it gets its departure route now
  tick(states,40);Core.forStation(st).dispatch(states[st],{type:'mode',value:'AUTO',source:'x'});
  assert.ok(a.run({states,model}).some(e=>e.type==='route'&&e.station===st&&e.train==='K1131'),'a waiting train is routed when AUTO resumes');}
-{const model=T.initial(),states=fresh(),a=make(),st='cheongnyangni';
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make(),st='cheongnyangni';
  Core.forStation(st).dispatch(states[st],{type:'mode',value:'CCM',source:'x'});tick(states,200);a.run({states,model});
  Core.forStation(st).dispatch(states[st],{type:'mode',value:'AUTO',source:'x'});
  assert.ok(!a.run({states,model}).some(e=>e.type==='route'&&e.station===st&&e.train==='K1131'),'a train whose time is long gone is not routed late');}
-{const model=T.initial(),states=fresh(),a=make();const st='cheongnyangni';
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();const st='cheongnyangni';
  // the first train (시발 at 청량리) departs at 30 s: its departure route is requested 60 s before -> already at t=0
  const ev=a.run({states,model,numbers});
  assert.ok(ev.some(e=>e.type==='route'&&e.station===st&&e.train==='K1131'),'AUTO requests the departure route of K1131');
  assert.ok(states[st].routes['4A-B002T']);}
 
 // 3) a route that cannot be set becomes a trouble and is retried until the condition clears
-{const model=T.initial(),states=fresh(),a=make();
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();
  const st='seoul',c=Core.forStation(st);
  // Block the departure route of K1131 at 서울 with a route sharing its eastbound track.
  c.dispatch(states[st],{type:'mode',value:'CCM',source:'x'});const blocker='4B-B902T';const r=c.dispatch(states[st],{type:'route',id:blocker,source:'x'});assert.ok(r.ok,r.message);c.dispatch(states[st],{type:'mode',value:'AUTO',source:'x'});
@@ -48,26 +48,26 @@ const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',
  assert.ok(resolved||a.troubles().length===0,'trouble cleared once the condition was gone');}
 
 // 4) numbers follow the train: place on arrival, move on departure, remove after leaving
-{numbersLog.length=0;const model=T.initial(),states=fresh(),a=make();
+{numbersLog.length=0;const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();
  for(let t=0;t<400;t+=5){tick(states,5);a.run({states,model,numbers});}
  const mine=numbersLog.filter(x=>x[3]==='K1131'||x[2]==='K1131');
  assert.ok(mine.some(x=>x[0]==='depart')&&mine.some(x=>x[0]==='remove'),JSON.stringify(mine.slice(0,6)));}
 
 // 5) the timetable is user data: other numbers, edited times, cancelled calls and partial trains all work
-{const model=T.initial();model.trains[0].id='Z9001';model.trains[0].calls.forEach(c=>{c.arrival+=900;c.departure+=900;});model.trains[1].cancelled=true;
+{const model=require('./sample-timetable.test-fixture.cjs')();model.trains[0].id='Z9001';model.trains[0].calls.forEach(c=>{c.arrival+=900;c.departure+=900;});model.trains[1].cancelled=true;
  const states=fresh(),a=make();let routes=0;
  for(let t=0;t<9000;t+=5){tick(states,5);routes+=a.run({states,model}).filter(e=>e.type==='route').length;}
  assert.ok(routes>0);assert.ok(Object.values(states).every(s=>Object.keys(s.routes).length===0));
  assert.strictEqual(a.stageOf(model.trains[1],model.trains[1].calls[0]),0,'cancelled train is never controlled');}
 
 // 6) +10초/+90초 jumps catch up in one go
-{const model=T.initial(),states=fresh(),a=make();tick(states,600);a.run({states,model});
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();tick(states,600);a.run({states,model});
  assert.ok(Object.values(states).every(s=>!Object.values(s.routes).some(r=>r.occupied)||true));}
 
 // 7) 자동제어 조건 ④~⑦ (실기3 3.4 마.): a failed signal / point, a TTB route and an ANTI route keep the request back as a trouble until it clears
 {const st='cheongnyangni',route='4A-B002T',c=Core.forStation(st);
  const attempt=(setup,undo,word)=>{
-  const model=T.initial(),states=fresh(),a=make();setup(states[st]);
+  const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make();setup(states[st]);
   const ev=a.run({states,model});
   assert.ok(!states[st].routes[route],word+': route not set');
   const tr=ev.find(e=>e.type==='trouble'&&e.station===st);assert.ok(tr&&tr.reason.includes(word),word+' trouble '+JSON.stringify(tr));
@@ -88,7 +88,7 @@ const numbersLog=[];const numbers={place:(st,slot,tr)=>numbersLog.push(['place',
 
 // 8) 신호 대기 지연: a blocked arrival route delays the train; the delay is recorded, and only pushed into the timetable when asked
 for(const reflect of [false,true]){
- const model=T.initial(),states=fresh(),a=make(),st='seoul',c=Core.forStation(st);
+ const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make(),st='seoul',c=Core.forStation(st);
  const train=model.trains.find(t=>t.id==='K1131'),i=train.calls.findIndex(x=>x.station===st),planned=structuredClone(train.calls);
  const route=(train.calls[i].arrivalRoute||'').replace('_','-');
  c.dispatch(states[st],{type:'fault',kind:'signal',id:c.routes[route].signal,on:true});
@@ -104,7 +104,7 @@ for(const reflect of [false,true]){
 }
 
 // 9) 선로망: a train leaving a station is handed to the next station on its trunk (the exit circuit is the departure route's destination)
-{const model=T.initial(),states=fresh(),a=make(),L=require('./line.js'),W=require('./train-windows.js'),hand=[];
+{const model=require('./sample-timetable.test-fixture.cjs')(),states=fresh(),a=make(),L=require('./line.js'),W=require('./train-windows.js'),hand=[];
  const nums={place(){},depart(){},remove(){},handoff:(st,tr,dest)=>{const h=dest&&L.handoff(st,dest,id=>(W.data||W)[id].map(x=>x.slot));if(h)hand.push([st,tr.id,h.station,h.slot]);}};
  for(let t=0;t<7200;t+=5){tick(states,5);a.run({states,model,numbers:nums});}
  assert.ok(hand.length>20,'hand-offs happened '+hand.length);

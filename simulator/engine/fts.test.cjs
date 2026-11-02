@@ -16,7 +16,7 @@ test('validation names what is wrong in a hand- or AI-made library',()=>{
  for(const s of ['과목은','문제명칭','제한시간','없는 진로 9Z-1T','알 수 없는 조건 종류 teleport','없는 역 nowhere','없는 문제 Y','없는 상황 Q'])assert.match(e,new RegExp(s.replace(/[()]/g,'\\$&')));
 });
 test('a session runs problems in order: trigger, phenomena, grading, time-out and 문제종료',()=>{
- const l=lib(),model=T.initial(),ctx={model,states:{},ls:{stations:{}},events:[],ui:{},manual:{}};
+ const l=lib(),model=require('./sample-timetable.test-fixture.cjs')(),ctx={model,states:{},ls:{stations:{}},events:[],ui:{},manual:{}};
  const s=F.createSession(l,'SC-01',{professor:'박교수',student:'tester',startedAt:0});
  assert.equal(s.items[0].problem,'P-C4201-01');
  let out=F.advance(l,s,()=>ctx,0);assert.equal(out[0].kind,'activate');assert.equal(s.items[0].status,'진행');
@@ -35,7 +35,7 @@ test('a session runs problems in order: trigger, phenomena, grading, time-out an
  const sum=F.summary(l,s);assert.equal(sum.rows.length,s.items.length);assert.ok(sum.got>=200);
 });
 test('conditions read LS, station state, events, schedule and manual marks',()=>{
- const model=T.initial(),ctx={model,states:{uiwang:{mode:'CCM',routes:{'2A-6T':{}},signals:{'3A':'STOP'},points:{'54':'R'}}},ls:{stations:{uiwang:{windows:{'B1011T':[{number:'K0651'}]}}}},events:[{type:'stop',station:'uiwang',id:'2B',ok:true}],ui:{windows:['graph'],graphTrain:'K1131'},manual:{'구술':true}};
+ const model=require('./sample-timetable.test-fixture.cjs')(),ctx={model,states:{uiwang:{mode:'CCM',routes:{'2A-6T':{}},signals:{'3A':'STOP'},points:{'54':'R'}}},ls:{stations:{uiwang:{windows:{'B1011T':[{number:'K0651'}]}}}},events:[{type:'stop',station:'uiwang',id:'2B',ok:true}],ui:{windows:['graph'],graphTrain:'K1131'},manual:{'구술':true}};
  const yes=[{type:'mode',station:'uiwang',value:'CCM'},{type:'route',station:'uiwang',route:'2A-6T'},{type:'signalStop',station:'uiwang',signal:'3A'},{type:'point',station:'uiwang',point:'54',value:'R'},{type:'trainAt',number:'K0651',station:'uiwang'},{type:'trainGone',number:'K9999'},{type:'trainExists',train:'K1131',from:'cheongnyangni',to:'suwon'},{type:'event',eventType:'stop',station:'uiwang',id:'2B'},{type:'graphTrain',train:'K1131'},{type:'manual',label:'구술'},{type:'schedule',train:'K1131',station:'jegidong',field:'dwell',value:30}];
  for(const c of yes)assert.ok(F.test(c,ctx),F.describe(c));
  assert.ok(!F.test({type:'route',station:'uiwang',route:'2B-4T'},ctx));

@@ -13,9 +13,14 @@ body.app-ls{display:flex;flex-direction:column;overflow:hidden;min-width:0;backg
 body.app-ls .ls-viewport>main{flex:1;min-height:0;overflow:auto;padding:0;margin:0;max-width:none;width:100%}
 .ls-panel{height:100%;min-height:420px;display:flex;flex-direction:row;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent}
 .ls-panel .ls-display{flex:1 1 0;min-width:0;min-height:0;margin:0;border-radius:0;display:flex;flex-direction:column}
-.ls-display .fidelity-note{flex:none;padding:3px 12px;font-size:11px}
 .ls-display .ls-stage{flex:1;min-height:0;padding:8px 0 0;display:flex;flex-direction:column;overflow:hidden}
-.ls-display .ls-head{padding:0 20px;flex:none;margin-bottom:6px;gap:8px 16px}
+.ls-display .ls-head{padding:0 12px;flex:none;display:grid;grid-template-columns:150px minmax(0,1fr) 150px;align-items:center;height:56px;margin-bottom:6px;gap:0 12px}
+.ls-controls{display:flex;align-items:center;justify-content:center;gap:16px;min-width:0}
+.ls-nav{width:150px;height:56px}.ls-nav-arrow{display:block;width:150px;height:56px;overflow:visible}
+.ls-nav .nb-arrow{cursor:pointer}.ls-nav .nb-arrow-shape{fill:#f4f000;stroke:#7a7400;stroke-width:1}
+.ls-nav .nb-arrow-dir,.ls-nav .nb-arrow-to{fill:#111;font-size:12px;font-weight:700;letter-spacing:.5px}
+.ls-nav .nb-arrow:hover .nb-arrow-shape,.ls-nav .nb-arrow:focus .nb-arrow-shape{fill:#fffb6a}
+.ls-nav .nb-arrow:focus{outline:none}.ls-nav .nb-arrow:focus .nb-arrow-shape{stroke:#173b40;stroke-width:2}
 .ls-display .mode-btn{min-height:44px;font-size:15px}.ls-display .stop-all{min-height:44px;padding:4px 14px;font-size:14px}.ls-display .ls-name{min-height:46px;min-width:170px;padding:2px 18px}.ls-display .ls-name b{font-size:19px;letter-spacing:5px}
 .ls-display .ls-svg{flex:1;min-height:0;min-width:0;width:100%;height:100%}
 /* 하단 역 바로가기 (원본 LS처럼 화면 아래) */

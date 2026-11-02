@@ -1,3 +1,4 @@
+from sample_timetable_fixture import insert_sample_timetable
 """[MA007_01] 열차운행패턴 관리 · [CA028_02] columns, 출력 미리보기, [CA028_03] 실적 전송 (photos 2026-10-30) (Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -17,7 +18,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page)
     ok = lambda: page.locator('#mmiAlertOk').click()
     # ---- [MA007_01] from the MMI menu
     page.locator('.mmi-top-btn', has_text='열차스케줄').click()

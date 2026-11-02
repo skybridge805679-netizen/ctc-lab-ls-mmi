@@ -4,16 +4,7 @@
  const R=typeof module!=='undefined'?require('./schedule-routes.js'):root.SimScheduleRoutes;
  const ROUTE=/^$|^\d{1,2}[A-Z]?_[A-Z0-9]{1,12}$/,STOPS=['시발','정차','통과','종착'],KINDS=['전동열차','일반열차','회송열차','KTX','무궁화호','화물'],FLAGS=['입고','출고','주박','회차','회송','영업','직통'];
  const clock=seconds=>{const value=8*3600+Math.round(seconds);return `${String(Math.floor(value/3600)%24).padStart(2,'0')}:${String(Math.floor(value%3600/60)).padStart(2,'0')}:${String(value%60).padStart(2,'0')}`;};
- function initial(){
-  const trains=[];
-  for(const direction of ['down','up'])for(let n=0;n<6;n++){
-   const stations=direction==='down'?N.stations:[...N.stations].reverse();
-   const calls=stations.map((station,i)=>({station:station.id,arrival:n*360+i*150,departure:n*360+i*150+30,...R.routesFor(station.id,direction,i===0,i===stations.length-1)}));
-   const number=direction==='down'?1131+n*2:1002+n*2;
-   trains.push({id:'K'+number,direction,kind:'전동열차',service:'정기',flags:[],cancelled:false,plan:calls.map(c=>({...c})),calls});
-  }
-  return {trains,changes:[],serviceDate:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'})};
- }
+ function initial(){return {trains:[],changes:[],serviceDate:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'})};}
  function delay(model,id,station,minutes){
   const train=model.trains.find(t=>t.id===id),index=train?.calls.findIndex(c=>c.station===station);
   if(!train||index<0||!Number.isInteger(minutes)||minutes<1||minutes>120||train.cancelled)return {ok:false,message:'열차·변경역·지연분(1~120분)을 확인하세요.'};

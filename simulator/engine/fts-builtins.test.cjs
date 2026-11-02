@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const R=require('./runtime.cjs'),F=require('./fts.js'),B=require('./fts-builtins.js'),EM=require('./emergency.js'),SC=require('./scenarios.js');
 // 대피 5종 · 비상 9종 대본을 바꾼 능동형 문제: 형식이 맞고, 대본과 다른 순서로 조작해도 모두 풀린다.
 const problems=B.all({});
-const libraryOf=p=>({version:F.VERSION,problems:[p],situations:[{id:'S',name:'S',section:'',scheduleId:'',limit:0,timetable:null,problems:[p.id]}],scenarios:[{id:'SC',name:'SC',situations:['S']}],schedules:[]});
+const libraryOf=p=>{const next=structuredClone(p);delete next.setup.clearTimetable;next.setup.scheduleId='TEST';return {version:F.VERSION,problems:[next],situations:[{id:'S',name:'S',section:'',scheduleId:'',limit:0,timetable:null,problems:[p.id]}],scenarios:[{id:'SC',name:'SC',situations:['S']}],schedules:[{id:'TEST',relative:true,timetable:B.timetableFor(p)}]};};
 const refs=(c,out=[])=>{if(!c)return out;if(c.type==='objective')out.push(c.id);(c.conditions||[]).forEach(k=>refs(k,out));refs(c.condition,out);return out;};
 // 선행 조건(목표 · 상황 반응)을 벗긴 실제 조건
 const gated=c=>c.type==='all'&&['objective','reaction'].includes(c.conditions[0].type)?c.conditions[1]:c;
@@ -76,7 +76,7 @@ test('every built-in script becomes a valid active problem with no script depend
   for(const x of p.setup.trains)assert.ok(p.setup.clear.includes(x.number),p.id+' '+x.number);
  }
  // 고장열차 스케줄은 교재 번호로 만들고, 출발진로 목표는 처음부터 이루어져 있지 않다
- const y=problems.find(p=>p.id==='P-yongsan-5');assert.equal(y.reactions[0].do[0].train,'A1002');assert.ok(y.objectives.some(o=>o.condition.type==='schedule'&&o.condition.value==='3C_B605T'));
+ const y=problems.find(p=>p.id==='P-yongsan-5');assert.ok(B.timetableFor(y).trains.some(t=>t.id==='A1002'));assert.ok(y.objectives.some(o=>o.condition.type==='schedule'&&o.condition.value==='3C_B605T'));
  // 번호를 바꾼 뒤에만 그 번호를 옮기거나 지울 수 있다 (순서가 꼭 필요한 곳만 묶는다)
  const e2=problems.find(p=>p.id==='P-em-02'),del=e2.objectives.find(o=>o.id==='delete-G0606');assert.deepEqual(refs(del.condition),['move-G0606']);
  assert.deepEqual(refs(e2.objectives.find(o=>o.id==='move-G0606').condition),['rename-G0606']);

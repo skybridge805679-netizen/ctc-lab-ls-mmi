@@ -27,7 +27,7 @@ try:
   page.click('[data-ptab="comm"]');expect(page.locator('#pTabs tbody tr')).to_have_count(28);page.fill('#pfLabel','구로역 CCM 통보');page.fill('#pfText','구로역, 관제 이상! CCM 전환합니다.');page.click('#pfAdd');expect(page.locator('#pTabs tbody tr')).to_have_count(29)
   page.click('[data-ptab="react"]');page.fill('#pfLabel','구로역 경보');page.select_option('#pfWhen','objective:o20');page.fill('#pfAfter','5');page.select_option('#pfType','alarm');page.dispatch_event('#pfType','change');page.fill('#pf-text','응용 상황: 구로역 선로 장애물');page.click('#pfAdd')
   expect(page.locator('#pTabs tbody tr').last).to_contain_text('5초 뒤')
-  page.click('[data-ptab="setup"]');setup_rows=page.locator('#pTabs tbody tr').count();page.select_option('#pfType','resetStation');page.dispatch_event('#pfType','change');page.select_option('#pf-station','guro');page.click('#pfAdd');expect(page.locator('#pTabs tbody tr')).to_have_count(setup_rows+1)
+  page.click('[data-ptab="setup"]');assert page.locator('#pSetupSchedule').input_value()==page.evaluate("SimFTSUI.library().problems.find(p=>p.id==='P-em-02').setup.scheduleId");setup_rows=page.locator('#pTabs tbody tr').count();page.select_option('#pfType','resetStation');page.dispatch_event('#pfType','change');page.select_option('#pf-station','guro');page.click('#pfAdd');expect(page.locator('#pTabs tbody tr')).to_have_count(setup_rows+1)
   # 잘못된 항목은 등록 전에 거른다
   page.click('[data-ptab="react"]');page.select_option('#pfType','runTrain');page.dispatch_event('#pfType','change');page.fill('#pf-number','K0602');page.fill('#pf-legs','dongmyo:없는창');page.click('#pfAdd');expect(page.locator('.mmi-alert')).to_contain_text('없는 열번창');page.click('#mmiAlertOk')
   page.click('#pSave');page.click('#mmiConfirmYes');page.click('#mmiAlertOk')
