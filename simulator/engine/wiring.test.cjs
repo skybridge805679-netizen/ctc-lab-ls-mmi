@@ -61,3 +61,7 @@ console.log(count+' wiring tests passed');
  for(const id of ['4B-B901T','55-B901T'])assert.deepEqual(R('seoul',id).geometryRails,['3T','2T'],id);
  assert.deepEqual(R('suwon','1A-2T').geometryRails,['3T','2T']);assert.equal(R('suwon','1A-2T').pointPositions['29'],'R');assert.notEqual(R('suwon','1A-2T').pointPositions['32'],'R');
  console.log('PASS fewest-reverse-switch route paths (서울 2B-3T via 56, 수원 1A-2T via 29)');}
+// 의왕: 원본 LS에서 3T-4T 건넘선(원본 52, 내부 51)은 2T-3T 건넘선(원본 51, 내부 52)보다 왼쪽에 따로 있다 — 한 점에 겹치지 않는다
+{const t=N.catalog.uiwang.topology,deg=new Map();for(const e of t.edges){deg.set(e.a,(deg.get(e.a)||0)+1);deg.set(e.b,(deg.get(e.b)||0)+1);}
+ assert.ok(Math.max(...deg.values())<=3,'의왕 4갈래 접점 없음');const x=p=>Number(t.edges.find(e=>e.point===p).b.split(':')[1].split(',')[0]);assert.ok(x('51')<x('52'),'3T 위 원본 52(내부 51)가 원본 51(내부 52)보다 왼쪽');
+ console.log('PASS 의왕 51·52 crossovers at separate 3T positions');}
