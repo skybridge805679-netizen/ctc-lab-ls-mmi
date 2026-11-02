@@ -57,9 +57,15 @@ function compile(st,def){
  for(const [id,rail,x,y,dir]of def.signals){const [px,py]=pagePoint([x,y]);signals[id]={kind:/^\d+[A-Z]$/.test(id)?(id[0]==='1'||id[0]==='2'?'장내':'출발'):'입환',direction:dir===1?'하행':'상행',dir,x:px,y:py};mapSignals[id]={x:px,y:py,dir};}
  for(const [k,node]of nodes)for(const id of node.points){if(!points[id]){const [x,y]=pagePoint(node.p);points[id]={parts:[id],x,y};mapPoints[id]={x,y};}}
  for(const [signal,rail,x,,dir]of def.signals){const start=key(rail,at(rail,x)),found=new Map();
+  // 같은 목적지로 가는 경로가 여럿이면 실제 진로표처럼 반위로 넘어가는 전환기가 가장 적은 경로를 고른다
+  // (선로 조각 수로 고르면 잘게 나뉜 선로를 피해 건넘선을 두 번 지나는 우회로가 뽑힌다 — 예: 서울 2B-3T가 56 대신 54·59로 4T를 돌던 문제)
+  const cost=trail=>{let cur=start;const locks=new Set(nodes.get(start).points);for(const e of trail){const nx=e.a===cur?e.b:e.a,a=nodes.get(cur).p,b=nodes.get(nx).p;for(const q of nodes.get(nx).points)locks.add(q);cur=nx;}
+   const reverse=[...locks].filter(id=>trail.some(e=>e.point===id||rails.get(e.rail)?.[5]?.includes(id))).length;return reverse*100000+trail.filter(e=>e.rail!=='join').length;};
+  // 반위 전환기 수가 같으면 예전 기준(선로 조각 수)을 그대로 쓴다 — 근거 없이 건넘선을 바꾸지 않는다
+  const better=(trail,previous)=>!previous||cost(trail)<cost(previous.trail);
   function walk(k,trail,seen){if(trail.length>90)return;const n=nodes.get(k);
-   if(trail.length&&n.pass.length){const physical=trail.filter(e=>e.rail!=='join');if(physical.length)for(const {name,only} of n.pass){if(only&&!only.includes(signal))continue;const previous=found.get(name);if(!previous||physical.length<previous.trail.filter(e=>e.rail!=='join').length)found.set(name,{trail:[...trail],end:k});}}
-   if(trail.length&&n.targets.length){for(const target of n.targets){const physical=trail.filter(e=>e.rail!=='join');if(!physical.length)continue;const previous=found.get(target);if(!previous||physical.length<previous.trail.filter(e=>e.rail!=='join').length)found.set(target,{trail:[...trail],end:k});}return;}
+   if(trail.length&&n.pass.length){const physical=trail.filter(e=>e.rail!=='join');if(physical.length)for(const {name,only} of n.pass){if(only&&!only.includes(signal))continue;const previous=found.get(name);if(better(trail,previous))found.set(name,{trail:[...trail],end:k});}}
+   if(trail.length&&n.targets.length){for(const target of n.targets){const physical=trail.filter(e=>e.rail!=='join');if(!physical.length)continue;const previous=found.get(target);if(better(trail,previous))found.set(target,{trail:[...trail],end:k});}return;}
    for(const e of n.adj){const next=e.a===k?e.b:e.a,p=nodes.get(next).p;if(seen.has(next)||(p[0]-n.p[0])*dir<-0.001)continue;const nextSeen=new Set(seen);nextSeen.add(next);walk(next,[...trail,e],nextSeen);}
   }
   walk(start,[],new Set([start]));

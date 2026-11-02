@@ -55,3 +55,9 @@ test('Guro crossing structures do not join unrelated upper and lower tracks',()=
  assert(!N.catalog.guro.routes['1A-3T']);
 });
 console.log(count+' wiring tests passed');
+// 경로 선택: 반위 전환기가 가장 적은 경로 (원본 LS: 서울 2B-3T는 2T에서 56 건넘선 하나로 3T — 54·59로 4T를 돌지 않는다)
+{const R=(st,id)=>N.catalog[st].routes[id];
+ assert.deepEqual(R('seoul','2B-3T').geometryRails,['2T','3T']);assert.deepEqual(Object.entries(R('seoul','2B-3T').pointPositions).filter(([,v])=>v==='R').map(([k])=>k),['56']);
+ for(const id of ['4B-B901T','55-B901T'])assert.deepEqual(R('seoul',id).geometryRails,['3T','2T'],id);
+ assert.deepEqual(R('suwon','1A-2T').geometryRails,['3T','2T']);assert.equal(R('suwon','1A-2T').pointPositions['29'],'R');assert.notEqual(R('suwon','1A-2T').pointPositions['32'],'R');
+ console.log('PASS fewest-reverse-switch route paths (서울 2B-3T via 56, 수원 1A-2T via 29)');}
