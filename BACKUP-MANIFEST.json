@@ -3080,8 +3080,8 @@
     },
     {
       "path": "simulator/README.md",
-      "bytes": 12365,
-      "sha256": "1e00bf4ee65cda10dccdf815c012867337bfff77689ed49bc3b724dbb8ea147d"
+      "bytes": 12376,
+      "sha256": "7567846142d97d97fe8b5a4197c0cd876db0db126dbfd995dcbb3be3f94de1ed"
     },
     {
       "path": "simulator/assets/README-orpheia.md",
@@ -3260,8 +3260,8 @@
     },
     {
       "path": "simulator/e2e/assessment.browser.test.py",
-      "bytes": 3973,
-      "sha256": "4e84122fe9c9a3be8aecf2bff7f2f7e0671bb77ae85d38c1c6ad59010a428d1d"
+      "bytes": 4396,
+      "sha256": "c8d624aec5074fddf7f783136c20e8d4715f859eef05313c190d7574ff6cbed6"
     },
     {
       "path": "simulator/e2e/autocontrol.browser.test.py",
@@ -4005,8 +4005,8 @@
     },
     {
       "path": "simulator/index.html",
-      "bytes": 18007,
-      "sha256": "5c1ead1e3d238e94480b4219777d1343fc7b149f641cd2de654c456ef52fb794"
+      "bytes": 18036,
+      "sha256": "4f653a125645483f5ddb1dd61576e5e0ec9005f119160893e589ddcd58359923"
     },
     {
       "path": "simulator/ui/app.js",
@@ -4015,8 +4015,8 @@
     },
     {
       "path": "simulator/ui/assessment-ui.js",
-      "bytes": 5716,
-      "sha256": "6cc7a5e16e51fbaae4f978efe525f46944e688a19d33577054c6995b07e42294"
+      "bytes": 2474,
+      "sha256": "73d683ecb8d9fde04f8fd42717415b544f35e82852e1764d22478705d558f2b9"
     },
     {
       "path": "simulator/ui/autocontrol-ui.js",
@@ -4230,8 +4230,8 @@
     },
     {
       "path": "simulator/ui/shell.css",
-      "bytes": 9069,
-      "sha256": "ba773025f9828de70e99e281cb66b9cf2a8b3c28e4b21b7b318d6736ec48b352"
+      "bytes": 8954,
+      "sha256": "d16f092a44e86b9a3603de6ffe717061e5d9472bc6236609e2c5dac7844f819c"
     },
     {
       "path": "simulator/ui/shell.js",
