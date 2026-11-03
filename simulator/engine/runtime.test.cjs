@@ -49,3 +49,15 @@ test('a checkpoint restores a moving scenario, controls, timetable and auto sett
  const r=create();r.command({type:'scenario:start',id:'em-03'});r.command({type:'tick',seconds:600});r.command({type:'auto',reflect:true});const saved=r.checkpoint(),n=create();n.restore(saved);const s=n.snapshot();assert.equal(s.clock.paused,true);assert.equal(s.states.anyang.clock,saved.states.anyang.clock);assert.equal(s.scenario.run.sc.id,'em-03');assert.deepEqual(s.scenario.jobs,saved.scenario.motion.jobs);assert.equal(s.auto.reflect,true);n.command({type:'tick',seconds:10});assert.equal(n.snapshot().states.anyang.clock,saved.states.anyang.clock+10);
 });
 test('scenario setup preserves the line-wide clock and zero-second refresh does not advance time',()=>{const r=create();r.command({type:'tick',seconds:123});r.command({type:'scenario:start',id:'em-03'});assert.ok(Object.values(r.snapshot().states).every(s=>s.clock===123));r.command({type:'tick',seconds:0});assert.ok(Object.values(r.snapshot().states).every(s=>s.clock===123));});
+
+test('opening another session discards old undo and redo, failed opening preserves them',()=>{
+ const r=require('./runtime.cjs').create(),clean=r.checkpoint(),T=require('./timetable');
+ const train=T.pattern({id:'K1001',from:'yongsan',to:'suwon',start:3600,kind:'전동열차'});
+ assert.ok(r.command({type:'timetable',method:'create',args:[train]}).ok);
+ assert.ok(r.command({type:'timetable',method:'remove',args:['K1001']}).ok);
+ const invalid=structuredClone(clean);invalid.schema=999;
+ assert.throws(()=>r.restore(invalid));assert.equal(r.snapshot().editHistory.undo,2);
+ r.restore(clean);assert.equal(r.snapshot().editHistory.undo,0);assert.equal(r.snapshot().editHistory.redo,0);
+ assert.equal(r.command({type:'timetable',method:'undo',args:[]}).ok,false);
+ assert.deepEqual(r.snapshot().timetable.trains,[]);
+});

@@ -4,6 +4,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 from playwright.sync_api import sync_playwright, expect
+from sample_timetable_fixture import insert_sample_timetable
 ROOT=Path(__file__).resolve().parent.parent
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args): pass
@@ -16,6 +17,7 @@ try:
    page=browser.new_page(viewport={'width':width,'height':1080});errors=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.clock.install();page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle')
+   insert_sample_timetable(page)
    page.click('#pauseBtn')
    with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;mmi.on('pageerror',lambda e:errors.append(str(e)))
@@ -91,7 +93,7 @@ try:
    page.evaluate('SimWorkspace.closeMMI()');expect(page.locator('#mmiShell')).to_have_count(0)
    assert len(page.context.pages)==1
    # Scenario controls in MMI drive timed train movement on the other screen.
-   page.reload(wait_until='networkidle');page.click('#pauseBtn')
+   page.reload(wait_until='networkidle');insert_sample_timetable(page);page.click('#pauseBtn')
    with page.expect_popup() as new:page.evaluate('SimWorkspace.detach()')
    mmi=new.value;page.evaluate("SimMMI.open('scenario')");mmi.select_option('#scSelect','yongsan-5');mmi.click('#scStart')
    number=mmi.input_value('#scTrain')

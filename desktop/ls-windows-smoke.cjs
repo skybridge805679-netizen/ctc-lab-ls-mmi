@@ -7,6 +7,15 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-ls-windows-'));let a
  const primary=await app.firstWindow();await primary.waitForFunction(()=>!!window.SimRemote&&!!window.SimWorkspace?.detached());const errors=[];
  primary.on('pageerror',e=>errors.push(String(e)));await primary.evaluate(()=>SimRemote.command({type:'clock',paused:true}));const original=await primary.locator('#lsStage').getAttribute('data-preset');
  const additional=async station=>{const next=app.waitForEvent('window');await primary.evaluate(st=>OrpheiaEngine.openView('ls',st),station);const page=await next;page.on('pageerror',e=>errors.push(String(e)));await page.waitForFunction(()=>!!window.SimExtraLS&&!!window.SimShell);return page;};
+ // A new or reloaded secondary LS must not cancel another display's replay lock.
+ await primary.evaluate(()=>SimRemote.command({type:'replay',on:true}));
+ const replayView=await additional('uiwang');
+ for(let attempt=0;attempt<2;attempt++){
+  if(attempt){await replayView.reload();await replayView.waitForFunction(()=>window.SimExtraLS&&window.SimShell);}
+  const locked=await replayView.evaluate(()=>({replay:SimRemote.snapshot.clock.replay,result:SimRemote.command({type:'control',station:'uiwang',action:{type:'mode',value:'CCM',source:'LS'}})}));
+  assert.equal(locked.replay,true);assert.equal(locked.result.ok,false);
+ }
+ await replayView.close();await primary.evaluate(()=>SimRemote.command({type:'replay',on:false}));
  const west=await additional('guro'),east=await additional('geumcheon');assert.equal(await primary.locator('#lsStage').getAttribute('data-preset'),original);assert.equal(await west.locator('#lsStage').getAttribute('data-preset'),'guro');assert.equal(await east.locator('#lsStage').getAttribute('data-preset'),'geumcheon');
  await app.evaluate(({BrowserWindow})=>{const windows=BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('lsStation='));windows.forEach((w,i)=>w.setBounds({x:i*960,y:0,width:960,height:720}));});
  await expect.poll(()=>west.evaluate(()=>innerWidth)).toBeLessThan(961);await expect.poll(()=>east.evaluate(()=>innerWidth)).toBeLessThan(961);

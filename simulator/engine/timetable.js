@@ -145,6 +145,6 @@ const H=typeof module!=='undefined'?require('./timetable-history'):root.SimTimet
  }
  const api={initial,delay,cancel,setCancelled,position,clock,valid,pattern,create,update,remove,copy,conflicts,nearestResolveStation,MIN_HEADWAY,RESOLVE_STATIONS,KINDS,FLAGS,STOPS};
  for(const method of ['delay','cancel','setCancelled','create','update','remove','copy']){const fn=api[method];api[method]=(model,...args)=>history(model).perform(model,[method==='create'?args[0]?.id:method==='copy'?args[1]:args[0]],()=>fn(model,...args));}
- Object.assign(api,{import:importFile,undo:model=>history(model).undo(model),redo:model=>history(model).redo(model),history:model=>history(model).status()});
+ Object.assign(api,{resetHistory:model=>history(model).reset(),import:importFile,undo:model=>history(model).undo(model),redo:model=>history(model).redo(model),history:model=>history(model).status()});
  if(typeof module!=='undefined')module.exports=api;else root.SimTimetable=api;
 })(typeof window!=='undefined'?window:globalThis);

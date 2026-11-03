@@ -22,7 +22,7 @@ root.addEventListener('DOMContentLoaded',()=>setTimeout(drain,0));
 function command(action){const response=root.OrpheiaEngine.request(action,cursor,version);if(response.error)throw new Error(response.error);apply(response.snapshot);return response.result;}
 command({type:'poll'});
 // A reconnected display leaves historical projection and resumes the intact live session.
-if(mirror.clock.replay)command({type:'replay',on:false});
+if(!root.SimExtraLS&&mirror.clock.replay)command({type:'replay',on:false});
 const nativeCore=root.SimCore,coreCache=new Map();
 function core(id){if(!coreCache.has(id)){const metadata=nativeCore.forStation(id),preview=metadata.dispatch;metadata.dispatch=(state,action)=>state===mirror.states[id]?command({type:'control',station:id,action}):preview(state,action);coreCache.set(id,metadata);}return coreCache.get(id);}
 root.SimCore={...nativeCore,forStation:core};

@@ -1,6 +1,6 @@
 {
-  "version": "0.39.4",
-  "backupDate": "2026-11-02",
+  "version": "0.39.5",
+  "backupDate": "2026-11-03",
   "scope": "현재 작업 트리. references는 references/MANIFEST.json 및 보존 브랜치 참조. 버전 ZIP 재생성 없음.",
   "files": [
     {
@@ -15,13 +15,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 66098,
-      "sha256": "51a81d0f2531b75b753f786a591574ec6280bc2f3c4602c83de66456c56ff24f"
+      "bytes": 66503,
+      "sha256": "95013698a2ee23b5cdd1575d08bd997d63e6eb788c63abfb9fca5b159e849b01"
     },
     {
       "path": "README.md",
-      "bytes": 25008,
-      "sha256": "bf29fa9a38ac70348a093decbaa7349cca27a046b9068dcf1dccabe35817f486"
+      "bytes": 24980,
+      "sha256": "41e7aaccf9324c252b0223aa2d96c4869e8f2c749803d0155e3412fda6a149be"
     },
     {
       "path": "desktop/check-package.cjs",
@@ -50,8 +50,8 @@
     },
     {
       "path": "desktop/fts-smoke.cjs",
-      "bytes": 8693,
-      "sha256": "e2aec96ec9724cf2a1a04492d155c5346589872061bf24905ceb6dc20b1f9e73"
+      "bytes": 8715,
+      "sha256": "e1ccd5277632991611d137f8d12612b1acb24ef38dcdb8e5433d2f8babb0ad03"
     },
     {
       "path": "desktop/install-electron.cjs",
@@ -65,8 +65,8 @@
     },
     {
       "path": "desktop/ls-windows-smoke.cjs",
-      "bytes": 7554,
-      "sha256": "6502ead3c5213e6531d75d3453c757a6406d36fd6fbb908aae6a4324c1a44d17"
+      "bytes": 8281,
+      "sha256": "513e5d668e1af9d3f5393068055dc6740dab9666968a0ffc9a02865234001c55"
     },
     {
       "path": "desktop/main.cjs",
@@ -90,8 +90,8 @@
     },
     {
       "path": "desktop/release-notes.md",
-      "bytes": 15213,
-      "sha256": "6fab70396063ee2504cce65b8a1b93a7cf795ca5af01d6b8ac1dca3ccdc9e112"
+      "bytes": 15451,
+      "sha256": "474fed5fa992a5b4bc1eaa795a15755abb170adbfabd94098c44a868ad9f1f45"
     },
     {
       "path": "desktop/reset-smoke.cjs",
@@ -2974,6 +2974,11 @@
       "sha256": "1bf215ea368503c5b1b8c7d3f7533e43b25d8f043604c93989ff560869709d2e"
     },
     {
+      "path": "docs/v0.39.5-검수결함수정.md",
+      "bytes": 1011,
+      "sha256": "16ff48f4fb64e6cc01f9f622a42f3caaa2ec682b247dd7a3cafef177738b5a1c"
+    },
+    {
       "path": "docs/개발로드맵.md",
       "bytes": 6070,
       "sha256": "33090ac427d20b2063f2e7bf56091e39a2c46126c497e5f9f12fb8b6f0431250"
@@ -3071,12 +3076,12 @@
     {
       "path": "package-lock.json",
       "bytes": 129077,
-      "sha256": "446f7efb9b794cab22d9a18b543e0da83aa2bc9e4447ae7b86af5aabed4401f0"
+      "sha256": "5125c2bcfd8dec70db73f0d97f271b76720306eacb0deb600782086a8bbe5033"
     },
     {
       "path": "package.json",
       "bytes": 2288,
-      "sha256": "2648faf5536caa4ee914d0541e702d54ff4c0254d2f322f057f478ce7929bf7d"
+      "sha256": "e14da8c7cc5bbdf3157b63ba9083e444a86646c1182bcfa3f14c062ffbe96cb1"
     },
     {
       "path": "simulator/README.md",
@@ -3545,8 +3550,8 @@
     },
     {
       "path": "simulator/e2e/workspace-windows.browser.test.py",
-      "bytes": 8323,
-      "sha256": "9bc7f2fe9a0fc76c07a92ee847d74e82b7bddb6e52ff680918739e99584ca585"
+      "bytes": 8447,
+      "sha256": "a52962604d1af416fdee59d287557cccba2d9d5b3d8350a17d890cf5016590fb"
     },
     {
       "path": "simulator/e2e/yongsan-labels.browser.test.py",
@@ -3840,13 +3845,13 @@
     },
     {
       "path": "simulator/engine/runtime.cjs",
-      "bytes": 21131,
-      "sha256": "b8c5ab4b3623a34d36207d45e320b789635f949cedf9a634d9b15902a95fc5c6"
+      "bytes": 21161,
+      "sha256": "73dc6a71d21ae7b41d65b758a87320e500ebc243ba27fe8be9068fcba3561dff"
     },
     {
       "path": "simulator/engine/runtime.test.cjs",
-      "bytes": 7403,
-      "sha256": "51d86ea4a0ea95528517856a5295bddfc3c4bb645418645748f7020ed584c4d8"
+      "bytes": 8225,
+      "sha256": "69da15345f423105908523860f1d8c272fffb63d8ab8a6b84c5c49430c42e8b9"
     },
     {
       "path": "simulator/engine/sample-timetable.test-fixture.cjs",
@@ -3955,8 +3960,8 @@
     },
     {
       "path": "simulator/engine/timetable.js",
-      "bytes": 14948,
-      "sha256": "2fee32fef77a97ac440e5bde0a2a6eb91db937cb965d0119a8bf5ca03edcbb65"
+      "bytes": 14991,
+      "sha256": "abd5bb35a7b3f676d1588de95f1d60a82e32670eb2c33d6c93375e548827742f"
     },
     {
       "path": "simulator/engine/track-geometry.js",
@@ -4215,8 +4220,8 @@
     },
     {
       "path": "simulator/ui/remote-engine.js",
-      "bytes": 4086,
-      "sha256": "a3ca4596060de1bdc8301269ff99de1f8f7fef2b61f06c78214f2a6fedf3390a"
+      "bytes": 4104,
+      "sha256": "6dce403dd26b8320cd76092c5a729c5108e7a1c8e2a6613dd109c73c3fcbac14"
     },
     {
       "path": "simulator/ui/schedule-dialogs.js",
