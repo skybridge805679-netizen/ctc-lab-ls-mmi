@@ -53,7 +53,7 @@ function create(host){
     for(const o of out){
      if(o.kind==='activate'){host.clearAlarms?.();
       if(o.problem.setup?.scheduleId){const sch=runLibrary.schedules?.find(s=>s.id===o.problem.setup.scheduleId);if(!sch)throw Error('문제 시간표를 찾을 수 없습니다: '+o.problem.setup.scheduleId);loadTimetable(sch.timetable,sch.relative);}
-      o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script)error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
+      o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script){const started=error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));if(started?.problem)o.item.statement=started.problem;else delete o.item.statement;}syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
      if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
      if(o.kind==='branch'){const said=String(o.branch.text||o.branch.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||o.branch.label;announce('branch','상황 변경 · '+said,'상황 변경 · '+o.branch.label);again=true;}
      if(o.kind==='end'){ended(o.item,o.status);again=false;}

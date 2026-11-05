@@ -139,7 +139,7 @@ function openPatternLoad({container=null,onPick}={}){
    // the list stays empty until [열차패턴조회] (photo 2026-10-30)
    const dir=q(id,`input[name="${id}Dir"]:checked`).value,rows=st.queried?P.search(patternList(),{kind:q(id,'[data-pl=kind]').value,direction:dir}):[];
    if(!rows.some(p=>p.id===st.sel)){st.sel=null;st.calls=null;}
-   q(id,'[data-pl=list]').innerHTML=`<table><thead><tr><th>순서</th><th>열차패턴명</th><th>등록자</th><th>등록일자</th><th>수정자</th><th>수정일자</th><th>선택된 패턴 ID</th></tr></thead><tbody>${rows.map((p,i)=>`<tr data-pl-id="${p.id}" class="${p.id===st.sel?'sel':''}"><td>${String(i+1).padStart(2,'0')}</td><td title="${esc(p.name)}">${esc(p.name)}</td><td>${esc(p.registrar)}</td><td>${esc(p.registeredAt)}</td><td>${esc(p.modifier)}</td><td>${esc(p.modifiedAt)}</td><td>${p.id}</td></tr>`).join('')||(st.queried?'<tr class="empty"><td colspan="7">조회된 패턴이 없습니다.</td></tr>':'')}</tbody></table>`;
+   q(id,'[data-pl=list]').innerHTML=`<table><thead><tr><th>순서</th><th>열차패턴명</th><th>등록자</th><th>등록일자</th><th>수정자</th><th>수정일자</th><th>선택된 패턴 ID</th></tr></thead><tbody>${rows.map((p,i)=>`<tr data-pl-id="${p.id}" class="${p.id===st.sel?'sel':''}"><td>${String(i+1).padStart(2,'0')}</td><td title="${esc(p.name)}">${esc(p.name)}</td><td>${esc(p.registrar)}</td><td>${esc(p.registeredAt)}</td><td>${esc(p.modifier)}</td><td>${esc(p.modifiedAt)}</td><td>${p.id}</td></tr>`).join('')||(st.queried?'<tr class="empty"><td colspan="7">조회된 패턴이 없습니다. 열차종류·열차방향을 확인하세요.</td></tr>':'<tr class="empty" data-pl-hint><td colspan="7">열차종류·열차방향을 고른 뒤 [열차패턴조회]를 누르면 패턴 목록이 나옵니다.</td></tr>')}</tbody></table>`;
    calls();
   };
   // 경유역 정보는 고칠 수 있다: edits change only what is applied, the stored pattern stays as it is
