@@ -105,6 +105,13 @@ function render(st,def,core,model,neighbours={}){
  const plateGap=prepared.corridor?128:94;
  const edgePorts=seams.ports(st,def,data);
  // 원본 슬라이드의 빨간 등 위치(tools/build-ls-xmap.py)가 있으면 그 자리를 신호기 기준으로 쓴다
+ // 원본 위치로 고정한 선로 꼭짓점(railPoints)이 있는 선로는, 그 선로 위의 모든 점(선로전환기 틈·번호)을 같은 원본 위치로 옮긴다
+ const Tw=p=>{if(!railFix.length)return T(p);const F=v=>fixPt(v,T(v));
+  for(const r of def.rails)for(let i=1;i<r[1].length;i++){const a=r[1][i-1],b=r[1][i],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(!L2)continue;const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<-.02||t>1.02)continue;
+   const qx=a[0]+t*dx,qy=a[1]+t*dy;if(Math.hypot(p[0]-qx,p[1]-qy)>3)continue;if(Math.abs(dy)<2)continue;   /* 가로 구간은 공통 배치(T) */const A=F(a),B=F(b);if(A[0]===T(a)[0]||B[0]===T(b)[0])continue;return [A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t];}   /* 양 끝이 다 고정된 구간(꺾인 사선)만 그대로 보간 */
+  const P=T(p),f=railFix.map(([fx,fy,ox])=>({d:Math.hypot(fx-p[0],fy-p[1]),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<30?[P[0]+f.dx,P[1]]:P;};   /* 고정 꼭짓점 근처(선로전환기 틈)는 그 꼭짓점만큼 */
+ // 선로 밖의 번호(선로전환기 번호 등)는 가장 가까운 고정 꼭짓점과 같은 만큼 옮긴다
+ const Tnear=p=>{const P=T(p);if(!railFix.length)return P;const f=railFix.map(([fx,fy,ox])=>({fx,fy,d:Math.hypot(fx-p[0],(fy-p[1])*.5),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<45?[P[0]+f.dx,P[1]]:P;};
  const sigBase=(id,P)=>{const v=L.xmap?.signals?.[id];return v?[L.adj(v[0]*WIDTH/L.xmap.width)-v[1]*18,P[1]]:P;};
  // 원본에서 줄마다 위치가 다른 꼭짓점(노량진 B929T·B930T가 꺾여 내려가는 두 수직선)은 원본 x에 고정한다
  const railFix=L.xmap?.railPoints||[],fixPt=([x,y],P)=>{const f=railFix.find(([fx,fy])=>Math.abs(fx-x)<1&&Math.abs(fy-y)<2);return f?[+L.adj(f[2]*WIDTH/L.xmap.width).toFixed(2),P[1]]:P;};
@@ -265,7 +272,7 @@ function render(st,def,core,model,neighbours={}){
  // Keep bottom captions within the same comfortable canvas inset as the upper bays.
  L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
  const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
- const switches=switchView.build(st,def,core,model,T,{width:WIDTH});
+ const switches=switchView.build(st,def,core,model,Tw,{width:WIDTH});
  const projectRoute=(points,destination)=>{
   const out=[points[0]],near=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1])<.1;
   for(let i=1;i<points.length;i++){
@@ -601,8 +608,8 @@ function render(st,def,core,model,neighbours={}){
  // Switch identifiers and source A/B part identifiers use the same placement solver.
  for(const [id,pos]of Object.entries(prepared.corridor?{}:core.points)){
   if(Object.values(core.pointParts||{}).includes(id)){pointSymbols+=`<g data-point-label="${id}" data-paired-switch="true"></g>`;continue;}
-  const anchor=pointAnchors[id]||T(toLocal(pos.x,pos.y)),R=model.points[id]==='R',manualLock=model.blockedPoints.includes(id),locked=manualLock||overlapPoints.has(id)||Object.keys(model.routes).some(route=>(core.routes[route].pointLocks||[]).includes(id));
-  const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>T(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
+  const anchor=pointAnchors[id]||Tnear(toLocal(pos.x,pos.y)),R=model.points[id]==='R',manualLock=model.blockedPoints.includes(id),locked=manualLock||overlapPoints.has(id)||Object.keys(model.routes).some(route=>(core.routes[route].pointLocks||[]).includes(id));
+  const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>Tnear(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
   const scissors=switches.connectors.find(c=>c.id===id&&c.kind==='scissors');
   const preferred=scissors?[scissors.endpoints[0][0]+(scissors.endpoints[1][0]-scissors.endpoints[0][0])*.25,scissors.endpoints[0][1]+(scissors.endpoints[0][1]<scissors.endpoints[1][1]?-24:24)]:surveyed||[anchor[0],anchor[1]-13];
   const label=takeLabel(id,anchor,'point',id,preferred);
