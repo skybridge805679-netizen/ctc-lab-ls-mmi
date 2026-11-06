@@ -105,8 +105,9 @@ const INTERMEDIATE={
  skku:{host:'uiwang',slots:{"ED": "B1022T", "GD": "B700T", "GU": "B693T", "EU": "B1019T"}},
  hwaseo:{host:'uiwang',slots:{"ED": "B1032T", "GD": "B710T", "GU": "B703T", "EU": "B1029T"}},
  sindorim:{host:'yeongdeungpo',slots:{"GD": "B622T", "GU": "B623T", "ED": "B946T", "EU": "B945T"}},
- daebang:{host:'noryangjin',slots:{"GD": "B616T1T", "ED": "B932T", "GU": "B615T2T"}},
- singil:{host:'noryangjin',slots:{"GD": "B618T2T", "ED": "B938T", "GU": "B619T1T"}},
+ // 상2선(EU) 정차 회로는 원본 LS 사진(2026-11-06)의 고상홈 표시 위치: 대방 B931T · 신길 B937T
+ daebang:{host:'noryangjin',slots:{"GD": "B616T1T", "ED": "B932T", "GU": "B615T2T", "EU": "B931T"}},
+ singil:{host:'noryangjin',slots:{"GD": "B618T2T", "ED": "B938T", "GU": "B619T1T", "EU": "B937T"}},
  jegidong:{host:'cheongnyangni',slots:{"MD": "B006T", "MU": "B005T"}},
 };
 // 연동역 A에서 B로 가는 본선 위에서 열차가 설 수 있는 비연동 중간역 (진행 순서)
