@@ -26,7 +26,9 @@ function render(ports,T,height,width,inset=0,obstacles=[]){
   paths.push(`<g class="seam-link ${port.state||'clear'}" data-track-state="${port.state||'clear'}" data-seam-side="${port.side}" data-seam-trunk="${port.trunk}" data-seam-code="${port.code}" data-seam-y="${toY}"><title>${port.name} · 화면 연결 · ${port.code}</title><path class="seam-clearance" d="${d}"/><path class="seam-rail" d="${d}"/></g>`);
   const labelWidth=port.name.includes(' · ')?104:48,lx=port.side==='left'?6:width-6-labelWidth;
   let labelY=toY-18;
-  for(const dy of [-18,34,-36,50,-54,66,-72,82,-90,98,-108,114]){const yy=toY+dy,box=[lx,yy-14,lx+labelWidth,yy+3];if(yy<18||yy>height-8||obstacles.some(b=>box[0]<b[2]+3&&box[2]>b[0]-3&&box[1]<b[3]+3&&box[3]>b[1]-3))continue;labelY=yy;obstacles.push(box);break;}
+  // 하선 이름은 선로 위쪽부터, 상선 이름은 선로 아래쪽부터 찾는다 (열번칸과 같은 쪽)
+  const order=/^상/.test(port.name)?[34,50,66,82,98,114,-18,-36,-54,-72,-90,-108]:[-18,-36,-54,-72,-90,-108,34,50,66,82,98,114];
+  for(const dy of order){const yy=toY+dy,box=[lx,yy-14,lx+labelWidth,yy+3];if(yy<18||yy>height-8||obstacles.some(b=>box[0]<b[2]+3&&box[2]>b[0]-3&&box[1]<b[3]+3&&box[3]>b[1]-3))continue;labelY=yy;obstacles.push(box);break;}
   labels.push(`<text class="seam-name" x="${port.side==='left'?6:width-6}" y="${labelY}" text-anchor="${port.side==='left'?'start':'end'}">${port.name}</text>`);
  }
  return `<g class="screen-continuations" aria-label="본선 화면 연결">${paths.join('')}${labels.join('')}</g>`;

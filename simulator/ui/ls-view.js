@@ -161,6 +161,17 @@ function render(st,def,core,model,neighbours={}){
   }
   paths.push([[start,row.y],[end,row.y]]);
  }
+ // 꺾이는 곳 정리: 회로 칸 줄로 만든 가로선이 선로가 수직·사선으로 꺾이는 꼭짓점 바깥으로 삐져나오면(원본 회로 사각형이 모서리 앞에서 시작)
+ // 그 꼭짓점에서 자른다 — 꺾인 하나의 선으로 보이게. 같은 줄을 계속 잇는 다른 선로가 있으면 자르지 않는다.
+ const railPolys=paths.slice(0,def.rails.length+(data.joins||[]).length),STUB=40;   // 선로 + 검토된 연결선(joins)의 꺾인 곳
+ const horizontalCovers=(y,a,b)=>railPolys.some(poly=>poly.slice(1).some((q,i)=>{const p=poly[i];return Math.abs(p[1]-y)<2&&Math.abs(q[1]-y)<2&&Math.min(p[0],q[0])<a+1&&Math.max(p[0],q[0])>b-1;}));
+ const bends=[];for(const poly of railPolys)poly.forEach((v,i)=>{const prev=poly[i-1],next=poly[i+1];for(const [h,o] of [[prev,next],[next,prev]]){if(!h||!o)continue;if(Math.abs(h[1]-v[1])<2&&Math.abs(o[1]-v[1])>=2)bends.push({x:v[0],y:v[1],inside:Math.sign(h[0]-v[0])});}});
+ let trimmedStubs=0;
+ for(let k=def.rails.length+(data.joins||[]).length;k<paths.length;k++){const seg=paths[k],y=seg[0][1];
+  for(const b of bends){if(Math.abs(b.y-y)>=2)continue;
+   if(b.inside>0&&seg[0][0]<b.x-.5&&seg[0][0]>b.x-STUB&&seg[1][0]>b.x&&!horizontalCovers(y,seg[0][0],b.x)){seg[0][0]=b.x;trimmedStubs++;}
+   if(b.inside<0&&seg[1][0]>b.x+.5&&seg[1][0]<b.x+STUB&&seg[0][0]<b.x&&!horizontalCovers(y,b.x,seg[1][0])){seg[1][0]=b.x;trimmedStubs++;}
+  }}
  let platforms='',rails='',sections='',labels='',routes='',symbols='',plates='',pointSymbols='',signalSymbols='',trains='',leaders='',annotations='';
  const occupiedBoxes=fixedObstacles.map(b=>[...b]);
  let trainShapes='';
@@ -177,7 +188,8 @@ function render(st,def,core,model,neighbours={}){
   const rail=def.rails.find(r=>r[0]===code||r[3]===code||r[4]===code);
   let cx,cy;
   if(inline&&rail?.[0]===code){[cx,cy]=T([rail[2]??(rail[1][0][0]+rail[1].at(-1)[0])/2,railY(def,code,rail[2]??rail[1][0][0])]);}
-  else if(cell){cx=cell.x+cell.width*item.fraction;cy=cell.y;}
+  // 열번칸은 자기 회로의 가운데에 둔다 (원본 슬라이드의 비율은 우리 화면의 회로 폭과 맞지 않아 옆 회로·폐색 표식 위로 밀린다)
+  else if(cell){const tokens=cell.label.split(' · ').filter(Boolean),k=Math.max(0,tokens.indexOf(code));cx=tokens.length>1&&tokens.includes(code)?cell.x+cell.width*(k+.5)/tokens.length:cell.x+cell.width/2;cy=cell.y;}
   else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[cx,cy]=T(p);cx+=rail[3]===code?42:rail[4]===code?-42:0;}
   else throw new Error(st.id+' train window anchor missing: '+code);
   const width=inline?100:80,height=inline?28:20;
@@ -188,19 +200,33 @@ function render(st,def,core,model,neighbours={}){
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),x=(a+b)/2,w=Math.max(b-a,plate.name.length*16+18);obstacles.push([x-w/2,Math.max(8,windowTop-plateGap),x+w/2,Math.max(8,windowTop-plateGap)+25]);}
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
+ // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
+ for(const p of edgePorts){if(!p.name)continue;const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
  const windowLanes=new Map();for(const b of windowBoxes.filter(b=>!b.inline)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  for(const lane of windowLanes.values()){
-  let best;const preferred=lane[0].item.side==='above'?-50:30,deltas=Array.from({length:41},(_,i)=>lane[0].item.side==='above'?-28-i*2:20+i*2).sort((a,b)=>Math.abs(a-preferred)-Math.abs(b-preferred));
-  for(const dy of deltas){let cost=0,choices=[];
-   for(const b of lane){let chosen;
-    candidates:for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
-     const x=Math.max(4,Math.min(WIDTH-width-4,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;
-     const score=hits*10000+(80-width)+Math.abs(dx)*2;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
+  // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.
+  const side=lane[0].item.side,cy=lane[0].cy,H=20,trackRows=[...new Set(cellRows.map(r=>Math.round(r.y)).concat(rows.map(y=>Math.round(T([0,y])[1]))))];
+  const neighbour=side==='above'?Math.max(-Infinity,...trackRows.filter(y=>y<cy-3)):Math.min(Infinity,...trackRows.filter(y=>y>cy+3));
+  const near=BAR/2+3,far=Number.isFinite(neighbour)?Math.abs(neighbour-cy)-BAR/2-3-H:110;
+  const band=far>=near?Array.from({length:Math.floor((far-near)/2)+1},(_,i)=>side==='above'?-(near+H+i*2):near+i*2):[];
+  const EDGE=4,preferred=side==='above'?-50:30,wide=Array.from({length:41},(_,i)=>side==='above'?-28-i*2:20+i*2).sort((a,b)=>Math.abs(a-preferred)-Math.abs(b-preferred));
+  const search=(deltas,inBand)=>{let best;
+   for(const dy of deltas){let cost=0,choices=[];
+    for(const b of lane){let chosen;
+     candidates:for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
+      const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;
+      const score=hits*10000+(80-width)*3+Math.abs(dx)*4;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
+     }
+     cost+=chosen.cost;choices.push(chosen);
     }
-    cost+=chosen.cost;choices.push(chosen);
+    cost+=inBand?Math.abs(dy)*.5:Math.abs(dy-preferred);if(!best||cost<best.cost)best={cost,choices};
+    if(cost===0)break;   // 띠 안에서는 끝까지 비교: 옆으로 크게 밀리는 것보다 조금 더 바깥(승강장 표시 아래 등)이 낫다
    }
-   cost+=Math.abs(dy-preferred);if(!best||cost<best.cost)best={cost,choices};if(cost===0)break;
-  }
+   return best;};
+  const hitsOf=r=>r?r.choices.filter(c=>c.cost>=10000).length:Infinity;
+  let best=band.length?search(band,true):null;
+  // 띠 안에 겹치지 않는 자리가 없을 때만 예전 넓은 탐색(이웃 선로 너머 포함)을 쓴다
+  if(!best||hitsOf(best)){const fallback=search(wide,false);if(hitsOf(fallback)<hitsOf(best))best=fallback;}
   lane.forEach((b,i)=>{Object.assign(b,best.choices[i]);obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);});
  }
 
