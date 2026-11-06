@@ -40,6 +40,7 @@ function wingOf(st,def){
   signals:source.signals.filter(p=>inside(p[0],p[1])&&outside(p[0])&&band(p[1]))
  };
 }
+const SY_MAX=1.9;
 function layout(def,wing,aspect,top=108,native=false){   // top: 원본 노란 화살표 자리
  const xs=[],ys=[];
  for(const rail of def.rails)for(const [x,y]of rail[1]){xs.push(x);ys.push(y);}
@@ -59,7 +60,10 @@ function layout(def,wing,aspect,top=108,native=false){   // top: 원본 노란 �
  const pitches=railRows.slice(1).map((y,i)=>y-railRows[i]).filter(d=>d>=20);
  const pitch=Math.min(...pitches,80);
  const sx=(WIDTH-2*PADDING)/(maxX-minX),targetH=Number.isFinite(aspect)&&aspect>0?Math.max(420,WIDTH/aspect):null;
- const bottom=64,sy=targetH?Math.max(48/pitch,(targetH-top-bottom)/Math.max(1,maxY-minY)):Math.max(sx,80/pitch);
+ // 세로 배율은 모든 역이 같은 상한(SY_MAX)을 쓴다: 화면 높이에 맞춰 역마다 늘리면 선로 간격이 역마다 달라져
+ // (지하청량리~지하서울은 3배 이상) 열번칸·폐색 표식·이름판 정렬이 들쭉날쭉해진다. 남는 높이는 위아래로 나눈다.
+ const bottom=64,fill=targetH?(targetH-top-bottom)/Math.max(1,maxY-minY):null,sy=targetH?Math.max(48/pitch,Math.min(SY_MAX,fill)):Math.max(sx,80/pitch);
+ if(targetH&&fill>sy)top+=Math.floor((fill-sy)*(maxY-minY)/2);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
  const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy]);
@@ -102,13 +106,15 @@ function render(st,def,core,model,neighbours={}){
      // 그 선로 승강장 칸(열번창, 폭 100)과 같은 폭·위치로
      const rail=def.rails.find(r=>r[2]!=null&&Math.abs(railY(def,r[0],r[2])-near)<2&&Math.abs(r[2]-(p[0]+p[2])/2)<80);let bx=x,br=right;if(rail){const [cx]=T([rail[2],near]);bx=cx-50;br=cx+50;}
      return {x:bx,y:above?ry-14-3-h:ry+14+3,right:br,height:h,kind:p[4],central:true,row:null,side:true};}}}
+  // 구내 승강장 표시는 원본처럼 그 승강장 선로 열번창(폭 100)과 같은 폭·위치로 맞춘다 (청량리·동묘앞 등 섬식)
+  if(central){const cy=(p[1]+p[3])/2,rail=def.rails.filter(r=>/^\d+T$/.test(r[0])&&r[2]!=null&&Math.abs(railY(def,r[0],r[2])-cy)<70&&Math.abs(r[2]-mid)<120).sort((u,v)=>Math.abs(railY(def,u[0],u[2])-cy)-Math.abs(railY(def,v[0],v[2])-cy))[0];if(rail){const [cx]=T([rail[2],cy]);return {x:cx-50,y,right:cx+50,height,kind:p[4],central,row:null};}}
   let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
   return {x,y,right,height,kind:p[4],central,row};
  });
  // 중간역 승강장(고상홈) 표시는 그 역의 정차 회로(line.js INTERMEDIATE의 전동선 ED·EU) 가운데에 붙인다.
  // 원본 좌표 그대로 두면 역간 폐색 회로가 화면에서 고르게 다시 배치될 때 옆 회로로 어긋난다 (노량진 신길 B938T).
  const tokenCentre=code=>cells.flatMap(c=>{const t=c.label.split(' · ').filter(Boolean),k=t.indexOf(code);return k<0&&c.label.replaceAll(' · ','')!==code?[]:[{cx:k<0?c.x+c.width/2:c.x+c.width*(k+.5)/t.length,y:c.y}];});
- const stops=Object.entries(lineInfo()?.INTERMEDIATE||{}).filter(([,v])=>v.host===st.id).flatMap(([id,v])=>Object.entries(v.slots).filter(([trunk])=>trunk[0]==='E').map(([trunk,code])=>({id,name:networkInfo()?.catalog?.[id]?.name,trunk,code})));
+ const stops=Object.entries(lineInfo()?.INTERMEDIATE||{}).filter(([,v])=>v.host===st.id).flatMap(([id,v])=>Object.entries(v.slots).filter(([trunk])=>/^[EM]/.test(trunk)).map(([trunk,code])=>({id,name:networkInfo()?.catalog?.[id]?.name,trunk,code})));
  for(const pb of platformBoxes){if(pb.central||pb.row===null)continue;const mid=(pb.x+pb.right)/2;
   const hit=stops.flatMap(s=>tokenCentre(s.code).filter(c=>Math.abs(c.y-pb.row)<3).map(c=>({...s,cx:c.cx}))).sort((a,b)=>Math.abs(a.cx-mid)-Math.abs(b.cx-mid))[0];
   if(hit&&Math.abs(hit.cx-mid)<200){const w=pb.right-pb.x;pb.x=hit.cx-w/2;pb.right=hit.cx+w/2;pb.stop=hit;}}
@@ -425,9 +431,12 @@ function render(st,def,core,model,neighbours={}){
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
-  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8]);
+  // 신호기 이름이 승강장 표시에 걸리면 마스트 반대쪽에 쓴다 (동묘앞 23)
+  const nameAt=d=>d===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8];
+  const nameDir=platformBoxes.some(p=>intersects(nameAt(dir),[p.x,p.y,p.right,p.y+p.height],1))&&!platformBoxes.some(p=>intersects(nameAt(-dir),[p.x,p.y,p.right,p.y+p.height],1))?-dir:dir;
+  occupiedBoxes.push(nameAt(nameDir));
   occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-dir*8}" y="${labelY+3.5}" text-anchor="${dir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-nameDir*8}" y="${labelY+3.5}" text-anchor="${nameDir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
   // Resolve dense labels locally only. Never detach an annotation from its turnout.
@@ -475,7 +484,7 @@ function render(st,def,core,model,neighbours={}){
  const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
  // Trim route colour to the same rail/quarter silhouette; preserve its continuous centre bridge.
  const routeMaskId='route-trim-'+st.id,routeMask=`<defs><mask id="${routeMaskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${WIDTH+80}" height="2400"><rect x="-40" y="-40" width="${WIDTH+80}" height="2400" fill="black"/><g mask="url(#${switches.maskId})" fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="miter" stroke-miterlimit="2" stroke-linecap="butt">${rails.replaceAll(/ data-reviewed-join="[^"]*"/g,'')}</g><g fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="bevel" stroke-linecap="butt">${switches.paint}${switches.bridges}</g></mask></defs>`;
- return {width:WIDTH,height:L.H,contentWidth:L.width||WIDTH,sourcePoint:T,ports:edgePorts.map(p=>({...p,at:T([p.x,p.y])})),navigation,svg:`${neighbours.overview?'':seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),occupiedBoxes)}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routeMask}<g class="route-network" mask="url(#${routeMaskId})">${routes}</g>${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ return {width:WIDTH,height:L.H,contentWidth:L.width||WIDTH,sourcePoint:T,ports:edgePorts.map(p=>({...p,at:T([p.x,p.y])})),navigation,svg:`${neighbours.overview?'':seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),[...occupiedBoxes,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...paths.flatMap(pts=>pts.slice(1).map((p,i)=>[Math.min(p[0],pts[i][0]),Math.min(p[1],pts[i][1])-BAR/2,Math.max(p[0],pts[i][0]),Math.max(p[1],pts[i][1])+BAR/2]))])}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routeMask}<g class="route-network" mask="url(#${routeMaskId})">${routes}</g>${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;
