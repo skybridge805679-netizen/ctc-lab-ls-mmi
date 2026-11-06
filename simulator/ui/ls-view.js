@@ -104,6 +104,10 @@ function render(st,def,core,model,neighbours={}){
  const WIDTH=neighbours.overview?Math.max(1600,L.width):1600;
  const plateGap=prepared.corridor?128:94;
  const edgePorts=seams.ports(st,def,data);
+ // 원본 슬라이드의 빨간 등 위치(tools/build-ls-xmap.py)가 있으면 그 자리를 신호기 기준으로 쓴다
+ const sigBase=(id,P)=>{const v=L.xmap?.signals?.[id];return v?[L.adj(v[0]*WIDTH/L.xmap.width)-v[1]*18,P[1]]:P;};
+ // 원본에서 줄마다 위치가 다른 꼭짓점(노량진 B929T·B930T가 꺾여 내려가는 두 수직선)은 원본 x에 고정한다
+ const railFix=L.xmap?.railPoints||[],fixPt=([x,y],P)=>{const f=railFix.find(([fx,fy])=>Math.abs(fx-x)<1&&Math.abs(fy-y)<2);return f?[+L.adj(f[2]*WIDTH/L.xmap.width).toFixed(2),P[1]]:P;};
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
  const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
@@ -139,7 +143,7 @@ function render(st,def,core,model,neighbours={}){
     else if(isBlock(c)){}
     else if(ref.has(c)){const [a,b]=ref.get(c);secondary.push([s0,!pinned(c.x,c.y,a,-1)?a:c.x],[s1,!pinned(c.x+c.width,c.y,b,1)?b:c.x+c.width]);}
     else secondary.push([s0,c.x],[s1,c.x+c.width]);}
-   primary.push([row[0].source[0],row[0].x],[row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);
+   if(!ref.has(row[0]))primary.push([row[0].source[0],row[0].x]);if(!ref.has(row.at(-1)))primary.push([row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);   /* 행 끝 칸이 원본 좌표를 가지면 그쪽을 따른다 */
    const fit=list=>{list.sort((a,b)=>a[0]-b[0]);const out=[];for(const a of list){if(out.length&&a[0]-out.at(-1)[0]<.5)continue;if(out.length&&a[1]<=out.at(-1)[1])continue;out.push(a);}return out;};
    let mono=fit(primary);
    for(const a of secondary){const lo=[...mono].reverse().find(m=>m[0]<a[0]-.5),hi=mono.find(m=>m[0]>a[0]+.5);if(mono.some(m=>Math.abs(m[0]-a[0])<.5))continue;if((!lo||a[1]>lo[1]+4)&&(!hi||a[1]<hi[1]-4))mono=fit([...mono,a]);}
@@ -150,14 +154,24 @@ function render(st,def,core,model,neighbours={}){
   if(port.side==='left'){const c=row.reduce((a,b)=>a.x<b.x?a:b);if(c.x>0&&c.x<220&&Math.abs(c.x-px)<30){c.width+=c.x;c.x=0;}}
   else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;if(r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
  // 꺾인 모서리·분기 끝 바로 옆 칸은 그 모서리에서 틈 하나만 띄우고 시작한다 (행별 원본 배치로 벌어진 빈 선로를 없앤다, 서울 B903T·B904T)
+ for(const [sx,sy,name] of L.xmap?.relabel||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(c)c.label=c.forceLabel=name;}   // 표시 이름만 원본대로
+ // 'nT · 회로'처럼 두 회로가 한 칸으로 추출된 곳은 원본 경계에서 두 칸으로 나눈다 (노량진 1T·51AT, 3T·52AT, 4T·52BT)
+ for(const [sx,sy,ox] of L.xmap?.splits||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(!c)continue;
+  const tokens=c.label.split(' · ').filter(Boolean);if(tokens.length<2)continue;const bx=L.adj(ox*WIDTH/L.xmap.width),end=c.x+c.width;if(bx<c.x+10||bx>end-10)continue;
+  c.width=bx-c.x;c.label=c.forceLabel=tokens[0];cells.push({...c,x:bx,width:end-bx,label:tokens.slice(1).join(' · '),forceLabel:tokens.slice(1).join(' · ')});}
  // 원본: 꺾인 모서리는 앞 회로에 속하고, 모서리 바깥으로 짧은 꼬리(TAIL)를 낸 뒤 틈, 그다음 칸 (서울 B902T→B904T, B901T→B903T)
  const cornerGaps=[],cornerTails=[],TAIL=28;
- if(L.xmap){const corners=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(T)),...(data.joins||[]).flatMap(j=>j.slice(1,-1).map(T))];
+ // 연결선(join)의 꺾인 곳이 누구 것인가: 반대쪽 끝이 이름 있는 선로 끝(또는 칸)에 붙어 있으면 그 회로의 꼬리(→ 꼬리 뒤에 틈),
+ // 반대쪽 끝이 이름 없는 조각이면 꺾인 선 전체가 이쪽 칸의 회로 (→ 틈 없이 칸을 모서리까지, 노량진 B618T2T)
+ const anchoredEnd=([x,y])=>def.rails.some(r=>[[r[1][0],r[3]],[r[1].at(-1),r[4]]].some(([p,code])=>code&&Math.abs(p[0]-x)<4&&Math.abs(p[1]-y)<4));
+ if(L.xmap){const corners=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.slice(1,-1).map(p=>{const P=fixPt(p,T(p));const near=Math.abs(j[0][1]-p[1])<2?j.at(-1):j[0];P.own=!anchoredEnd(Math.abs(j[0][1]-p[1])<2?j.at(-1):j[0]);P.far=near;return P;}))];
   for(const c of cells){const others=cells.filter(o=>o!==c&&Math.abs(o.y-c.y)<3);
    const left=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x<c.x+4&&c.x-x<90&&!others.some(o=>o.x+o.width>x&&o.x+o.width<=c.x+1)).sort((a,b)=>b[0]-a[0])[0];
-   if(left){const nx=left[0]+BAR/2+TAIL+7;if(Math.abs(nx-c.x)>1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);cornerTails.push([[left[0],c.y],[nx,c.y]]);}}
+   if(left&&left.own){const nx=left[0]+BAR/2;if(nx<c.x-1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;}}
+   else if(left){const nx=left[0]+BAR/2+TAIL+7;if(Math.abs(nx-c.x)>1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);cornerTails.push([[left[0],c.y],[nx,c.y]]);}}
    const right=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x>c.x+c.width-4&&x-(c.x+c.width)<90&&!others.some(o=>o.x<x&&o.x>=c.x+c.width-1)).sort((a,b)=>a[0]-b[0])[0];
-   if(right){const nr=right[0]-BAR/2-TAIL-7;if(Math.abs(nr-(c.x+c.width))>1&&nr>c.x+24){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);cornerTails.push([[nr,c.y],[right[0],c.y]]);}}}}
+   if(right&&right.own){const nr=right[0]-BAR/2;if(nr>c.x+c.width+1)c.width=nr-c.x;}
+   else if(right){const nr=right[0]-BAR/2-TAIL-7;if(Math.abs(nr-(c.x+c.width))>1&&nr>c.x+24){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);cornerTails.push([[nr,c.y],[right[0],c.y]]);}}}}
  // 회로 칸 사이 틈 (원본 LS): 같은 줄의 서로 다른 회로 경계마다 같은 폭(GAP)의 틈을 두고, 신호기·입환표지는 그 틈에 선다.
  // 떼지 않는 곳: 같은 회로 조각(이름이 같은 칸), 승강장 열번창과 그 nT(한 회로), 꺾인 연결·분기 사선(칸 끝에 붙음).
  const GAP=7,cellGaps=[...cornerGaps];
@@ -167,8 +181,9 @@ function render(st,def,core,model,neighbours={}){
   for(const [y,row] of rowMap){row.sort((a,b)=>a.x-b.x);
    for(let i=0;i<row.length-1;i++){const L1=row[i],R1=row[i+1],end=L1.x+L1.width,gap=R1.x-end;
     if(gap>30||gap<-Math.min(L1.width,R1.width)*.5)continue;   // 멀리 떨어진 칸(사이에 분기·다른 선로)은 그대로
-    if(L1.label&&L1.label===R1.label){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 같은 회로 조각은 잇는다
-    let b=(end+R1.x)/2;const sig=sigX.filter(q=>Math.abs(q.Y-y)<3&&Math.abs(q.X-b)<=24).sort((p,q)=>Math.abs(p.X-b)-Math.abs(q.X-b))[0];if(sig)b=sig.X;   // 신호기가 있으면 그 자리가 경계
+    if(L1.label&&L1.label===R1.label){if(gap>0)L1.width=R1.x-L1.x;continue;}
+    if((!L1.label&&/^\d+T$/.test(R1.label))||(!R1.label&&/^\d+T$/.test(L1.label))){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 승강장 칸과 그 nT는 한 회로   // 같은 회로 조각은 잇는다
+    let b=(end+R1.x)/2;   /* 경계는 칸(원본 배치)이 정한다; 신호기는 아래에서 이 틈으로 옮긴다 */
     b=Math.max(L1.x+12,Math.min(R1.x+R1.width-12,b));const r=R1.x+R1.width;L1.width=b-GAP/2-L1.x;R1.x=b+GAP/2;R1.width=r-R1.x;cellGaps.push([b,y]);}}}
  // Platform glyphs keep a readable size and a consistent offset from their rail.
  const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
@@ -204,7 +219,8 @@ function render(st,def,core,model,neighbours={}){
   const y=own.y-84,mid=(own.x+own.right)/2,half=Math.max(own.right-own.x,plate.name.length*16+18)/2+6,above=Math.max(-Infinity,...cells.filter(c=>c.x<mid+half&&c.x+c.width>mid-half).map(c=>c.y).filter(v=>v<own.row-3));return y-4>above+BAR/2?y:fallback;};
  // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
  const bracketBoxes=wing.fixed.brackets.map(b=>{
-  const [x,y,w,h]=b.bounds,cx=T([x+w/2,y])[0];
+  const [x,y,w,h]=b.bounds;let cx=T([x+w/2,y])[0];
+  { /* 괄호 표식은 그 사이를 지나는 수직선에 맞춘다 */ const v=(L.xmap?.railPoints||[]).filter(([fx])=>Math.abs(fx-(x+w/2))<12).sort((a,b)=>Math.abs(a[0]-x-w/2)-Math.abs(b[0]-x-w/2))[0];if(v)cx=L.adj(v[2]*WIDTH/L.xmap.width); }
   const crossed=[...new Set(rows.filter(row=>row>=y-5&&row<=y+h+5))];
   const top=crossed.length?T([x,Math.min(...crossed)])[1]-17:T([x,y])[1];
   const bottom=crossed.length?T([x,Math.max(...crossed)])[1]+17:T([x,y+h])[1];
@@ -249,8 +265,8 @@ function render(st,def,core,model,neighbours={}){
  };
  const active=Object.entries(model.routes).map(([id,state])=>({id,state:state.occupied?'occupied':state.lock?'locked':'set',points:projectRoute(routePoints(core.routes[id].path),core.routes[id].destination)}));
  const onRoute=cell=>active.find(route=>route.points.slice(1).some((b,i)=>{const a=route.points[i];return Math.abs(a[1]-b[1])<.5&&Math.abs(a[1]-cell.y)<5&&Math.min(a[0],b[0])<cell.x+cell.width-2&&Math.max(a[0],b[0])>cell.x+2;}));
- const snapJoin=([x,y])=>{const nearest=rows.filter(row=>Math.abs(row-y)<2).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y))[0];return T([x,nearest??y]);};
- const paths=[...def.rails.map(r=>r[1].map(T)),...(data.joins||[]).map(poly=>poly.map(snapJoin))];
+ const snapJoin=([x,y])=>{const nearest=rows.filter(row=>Math.abs(row-y)<2).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y))[0];return fixPt([x,y],T([x,nearest??y]));};
+ const paths=[...def.rails.map(r=>r[1].map(p=>fixPt(p,T(p)))),...(data.joins||[]).map(poly=>poly.map(snapJoin))];
  paths.push(...cornerTails);   // 모서리 꼬리 (앞 회로 색으로 이어진다)
  const pointAnchors={};
  for(const [id,a,x,b,z]of def.links){const p=T([x,railY(def,a,x)]),q=T([z,railY(def,b,z)]);pointAnchors[id]=[(p[0]+q[0])/2,(p[1]+q[1])/2];}
@@ -286,7 +302,7 @@ function render(st,def,core,model,neighbours={}){
  let cached=windowLayouts.get(def)?.get(layoutKey);
  if(!cached){
  const windowBoxes=[];
- const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=T([x,y]);return [X-40,Y-11,X+40,Y+11];})];
+ const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=sigBase(id,T([x,y]));return [X-48,Y-11,X+48,Y+11];})];
  const capsulePositions=blockView.build(st,def,cells,T,prepared.split);
  for(const b of capsulePositions)obstacles.push(b.box);
  for(const item of visibleWindows){
@@ -363,7 +379,7 @@ function render(st,def,core,model,neighbours={}){
  }
  // Adjacent extraction fragments may belong to one named circuit. Consolidate text only;
  // every original circuit rectangle, hit target and interlocking resource stays intact.
- const labelCells=cells.map(c=>({...c,label:labelReview.labelFor(st.id,c.source)}));
+ const labelCells=cells.map(c=>({...c,label:c.forceLabel??labelReview.labelFor(st.id,c.source)}));
  const fragments=labelCells.flatMap(c=>{
   const atomic=c.label.replaceAll(' · ',''),tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   return tokens.map((label,i)=>({...c,label,x:c.x+c.width*i/tokens.length,width:c.width/tokens.length}));
@@ -408,7 +424,8 @@ function render(st,def,core,model,neighbours={}){
   const pb=!extension&&platformBox(name),onRow=pb&&Math.abs(pb.cy-y)<4;
   // 칸이 없는 선로 끝 구간의 이름은 그 빈 구간(화면 끝~첫 칸) 가운데에 둔다 (수원 B1036T가 XT에 붙지 않게)
   const rowCells=cells.filter(c=>Math.abs(c.y-y)<3),gapL=Math.max(4,...rowCells.filter(c=>c.x+c.width<=baseX+offset+1).map(c=>c.x+c.width)),gapR=Math.min(WIDTH-4,...rowCells.filter(c=>c.x>=baseX+offset-1).map(c=>c.x));
-  const freeMid=gapR-gapL>width+16?(gapL+gapR)/2:null;
+  const iv=intervals.find(([a,b])=>baseX+offset>=a-2&&baseX+offset<=b+2),fl=iv?Math.max(gapL,iv[0]):gapL,fr=iv?Math.min(gapR,iv[1]-BAR):gapR;   /* 그 선로의 가로 구간 안에서 */
+  const freeMid=fr-fl>width+16?(fl+fr)/2:null;
   const preferredX=extension?(edgeX+4+WIDTH-12)/2:onRow?pb.x+pb.width+7+width/2:freeMid??baseX+offset;
   let x=preferredX;
   // 승강장 오른쪽 칸을 먼저 찾고(오른쪽으로만 이동), 없으면 원래 방식(양쪽)으로 찾는다
@@ -502,7 +519,31 @@ function render(st,def,core,model,neighbours={}){
   return true;
  });
  // Each signal stays at its surveyed mast and lamp coordinates. Paired signals retain their source stack.
- const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x),[X,Y]=T([x,railLocal]);return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
+ // 원본 LS: 신호기·입환표지는 회로 사이 틈에 선다. 역 구내는 여러 선로의 틈이 한 세로줄(열)로 맞춰져 있다.
+ // 1) 같은 줄의 가까운 틈, 없으면 2) 이웃 줄들이 이루는 틈 열로 신호기를 옮기고, 그 자리에 자기 선로가 이어져 있으면 틈을 낸다.
+ // 3) 승강장 선로(nT)는 그 열을 지나가면 틈을 낸다 (영등포 22T·24AT·1T, 3B 선로 등).
+ const sigAt=new Map();
+ if(cellGaps.length){
+  const onRail=(x,y)=>paths.some(pts=>pts.some((p,i)=>i&&Math.abs(p[1]-y)<3&&Math.abs(pts[i-1][1]-y)<3&&Math.min(p[0],pts[i-1][0])<x-6&&Math.max(p[0],pts[i-1][0])>x+6))||cells.some(c=>Math.abs(c.y-y)<3&&c.x<x-6&&c.x+c.width>x+6);
+  const hasGap=(x,y,r=12)=>cellGaps.some(([gx,gy])=>Math.abs(gy-y)<3&&Math.abs(gx-x)<r);
+  const columns=[];for(const [gx] of cellGaps){const col=columns.find(c=>Math.abs(c.x-gx)<10);if(col){col.n++;col.x+=(gx-col.x)/col.n;}else columns.push({x:gx,n:1});}
+  const platRows=(trainWindows.data[st.id]||[]).filter(w=>w.side==='inline'&&/^\d+T$/.test(w.slot||w.code)).map(w=>def.rails.find(r=>r[0]===(w.slot||w.code))).filter(r=>r&&r[2]!=null).map(r=>T([r[2],railY(def,r[0],r[2])]));
+  const platX=x=>platRows.length?Math.min(...platRows.map(([px])=>Math.abs(px-x))):Infinity;
+  // 승강장 옆에서 40px 안에 두 열이 생기면 승강장에 가까운 열 하나로 모은다 (원본: nT 칸 바로 뒤 한 줄)
+  let strong=columns.filter(c=>c.n>=3).sort((a,b)=>platX(a.x)-platX(b.x));const kept=[];for(const c of strong)if(!kept.some(k=>Math.abs(k.x-c.x)<40&&platX(c.x)<300))kept.push(c);strong=kept;
+  for(const k of strong){if(platX(k.x)>=300)continue;for(const g of cellGaps){if(Math.abs(g[0]-k.x)>=40||Math.abs(g[0]-k.x)<=3||!platRows.some(([,py])=>Math.abs(py-g[1])<3))continue;
+   for(const c of cells){if(Math.abs(c.y-g[1])>=3)continue;if(Math.abs(c.x+c.width-(g[0]-GAP/2))<6)c.width=k.x-GAP/2-c.x;else if(Math.abs(c.x-(g[0]+GAP/2))<6){const r=c.x+c.width;c.x=k.x+GAP/2;c.width=r-c.x;}}g[0]=k.x;}}
+  for(const [id,rail,x,lampY] of def.signals){const [X,Y]=sigBase(id,T([x,railY(def,rail,x)])),LY0=T([0,lampY])[1];
+   const own=cellGaps.filter(([gx,gy])=>Math.abs(gy-Y)<3&&Math.abs(gx-X)<45).sort((a,b)=>Math.abs(a[0]-X)-Math.abs(b[0]-X))[0];
+   const col=strong.filter(c=>Math.abs(c.x-X)<40).sort((a,b)=>Math.abs(a.x-X)-Math.abs(b.x-X))[0];
+   const nx=own?own[0]:col?col.x:null;if(nx==null)continue;
+   if(capsulePositions.some(c=>intersects([nx-30,LY0-9,nx+30,LY0+9],c.box,2))&&!capsulePositions.some(c=>intersects([X-30,LY0-9,X+30,LY0+9],c.box,2)))continue;   // 폐색 표식과 겹치면 옮기지 않는다
+   sigAt.set(id,nx);
+   if(!hasGap(nx,Y)&&onRail(nx,Y))cellGaps.push([nx,Y]);}
+  for(const [px,py] of platRows)for(const c of strong){if(Math.abs(c.x-px)>260||hasGap(c.x,py,16))continue;if(onRail(c.x,py))cellGaps.push([c.x,py]);}
+ }
+ const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x);let [X,Y]=sigBase(id,T([x,railLocal]));if(sigAt.has(id))X=sigAt.get(id);
+  {const LY=T([0,lampY])[1],body=x0=>[Math.min(x0,x0+dir*18)-4,LY-8,Math.max(x0,x0+dir*18)+12,LY+8];for(let k=0;k<12;k++){const hit=capsulePositions.find(c=>intersects(body(X),c.box,1));if(!hit)break;X+=Math.sign(X-(hit.box[0]+hit.box[2])/2||1)*4;}} /* 폐색 표식과 겹치면 옆으로 비킨다 */return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
  // Give a tight stack of names its own minimum line spacing, without moving lamps.
  const nameY=new Map(placed.map(s=>[s.id,T([0,s.lampY])[1]])),nameColumns=new Map();
  for(const s of placed){const key=s.anchorX.toFixed(1)+'|'+s.dir;if(!nameColumns.has(key))nameColumns.set(key,[]);nameColumns.get(key).push(s);}
@@ -523,7 +564,7 @@ function render(st,def,core,model,neighbours={}){
   const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
   // 신호기 이름이 승강장 표시에 걸리면 마스트 반대쪽에 쓴다 (동묘앞 23)
   const nameAt=d=>d===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8];
-  const keepOut=[...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...windowBoxes.filter(b=>b.inline).map(b=>[b.x,b.y,b.x+b.width,b.y+b.height])];   // 승강장·승강장 열번창
+  const keepOut=[...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...windowBoxes.filter(b=>b.inline).map(b=>[b.x,b.y,b.x+b.width,b.y+b.height]),...capsulePositions.map(c=>c.box)];   // 승강장·승강장 열번창
   const nameDir=keepOut.some(b=>intersects(nameAt(dir),b,1))&&!keepOut.some(b=>intersects(nameAt(-dir),b,1))?-dir:dir;
   occupiedBoxes.push(nameAt(nameDir));
   occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);

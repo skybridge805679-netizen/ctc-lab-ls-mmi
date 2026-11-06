@@ -577,7 +577,11 @@
             "B944T",
             "B946T"
           ],
-          "slide": 9
+          "slide": 9,
+          "widths": [
+            76,
+            202
+          ]
         },
         {
           "y": 742,
@@ -590,7 +594,18 @@
           "slide": 9
         }
       ],
-      "joins": []
+      "joins": [],
+      "labelCorrections": [
+        {
+          "from": "",
+          "to": "B942T",
+          "at": [
+            1196.9,
+            690.5
+          ],
+          "note": "원본 LS: B942T 한 칸 (PDF에서 두 조각)"
+        }
+      ]
     },
     "guro": {
       "strips": [

@@ -56,7 +56,7 @@ def slide_bars(slide):
 def our_cells():
     js = ("const LS=require('./simulator/ui/ls-view.js'),N=require('./simulator/engine/network.js');const o={};"
           "const W=require('./simulator/engine/wiring.js');"
-          f"for(const id of {json.dumps(list(SLIDES))}){{const xs=W.data[id].rails.flatMap(r=>r[1].map(p=>p[0]));o[id]={{cells:LS.sceneOf(N.catalog[id]).cells,railMin:Math.min(...xs),railMax:Math.max(...xs)}};}}"
+          f"for(const id of {json.dumps(list(SLIDES))}){{const xs=W.data[id].rails.flatMap(r=>r[1].map(p=>p[0]));o[id]={{cells:LS.sceneOf(N.catalog[id]).cells,railMin:Math.min(...xs),railMax:Math.max(...xs),signals:W.data[id].signals}};}}"
           "process.stdout.write(JSON.stringify(o))")
     return json.loads(subprocess.run(['node', '-e', js], cwd=ROOT, check=True, capture_output=True, text=True).stdout)
 
@@ -266,7 +266,24 @@ def build(sid, slide, scene):
         if (sx, sy) in trusted or (iou >= 0.5 and 0.6 <= (b - a) / max(1, m1 - m0) <= 1.7):
             good[(sx, sy)] = (label, a, b)
     matches = good
-    return {'slide': slide, 'width': width,
+    # 신호기 위치: 원본 슬라이드의 빨간 등(신호 현시)을 찾아 그 신호기의 원본 x로 쓴다
+    im = cv2.imread(str(ROOT / f'simulator/assets/stations/slide{slide}.png'))
+    red = ((im[:, :, 2] > 190) & (im[:, :, 1] < 80) & (im[:, :, 0] < 80)).astype(np.uint8)
+    n, _, st, cen = cv2.connectedComponentsWithStats(red, 8)
+    lamps = [(float(cen[i][0]), float(cen[i][1])) for i in range(1, n) if 4 <= st[i][2] <= 26 and 4 <= st[i][3] <= 26 and st[i][1] > 150]
+    sigx, used = {}, set()
+    cand = []
+    for sig in scene['signals']:
+        sid_, rail, x, lampY, d = sig
+        ex, ey = interp(knots, x), float(np.polyval(A, lampY))
+        for j, (lx, ly) in enumerate(lamps):
+            if abs(ly - ey) < 14 and abs(lx - ex) < 170:
+                cand.append((abs(lx - ex) + 3 * abs(ly - ey), sid_, j, lx, d))
+    for _, sid_, j, lx, d in sorted(cand):
+        if sid_ in sigx or j in used:
+            continue
+        sigx[sid_] = [round(lx, 1), d]; used.add(j)
+    return {'slide': slide, 'width': width, 'signals': sigx, 'splits': allov.get('splits', {}).get(sid, []), 'relabel': [[a, b, c] for a, b, c, *_ in allov.get('relabel', {}).get(sid, [])], 'railPoints': [[a, b, c] for a, b, c, *_ in allov.get('railPoints', {}).get(sid, [])],
             'knots': [[round(a, 1), round(b, 1)] for a, b in knots],
             'cells': sorted([[k[0], k[1], v[0], v[1], v[2]] for k, v in matches.items()])}
 
