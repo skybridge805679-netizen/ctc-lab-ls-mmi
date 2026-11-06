@@ -100,4 +100,7 @@ jobs:
             echo "Release ${tag} already exists; existing downloads are preserved."
             exit 0
           fi
-          gh release create "$tag" installers/* --target "$GITHUB_SHA" --title "ORPHEIA CTC LAB ${version}" --notes-file desktop/release-notes.md
+          # 릴리즈 본문에는 이번 버전 항목만 싣는다 (파일 전체 이력을 싣지 않음)
+          awk -v v="v${version}" 'index($0,v)==1 && substr($0,length(v)+1,1)~/[: ]|^$/ {on=1} on && /^v[0-9]/ && index($0,v)!=1 {exit} on' desktop/release-notes.md > current-notes.md
+          [ -s current-notes.md ] || echo "v${version}" > current-notes.md
+          gh release create "$tag" installers/* --target "$GITHUB_SHA" --title "ORPHEIA CTC LAB ${version}" --notes-file current-notes.md
