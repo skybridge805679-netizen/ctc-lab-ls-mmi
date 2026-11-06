@@ -160,21 +160,24 @@ function render(st,def,core,model,neighbours={}){
   const tokens=c.label.split(' · ').filter(Boolean);if(tokens.length<2)continue;const bx=L.adj(ox*WIDTH/L.xmap.width),end=c.x+c.width;if(bx<c.x+10||bx>end-10)continue;
   c.width=bx-c.x;c.label=c.forceLabel=tokens[0];cells.push({...c,x:bx,width:end-bx,label:tokens.slice(1).join(' · '),forceLabel:tokens.slice(1).join(' · ')});}
  // 원본: 꺾인 모서리는 앞 회로에 속하고, 모서리 바깥으로 짧은 꼬리(TAIL)를 낸 뒤 틈, 그다음 칸 (서울 B902T→B904T, B901T→B903T)
- const cornerGaps=[],cornerTails=[],TAIL=28;
+ const GAP=7,cornerGaps=[],cornerTails=[],TAIL=28;
  // 연결선(join)의 꺾인 곳이 누구 것인가: 반대쪽 끝이 이름 있는 선로 끝(또는 칸)에 붙어 있으면 그 회로의 꼬리(→ 꼬리 뒤에 틈),
  // 반대쪽 끝이 이름 없는 조각이면 꺾인 선 전체가 이쪽 칸의 회로 (→ 틈 없이 칸을 모서리까지, 노량진 B618T2T)
  const anchoredEnd=([x,y])=>def.rails.some(r=>[[r[1][0],r[3]],[r[1].at(-1),r[4]]].some(([p,code])=>code&&Math.abs(p[0]-x)<4&&Math.abs(p[1]-y)<4));
  if(L.xmap){const corners=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.slice(1,-1).map(p=>{const P=fixPt(p,T(p));const near=Math.abs(j[0][1]-p[1])<2?j.at(-1):j[0];P.own=!anchoredEnd(Math.abs(j[0][1]-p[1])<2?j.at(-1):j[0]);P.far=near;return P;}))];
-  for(const c of cells){const others=cells.filter(o=>o!==c&&Math.abs(o.y-c.y)<3);
+  const hasRef=c=>L.xmap.cells.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6);
+  for(const c of cells){const fixedC=hasRef(c);   /* 원본 위치를 아는 칸은 옮기지 않고 앞에 틈·꼬리만 */const others=cells.filter(o=>o!==c&&Math.abs(o.y-c.y)<3);
    const left=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x<c.x+4&&c.x-x<90&&!others.some(o=>o.x+o.width>x&&o.x+o.width<=c.x+1)).sort((a,b)=>b[0]-a[0])[0];
-   if(left&&left.own){const nx=left[0]+BAR/2;if(nx<c.x-1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;}}
+   if(left&&left.own&&!fixedC){const nx=left[0]+BAR/2;if(nx<c.x-1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;}}
+   else if(left&&fixedC){if(c.x-(left[0]+BAR/2)>GAP+2){cornerGaps.push([c.x-GAP/2,c.y]);cornerTails.push([[left[0],c.y],[c.x,c.y]]);}}
    else if(left){const nx=left[0]+BAR/2+TAIL+7;if(Math.abs(nx-c.x)>1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);cornerTails.push([[left[0],c.y],[nx,c.y]]);}}
    const right=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x>c.x+c.width-4&&x-(c.x+c.width)<90&&!others.some(o=>o.x<x&&o.x>=c.x+c.width-1)).sort((a,b)=>a[0]-b[0])[0];
-   if(right&&right.own){const nr=right[0]-BAR/2;if(nr>c.x+c.width+1)c.width=nr-c.x;}
+   if(right&&right.own&&!fixedC){const nr=right[0]-BAR/2;if(nr>c.x+c.width+1)c.width=nr-c.x;}
+   else if(right&&fixedC){if((right[0]-BAR/2)-(c.x+c.width)>GAP+2){cornerGaps.push([c.x+c.width+GAP/2,c.y]);cornerTails.push([[c.x+c.width,c.y],[right[0],c.y]]);}}
    else if(right){const nr=right[0]-BAR/2-TAIL-7;if(Math.abs(nr-(c.x+c.width))>1&&nr>c.x+24){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);cornerTails.push([[nr,c.y],[right[0],c.y]]);}}}}
  // 회로 칸 사이 틈 (원본 LS): 같은 줄의 서로 다른 회로 경계마다 같은 폭(GAP)의 틈을 두고, 신호기·입환표지는 그 틈에 선다.
  // 떼지 않는 곳: 같은 회로 조각(이름이 같은 칸), 승강장 열번창과 그 nT(한 회로), 꺾인 연결·분기 사선(칸 끝에 붙음).
- const GAP=7,cellGaps=[...cornerGaps];
+ const cellGaps=[...cornerGaps];
  if(!neighbours.overview){
   const sigX=def.signals.map(([id,rail,x])=>{const [X,Y]=T([x,railY(def,rail,x)]);return {id,X,Y};});
   const rowMap=new Map();for(const c of cells){const k=[...rowMap.keys()].find(y=>Math.abs(y-c.y)<3)??c.y;if(!rowMap.has(k))rowMap.set(k,[]);rowMap.get(k).push(c);}
@@ -182,7 +185,8 @@ function render(st,def,core,model,neighbours={}){
    for(let i=0;i<row.length-1;i++){const L1=row[i],R1=row[i+1],end=L1.x+L1.width,gap=R1.x-end;
     if(gap>30||gap<-Math.min(L1.width,R1.width)*.5)continue;   // 멀리 떨어진 칸(사이에 분기·다른 선로)은 그대로
     if(L1.label&&L1.label===R1.label){if(gap>0)L1.width=R1.x-L1.x;continue;}
-    if((!L1.label&&/^\d+T$/.test(R1.label))||(!R1.label&&/^\d+T$/.test(L1.label))){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 승강장 칸과 그 nT는 한 회로   // 같은 회로 조각은 잇는다
+    const platSlot=n=>/^\d+T$/.test(n)&&(trainWindows.data[st.id]||[]).some(w=>w.side==='inline'&&(w.slot===n||w.code===n));
+    if((!L1.label&&platSlot(R1.label))||(!R1.label&&platSlot(L1.label))){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 승강장 칸과 그 nT는 한 회로   // 같은 회로 조각은 잇는다
     let b=(end+R1.x)/2;   /* 경계는 칸(원본 배치)이 정한다; 신호기는 아래에서 이 틈으로 옮긴다 */
     b=Math.max(L1.x+12,Math.min(R1.x+R1.width-12,b));const r=R1.x+R1.width;L1.width=b-GAP/2-L1.x;R1.x=b+GAP/2;R1.width=r-R1.x;cellGaps.push([b,y]);}}}
  // 틈 열(여러 선로의 틈이 한 세로줄로 맞춰진 곳)을 찾고, 승강장 옆 열은 하나로 모아 칸 경계도 함께 옮긴다 (칸을 그리기 전에)
@@ -426,8 +430,8 @@ function render(st,def,core,model,neighbours={}){
  const hasName=name=>fragments.some(c=>c.label===name);
  const addRailName=(name,anchor,poly,offset=0)=>{
   if(!name||hasName(name))return;
-  const [baseX,y]=T(anchor),width=name.length*7.2+6;
-  let intervals=poly.slice(1).flatMap((p,i)=>{const a=T(poly[i]),b=T(p);return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
+  const [baseX,y]=fixPt(anchor,T(anchor)),width=name.length*7.2+6;
+  let intervals=poly.slice(1).flatMap((p,i)=>{const a=fixPt(poly[i],T(poly[i])),b=fixPt(p,T(p));return Math.abs(a[1]-b[1])<2&&Math.abs(y-a[1])<2?[[Math.min(a[0],b[0]),Math.max(a[0],b[0])]]:[];});
   // An unnamed boundary segment belongs beyond the local endpoint, on the existing
   // horizontal screen continuation. Never push B607T back into the named YT circuit.
   const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);

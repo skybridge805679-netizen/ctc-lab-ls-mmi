@@ -2,13 +2,13 @@
 const inventory=typeof module!=='undefined'?require('../engine/block-signals'):root.SimBlockSignals;
 const {railY}=typeof module!=='undefined'?require('../engine/track-geometry'):root.SimTrackGeometry;
 function build(st,def,cells,T,visibleOnly=false){
- const items=(inventory[st.id]||[]).map(item=>{
+ const items=(inventory[st.id]||[]).map(src=>{let item=src;
   const code=item.anchorCode||item.code;
   const cell=cells.find(c=>c.label.replaceAll(' · ','')===code);
   const rail=def.rails.find(r=>r[3]===code||r[4]===code||r[0]===code);
   let x,y;
   let cellY;if(cell){x=cell.x+cell.width*item.fraction;y=cell.y;cellY=cell.y;}
-  else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[x,y]=T(p);x+=rail[3]===code?20:/^B\d+T/.test(code)?20:-20;}
+  else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[x,y]=T(p);x+=rail[3]===code?20:/^B\d+T/.test(code)?20:-20;cellY=y;item={...item,railEnd:rail[3]===code?'left':rail[4]===code?'right':null};}   /* 칸 없는 선로 회로도 그 줄 경계에 맞춘다 */
   else {if(visibleOnly)return null;throw new Error(st.id+' block number anchor missing: '+code);}
   x=Math.max(22,Math.min(1578,x));y+=item.side==='above'?-17:17;
   return {...item,x,y,cellY,minX:cell?cell.x+22:22,maxX:cell?cell.x+cell.width-22:1578,box:[x-22,y-10,x+22,y+10]};
@@ -17,11 +17,13 @@ function build(st,def,cells,T,visibleOnly=false){
  // 하선(기둥 왼쪽)은 회로의 왼쪽 경계, 상선(기둥 오른쪽)은 오른쪽 경계. 원본 슬라이드의 회로 내 비율은 가장 가까운 경계를 고르는 데만 쓰고,
  // 한 경계에는 같은 쪽 표식이 하나만 선다 (노량진 B618T1T의 3·2호주가 한 회로 안에 겹치던 문제).
  const rowsOf=new Map();for(const c of cells){const k=[...rowsOf.keys()].find(y=>Math.abs(y-c.y)<3)??c.y;if(!rowsOf.has(k))rowsOf.set(k,[]);rowsOf.get(k).push(c.x,c.x+c.width);}
- const edges=y=>{const k=[...rowsOf.keys()].find(r=>Math.abs(r-y)<3);if(k===undefined)return [];const xs=[...rowsOf.get(k)].sort((a,b)=>a-b),out=[];for(const x of xs){if(out.length&&x-out.at(-1)<=10){out[out.length-1]=(out.at(-1)+x)/2;continue;}out.push(x);}return out;};   // 칸 사이 틈(양쪽 테두리)은 한 경계
+ const edges=y=>{const k=[...rowsOf.keys()].find(r=>Math.abs(r-y)<3);if(k===undefined)return [];const xs=[...rowsOf.get(k)].sort((a,b)=>a-b),out=[];if(xs[0]>8&&xs[0]<230)xs.unshift(-17);if(xs.at(-1)<1592&&xs.at(-1)>1370)xs.push(1617);   /* 칸 없이 화면 끝까지 가는 선로(수원 B1036T): 화면 끝이 경계 */for(const x of xs){if(out.length&&x-out.at(-1)<=10){out[out.length-1]=(out.at(-1)+x)/2;continue;}out.push(x);}return out;};   // 칸 사이 틈(양쪽 테두리)은 한 경계
  const used=new Map();
  for(const item of items.filter(i=>i.cellY!==undefined).sort((a,b)=>a.x-b.x)){
   const stem=item.stem==='left'?-1:1,bar=item.x+stem*21,key=item.cellY.toFixed(0)+'|'+item.side+'|'+item.stem,taken=used.get(key)||new Set();
-  const pick=edges(item.cellY).filter(x=>!taken.has(Math.round(x))&&Math.abs(x-bar)<160).sort((a,b)=>Math.abs(a-bar)-Math.abs(b-bar))[0];
+  const E=edges(item.cellY);let pick=E.filter(x=>!taken.has(Math.round(x))&&Math.abs(x-bar)<160).sort((a,b)=>Math.abs(a-bar)-Math.abs(b-bar))[0];
+  /* 화면 끝에서 시작하는 선로 회로(수원 B1036T·B714T): 그 회로의 바깥 경계는 화면 끝 */
+  if(item.railEnd==='left'&&stem<0)pick=E[0];else if(item.railEnd==='right'&&stem>0)pick=E.at(-1);
   if(pick===undefined)continue;taken.add(Math.round(pick));used.set(key,taken);
   item.x=Math.max(22,Math.min(1578,pick-stem*21));item.boundary=pick;item.minX=Math.min(item.minX,item.x);item.maxX=Math.max(item.maxX,item.x);item.box=[item.x-22,item.y-10,item.x+22,item.y+10];
  }
