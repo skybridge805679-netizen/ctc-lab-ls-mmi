@@ -154,7 +154,7 @@ function render(st,def,core,model,neighbours={}){
   if(port.side==='left'){const c=row.reduce((a,b)=>a.x<b.x?a:b);if(c.x>0&&c.x<220&&Math.abs(c.x-px)<30){c.width+=c.x;c.x=0;}}
   else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;if(r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
  // 꺾인 모서리·분기 끝 바로 옆 칸은 그 모서리에서 틈 하나만 띄우고 시작한다 (행별 원본 배치로 벌어진 빈 선로를 없앤다, 서울 B903T·B904T)
- for(const [sx,sy,name] of L.xmap?.relabel||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(c)c.label=c.forceLabel=name;}   // 표시 이름만 원본대로
+ for(const [sx,sy,name] of L.xmap?.relabel||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(c)c.forceLabel=name;}   // 표시 이름만 원본대로 (회로 식별은 그대로)
  // 'nT · 회로'처럼 두 회로가 한 칸으로 추출된 곳은 원본 경계에서 두 칸으로 나눈다 (노량진 1T·51AT, 3T·52AT, 4T·52BT)
  for(const [sx,sy,ox] of L.xmap?.splits||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(!c)continue;
   const tokens=c.label.split(' · ').filter(Boolean);if(tokens.length<2)continue;const bx=L.adj(ox*WIDTH/L.xmap.width),end=c.x+c.width;if(bx<c.x+10||bx>end-10)continue;
@@ -253,6 +253,7 @@ function render(st,def,core,model,neighbours={}){
   const w=Math.max(...c.lines.map(t=>t.length))*15+32,h=c.lines.length*22+20;
   let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
   if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*90;}
+  { /* 원본 화면 위치를 아는 역은 그 가로 위치에 둔다 (의왕 남부화물기지 A·B선) */ const v=L.xmap?.captions?.[c.id];if(v)x=L.adj(v*WIDTH/L.xmap.width); }
   if(c.id==='depot-lead'){
    const a=def.rails.find(r=>r[4]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
    const right=T([Math.max(a[0],b[0]),a[1]])[0];y=(T(a)[1]+T(b)[1])/2;x=right+32+w/2;
@@ -344,7 +345,7 @@ function render(st,def,core,model,neighbours={}){
  for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=Math.max(b-a,plate.name.length*16+18),x=plateX(own?(own.x+own.right)/2:(a+b)/2,w),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
- for(const p of edgePorts){if(!p.name)continue;const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
+ for(const p of edgePorts){if(true)continue;   /* 선로명 표기 삭제(원본에 없음): 자리 예약도 하지 않는다 */const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
  const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  for(const lane of windowLanes.values()){
   // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.

@@ -283,7 +283,7 @@ def build(sid, slide, scene):
         if sid_ in sigx or j in used:
             continue
         sigx[sid_] = [round(lx, 1), d]; used.add(j)
-    return {'slide': slide, 'width': width, 'signals': sigx, 'splits': allov.get('splits', {}).get(sid, []), 'relabel': [[a, b, c] for a, b, c, *_ in allov.get('relabel', {}).get(sid, [])], 'railPoints': [[a, b, c] for a, b, c, *_ in allov.get('railPoints', {}).get(sid, [])],
+    return {'slide': slide, 'width': width, 'signals': sigx, 'splits': allov.get('splits', {}).get(sid, []), 'relabel': [[a, b, c] for a, b, c, *_ in allov.get('relabel', {}).get(sid, [])], 'captions': allov.get('captions', {}).get(sid, {}), 'railPoints': [[a, b, c] for a, b, c, *_ in allov.get('railPoints', {}).get(sid, [])],
             'knots': [[round(a, 1), round(b, 1)] for a, b in knots],
             'cells': sorted([[k[0], k[1], v[0], v[1], v[2]] for k, v in matches.items()])}
 

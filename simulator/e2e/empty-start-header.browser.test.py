@@ -30,7 +30,7 @@ try:
      assert c['x']>=m['nav'][0]['x']+m['nav'][0]['w']-1 and c['x']+c['w']<=m['nav'][1]['x']+1,(view,m)
     rows.append({'viewport':width,'view':view['id'],**m})
     if view['id']=='cheongnyangni':
-     names=page.locator('.seam-name').all_text_contents();assert set(names)=={'하2선','상2선'},names
+     assert page.locator('.seam-name').count()==0   # 선로명 표기는 원본에 없어 그리지 않는다
     if os.environ.get('UPDATE_DOCS_PREVIEWS')=='1' and width==1920 and view['id'] in ['cheongnyangni','dongmyo','yongsan','guro','uiwang-suwon']:
      OUT.mkdir(parents=True,exist_ok=True);page.screenshot(path=str(OUT/(view['id']+'.png')),animations='disabled')
    # Both click and keyboard navigation retain the original station destinations.

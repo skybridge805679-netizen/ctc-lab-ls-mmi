@@ -29,12 +29,7 @@ function render(ports,T,height,width,inset=0,obstacles=[]){
   const d=`M${x} ${y}L${edge} ${toY}`;
   // Clear the edge underlay without adding a junction or a change in direction.
   paths.push(`<g class="seam-link ${port.state||'clear'}" data-track-state="${port.state||'clear'}" data-seam-side="${port.side}" data-seam-trunk="${port.trunk}" data-seam-code="${port.code}" data-seam-y="${toY}"><title>${port.name} · 화면 연결 · ${port.code}</title><path class="seam-clearance" d="${d}"/><path class="seam-rail" d="${d}"/></g>`);
-  const labelWidth=port.name.includes(' · ')?104:48,lx=port.side==='left'?6:width-6-labelWidth;
-  let labelY=toY-18;
-  // 하선 이름은 선로 위쪽부터, 상선 이름은 선로 아래쪽부터 찾고, 막히면 반대쪽 가까운 자리를 먼저 쓴다 (다른 선로 옆으로 멀어지지 않게)
-  const order=/^상/.test(port.name)?[34,50,-18,66,-36,82,-54,98,-72,114,-90,-108]:[-18,-36,34,-54,50,-72,66,-90,82,-108,98,114];
-  for(const dy of order){const yy=toY+dy,box=[lx,yy-14,lx+labelWidth,yy+3];if(yy<18||yy>height-8||obstacles.some(b=>box[0]<b[2]+3&&box[2]>b[0]-3&&box[1]<b[3]+3&&box[3]>b[1]-3))continue;labelY=yy;obstacles.push(box);break;}
-  labels.push(`<text class="seam-name" x="${port.side==='left'?6:width-6}" y="${labelY}" text-anchor="${port.side==='left'?'start':'end'}">${port.name}</text>`);
+  // 선로명(하2선·상1선 …)은 원본 LS에 없어 그리지 않는다
  }
  return `<g class="screen-continuations" aria-label="본선 화면 연결">${paths.join('')}${labels.join('')}</g>`;
 }
