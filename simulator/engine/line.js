@@ -88,7 +88,7 @@ function handoff(station,dest,slotsOf,travelDirection){
  const direction=travelDirection||(trunk.endsWith('D')?'down':'up'),n=next(station,trunk,direction);if(!n)return null;
  const slot=entrySlot(n.station,trunk,direction,slotsOf(n.station));return slot?{station:n.station,slot,trunk,direction,section:n.section,signal:arrivalSignal(n.station,trunk,direction)}:null;
 }
-// 비연동 중간역: 이웃 연동역 LS 화면의 역판 아래에 있는 열번창 (본선별). 석수 상2선(EU)=B967T처럼 LS 좌표와 열번창 위치로 정했다.
+// 비연동 중간역: 이웃 연동역 LS 화면의 역판 아래에 있는 열번창 (본선별). LS 좌표와 열번창 위치로 정했고, 원본 LS의 고상홈 표시가 있으면 그 열을 따른다.
 const INTERMEDIATE={
  cityhall:{host:'jonggak',slots:{"MD": "B060T", "MU": "B055T"}},
  sinseoldong:{host:'dongmyo',slots:{"MD": "B012T", "MU": "B011T"}},
@@ -98,7 +98,8 @@ const INTERMEDIATE={
  namyeong:{host:'seoul',slots:{"ED": "B908T", "EU": "B909T", "GD": "B602T", "GU": "B601T"}},
  gasan:{host:'guro',slots:{"ED": "B956T", "GD": "B632T", "GU": "B631T", "EU": "B953T"}},
  doksan:{host:'guro',slots:{"ED": "B962T", "GD": "B636T", "GU": "B637T", "EU": "B959T"}},
- seoksu:{host:'geumcheon',slots:{"ED": "B974T", "GD": "B650T", "GU": "B643T", "EU": "B967T"}},
+ // 석수: 원본 LS(slide 11) 고상홈은 B972T·B648T / B643T·B969T 열에 있다
+ seoksu:{host:'geumcheon',slots:{"ED": "B972T", "GD": "B648T", "GU": "B643T", "EU": "B969T"}},
  gwanak:{host:'anyang',slots:{"ED": "B978T", "GD": "B652T", "GU": "B653T", "EU": "B975T"}},
  myeonghak:{host:'anyang',slots:{"ED": "B990T", "GD": "B666T", "GU": "B663T", "EU": "B989T"}},
  dangjeong:{host:'gunpo',slots:{"ED": "B1006T", "GD": "B682T", "GU": "B679T", "EU": "B1005T"}},

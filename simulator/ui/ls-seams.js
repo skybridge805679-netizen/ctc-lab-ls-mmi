@@ -13,6 +13,9 @@ function ports(st,def,scene){
   if(entry?!entry[side]:!cells.length)continue;
   const candidates=cells.map(c=>{const row=rows.filter(y=>Math.abs(y-c[1])<6).sort((a,b)=>Math.abs(a-c[1])-Math.abs(b-c[1]))[0];return {x:c[0]+(side==='right'?c[2]:0),y:row??c[1],code:c[3]};});
   for(const rail of def.rails)if(Line.trunkOf(rail[side==='left'?3:4])===trunk){const p=side==='left'?rail[1][0]:rail[1].at(-1);candidates.push({x:p[0],y:p[1],code:rail[side==='left'?3:4]});}
+  // 검토된 연결선(joins)이 이 끝에서 더 바깥으로 이어지면(예: 용산 B605T는 AT 줄에서 꺾여 내려가 화면 왼쪽 아래로 나간다) 그 바깥 끝에서 화면 끝으로 잇는다
+  for(const c of candidates)for(const poly of scene.joins||[]){for(const [end,other] of [[poly[0],poly.at(-1)],[poly.at(-1),poly[0]]]){
+   if(Math.abs(end[1]-c.y)<4&&Math.abs(end[0]-c.x)<20&&(side==='left'?other[0]<c.x-5:other[0]>c.x+5)){c.x=other[0];c.y=other[1];}}}
   candidates.sort((a,b)=>side==='left'?a.x-b.x:b.x-a.x);
   if(candidates[0])out.push({side,trunk,...candidates[0],name:Line.lineNameOf(trunk)});
  }

@@ -95,6 +95,13 @@ function render(st,def,core,model,neighbours={}){
  const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
   const [x,a]=T([p[0],p[1]]),[right,b]=T([p[2],p[3]]),mid=(p[0]+p[2])/2,central=!prepared.corridor&&(p[3]-p[1]>=15||p[6]==='central')&&mid>=Math.min(...coreXs)&&mid<=Math.max(...coreXs);   // p[6]: 두 선로 사이 섬식 승강장(높이가 낮아도 구내 승강장)
   const height=p[6]==='central'?Math.max(4,b-a):Math.max(8,Math.min(central?64:16,b-a));let y=(a+b-height)/2;
+  // 한쪽 승강장(선로 하나에만 붙은 고상·저상 표시): 화면이 세로로 늘어나도 그 선로 승강장 칸 바로 위/아래에 얇게 붙인다 (종각·노량진 1T 위 등)
+  if(central&&p[6]!=='central'){const cy=(p[1]+p[3])/2,srcRows=[...new Set(rows)],near=srcRows.filter(r=>Math.abs(r-cy)<40).sort((u,v)=>Math.abs(u-cy)-Math.abs(v-cy))[0];
+   if(near!==undefined){const above=cy<near,opposite=srcRows.some(r=>above?(r<cy&&cy-r<60):(r>cy&&r-cy<60));
+    if(!opposite){const [,ry]=T([p[0],near]),h=10;
+     // 그 선로 승강장 칸(열번창, 폭 100)과 같은 폭·위치로
+     const rail=def.rails.find(r=>r[2]!=null&&Math.abs(railY(def,r[0],r[2])-near)<2&&Math.abs(r[2]-(p[0]+p[2])/2)<80);let bx=x,br=right;if(rail){const [cx]=T([rail[2],near]);bx=cx-50;br=cx+50;}
+     return {x:bx,y:above?ry-14-3-h:ry+14+3,right:br,height:h,kind:p[4],central:true,row:null,side:true};}}}
   let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
   return {x,y,right,height,kind:p[4],central,row};
  });
@@ -109,7 +116,7 @@ function render(st,def,core,model,neighbours={}){
  // 이름판도 화면 좌우 끝 선로명 자리(62px)는 비운다
  const plateX=(x,w)=>Math.max(62+w/2,Math.min(WIDTH-62-w/2,x));
  const plateY=(plate,fallback)=>{const own=platformBoxes.filter(pb=>pb.stop?.name===plate.name&&pb.y<pb.row).sort((a,b)=>a.y-b.y)[0];if(!own)return fallback;
-  const y=own.y-61,mid=(own.x+own.right)/2,half=Math.max(own.right-own.x,plate.name.length*16+18)/2+6,above=Math.max(-Infinity,...cells.filter(c=>c.x<mid+half&&c.x+c.width>mid-half).map(c=>c.y).filter(v=>v<own.row-3));return y-4>above+BAR/2?y:fallback;};
+  const y=own.y-84,mid=(own.x+own.right)/2,half=Math.max(own.right-own.x,plate.name.length*16+18)/2+6,above=Math.max(-Infinity,...cells.filter(c=>c.x<mid+half&&c.x+c.width>mid-half).map(c=>c.y).filter(v=>v<own.row-3));return y-4>above+BAR/2?y:fallback;};
  // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
  const bracketBoxes=wing.fixed.brackets.map(b=>{
   const [x,y,w,h]=b.bounds,cx=T([x+w/2,y])[0];
@@ -200,15 +207,17 @@ function render(st,def,core,model,neighbours={}){
   const code=item.anchorCode||item.code,inline=item.side==='inline';
   const cell=cells.find(c=>c.label.split(' · ').includes(code)||c.label.replaceAll(' · ','')===code);
   const rail=def.rails.find(r=>r[0]===code||r[3]===code||r[4]===code);
-  let cx,cy;
+  let cx,cy,beside=false;
   if(inline&&rail?.[0]===code){[cx,cy]=T([rail[2]??(rail[1][0][0]+rail[1].at(-1)[0])/2,railY(def,code,rail[2]??rail[1][0][0])]);}
   // 열번칸은 자기 회로의 가운데에 둔다 (원본 슬라이드의 비율은 우리 화면의 회로 폭과 맞지 않아 옆 회로·폐색 표식 위로 밀린다)
+  // 원본에서 회로 밖(선로 끝 옆)에 있는 칸(예: 청량리 MT, 비율 -0.5)은 그 선로 끝 옆, 선로 높이에 둔다
+  else if(cell&&(item.fraction<-.2||item.fraction>1.2)){cx=item.fraction<0?cell.x-46:cell.x+cell.width+46;cy=cell.y;beside=true;}
   else if(cell){const tokens=cell.label.split(' · ').filter(Boolean),k=Math.max(0,tokens.indexOf(code));cx=tokens.length>1&&tokens.includes(code)?cell.x+cell.width*(k+.5)/tokens.length:cell.x+cell.width/2;cy=cell.y;}
   else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[cx,cy]=T(p);cx+=rail[3]===code?42:rail[4]===code?-42:0;}
   else throw new Error(st.id+' train window anchor missing: '+code);
   const width=inline?100:80,height=inline?28:20;
   const x=Math.max(4,Math.min(WIDTH-width-4,cx-width/2)),y=cy+(inline?-height/2:item.side==='above'?-50:30);
-  windowBoxes.push({item,inline,x,y,width,height,cy});
+  windowBoxes.push({item,inline,x,y:beside?cy-10:y,width,height:beside?20:height,cy,beside});
  }
  // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
@@ -216,7 +225,7 @@ function render(st,def,core,model,neighbours={}){
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
  for(const p of edgePorts){if(!p.name)continue;const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
- const windowLanes=new Map();for(const b of windowBoxes.filter(b=>!b.inline)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
+ const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  for(const lane of windowLanes.values()){
   // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.
   const side=lane[0].item.side,cy=lane[0].cy,H=20,trackRows=[...new Set(cellRows.map(r=>Math.round(r.y)).concat(rows.map(y=>Math.round(T([0,y])[1]))))];
@@ -273,6 +282,8 @@ function render(st,def,core,model,neighbours={}){
  });
  // 표기 통일: 승강장 선로 번호(nT)는 그 선로 승강장(열번창) 바로 오른쪽 칸에 둔다. 자리가 없을 때만 원래 위치를 쓴다.
  const platformBox=name=>/^\d+T$/.test(name)?windowBoxes.find(b=>b.inline&&(b.item.slot===name||b.item.code===name)):null;
+ // 승강장 선로 번호(nT) 자리를 먼저 잡는다: 다른 회로명(예: 동묘앞 XT)이 그 자리에 오면 자기 칸 안에서 비켜 간다 — 원본 순서(승강장 · 1T · XT)
+ const platformLabelBoxes=windowBoxes.filter(b=>b.inline&&/^\d+T$/.test(b.item.slot||b.item.code)).map(b=>{const n=b.item.slot||b.item.code,w=n.length*7.2+4;return {name:n,cy:b.cy,box:[b.x+b.width+7,b.cy-8,b.x+b.width+7+w,b.cy+8]};});
  const labelRuns=[];
  for(const c of fragments.sort((a,b)=>a.y-b.y||a.x-b.x)){
   const prev=labelRuns.at(-1);
@@ -286,6 +297,7 @@ function render(st,def,core,model,neighbours={}){
    const left=c.x+c.width*i/tokens.length,right=c.x+c.width*(i+1)/tokens.length;
    let intervals=[[left+3,right-3]];
    for(const box of windowBoxes.filter(b=>b.inline&&Math.abs(b.cy-c.y)<4))intervals=intervals.flatMap(([a,b])=>box.x>=b||box.x+box.width<=a?[[a,b]]:[[a,Math.min(b,box.x-5)],[Math.max(a,box.x+box.width+5),b]].filter(([l,r])=>r-l>6));
+   for(const r of platformLabelBoxes.filter(r=>r.name!==label&&Math.abs(r.cy-c.y)<4))intervals=intervals.flatMap(([a,b])=>r.box[0]>=b||r.box[2]<=a?[[a,b]]:[[a,Math.min(b,r.box[0]-3)],[Math.max(a,r.box[2]+3),b]].filter(([l,r])=>r-l>6));
    if(!intervals.length)intervals=[[left+3,right-3]];
    const pb=platformBox(label),need=label.length*7.2+4,beside=pb&&Math.abs(pb.cy-c.y)<4?intervals.filter(([a,b])=>a>=pb.x+pb.width-1&&b-a>=need).sort((p,q)=>p[0]-q[0])[0]:null;
    const [a,b]=beside||intervals.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0],width=Math.max(6,b-a),textWidth=Math.min(width,label.length*7.2),x=beside?Math.min(b-textWidth/2-2,Math.max(a,pb.x+pb.width+8)+textWidth/2):(a+b)/2;
@@ -306,11 +318,11 @@ function render(st,def,core,model,neighbours={}){
   const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
   if(extension){intervals=[[edgeX+4,WIDTH-12]];symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
   const pb=!extension&&platformBox(name),onRow=pb&&Math.abs(pb.cy-y)<4;
-  const preferredX=extension?(edgeX+4+WIDTH-12)/2:onRow?pb.x+pb.width+8+width/2:baseX+offset;
+  const preferredX=extension?(edgeX+4+WIDTH-12)/2:onRow?pb.x+pb.width+7+width/2:baseX+offset;
   let x=preferredX;
   // 승강장 오른쪽 칸을 먼저 찾고(오른쪽으로만 이동), 없으면 원래 방식(양쪽)으로 찾는다
   const deltas=[0];if(onRow){for(let d=6;d<120;d+=6)deltas.push(d);for(let d=6;d<WIDTH;d+=6)deltas.push(baseX+offset-preferredX-d,baseX+offset-preferredX+d);}else for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
-  for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
+  for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;/* 글자 높이(±6)로만 겹침을 본다: 선로 바로 밑 열번창이 이름을 밀어내지 않게 */if(!occupiedBoxes.some(o=>intersects([box[0],y-6,box[2],y+6],o,3))){x=candidate;break;}}
   labels+=`<text class="rail-name" data-label-placement="${extension?'edge-extension':'native-rail'}" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
   occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
  };
