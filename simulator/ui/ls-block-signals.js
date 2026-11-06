@@ -17,7 +17,7 @@ function build(st,def,cells,T,visibleOnly=false){
  // 하선(기둥 왼쪽)은 회로의 왼쪽 경계, 상선(기둥 오른쪽)은 오른쪽 경계. 원본 슬라이드의 회로 내 비율은 가장 가까운 경계를 고르는 데만 쓰고,
  // 한 경계에는 같은 쪽 표식이 하나만 선다 (노량진 B618T1T의 3·2호주가 한 회로 안에 겹치던 문제).
  const rowsOf=new Map();for(const c of cells){const k=[...rowsOf.keys()].find(y=>Math.abs(y-c.y)<3)??c.y;if(!rowsOf.has(k))rowsOf.set(k,[]);rowsOf.get(k).push(c.x,c.x+c.width);}
- const edges=y=>{const k=[...rowsOf.keys()].find(r=>Math.abs(r-y)<3);if(k===undefined)return [];const xs=[...rowsOf.get(k)].sort((a,b)=>a-b),out=[];for(const x of xs)if(!out.length||x-out.at(-1)>4)out.push(x);return out;};
+ const edges=y=>{const k=[...rowsOf.keys()].find(r=>Math.abs(r-y)<3);if(k===undefined)return [];const xs=[...rowsOf.get(k)].sort((a,b)=>a-b),out=[];for(const x of xs){if(out.length&&x-out.at(-1)<=10){out[out.length-1]=(out.at(-1)+x)/2;continue;}out.push(x);}return out;};   // 칸 사이 틈(양쪽 테두리)은 한 경계
  const used=new Map();
  for(const item of items.filter(i=>i.cellY!==undefined).sort((a,b)=>a.x-b.x)){
   const stem=item.stem==='left'?-1:1,bar=item.x+stem*21,key=item.cellY.toFixed(0)+'|'+item.side+'|'+item.stem,taken=used.get(key)||new Set();

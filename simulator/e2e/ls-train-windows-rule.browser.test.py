@@ -1,4 +1,4 @@
-"""LS 표기 통일: 열번칸은 자기 회로 가운데, 자기 선로와 그쪽 이웃 선로 사이에 놓이고(다른 선로를 건너지 않음),
+"""LS 표기 통일: 열번칸은 원본 화면(슬라이드)의 그 가로 위치에, 자기 선로와 그쪽 이웃 선로 사이에 놓이고(다른 선로를 건너지 않음),
 꺾이는 선로는 모서리 밖으로 튀어나온 조각 없이 하나의 꺾인 선으로 그린다 (15개 역, Chromium)."""
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -13,7 +13,9 @@ JS = """()=>{const svg=document.querySelector('#trackSvg');
  const names=[...svg.querySelectorAll('text.cell-name,text.rail-name')].map(t=>{const b=t.getBBox();return {n:t.textContent.trim(),cx:b.x+b.width/2,cy:b.y+b.height/2};});
  return [...svg.querySelectorAll('.ls-train-slot.detached')].map(g=>{const r=g.querySelector('rect').getBBox(),slot=g.dataset.trainSlot,c=names.find(x=>x.n===slot);if(!c)return null;
   const above=r.y+r.height/2<c.cy,top=r.y,bottom=r.y+r.height;
-  return {slot,dx:Math.round(r.x+r.width/2-c.cx),crossed:rows.some(y=>Math.abs(y-c.cy)>4&&(above?(y<c.cy&&y>bottom):(y>c.cy&&y<top)))};}).filter(Boolean);}"""
+  const st=window.selectedStation||document.querySelector('[data-station-id]')?.dataset.stationId,xm=window.SimLSXMap?.[window.__st],src=(window.SimTrainWindows.data[window.__st]||[]).find(w=>w.slot===slot&&w.side!=='inline');
+  const want=xm&&src?.sourceWindow&&src.slide===xm.slide?(src.sourceWindow[0]+src.sourceWindow[2]/2)*1600/xm.width:null;
+  return {slot,dx:want==null?0:Math.round(r.x+r.width/2-want),crossed:rows.some(y=>Math.abs(y-c.cy)>4&&(above?(y<c.cy&&y>bottom):(y>c.cy&&y<top)))};}).filter(Boolean);}"""
 server = ThreadingHTTPServer(('127.0.0.1', 0), partial(Quiet, directory=str(ROOT))); Thread(target=server.serve_forever, daemon=True).start()
 try:
     with sync_playwright() as p:
@@ -22,9 +24,9 @@ try:
         page.goto(f'http://127.0.0.1:{server.server_port}', wait_until='networkidle')
         rows, crossed, centred = 0, [], 0
         for st in page.evaluate("SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id)"):
-            page.evaluate("id=>selectStation(id)", st); page.wait_for_timeout(150)
+            page.evaluate("id=>{selectStation(id);window.__st=id;}", st); page.wait_for_timeout(150)
             for r in page.evaluate(JS):
-                rows += 1; centred += abs(r['dx']) <= 20
+                rows += 1; centred += abs(r['dx']) <= 40   # 원본 위치에서 40px 안 (시저스 폭 보정·화면 끝 여백)
                 if r['crossed']: crossed.append(f"{st} {r['slot']}")
         # 노량진 B618T2T 하나는 원본에서도 선로가 화면 끝에서 꺾여 올라가는 자리라 띠가 없다 (예외로 둔다)
         assert crossed == ['noryangjin B618T2T'], crossed
@@ -43,12 +45,12 @@ try:
         # 폐색호주: 표식의 기둥(⊢)이 회로 경계에 선다 — 「x~y호주 사이」가 한 회로를 가리킨다 (화면 끝 회로 몇 개만 예외)
         BLK = """()=>{const svg=document.querySelector('#trackSvg');const beds=[...svg.querySelectorAll('.cell-bed')].map(r=>{const b=r.getBBox();return {x1:b.x,x2:b.x+b.width,y:b.y+b.height/2};});
           return [...svg.querySelectorAll('.block-indicator')].map(g=>{const st=g.querySelector('.block-stem').getBBox(),body=g.querySelector('.block-body').getBBox(),bar=st.x<body.x?st.x:st.x+st.width,cy=body.y+body.height/2;
-           const ry=beds.filter(b=>Math.abs(b.y-cy)<30).sort((a,b)=>Math.abs(a.y-cy)-Math.abs(b.y-cy))[0]?.y;const e=beds.filter(b=>Math.abs(b.y-ry)<3).flatMap(b=>[b.x1,b.x2]);return e.length&&Math.min(...e.map(x=>Math.abs(x-bar)))<=3;});}"""
+           const ry=beds.filter(b=>Math.abs(b.y-cy)<30).sort((a,b)=>Math.abs(a.y-cy)-Math.abs(b.y-cy))[0]?.y;const e=beds.filter(b=>Math.abs(b.y-ry)<3).flatMap(b=>[b.x1,b.x2]);return e.length&&Math.min(...e.map(x=>Math.abs(x-bar)))<=5;   /* 원본 칸 사이 틈(4~8px)의 가운데 */});}"""
         marks = []
         for st in page.evaluate("SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id)"):
             page.evaluate("id=>selectStation(id)", st); page.wait_for_timeout(120); marks += page.evaluate(BLK)
         assert len(marks) >= 200 and sum(marks) >= 195, (len(marks), sum(marks))
         b.close()
-    print(f'PASS train windows: {centred}/{rows} centred on their circuit, none crosses another track (one source exception), bends drawn without stubs')
+    print(f'PASS train windows: {centred}/{rows} at their original screen position, none crosses another track (one source exception), bends drawn without stubs')
 finally:
     server.shutdown()

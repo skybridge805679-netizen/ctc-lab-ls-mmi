@@ -23,3 +23,7 @@ v0.13.0에서는 용산·동묘앞의 경계 칸을 보완해 67개 선로 열·
 ## 의왕~수원 화면의 원본 좌표 (v0.25.3)
 
 [corridor-layout.json](corridor-layout.json)은 PPT 슬라이드 18 이미지의 실제 회로 39칸·역명판 2개·승강장 표시 4개의 좌표다. 회로 좌표와 코드는 폐색 번호 전사에서 대조한 원본 사각형을 재사용했다. 이미지 해시를 보존하며 원본 폭을 균등 분할하지 않는다. 수원 진입 회로 B1036T·B714T·B709T·B1035T는 수원 화면에서 표시한다. `python tools/build-corridor-layout.py`로 런타임 좌표를 생성한다.
+
+## 원본 화면 가로 배치 (v0.39.13)
+
+[ls-xmap.json](ls-xmap.json)은 역 화면의 PDF x → 원본 LS 화면(PPT 슬라이드 2~19 픽셀) x 대응표다. `python3 tools/build-ls-xmap.py`가 슬라이드 이미지의 흰 회로 칸을 행마다 읽고, 폐색 표식·열번창 전사의 칸 좌표를 기준점으로 우리 칸과 순서대로 맞춰 만든다(`simulator/engine/ls-xmap.js`). 자동 대응이 어려운 곳은 [ls-xmap-overrides.json](ls-xmap-overrides.json)에 원본 위치를 적는다. 회로 칸·선로 연결·연동 조건은 바꾸지 않고 화면 좌표만 바꾼다. 칸 띠(intermediate-circuits.json)를 고치면 다시 생성한다.
