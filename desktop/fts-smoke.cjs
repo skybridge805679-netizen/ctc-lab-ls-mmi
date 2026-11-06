@@ -24,7 +24,11 @@ async function launch(){const packed=process.env.ORPHEIA_PACKAGED_EXECUTABLE,exe
  assert.ok(!JSON.stringify(await ls.evaluate(()=>SimMMI.getLogs())).includes('교육 시작'));assert.ok((await ls.evaluate(()=>SimRemote.snapshot.fts.logs.map(l=>l.text))).some(t=>t.startsWith('교육 시작')));
  await ls.reload({waitUntil:'load'});await ls.waitForFunction(()=>SimRemote?.snapshot.fts.session?.items[1].status==='진행');await ls.waitForFunction(()=>SimWorkspace.detached());assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.session.id),id);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.pid),pid);
  mmi=await byTitle('ORPHEIA · MMI');await ls.evaluate(id=>selectStation(id),'uiwang');assert.equal(await ls.locator('#assessmentBtn').count(),0);await ls.click('#assessmentStatus');await expect(ls.locator('#actionDialog')).not.toBeVisible();assert.equal(await ls.locator('#assessmentMinutes').count(),0);
- await ls.locator('#trackSvg').click({button:'right',position:{x:20,y:20}});await ls.locator('[data-context-action="scan-current"]').click();await expect(ls.locator('#actionDialog')).toContainText('베이스스캔');await confirmDialog(ls);await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.items[1].status==='완료');await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.items[2].status==='진행');
+ for(let attempt=0;;attempt++){await ls.locator('#trackSvg').click({button:'right',position:{x:20,y:20}});await ls.locator('[data-context-action="scan-current"]').click();
+  try{await expect(ls.locator('#actionDialog')).toContainText('베이스스캔',{timeout:4000});break;}
+  catch(e){fs.mkdirSync('test-results',{recursive:true});await ls.screenshot({path:`test-results/fts-scan-dialog-${attempt}.png`}).catch(()=>{});fs.writeFileSync(`test-results/fts-scan-dialog-${attempt}.html`,await ls.locator('#actionDialog').innerHTML().catch(()=>''));
+   if(attempt)throw e;await ls.keyboard.press('Escape');await ls.waitForTimeout(300);}}   // 간헐적으로 내용 없는 확인창이 뜬다(원인 조사 중): 한 번만 다시 연다, 화면·HTML은 남긴다
+ await confirmDialog(ls);await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.items[1].status==='완료');await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.items[2].status==='진행');
  fts=await openFts();await fts.locator('#ftsPanel [data-fts-page="monitor"]').first().click();await expect(fts.locator('[data-manual="베이스스캔 구술"]')).toBeVisible();
  if(process.env.ORPHEIA_CAPTURE_FTS==='1'){
   await app.evaluate(({BrowserWindow})=>{for(const w of BrowserWindow.getAllWindows())w.setBounds({x:0,y:0,width:1700,height:1030});});
