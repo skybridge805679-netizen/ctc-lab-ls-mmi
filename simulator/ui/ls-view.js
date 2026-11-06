@@ -150,13 +150,14 @@ function render(st,def,core,model,neighbours={}){
   if(port.side==='left'){const c=row.reduce((a,b)=>a.x<b.x?a:b);if(c.x>0&&c.x<220&&Math.abs(c.x-px)<30){c.width+=c.x;c.x=0;}}
   else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;if(r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
  // 꺾인 모서리·분기 끝 바로 옆 칸은 그 모서리에서 틈 하나만 띄우고 시작한다 (행별 원본 배치로 벌어진 빈 선로를 없앤다, 서울 B903T·B904T)
- const cornerGaps=[];
+ // 원본: 꺾인 모서리는 앞 회로에 속하고, 모서리 바깥으로 짧은 꼬리(TAIL)를 낸 뒤 틈, 그다음 칸 (서울 B902T→B904T, B901T→B903T)
+ const cornerGaps=[],cornerTails=[],TAIL=28;
  if(L.xmap){const corners=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(T)),...(data.joins||[]).flatMap(j=>j.slice(1,-1).map(T))];
   for(const c of cells){const others=cells.filter(o=>o!==c&&Math.abs(o.y-c.y)<3);
    const left=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x<c.x+4&&c.x-x<90&&!others.some(o=>o.x+o.width>x&&o.x+o.width<=c.x+1)).sort((a,b)=>b[0]-a[0])[0];
-   if(left){const nx=left[0]+BAR/2+7;if(nx<c.x-1){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);}}
+   if(left){const nx=left[0]+BAR/2+TAIL+7;if(Math.abs(nx-c.x)>1&&nx<c.x+c.width-24){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);cornerTails.push([[left[0],c.y],[nx,c.y]]);}}
    const right=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x>c.x+c.width-4&&x-(c.x+c.width)<90&&!others.some(o=>o.x<x&&o.x>=c.x+c.width-1)).sort((a,b)=>a[0]-b[0])[0];
-   if(right){const nr=right[0]-BAR/2-7;if(nr>c.x+c.width+1){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);}}}}
+   if(right){const nr=right[0]-BAR/2-TAIL-7;if(Math.abs(nr-(c.x+c.width))>1&&nr>c.x+24){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);cornerTails.push([[nr,c.y],[right[0],c.y]]);}}}}
  // 회로 칸 사이 틈 (원본 LS): 같은 줄의 서로 다른 회로 경계마다 같은 폭(GAP)의 틈을 두고, 신호기·입환표지는 그 틈에 선다.
  // 떼지 않는 곳: 같은 회로 조각(이름이 같은 칸), 승강장 열번창과 그 nT(한 회로), 꺾인 연결·분기 사선(칸 끝에 붙음).
  const GAP=7,cellGaps=[...cornerGaps];
@@ -250,6 +251,7 @@ function render(st,def,core,model,neighbours={}){
  const onRoute=cell=>active.find(route=>route.points.slice(1).some((b,i)=>{const a=route.points[i];return Math.abs(a[1]-b[1])<.5&&Math.abs(a[1]-cell.y)<5&&Math.min(a[0],b[0])<cell.x+cell.width-2&&Math.max(a[0],b[0])>cell.x+2;}));
  const snapJoin=([x,y])=>{const nearest=rows.filter(row=>Math.abs(row-y)<2).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y))[0];return T([x,nearest??y]);};
  const paths=[...def.rails.map(r=>r[1].map(T)),...(data.joins||[]).map(poly=>poly.map(snapJoin))];
+ paths.push(...cornerTails);   // 모서리 꼬리 (앞 회로 색으로 이어진다)
  const pointAnchors={};
  for(const [id,a,x,b,z]of def.links){const p=T([x,railY(def,a,x)]),q=T([z,railY(def,b,z)]);pointAnchors[id]=[(p[0]+q[0])/2,(p[1]+q[1])/2];}
  // Adjacent source cells form continuous rail runs; circuit boundaries are drawn once as ticks, never nested boxes.
@@ -412,6 +414,11 @@ function render(st,def,core,model,neighbours={}){
   // 승강장 오른쪽 칸을 먼저 찾고(오른쪽으로만 이동), 없으면 원래 방식(양쪽)으로 찾는다
   const deltas=[0];if(onRow){for(let d=6;d<120;d+=6)deltas.push(d);for(let d=6;d<WIDTH;d+=6)deltas.push(baseX+offset-preferredX-d,baseX+offset-preferredX+d);}else for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
   for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;/* 글자 높이(±6)로만 겹침을 본다: 선로 바로 밑 열번창이 이름을 밀어내지 않게 */if(!occupiedBoxes.some(o=>intersects([box[0],y-6,box[2],y+6],o,3))){x=candidate;break;}}
+  // 칸 없이 선로만 그린 회로(예: 서울 B901T)도 이웃 회로 칸과 틈으로 나눈다
+  if(!extension&&cellGaps.length){const row=cells.filter(c=>Math.abs(c.y-y)<3),inRail=v=>intervals.some(([a,b])=>v>a+4&&v<b-4);
+   const lc=row.filter(c=>c.x+c.width<=x).sort((a,b)=>b.x+b.width-a.x-a.width)[0],rc=row.filter(c=>c.x>=x).sort((a,b)=>a.x-b.x)[0];
+   if(lc&&inRail(lc.x+lc.width+GAP)&&!cellGaps.some(([gx,gy])=>Math.abs(gy-y)<3&&Math.abs(gx-lc.x-lc.width)<8))cellGaps.push([lc.x+lc.width+GAP/2,y]);
+   if(rc&&inRail(rc.x-GAP)&&!cellGaps.some(([gx,gy])=>Math.abs(gy-y)<3&&Math.abs(gx-rc.x)<8))cellGaps.push([rc.x-GAP/2,y]);}
   labels+=`<text class="rail-name" data-label-placement="${extension?'edge-extension':'native-rail'}" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
   occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
  };
