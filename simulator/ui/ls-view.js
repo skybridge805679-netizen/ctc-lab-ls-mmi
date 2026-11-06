@@ -126,9 +126,10 @@ function render(st,def,core,model,neighbours={}){
   const isBlock=c=>/^B\d/.test(c.label||'');
   const byRow=new Map();for(const c of cells){const key=Math.round(c.y);if(!byRow.has(key))byRow.set(key,[]);byRow.get(key).push(c);}
   // 분기 사선·꺾인 연결이 붙는 칸 끝은 공통 함수 자리에 고정한다 (선이 끊기지 않게)
-  const fixedPts=[...def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]),...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(T)),...(data.joins||[]).flatMap(j=>j.map(T))];
+  const fixedPts=[...def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]),...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.map(p=>fixPt(p,T(p))))];
   /* 원본 칸이 그 점을 넘어 덮으면(사선이 칸 가운데에 내려앉는 곳) 고정하지 않는다 */
-  const pinned=(x,y,refX,side)=>fixedPts.some(([px,py])=>Math.abs(py-y)<4&&Math.abs(px-x)<10&&!(side<0?refX<px-10:refX>px+10));
+  const pinned=(x,y,refX,side)=>fixedPts.some(([px,py])=>Math.abs(py-y)<4&&(Math.abs(px-x)<10||Math.abs(px-refX)<10)&&!(side<0?refX<px-10:refX>px+10));
+  const pinX=(x,y,refX)=>{const f=fixedPts.filter(([px,py])=>Math.abs(py-y)<4&&(Math.abs(px-x)<10||Math.abs(px-refX)<10)).sort((a,b)=>Math.abs(a[0]-refX)-Math.abs(b[0]-refX))[0];return f?f[0]:x;};
   for(const row of byRow.values()){if(!row.some(c=>ref.has(c)))continue;row.sort((a,b)=>a.source[0]-b.source[0]);
    // 1순위: 폐색 칸의 원본 좌표(전사)와 행 양 끝. 2순위: 역 구내 칸 — 1순위와 어긋나지 않을 때만 넣는다
    // 잘못 기록된 전사 걸러내기: 한 줄의 폐색 칸은 원본/PDF 폭 비율이 거의 같다 — 중앙값에서 크게 벗어나거나 앞 칸과 겹치면 버린다
@@ -141,7 +142,7 @@ function render(st,def,core,model,neighbours={}){
    for(const c of row){const s0=c.source[0],s1=c.source[0]+c.source[2];
     if(isBlock(c)&&good.has(c)){const [a,b]=good.get(c);primary.push([s0,a],[s1,b]);}
     else if(isBlock(c)){}
-    else if(ref.has(c)){const [a,b]=ref.get(c);secondary.push([s0,!pinned(c.x,c.y,a,-1)?a:c.x],[s1,!pinned(c.x+c.width,c.y,b,1)?b:c.x+c.width]);}
+    else if(ref.has(c)){const [a,b]=ref.get(c);secondary.push([s0,!pinned(c.x,c.y,a,-1)?a:pinX(c.x,c.y,a)],[s1,!pinned(c.x+c.width,c.y,b,1)?b:pinX(c.x+c.width,c.y,b)-BAR/2]);}
     else secondary.push([s0,c.x],[s1,c.x+c.width]);}
    if(!ref.has(row[0]))primary.push([row[0].source[0],row[0].x]);if(!ref.has(row.at(-1)))primary.push([row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);   /* 행 끝 칸이 원본 좌표를 가지면 그쪽을 따른다 */
    const fit=list=>{list.sort((a,b)=>a[0]-b[0]);const out=[];for(const a of list){if(out.length&&a[0]-out.at(-1)[0]<.5)continue;if(out.length&&a[1]<=out.at(-1)[1])continue;out.push(a);}return out;};
