@@ -121,19 +121,54 @@ function render(st,def,core,model,neighbours={}){
   for(const c of cells){const m=L.xmap.cells.find(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6);if(m)ref.set(c,[L.adj(m[3]*k),L.adj(m[4]*k)]);}
   const isBlock=c=>/^B\d/.test(c.label||'');
   const byRow=new Map();for(const c of cells){const key=Math.round(c.y);if(!byRow.has(key))byRow.set(key,[]);byRow.get(key).push(c);}
-  for(const row of byRow.values()){if(!row.some(c=>isBlock(c)&&ref.has(c)))continue;row.sort((a,b)=>a.source[0]-b.source[0]);
-   const anchors=[];
+  // 분기 사선·꺾인 연결이 붙는 칸 끝은 공통 함수 자리에 고정한다 (선이 끊기지 않게)
+  const fixedPts=[...def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]),...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(T)),...(data.joins||[]).flatMap(j=>j.map(T))];
+  /* 원본 칸이 그 점을 넘어 덮으면(사선이 칸 가운데에 내려앉는 곳) 고정하지 않는다 */
+  const pinned=(x,y,refX,side)=>fixedPts.some(([px,py])=>Math.abs(py-y)<4&&Math.abs(px-x)<10&&!(side<0?refX<px-10:refX>px+10));
+  for(const row of byRow.values()){if(!row.some(c=>ref.has(c)))continue;row.sort((a,b)=>a.source[0]-b.source[0]);
+   // 1순위: 폐색 칸의 원본 좌표(전사)와 행 양 끝. 2순위: 역 구내 칸 — 1순위와 어긋나지 않을 때만 넣는다
+   // 잘못 기록된 전사 걸러내기: 한 줄의 폐색 칸은 원본/PDF 폭 비율이 거의 같다 — 중앙값에서 크게 벗어나거나 앞 칸과 겹치면 버린다
+   const blockRefs=row.filter(c=>isBlock(c)&&ref.has(c)),ratios=blockRefs.map(c=>(ref.get(c)[1]-ref.get(c)[0])/Math.max(1,c.source[2])).sort((a,b)=>a-b),med=ratios[ratios.length>>1]||1;
+   const good=new Map();let prevEnd=-Infinity;
+   for(const c of blockRefs){const [a,b]=ref.get(c);if(a<prevEnd-3)continue;good.set(c,[a,b]);prevEnd=b;}   /* 겹치는 전사만 버린다 (폭은 원본이 기준) */
+   // 원본에서 맞닿은 두 칸의 경계가 서로 어긋나면(틈이 벌어지면) 가운데로 맞춘다
+   const gl=[...good.keys()];for(let i=0;i<gl.length-1;i++){const A=gl[i],B=gl[i+1];if(B.source[0]-(A.source[0]+A.source[2])>8)continue;const ea=good.get(A),eb=good.get(B);if(eb[0]-ea[1]>12){const m=(ea[1]+eb[0])/2;ea[1]=m-3;eb[0]=m+3;}}
+   const primary=[],secondary=[];
    for(const c of row){const s0=c.source[0],s1=c.source[0]+c.source[2];
-    if(isBlock(c)&&ref.has(c)){const [a,b]=ref.get(c);anchors.push([s0,a],[s1,b]);}
-    else if(!isBlock(c))anchors.push([s0,c.x],[s1,c.x+c.width]);}
-   anchors.push([row[0].source[0],row[0].x],[row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);
-   anchors.sort((a,b)=>a[0]-b[0]);const mono=[];for(const a of anchors){if(mono.length&&a[0]-mono.at(-1)[0]<.5)continue;if(mono.length&&a[1]<=mono.at(-1)[1])continue;mono.push(a);}
+    if(isBlock(c)&&good.has(c)){const [a,b]=good.get(c);primary.push([s0,a],[s1,b]);}
+    else if(isBlock(c)){}
+    else if(ref.has(c)){const [a,b]=ref.get(c);secondary.push([s0,!pinned(c.x,c.y,a,-1)?a:c.x],[s1,!pinned(c.x+c.width,c.y,b,1)?b:c.x+c.width]);}
+    else secondary.push([s0,c.x],[s1,c.x+c.width]);}
+   primary.push([row[0].source[0],row[0].x],[row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);
+   const fit=list=>{list.sort((a,b)=>a[0]-b[0]);const out=[];for(const a of list){if(out.length&&a[0]-out.at(-1)[0]<.5)continue;if(out.length&&a[1]<=out.at(-1)[1])continue;out.push(a);}return out;};
+   let mono=fit(primary);
+   for(const a of secondary){const lo=[...mono].reverse().find(m=>m[0]<a[0]-.5),hi=mono.find(m=>m[0]>a[0]+.5);if(mono.some(m=>Math.abs(m[0]-a[0])<.5))continue;if((!lo||a[1]>lo[1]+4)&&(!hi||a[1]<hi[1]-4))mono=fit([...mono,a]);}
    if(mono.length<2)continue;
-   for(const c of row){if(!isBlock(c))continue;const x0=knotAt(mono,c.source[0]),x1=knotAt(mono,c.source[0]+c.source[2]);if(x1-x0>8){c.x=x0;c.width=x1-x0;}/* 원본 좌표에 칸 사이 틈이 이미 들어 있다 */}}}
+   for(const c of row){if(!isBlock(c)&&!ref.has(c))continue;const x0=knotAt(mono,c.source[0]),x1=knotAt(mono,c.source[0]+c.source[2]);if(x1-x0>8){c.x=x0;c.width=x1-x0;}/* 원본 좌표에 칸 사이 틈이 이미 들어 있다 */}}}
  // 원본처럼 화면 끝으로 나가는 선로는 그 행의 끝 회로 칸이 화면 끝까지 닿는다 (빈 선로 조각을 덧붙이지 않는다)
  for(const port of edgePorts){const [px,py]=T([port.x,port.y]);const row=cells.filter(c=>Math.abs(c.y-py)<3);if(!row.length)continue;
   if(port.side==='left'){const c=row.reduce((a,b)=>a.x<b.x?a:b);if(c.x>0&&c.x<220&&Math.abs(c.x-px)<30){c.width+=c.x;c.x=0;}}
   else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;if(r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
+ // 꺾인 모서리·분기 끝 바로 옆 칸은 그 모서리에서 틈 하나만 띄우고 시작한다 (행별 원본 배치로 벌어진 빈 선로를 없앤다, 서울 B903T·B904T)
+ const cornerGaps=[];
+ if(L.xmap){const corners=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(T)),...(data.joins||[]).flatMap(j=>j.slice(1,-1).map(T))];
+  for(const c of cells){const others=cells.filter(o=>o!==c&&Math.abs(o.y-c.y)<3);
+   const left=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x<c.x+4&&c.x-x<90&&!others.some(o=>o.x+o.width>x&&o.x+o.width<=c.x+1)).sort((a,b)=>b[0]-a[0])[0];
+   if(left){const nx=left[0]+BAR/2+7;if(nx<c.x-1){c.width+=c.x-nx;c.x=nx;cornerGaps.push([nx-3.5,c.y]);}}
+   const right=corners.filter(([x,y])=>Math.abs(y-c.y)<4&&x>c.x+c.width-4&&x-(c.x+c.width)<90&&!others.some(o=>o.x<x&&o.x>=c.x+c.width-1)).sort((a,b)=>a[0]-b[0])[0];
+   if(right){const nr=right[0]-BAR/2-7;if(nr>c.x+c.width+1){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);}}}}
+ // 회로 칸 사이 틈 (원본 LS): 같은 줄의 서로 다른 회로 경계마다 같은 폭(GAP)의 틈을 두고, 신호기·입환표지는 그 틈에 선다.
+ // 떼지 않는 곳: 같은 회로 조각(이름이 같은 칸), 승강장 열번창과 그 nT(한 회로), 꺾인 연결·분기 사선(칸 끝에 붙음).
+ const GAP=7,cellGaps=[...cornerGaps];
+ if(!neighbours.overview){
+  const sigX=def.signals.map(([id,rail,x])=>{const [X,Y]=T([x,railY(def,rail,x)]);return {id,X,Y};});
+  const rowMap=new Map();for(const c of cells){const k=[...rowMap.keys()].find(y=>Math.abs(y-c.y)<3)??c.y;if(!rowMap.has(k))rowMap.set(k,[]);rowMap.get(k).push(c);}
+  for(const [y,row] of rowMap){row.sort((a,b)=>a.x-b.x);
+   for(let i=0;i<row.length-1;i++){const L1=row[i],R1=row[i+1],end=L1.x+L1.width,gap=R1.x-end;
+    if(gap>30||gap<-Math.min(L1.width,R1.width)*.5)continue;   // 멀리 떨어진 칸(사이에 분기·다른 선로)은 그대로
+    if(L1.label&&L1.label===R1.label){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 같은 회로 조각은 잇는다
+    let b=(end+R1.x)/2;const sig=sigX.filter(q=>Math.abs(q.Y-y)<3&&Math.abs(q.X-b)<=24).sort((p,q)=>Math.abs(p.X-b)-Math.abs(q.X-b))[0];if(sig)b=sig.X;   // 신호기가 있으면 그 자리가 경계
+    b=Math.max(L1.x+12,Math.min(R1.x+R1.width-12,b));const r=R1.x+R1.width;L1.width=b-GAP/2-L1.x;R1.x=b+GAP/2;R1.width=r-R1.x;cellGaps.push([b,y]);}}}
  // Platform glyphs keep a readable size and a consistent offset from their rail.
  const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
   const [x,a]=T([p[0],p[1]]),[right,b]=T([p[2],p[3]]),mid=(p[0]+p[2])/2,central=!prepared.corridor&&(p[3]-p[1]>=15||p[6]==='central')&&mid>=Math.min(...coreXs)&&mid<=Math.max(...coreXs);   // p[6]: 두 선로 사이 섬식 승강장(높이가 낮아도 구내 승강장)
@@ -367,7 +402,7 @@ function render(st,def,core,model,neighbours={}){
   // horizontal screen continuation. Never push B607T back into the named YT circuit.
   const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);
   const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
-  if(extension){intervals=[[edgeX+4,WIDTH-12]];symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
+  if(extension){intervals=[[edgeX+4+GAP/2,WIDTH-12]];if(cellGaps.length)cellGaps.push([edgeX+GAP/2,y]);else symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
   const pb=!extension&&platformBox(name),onRow=pb&&Math.abs(pb.cy-y)<4;
   // 칸이 없는 선로 끝 구간의 이름은 그 빈 구간(화면 끝~첫 칸) 가운데에 둔다 (수원 B1036T가 XT에 붙지 않게)
   const rowCells=cells.filter(c=>Math.abs(c.y-y)<3),gapL=Math.max(4,...rowCells.filter(c=>c.x+c.width<=baseX+offset+1).map(c=>c.x+c.width)),gapR=Math.min(WIDTH-4,...rowCells.filter(c=>c.x>=baseX+offset-1).map(c=>c.x));
@@ -424,7 +459,7 @@ function render(st,def,core,model,neighbours={}){
   else if(!c)stubs.push({name:b.item.slot,x:b.x-9,y:b.cy,width:b.width+18});}       // rail drawn as a plain path: red either side of the window
  for(const t of stubs)routes+=`<rect class="train-occ" data-train-occupied="${esc(t.name)}" x="${t.x}" y="${t.y-BAR/2}" width="${t.width}" height="${BAR}"/>`;
  for(const [c,hit] of hitCells){const named=typeof hit==='string';routes+=`<rect class="train-occ" data-train-occupied="${esc(named?hit:hit.name)}" x="${named?c.x:hit.x}" y="${c.y-BAR/2}" width="${named?c.width:hit.width}" height="${BAR}"/>`;}
- for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
+ if(!cellGaps.length)for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
   const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],width=Math.max(right-left,plate.name.length*16+18),x=plateX(own?(own.x+own.right)/2:(left+right)/2,width);
@@ -533,7 +568,9 @@ function render(st,def,core,model,neighbours={}){
  const ports=edgePorts.map(p=>{const c=cells.find(c=>c.label.replaceAll(' · ','')===p.code);return {...p,state:c&&(hitCells.has(c)?'occupied':onRoute(c)?.state)||'clear'};});
  // Trim route colour to the same rail/quarter silhouette; preserve its continuous centre bridge.
  const routeMaskId='route-trim-'+st.id,routeMask=`<defs><mask id="${routeMaskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${WIDTH+80}" height="2400"><rect x="-40" y="-40" width="${WIDTH+80}" height="2400" fill="black"/><g mask="url(#${switches.maskId})" fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="miter" stroke-miterlimit="2" stroke-linecap="butt">${rails.replaceAll(/ data-reviewed-join="[^"]*"/g,'')}</g><g fill="none" stroke="white" stroke-width="${BAR}" stroke-linejoin="bevel" stroke-linecap="butt">${switches.paint}${switches.bridges}</g></mask></defs>`;
- return {width:WIDTH,height:L.H,contentWidth:L.width||WIDTH,sourcePoint:T,ports:edgePorts.map(p=>({...p,at:T([p.x,p.y])})),navigation,svg:`${neighbours.overview?'':seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),[...occupiedBoxes,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...paths.flatMap(pts=>pts.slice(1).map((p,i)=>[Math.min(p[0],pts[i][0]),Math.min(p[1],pts[i][1])-BAR/2,Math.max(p[0],pts[i][0]),Math.max(p[1],pts[i][1])+BAR/2]))])}${switches.mask}${platforms}<g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routeMask}<g class="route-network" mask="url(#${routeMaskId})">${routes}</g>${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
+ const gapMaskId='cell-gap-'+st.id,gapAttr=cellGaps.length?` mask="url(#${gapMaskId})"`:'';
+ const gapMask=cellGaps.length?`<defs><mask id="${gapMaskId}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${WIDTH+80}" height="2400"><rect x="-40" y="-40" width="${WIDTH+80}" height="2400" fill="white"/>${cellGaps.map(([x,y])=>`<rect data-cell-gap="${x.toFixed(1)}" x="${(x-GAP/2).toFixed(2)}" y="${(y-BAR/2-2).toFixed(2)}" width="${GAP}" height="${BAR+4}" fill="black"/>`).join('')}</mask></defs>`:'';
+ return {width:WIDTH,height:L.H,contentWidth:L.width||WIDTH,sourcePoint:T,ports:edgePorts.map(p=>({...p,at:T([p.x,p.y])})),navigation,svg:`${neighbours.overview?'':seams.render(ports,T,L.H,WIDTH,Math.max(0,(L.H*(neighbours.aspect||WIDTH/L.H)-WIDTH)/2),[...occupiedBoxes,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...paths.flatMap(pts=>pts.slice(1).map((p,i)=>[Math.min(p[0],pts[i][0]),Math.min(p[1],pts[i][1])-BAR/2,Math.max(p[0],pts[i][0]),Math.max(p[1],pts[i][1])+BAR/2]))])}${switches.mask}${platforms}${gapMask}<g class="cell-gaps"${gapAttr}><g class="track-shape" mask="url(#${switches.maskId})"><g class="bed-inner rail-network">${rails}</g><g class="wing-inner section-network">${sections}</g></g></g><g class="switch-network">${switches.svg}${switches.metadata}</g>${routeMask}<g class="cell-gaps"${gapAttr}><g class="route-network" mask="url(#${routeMaskId})">${routes}</g></g>${symbols}${labels}${plates}${leaders}${annotations}${pointSymbols}${signalSymbols}${trains}${trainShapes}`};
 }
 const api={render,layout,wingOf,sceneOf,railY};
 if(typeof module!=='undefined')module.exports=api;else root.SimLS=api;
