@@ -76,7 +76,7 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  if(targetH&&fill>sy)top+=Math.floor((fill-sy)*(maxY-minY)/2);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
- const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy]);
+ const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy,railY(def,a,x),railY(def,b,z)]);
  const knots=[...new Set([minX,maxX,...spans.flatMap(s=>s.slice(0,2))])].sort((a,b)=>a-b);
  const weights=knots.slice(1).map((x,i)=>{const lo=knots[i],mid=(x+lo)/2,span=spans.find(([a,b])=>mid>=a&&mid<=b);return span?Math.max(1,Math.max(100,Math.min(300,span[2]*.85))/((span[1]-span[0])*sx)):1;});
  const cumulative=[0];weights.forEach((w,i)=>cumulative.push(cumulative.at(-1)+(knots[i+1]-knots[i])*w));
@@ -84,13 +84,16 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  const yAt=y=>top+(y-minY)*sy;
  if(xmap){const k=WIDTH/xmap.width,orig=xmap.knots.map(([a,b])=>[a,b*k]);let knots=orig;
   // 시저스(X자 건넘선)는 세로 간격에 비해 가로가 좁으면 기둥처럼 보인다: 높이의 0.8배 이상 가로폭을 확보하고, 늘린 만큼 좌우 구간을 비례해 줄인다
-  for(const [x0,x1,h] of spans){const need=h*.8,g0=knotAt(knots,x0),g1=knotAt(knots,x1),cur=g1-g0;if(cur>=need)continue;
+  // 원본 좌표 화면에서는 칸 경계를 움직이지 않는다: 시저스가 높이의 0.8배보다 좁으면 X 그림만 양옆으로 늘린다 (금천구청 21·22)
+  const pads=[];for(const [x0,x1,h,ya,yb] of spans){const need=h*.8,g0=knotAt(knots,x0),g1=knotAt(knots,x1),cur=g1-g0;if(cur>=need)continue;
+   const pad=(need-cur)/2,inside=y=>(xmap.cells||[]).some(c=>Math.abs(c[1]-y)<4&&c[3]*k<=g0-pad-4&&c[4]*k>=g1+pad+4);
+   if(inside(ya)&&inside(yb)){pads.push({x0,x1,ya,yb,pad});continue;}
    const lo=knots[0][0],hi=knots.at(-1)[0],G0=knotAt(knots,lo),G1=knotAt(knots,hi),extra=need-cur,leftW=g0-G0,rightW=G1-g1;if(leftW+rightW<=extra*1.5)continue;
    const dl=extra*leftW/(leftW+rightW),dr=extra-dl,pts=[...new Set([...knots.map(q=>q[0]),x0,x1])].sort((a,b)=>a-b);
    knots=pts.map(x=>{const g=knotAt(knots,x);if(x<=x0)return [x,G0+(g-G0)*(leftW-dl)/Math.max(1e-6,leftW)];if(x>=x1)return [x,G1-(G1-g)*(rightW-dr)/Math.max(1e-6,rightW)];const a=G0+leftW-dl;return [x,a+(g-g0)*need/Math.max(1e-6,cur)];});}
   // 원본 화면 x(열번칸·폐색 칸의 원본 좌표)에도 같은 보정을 적용하는 함수
   const adjKnots=knots.map(([x,g])=>[knotAt(orig,x),g]).filter((q,i,a)=>i===0||q[0]>a[i-1][0]+1e-6),adj=v=>adjKnots.length>1?knotAt(adjKnots,v):v;
-  return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),xmap,adj,pt:([x,y])=>[+knotAt(knots,x).toFixed(2),+yAt(y).toFixed(2)]};}
+  return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),xmap,adj,pads,pt:([x,y])=>[+knotAt(knots,x).toFixed(2),+yAt(y).toFixed(2)]};}
  return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
@@ -106,7 +109,7 @@ function render(st,def,core,model,neighbours={}){
  const edgePorts=seams.ports(st,def,data);
  // 원본 슬라이드의 빨간 등 위치(tools/build-ls-xmap.py)가 있으면 그 자리를 신호기 기준으로 쓴다
  // 원본 위치로 고정한 선로 꼭짓점(railPoints)이 있는 선로는, 그 선로 위의 모든 점(선로전환기 틈·번호)을 같은 원본 위치로 옮긴다
- const Tw=p=>{if(!railFix.length)return T(p);const F=v=>fixPt(v,T(v));
+ const Tw=p=>{const sp=(L.pads||[]).find(s=>(Math.abs(p[0]-s.x0)<.6||Math.abs(p[0]-s.x1)<.6)&&(Math.abs(p[1]-s.ya)<2||Math.abs(p[1]-s.yb)<2));if(sp){const P=T(p);return [P[0]+(Math.abs(p[0]-sp.x0)<.6?-sp.pad:sp.pad),P[1]];}if(!railFix.length)return T(p);const F=v=>fixPt(v,T(v));
   for(const r of def.rails)for(let i=1;i<r[1].length;i++){const a=r[1][i-1],b=r[1][i],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(!L2)continue;const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<-.02||t>1.02)continue;
    const qx=a[0]+t*dx,qy=a[1]+t*dy;if(Math.hypot(p[0]-qx,p[1]-qy)>3)continue;if(Math.abs(dy)<2)continue;   /* 가로 구간은 공통 배치(T) */const A=F(a),B=F(b);if(A[0]===T(a)[0]||B[0]===T(b)[0])continue;return [A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t];}   /* 양 끝이 다 고정된 구간(꺾인 사선)만 그대로 보간 */
   const P=T(p),f=railFix.map(([fx,fy,ox])=>({d:Math.hypot(fx-p[0],fy-p[1]),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<30?[P[0]+f.dx,P[1]]:P;};   /* 고정 꼭짓점 근처(선로전환기 틈)는 그 꼭짓점만큼 */
@@ -114,7 +117,7 @@ function render(st,def,core,model,neighbours={}){
  const Tnear=p=>{const P=T(p);if(!railFix.length)return P;const f=railFix.map(([fx,fy,ox])=>({fx,fy,d:Math.hypot(fx-p[0],(fy-p[1])*.5),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<45?[P[0]+f.dx,P[1]]:P;};
  const sigBase=(id,P)=>{const v=L.xmap?.signals?.[id];return v?[L.adj(v[0]*WIDTH/L.xmap.width)-v[1]*18,P[1]]:P;};
  // 기둥이 칸 틈에 선 뒤 원본 빨간 등이 기둥에서 24~40px 떨어져 있으면(등 두 개짜리 장내·출발 신호기) 몸체를 그만큼 늘린다 (안양 1A·3B·4C·2B 등)
- const sigReach=(id,X,dir)=>{const v=L.xmap?.signals?.[id];if(!v)return 18;const d=(L.adj(v[0]*WIDTH/L.xmap.width)-X)*dir;return d>=24&&d<=40?Math.round(d):18;};
+ const sigReach=(id,X,dir)=>{const v=L.xmap?.signals?.[id];if(!v)return 18;const d=(L.adj(v[0]*WIDTH/L.xmap.width)-X)*dir;return d>=24&&d<=40?Math.round(d):d>=0&&d<15&&core.signals[id]?.kind==="입환"?12:18;};   /* 원본 등이 기둥에 바짝 붙은 짧은 신호기(금천구청 51·54)는 12 */
  // 원본에서 줄마다 위치가 다른 꼭짓점(노량진 B929T·B930T가 꺾여 내려가는 두 수직선)은 원본 x에 고정한다
  const railFix=L.xmap?.railPoints||[],fixPt=([x,y],P)=>{const f=railFix.find(([fx,fy])=>Math.abs(fx-x)<1&&Math.abs(fy-y)<2);return f?[+L.adj(f[2]*WIDTH/L.xmap.width).toFixed(2),P[1]]:P;};
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
@@ -135,10 +138,13 @@ function render(st,def,core,model,neighbours={}){
   const isBlock=c=>/^B\d/.test(c.label||'');
   const byRow=new Map();for(const c of cells){const key=Math.round(c.y);if(!byRow.has(key))byRow.set(key,[]);byRow.get(key).push(c);}
   // 분기 사선·꺾인 연결이 붙는 칸 끝은 공통 함수 자리에 고정한다 (선이 끊기지 않게)
-  const fixedPts=[...def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]),...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.map(p=>fixPt(p,T(p))))];
+  /* 건넘선 끝은 원본 칸 끝(refX)이 그 근처일 때만 칸 끝을 끌어당긴다 (금천구청 24AT·25BT는 25 건넘선과 떨어져 있다) */
+  const linkPts=def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]);
+  const fixedPts=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.map(p=>fixPt(p,T(p))))];
   /* 원본 칸이 그 점을 넘어 덮으면(사선이 칸 가운데에 내려앉는 곳) 고정하지 않는다 */
-  const pinned=(x,y,refX,side)=>fixedPts.some(([px,py])=>Math.abs(py-y)<4&&(Math.abs(px-x)<10||Math.abs(px-refX)<10)&&!(side<0?refX<px-10:refX>px+10));
-  const pinX=(x,y,refX)=>{const f=fixedPts.filter(([px,py])=>Math.abs(py-y)<4&&(Math.abs(px-x)<10||Math.abs(px-refX)<10)).sort((a,b)=>Math.abs(a[0]-refX)-Math.abs(b[0]-refX))[0];return f?f[0]:x;};
+  const near=(x,y,refX)=>([px,py],k)=>Math.abs(py-y)<4&&(Math.abs(px-refX)<10||(k>=linkPts.length&&Math.abs(px-x)<10)),allPts=[...linkPts,...fixedPts];
+  const pinned=(x,y,refX,side)=>allPts.some((p,k)=>near(x,y,refX)(p,k)&&!(side<0?refX<p[0]-10:refX>p[0]+10));
+  const pinX=(x,y,refX)=>{const f=allPts.filter((p,k)=>near(x,y,refX)(p,k)).sort((a,b)=>Math.abs(a[0]-refX)-Math.abs(b[0]-refX))[0];return f?f[0]:x;};
   for(const row of byRow.values()){if(!row.some(c=>ref.has(c)))continue;row.sort((a,b)=>a.source[0]-b.source[0]);
    // 1순위: 폐색 칸의 원본 좌표(전사)와 행 양 끝. 2순위: 역 구내 칸 — 1순위와 어긋나지 않을 때만 넣는다
    // 잘못 기록된 전사 걸러내기: 한 줄의 폐색 칸은 원본/PDF 폭 비율이 거의 같다 — 중앙값에서 크게 벗어나거나 앞 칸과 겹치면 버린다
@@ -208,11 +214,15 @@ function render(st,def,core,model,neighbours={}){
   const platX=x=>platRows.length?Math.min(...platRows.map(([px])=>Math.min(Math.abs(px+50-x),Math.abs(px-50-x)))):Infinity;
   // 승강장 옆에서 40px 안에 두 열이 생기면 승강장에 가까운 열 하나로 모은다 (원본: nT 칸 바로 뒤 한 줄)
   let strong=columns.filter(c=>(c.n>=3||(c.n>=2&&platX(c.x)<120))&&platX(c.x)>=35).sort((a,b)=>platX(a.x)-platX(b.x));   /* nT 칸 자리(열번창 끝에서 35px 이상)는 남긴다 */   /* 승강장 바로 옆은 두 줄만 맞아도 열 */const kept=[];for(const c of strong)if(!kept.some(k=>Math.abs(k.x-c.x)<40&&platX(c.x)<250))kept.push(c);strong=kept;
-  for(const k of strong){if(platX(k.x)>=250)continue;for(const g of cellGaps){if(Math.abs(g[0]-k.x)>=40||Math.abs(g[0]-k.x)<=3||!platRows.some(([,py])=>Math.abs(py-g[1])<3))continue;
+  /* overrides로 원본 위치를 직접 적은 두 칸 사이 경계는 열에 맞추려고 옮기지 않는다 (금천구청 3T 24AT|25AT는 5T·6T 열과 원본에서도 어긋나 있다) */
+  const refd=c=>!!L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6),bothRef=g=>{const near=cells.filter(c=>Math.abs(c.y-g[1])<3);const a=near.find(c=>Math.abs(c.x+c.width-(g[0]-GAP/2))<6),b=near.find(c=>Math.abs(c.x-(g[0]+GAP/2))<6);return (a||b)&&(!a||refd(a))&&(!b||refd(b));};   /* 한쪽이 꺾임 꼬리면 칸 쪽만 본다 */
+  for(const k of strong){if(platX(k.x)>=250)continue;for(const g of cellGaps){if(Math.abs(g[0]-k.x)>=40||Math.abs(g[0]-k.x)<=3||!platRows.some(([,py])=>Math.abs(py-g[1])<3)||bothRef(g))continue;
    for(const c of cells){if(Math.abs(c.y-g[1])>=3)continue;if(Math.abs(c.x+c.width-(g[0]-GAP/2))<6)c.width=k.x-GAP/2-c.x;else if(Math.abs(c.x-(g[0]+GAP/2))<6){const r=c.x+c.width;c.x=k.x+GAP/2;c.width=r-c.x;}}g[0]=k.x;}}
   return {strong,platRows,platX};})();
  // Platform glyphs keep a readable size and a consistent offset from their rail.
- const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
+ /* 원본 좌표로 고정한 승강장(ls-xmap-overrides platforms)은 원본 x 그대로 */
+ const pinPlat=(p,box)=>{const q=(L.xmap?.platforms||[]).find(q=>Math.abs(q[0]-p[0])<1&&Math.abs(q[1]-p[1])<1);if(q){box.x=L.adj(q[2]*WIDTH/L.xmap.width);box.right=L.adj(q[3]*WIDTH/L.xmap.width);box.pinned=true;}return box;};
+ const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>pinPlat(p,(()=>{
   const [x,a]=T([p[0],p[1]]),[right,b]=T([p[2],p[3]]),mid=(p[0]+p[2])/2,central=!prepared.corridor&&(p[3]-p[1]>=15||p[6]==='central')&&mid>=Math.min(...coreXs)&&mid<=Math.max(...coreXs);   // p[6]: 두 선로 사이 섬식 승강장(높이가 낮아도 구내 승강장)
   const height=p[6]==='central'?Math.max(4,b-a):Math.max(8,Math.min(central?64:16,b-a));let y=(a+b-height)/2;
   // 한쪽 승강장(선로 하나에만 붙은 고상·저상 표시): 화면이 세로로 늘어나도 그 선로 승강장 칸 바로 위/아래에 얇게 붙인다 (종각·노량진 1T 위 등)
@@ -230,21 +240,24 @@ function render(st,def,core,model,neighbours={}){
    return {x:x0-50,y,right:x0+50,height,kind:p[4],central,row:null};}}
   let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
   return {x,y,right,height,kind:p[4],central,row};
- });
+ })()));
  // 중간역 승강장(고상홈) 표시는 그 역의 정차 회로(line.js INTERMEDIATE의 전동선 ED·EU) 가운데에 붙인다.
  // 원본 좌표 그대로 두면 역간 폐색 회로가 화면에서 고르게 다시 배치될 때 옆 회로로 어긋난다 (노량진 신길 B938T).
  const tokenCentre=code=>cells.flatMap(c=>{const t=c.label.split(' · ').filter(Boolean),k=t.indexOf(code);return k<0&&c.label.replaceAll(' · ','')!==code?[]:[{cx:k<0?c.x+c.width/2:c.x+c.width*(k+.5)/t.length,y:c.y}];});
  const stops=Object.entries(lineInfo()?.INTERMEDIATE||{}).filter(([,v])=>v.host===st.id).flatMap(([id,v])=>Object.entries(v.slots).filter(([trunk])=>/^[EM]/.test(trunk)).map(([trunk,code])=>({id,name:networkInfo()?.catalog?.[id]?.name,trunk,code})));
  for(const pb of platformBoxes){if(pb.central||pb.row===null)continue;const mid=(pb.x+pb.right)/2;
   const hit=stops.flatMap(s=>tokenCentre(s.code).filter(c=>Math.abs(c.y-pb.row)<3).map(c=>({...s,cx:c.cx}))).sort((a,b)=>Math.abs(a.cx-mid)-Math.abs(b.cx-mid))[0];
-  if(hit&&Math.abs(hit.cx-mid)<200){const w=pb.right-pb.x;pb.x=hit.cx-w/2;pb.right=hit.cx+w/2;pb.stop=hit;}}
+  if(hit&&Math.abs(hit.cx-mid)<200){if(!pb.pinned){const w=pb.right-pb.x;pb.x=hit.cx-w/2;pb.right=hit.cx+w/2;}pb.stop=hit;}}   /* 원본 x로 고정한 승강장은 자리는 두고 정차역만 잇는다 */
  // 중간역 이름판은 그 역 하선 승강장 표시 위(열번칸 자리를 띄우고)에 둔다. 위쪽 선로와 겹치면 예전처럼 화면 위 띠에 둔다.
  // 이름판도 화면 좌우 끝 선로명 자리(62px)는 비운다
  const plateX=(x,w)=>Math.max(62+w/2,Math.min(WIDTH-62-w/2,x));
+ const plateAt=(plate,x)=>{const v=L.xmap?.captions?.[plate.name];return v?L.adj(v*WIDTH/L.xmap.width):x;};   /* 원본 화면 가운데 x를 아는 이름판 (금천구청 석수) */
  // 하선 승강장 표시가 없는 중간역 이름판(서울 남영 등)은 원본처럼 이름판 아래 첫 선로의 열번칸 바로 위에 둔다.
- const plateOverRow=(plate,fallback)=>{const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),w=Math.max(b-a,plate.name.length*16+18),mid=(a+b)/2;
+ const plateOverRow=(plate,fallback)=>{const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),w=Math.max(b-a,plate.name.length*16+18),w2=w,mid=(a+b)/2;
   const under=cells.filter(c=>c.x<mid+w/2&&c.x+c.width>mid-w/2).sort((p,q)=>p.y-q.y)[0];if(!under)return fallback;
-  const y=under.y-84;return y>=8&&!cells.some(c=>c.y<under.y-4&&c.y>y-12&&c.x<mid+w/2+20&&c.x+c.width>mid-w/2-20)?y:fallback;};
+  /* 원본처럼 이름판 → 열번칸 → 폐색 표식 → 선로 순서: 이름판 아래에 원본 열번칸이 오면 그 띠(폐색 표식 위로 밀린 높이까지)를 비운다 (금천구청 석수 · B974T) */
+  const winUnder=L.xmap&&visibleWindows.some(w=>w.side==='above'&&w.sourceWindow&&w.slide===L.xmap.slide&&(()=>{const a=L.adj(w.sourceWindow[0]*WIDTH/L.xmap.width),b=L.adj((w.sourceWindow[0]+w.sourceWindow[2])*WIDTH/L.xmap.width);return a<mid+w2/2&&b>mid-w2/2;})());
+  const y=under.y-(winUnder?96:84);return y>=8&&!cells.some(c=>c.y<under.y-4&&c.y>y-12&&c.x<mid+w/2+20&&c.x+c.width>mid-w/2-20)?y:fallback;};
  const plateY=(plate,fallback)=>{const own=platformBoxes.filter(pb=>pb.stop?.name===plate.name&&pb.y<pb.row).sort((a,b)=>a.y-b.y)[0];if(!own)return plateOverRow(plate,fallback);
   const y=own.y-84,mid=(own.x+own.right)/2,half=Math.max(own.right-own.x,plate.name.length*16+18)/2+6,above=Math.max(-Infinity,...cells.filter(c=>c.x<mid+half&&c.x+c.width>mid-half).map(c=>c.y).filter(v=>v<own.row-3));return y-4>above+BAR/2?y:fallback;};
  // Fixed source symbols use the same transform as rails; they never mutate interlocking state.
@@ -358,7 +371,7 @@ function render(st,def,core,model,neighbours={}){
  }
  // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
- for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=Math.max(b-a,plate.name.length*16+18),x=plateX(own?(own.x+own.right)/2:(a+b)/2,w),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
+ for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=Math.max(b-a,plate.name.length*16+18),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(a+b)/2,w)),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
  for(const p of edgePorts){if(true)continue;   /* 선로명 표기 삭제(원본에 없음): 자리 예약도 하지 않는다 */const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
@@ -519,7 +532,7 @@ function render(st,def,core,model,neighbours={}){
  if(!cellGaps.length)for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
-  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],width=Math.max(right-left,plate.name.length*16+18),x=plateX(own?(own.x+own.right)/2:(left+right)/2,width);
+  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],width=Math.max(right-left,plate.name.length*16+18),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(left+right)/2,width));
   // 이름판은 자기 역 하선 승강장 위 (자리가 없으면 화면 위 띠)
   const y=plateY(plate,Math.max(8,topRow-plateGap));
   plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
@@ -567,7 +580,10 @@ function render(st,def,core,model,neighbours={}){
    if(capsulePositions.some(c=>intersects([nx-30,LY0-9,nx+30,LY0+9],c.box,2))&&!capsulePositions.some(c=>intersects([X-30,LY0-9,X+30,LY0+9],c.box,2)))continue;   // 폐색 표식과 겹치면 옮기지 않는다
    sigAt.set(id,nx);
    if(!hasGap(nx,Y)&&onRail(nx,Y))cellGaps.push([nx,Y]);}
-  for(const [px,py] of platRows)for(const c of strong){if(Math.abs(c.x-px)>260||hasGap(c.x,py,16))continue;if(onRail(c.x,py))cellGaps.push([c.x,py]);}
+  /* overrides로 원본 위치를 적은 칸(과 그 꺾임 꼬리) 안에는 열 틈을 새로 넣지 않는다 (원본에 없는 틈: 금천구청 1T·3T·4T의 x≈412) */
+  const isPin=cc=>!!L.xmap?.pinned?.some(e=>Math.abs(e[0]-cc.source[0])<.6&&Math.abs(e[1]-cc.source[1])<.6);
+  const pinnedAt=(x,y)=>cells.some(cc=>isPin(cc)&&Math.abs(cc.y-y)<3&&x>cc.x+8&&x<cc.x+cc.width-8)||cornerTails.some(([[a,ay],[b]])=>Math.abs(ay-y)<3&&x>=Math.min(a,b)&&x<=Math.max(a,b)&&cells.some(cc=>isPin(cc)&&Math.abs(cc.y-y)<3&&(Math.abs(cc.x-b)<2||Math.abs(cc.x+cc.width-a)<2)));
+  for(const [px,py] of platRows)for(const c of strong){if(Math.abs(c.x-px)>260||hasGap(c.x,py,16)||pinnedAt(c.x,py))continue;if(onRail(c.x,py))cellGaps.push([c.x,py]);}
  }
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x);let [X,Y]=sigBase(id,T([x,railLocal]));if(sigAt.has(id))X=sigAt.get(id);
   {const LY=T([0,lampY])[1],body=x0=>[Math.min(x0,x0+dir*18)-4,LY-8,Math.max(x0,x0+dir*18)+12,LY+8];for(let k=0;k<12;k++){const hit=capsulePositions.find(c=>intersects(body(X),c.box,1));if(!hit)break;X+=Math.sign(X-(hit.box[0]+hit.box[2])/2||1)*4;}} /* 폐색 표식과 겹치면 옆으로 비킨다 */return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
@@ -629,7 +645,7 @@ function render(st,def,core,model,neighbours={}){
  const seen=new Set();
  for(const item of [...wing.labels,...partLabels,...(prepared.corridor?[]:core.pointPartLabels||[]).map(p=>[p.x,p.y,p.part])]){
   const key=item.join('|');if(seen.has(key))continue;seen.add(key);
-  const anchor=T(item),label=takeLabel(item[2],anchor,'part',key),group=core.pointParts?.[item[2]];
+  const anchor=Tnear(item),label=takeLabel(item[2],anchor,'part',key),group=core.pointParts?.[item[2]];
   if(group){const R=model.points[group]==='R',locked=model.blockedPoints.includes(group)||Object.keys(model.routes).some(id=>(core.routes[id].pointLocks||[]).includes(group)||core.overlapOf(id,model)?.points[group]);annotations+=`<g class="point-tag ${R?'rev':''} ${locked?'locked':''}" data-point-control="${item[2]}" data-point-group="${group}" role="button" tabindex="0" aria-label="선로전환기 ${item[2]}"><rect x="${label.x-18}" y="${label.y-11}" width="36" height="22" fill="transparent"/>${label.svg}<title>SW_${item[2]} · ${R?'반위':'정위'} · 쌍동 A/B 동시 전환${locked?' · 쇄정':''}</title></g>`;if(overlapPoints.has(group))annotations+=`<circle class="overlap-ring" data-overlap-point="${group}" cx="${label.x}" cy="${label.y}" r="18"/>`;}else annotations+=label.svg;
  }
  for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}

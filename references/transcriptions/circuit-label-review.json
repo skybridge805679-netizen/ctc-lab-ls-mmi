@@ -1231,6 +1231,15 @@
       "blankCellReview": [
         {
           "at": [
+            516.2,
+            268,
+            169
+          ],
+          "sourceText": "1T",
+          "status": "existing rail name"
+        },
+        {
+          "at": [
             787.1,
             318,
             66
