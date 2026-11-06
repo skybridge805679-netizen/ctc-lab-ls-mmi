@@ -185,6 +185,18 @@ function render(st,def,core,model,neighbours={}){
     if((!L1.label&&/^\d+T$/.test(R1.label))||(!R1.label&&/^\d+T$/.test(L1.label))){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 승강장 칸과 그 nT는 한 회로   // 같은 회로 조각은 잇는다
     let b=(end+R1.x)/2;   /* 경계는 칸(원본 배치)이 정한다; 신호기는 아래에서 이 틈으로 옮긴다 */
     b=Math.max(L1.x+12,Math.min(R1.x+R1.width-12,b));const r=R1.x+R1.width;L1.width=b-GAP/2-L1.x;R1.x=b+GAP/2;R1.width=r-R1.x;cellGaps.push([b,y]);}}}
+ // 틈 열(여러 선로의 틈이 한 세로줄로 맞춰진 곳)을 찾고, 승강장 옆 열은 하나로 모아 칸 경계도 함께 옮긴다 (칸을 그리기 전에)
+ const gapColumns=(()=>{
+  const columns=[];for(const [gx] of cellGaps){const col=columns.find(c=>Math.abs(c.x-gx)<12);if(col){col.n++;col.x+=(gx-col.x)/col.n;}else columns.push({x:gx,n:1});}
+  // 승강장 열번창(원본 위치)의 좌우 끝 — nT 칸 바로 뒤가 틈 열이다
+  const platRows=(trainWindows.data[st.id]||[]).filter(w=>w.side==='inline'&&/^\d+T$/.test(w.slot||w.code)).map(w=>{const r=def.rails.find(r=>r[0]===(w.slot||w.code));if(!r||r[2]==null)return null;const P=T([r[2],railY(def,r[0],r[2])]);
+   const cx=L.xmap&&w.sourceWindow&&w.slide===L.xmap.slide?L.adj((w.sourceWindow[0]+w.sourceWindow[2]/2)*WIDTH/L.xmap.width):P[0];return [cx,P[1]];}).filter(Boolean);
+  const platX=x=>platRows.length?Math.min(...platRows.map(([px])=>Math.min(Math.abs(px+50-x),Math.abs(px-50-x)))):Infinity;
+  // 승강장 옆에서 40px 안에 두 열이 생기면 승강장에 가까운 열 하나로 모은다 (원본: nT 칸 바로 뒤 한 줄)
+  let strong=columns.filter(c=>(c.n>=3||(c.n>=2&&platX(c.x)<120))&&platX(c.x)>=35).sort((a,b)=>platX(a.x)-platX(b.x));   /* nT 칸 자리(열번창 끝에서 35px 이상)는 남긴다 */   /* 승강장 바로 옆은 두 줄만 맞아도 열 */const kept=[];for(const c of strong)if(!kept.some(k=>Math.abs(k.x-c.x)<40&&platX(c.x)<250))kept.push(c);strong=kept;
+  for(const k of strong){if(platX(k.x)>=250)continue;for(const g of cellGaps){if(Math.abs(g[0]-k.x)>=40||Math.abs(g[0]-k.x)<=3||!platRows.some(([,py])=>Math.abs(py-g[1])<3))continue;
+   for(const c of cells){if(Math.abs(c.y-g[1])>=3)continue;if(Math.abs(c.x+c.width-(g[0]-GAP/2))<6)c.width=k.x-GAP/2-c.x;else if(Math.abs(c.x-(g[0]+GAP/2))<6){const r=c.x+c.width;c.x=k.x+GAP/2;c.width=r-c.x;}}g[0]=k.x;}}
+  return {strong,platRows,platX};})();
  // Platform glyphs keep a readable size and a consistent offset from their rail.
  const coreXs=def.rails.flatMap(r=>r[1].map(p=>p[0])),platformBoxes=wing.platforms.map(p=>{
   const [x,a]=T([p[0],p[1]]),[right,b]=T([p[2],p[3]]),mid=(p[0]+p[2])/2,central=!prepared.corridor&&(p[3]-p[1]>=15||p[6]==='central')&&mid>=Math.min(...coreXs)&&mid<=Math.max(...coreXs);   // p[6]: 두 선로 사이 섬식 승강장(높이가 낮아도 구내 승강장)
@@ -526,13 +538,7 @@ function render(st,def,core,model,neighbours={}){
  if(cellGaps.length){
   const onRail=(x,y)=>paths.some(pts=>pts.some((p,i)=>i&&Math.abs(p[1]-y)<3&&Math.abs(pts[i-1][1]-y)<3&&Math.min(p[0],pts[i-1][0])<x-6&&Math.max(p[0],pts[i-1][0])>x+6))||cells.some(c=>Math.abs(c.y-y)<3&&c.x<x-6&&c.x+c.width>x+6);
   const hasGap=(x,y,r=12)=>cellGaps.some(([gx,gy])=>Math.abs(gy-y)<3&&Math.abs(gx-x)<r);
-  const columns=[];for(const [gx] of cellGaps){const col=columns.find(c=>Math.abs(c.x-gx)<10);if(col){col.n++;col.x+=(gx-col.x)/col.n;}else columns.push({x:gx,n:1});}
-  const platRows=(trainWindows.data[st.id]||[]).filter(w=>w.side==='inline'&&/^\d+T$/.test(w.slot||w.code)).map(w=>def.rails.find(r=>r[0]===(w.slot||w.code))).filter(r=>r&&r[2]!=null).map(r=>T([r[2],railY(def,r[0],r[2])]));
-  const platX=x=>platRows.length?Math.min(...platRows.map(([px])=>Math.abs(px-x))):Infinity;
-  // 승강장 옆에서 40px 안에 두 열이 생기면 승강장에 가까운 열 하나로 모은다 (원본: nT 칸 바로 뒤 한 줄)
-  let strong=columns.filter(c=>c.n>=3).sort((a,b)=>platX(a.x)-platX(b.x));const kept=[];for(const c of strong)if(!kept.some(k=>Math.abs(k.x-c.x)<40&&platX(c.x)<300))kept.push(c);strong=kept;
-  for(const k of strong){if(platX(k.x)>=300)continue;for(const g of cellGaps){if(Math.abs(g[0]-k.x)>=40||Math.abs(g[0]-k.x)<=3||!platRows.some(([,py])=>Math.abs(py-g[1])<3))continue;
-   for(const c of cells){if(Math.abs(c.y-g[1])>=3)continue;if(Math.abs(c.x+c.width-(g[0]-GAP/2))<6)c.width=k.x-GAP/2-c.x;else if(Math.abs(c.x-(g[0]+GAP/2))<6){const r=c.x+c.width;c.x=k.x+GAP/2;c.width=r-c.x;}}g[0]=k.x;}}
+  const {strong,platRows}=gapColumns;
   for(const [id,rail,x,lampY] of def.signals){const [X,Y]=sigBase(id,T([x,railY(def,rail,x)])),LY0=T([0,lampY])[1];
    const own=cellGaps.filter(([gx,gy])=>Math.abs(gy-Y)<3&&Math.abs(gx-X)<45).sort((a,b)=>Math.abs(a[0]-X)-Math.abs(b[0]-X))[0];
    const col=strong.filter(c=>Math.abs(c.x-X)<40).sort((a,b)=>Math.abs(a.x-X)-Math.abs(b.x-X))[0];
