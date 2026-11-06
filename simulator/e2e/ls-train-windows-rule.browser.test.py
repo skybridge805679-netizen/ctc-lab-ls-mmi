@@ -40,6 +40,14 @@ try:
             page.evaluate("id=>selectStation(id)", st); page.wait_for_timeout(120)
             stubs += [st + ' ' + x for x in page.evaluate(STUB)]
         assert not stubs, stubs
+        # 폐색호주: 표식의 기둥(⊢)이 회로 경계에 선다 — 「x~y호주 사이」가 한 회로를 가리킨다 (화면 끝 회로 몇 개만 예외)
+        BLK = """()=>{const svg=document.querySelector('#trackSvg');const beds=[...svg.querySelectorAll('.cell-bed')].map(r=>{const b=r.getBBox();return {x1:b.x,x2:b.x+b.width,y:b.y+b.height/2};});
+          return [...svg.querySelectorAll('.block-indicator')].map(g=>{const st=g.querySelector('.block-stem').getBBox(),body=g.querySelector('.block-body').getBBox(),bar=st.x<body.x?st.x:st.x+st.width,cy=body.y+body.height/2;
+           const ry=beds.filter(b=>Math.abs(b.y-cy)<30).sort((a,b)=>Math.abs(a.y-cy)-Math.abs(b.y-cy))[0]?.y;const e=beds.filter(b=>Math.abs(b.y-ry)<3).flatMap(b=>[b.x1,b.x2]);return e.length&&Math.min(...e.map(x=>Math.abs(x-bar)))<=3;});}"""
+        marks = []
+        for st in page.evaluate("SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id)"):
+            page.evaluate("id=>selectStation(id)", st); page.wait_for_timeout(120); marks += page.evaluate(BLK)
+        assert len(marks) >= 200 and sum(marks) >= 195, (len(marks), sum(marks))
         b.close()
     print(f'PASS train windows: {centred}/{rows} centred on their circuit, none crosses another track (one source exception), bends drawn without stubs')
 finally:
