@@ -231,6 +231,8 @@ function render(st,def,core,model,neighbours={}){
   const atomic=c.label.replaceAll(' · ',''),tokens=/^B\d{3,4}T[12]T$/.test(atomic)?[atomic]:c.label.split(' · ').filter(Boolean);
   return tokens.map((label,i)=>({...c,label,x:c.x+c.width*i/tokens.length,width:c.width/tokens.length}));
  });
+ // 표기 통일: 승강장 선로 번호(nT)는 그 선로 승강장(열번창) 바로 오른쪽 칸에 둔다. 자리가 없을 때만 원래 위치를 쓴다.
+ const platformBox=name=>/^\d+T$/.test(name)?windowBoxes.find(b=>b.inline&&(b.item.slot===name||b.item.code===name)):null;
  const labelRuns=[];
  for(const c of fragments.sort((a,b)=>a.y-b.y||a.x-b.x)){
   const prev=labelRuns.at(-1);
@@ -245,7 +247,8 @@ function render(st,def,core,model,neighbours={}){
    let intervals=[[left+3,right-3]];
    for(const box of windowBoxes.filter(b=>b.inline&&Math.abs(b.cy-c.y)<4))intervals=intervals.flatMap(([a,b])=>box.x>=b||box.x+box.width<=a?[[a,b]]:[[a,Math.min(b,box.x-5)],[Math.max(a,box.x+box.width+5),b]].filter(([l,r])=>r-l>6));
    if(!intervals.length)intervals=[[left+3,right-3]];
-   const [a,b]=intervals.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0],x=(a+b)/2,width=Math.max(6,b-a),textWidth=Math.min(width,label.length*7.2);
+   const pb=platformBox(label),need=label.length*7.2+4,beside=pb&&Math.abs(pb.cy-c.y)<4?intervals.filter(([a,b])=>a>=pb.x+pb.width-1&&b-a>=need).sort((p,q)=>p[0]-q[0])[0]:null;
+   const [a,b]=beside||intervals.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0],width=Math.max(6,b-a),textWidth=Math.min(width,label.length*7.2),x=beside?Math.min(b-textWidth/2-2,Math.max(a,pb.x+pb.width+8)+textWidth/2):(a+b)/2;
    const fit=label.length*7.2>width?` textLength="${Math.max(6,width)}" lengthAdjust="spacingAndGlyphs"`:'';
    labels+=`<text class="cell-name" data-circuit-label="${esc(label)}" x="${x}" y="${c.y+4.3}" text-anchor="middle"${fit}>${esc(label)}</text>`;
    occupiedBoxes.push([x-textWidth/2,c.y-8,x+textWidth/2,c.y+8]);
@@ -262,9 +265,11 @@ function render(st,def,core,model,neighbours={}){
   const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);
   const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
   if(extension){intervals=[[edgeX+4,WIDTH-12]];symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
-  const preferredX=extension?(edgeX+4+WIDTH-12)/2:baseX+offset;
+  const pb=!extension&&platformBox(name),onRow=pb&&Math.abs(pb.cy-y)<4;
+  const preferredX=extension?(edgeX+4+WIDTH-12)/2:onRow?pb.x+pb.width+8+width/2:baseX+offset;
   let x=preferredX;
-  const deltas=[0];for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
+  // 승강장 오른쪽 칸을 먼저 찾고(오른쪽으로만 이동), 없으면 원래 방식(양쪽)으로 찾는다
+  const deltas=[0];if(onRow){for(let d=6;d<120;d+=6)deltas.push(d);for(let d=6;d<WIDTH;d+=6)deltas.push(baseX+offset-preferredX-d,baseX+offset-preferredX+d);}else for(let d=6;d<WIDTH;d+=6)deltas.push(-d,d);
   for(const dx of deltas){const candidate=preferredX+dx,box=[candidate-width/2,y-8,candidate+width/2,y+8];if(!intervals.some(([a,b])=>box[0]>a+2&&box[2]<b-2))continue;if(!occupiedBoxes.some(o=>intersects(box,o,3))){x=candidate;break;}}
   labels+=`<text class="rail-name" data-label-placement="${extension?'edge-extension':'native-rail'}" data-circuit-label="${esc(name)}" x="${x}" y="${y+4.3}" text-anchor="middle">${esc(name)}</text>`;
   occupiedBoxes.push([x-width/2,y-8,x+width/2,y+8]);
