@@ -4001,8 +4001,8 @@
       ],
       "candidate": "B660T",
       "code": "B657T",
-      "side": "below",
-      "fraction": 0.9,
+      "side": "above",
+      "fraction": 0.3866,
       "slot": "B657T",
       "reviewed": true
     },

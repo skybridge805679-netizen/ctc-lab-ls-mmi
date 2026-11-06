@@ -64,6 +64,8 @@ for st in info:
  caps=[local(p) for p in symbols[st['page']] if bx<=p[0]<=bx+bw and by<=p[1]<=by+bh]
  markers={2:[[20,350,'SP']],3:[[1310,104,'SP'],[443,435,'SS']],4:[[315,295,'SP'],[1190,270,'SS']]}
  markers=[local(p) for p in markers[st['page']] if bx<=p[0]<=bx+bw and by<=p[1]<=by+bh]
+ # 원본 LS 안양 화면(slide12)에는 SP 표지가 없다 (전체노선 배선도에만 있음)
+ if st['id']=='anyang':markers=[m for m in markers if m[2]!='SP']
  # Short white glyph fragments inside a crossover are not track-circuit beds.
  # Keep named sections and long uncontrolled through tracks; reject only short,
  # unnamed fragments off every surveyed horizontal rail centreline.

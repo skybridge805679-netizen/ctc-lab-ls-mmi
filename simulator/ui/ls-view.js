@@ -113,6 +113,8 @@ function render(st,def,core,model,neighbours={}){
  // 선로 밖의 번호(선로전환기 번호 등)는 가장 가까운 고정 꼭짓점과 같은 만큼 옮긴다
  const Tnear=p=>{const P=T(p);if(!railFix.length)return P;const f=railFix.map(([fx,fy,ox])=>({fx,fy,d:Math.hypot(fx-p[0],(fy-p[1])*.5),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<45?[P[0]+f.dx,P[1]]:P;};
  const sigBase=(id,P)=>{const v=L.xmap?.signals?.[id];return v?[L.adj(v[0]*WIDTH/L.xmap.width)-v[1]*18,P[1]]:P;};
+ // 기둥이 칸 틈에 선 뒤 원본 빨간 등이 기둥에서 24~40px 떨어져 있으면(등 두 개짜리 장내·출발 신호기) 몸체를 그만큼 늘린다 (안양 1A·3B·4C·2B 등)
+ const sigReach=(id,X,dir)=>{const v=L.xmap?.signals?.[id];if(!v)return 18;const d=(L.adj(v[0]*WIDTH/L.xmap.width)-X)*dir;return d>=24&&d<=40?Math.round(d):18;};
  // 원본에서 줄마다 위치가 다른 꼭짓점(노량진 B929T·B930T가 꺾여 내려가는 두 수직선)은 원본 x에 고정한다
  const railFix=L.xmap?.railPoints||[],fixPt=([x,y],P)=>{const f=railFix.find(([fx,fy])=>Math.abs(fx-x)<1&&Math.abs(fy-y)<2);return f?[+L.adj(f[2]*WIDTH/L.xmap.width).toFixed(2),P[1]]:P;};
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
@@ -221,7 +223,11 @@ function render(st,def,core,model,neighbours={}){
      const rail=def.rails.find(r=>r[2]!=null&&Math.abs(railY(def,r[0],r[2])-near)<2&&Math.abs(r[2]-(p[0]+p[2])/2)<80);let bx=x,br=right;if(rail){let [cx]=T([rail[2],near]);const sw=L.xmap&&(trainWindows.data[st.id]||[]).find(w=>w.side==='inline'&&(w.slot===rail[0]||w.code===rail[0])&&w.sourceWindow&&w.slide===L.xmap.slide);if(sw)cx=L.adj((sw.sourceWindow[0]+sw.sourceWindow[2]/2)*WIDTH/L.xmap.width);bx=cx-50;br=cx+50;}
      return {x:bx,y:above?ry-14-3-h:ry+14+3,right:br,height:h,kind:p[4],central:true,row:null,side:true};}}}
   // 구내 승강장 표시는 원본처럼 그 승강장 선로 열번창(폭 100)과 같은 폭·위치로 맞춘다 (청량리·동묘앞 등 섬식)
-  if(central){const cy=(p[1]+p[3])/2,rail=def.rails.filter(r=>/^\d+T$/.test(r[0])&&r[2]!=null&&Math.abs(railY(def,r[0],r[2])-cy)<70&&Math.abs(r[2]-mid)<120).sort((u,v)=>Math.abs(railY(def,u[0],u[2])-cy)-Math.abs(railY(def,v[0],v[2])-cy))[0];if(rail){const [cx]=T([rail[2],cy]);const sw=L.xmap&&(trainWindows.data[st.id]||[]).find(w=>w.side==='inline'&&(w.slot===rail[0]||w.code===rail[0])&&w.sourceWindow&&w.slide===L.xmap.slide),x0=sw?L.adj((sw.sourceWindow[0]+sw.sourceWindow[2]/2)*WIDTH/L.xmap.width):cx;return {x:x0-50,y,right:x0+50,height,kind:p[4],central,row:null};}}
+  if(central){const cy=(p[1]+p[3])/2,rail=def.rails.filter(r=>/^\d+T$/.test(r[0])&&r[2]!=null&&Math.abs(railY(def,r[0],r[2])-cy)<70&&Math.abs(r[2]-mid)<120).sort((u,v)=>Math.abs(railY(def,u[0],u[2])-cy)-Math.abs(railY(def,v[0],v[2])-cy))[0];if(rail){const [cx]=T([rail[2],cy]);const sw=L.xmap&&(trainWindows.data[st.id]||[]).find(w=>w.side==='inline'&&(w.slot===rail[0]||w.code===rail[0])&&w.sourceWindow&&w.slide===L.xmap.slide),x0=sw?L.adj((sw.sourceWindow[0]+sw.sourceWindow[2]/2)*WIDTH/L.xmap.width):cx;
+   /* 한 승강장이 두 색(하늘색·주황)으로 나뉘면 원본처럼 열번창 폭 100을 원본 길이 비율로 나눈다 (안양 2T·3T 사이) */
+   const grp=wing.platforms.filter(q=>Math.abs((q[1]+q[3])/2-cy)<4&&q[2]>=p[0]-80&&q[0]<=p[2]+80&&q[6]!=='central');const gx0=Math.min(...grp.map(q=>q[0])),gx1=Math.max(...grp.map(q=>q[2]));
+   if(grp.length>1&&gx1-gx0<120){const f=v=>x0-50+100*(v-gx0)/(gx1-gx0);const nx=grp.map(q=>q[0]).filter(v=>v>p[2]-1&&v-p[2]<4)[0];return {x:f(p[0]),y,right:f(nx??p[2]),height,kind:p[4],central,row:null};}
+   return {x:x0-50,y,right:x0+50,height,kind:p[4],central,row:null};}}
   let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
   return {x,y,right,height,kind:p[4],central,row};
  });
@@ -344,7 +350,9 @@ function render(st,def,core,model,neighbours={}){
   else throw new Error(st.id+' train window anchor missing: '+code);
   // 가로 좌표가 원본 화면과 같은 역 화면에서는 열번칸을 원본 슬라이드의 그 자리에 둔다 (선로 위 승강장 칸 제외)
   if(L.xmap&&!beside&&item.sourceWindow&&item.slide===L.xmap.slide)cx=L.adj((item.sourceWindow[0]+item.sourceWindow[2]/2)*WIDTH/L.xmap.width);
-  const width=inline?100:80,height=inline?28:20;
+  /* 원본 좌표 화면에서는 떨어진 열번칸도 원본 폭(슬라이드 112px ≈ 94)으로 그린다 */
+  const srcW=L.xmap&&!inline&&!beside&&item.sourceWindow&&item.slide===L.xmap.slide?Math.round(item.sourceWindow[2]*WIDTH/L.xmap.width):0;
+  const width=inline?100:Math.max(80,Math.min(100,srcW)),height=inline?28:20;
   const x=Math.max(4,Math.min(WIDTH-width-4,cx-width/2)),y=cy+(inline?-height/2:item.side==='above'?-50:30);
   windowBoxes.push({item,inline,x,y:beside?cy-10:y,width,height:beside?20:height,cy,beside});
  }
@@ -365,9 +373,9 @@ function render(st,def,core,model,neighbours={}){
   const search=(deltas,inBand)=>{let best;
    for(const dy of deltas){let cost=0,choices=[];
     for(const b of lane){let chosen;
-     candidates:for(const width of [80,64,56,48])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
+     candidates:for(const width of [...new Set([b.width,80,64,56,48])])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
       const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;
-      const score=hits*10000+(80-width)*3+Math.abs(dx)*4;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
+      const score=hits*10000+(b.width-width)*3+Math.abs(dx)*4;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
      }
      cost+=chosen.cost;choices.push(chosen);
     }
@@ -576,17 +584,17 @@ function render(st,def,core,model,neighbours={}){
  }
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
-  const LY=T([0,s.lampY])[1],lampX=X+dir*18;
+  const reach=sigReach(id,X,dir),LY=T([0,s.lampY])[1],lampX=X+dir*reach;
   const labelY=nameY.get(id);
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
-  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="28" height="14" rx="7"/><circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
-  const box=dir===1?[X-30,LY-8,X+25,LY+8]:[X-25,LY-8,X+30,LY+8];
+  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="${reach+10}" height="14" rx="7"/>${reach>18?`<circle class="lamp off" cx="${lampX-dir*13}" cy="${LY}" r="6"/>`:''}<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
+  const box=dir===1?[X-30,LY-8,X+reach+7,LY+8]:[X-reach-7,LY-8,X+30,LY+8];
   // 신호기 이름이 승강장 표시에 걸리면 마스트 반대쪽에 쓴다 (동묘앞 23)
   const nameAt=d=>d===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8];
   const keepOut=[...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...windowBoxes.filter(b=>b.inline).map(b=>[b.x,b.y,b.x+b.width,b.y+b.height]),...capsulePositions.map(c=>c.box)];   // 승강장·승강장 열번창
   const nameDir=keepOut.some(b=>intersects(nameAt(dir),b,1))&&!keepOut.some(b=>intersects(nameAt(-dir),b,1))?-dir:dir;
   occupiedBoxes.push(nameAt(nameDir));
-  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+23,LY+8]:[X-23,LY-8,X+8+id.length*7.5,LY+8]);
+  occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+reach+5,LY+8]:[X-reach-5,LY-8,X+8+id.length*7.5,LY+8]);
   signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-nameDir*8}" y="${labelY+3.5}" text-anchor="${nameDir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
@@ -609,7 +617,7 @@ function render(st,def,core,model,neighbours={}){
  for(const [id,pos]of Object.entries(prepared.corridor?{}:core.points)){
   if(Object.values(core.pointParts||{}).includes(id)){pointSymbols+=`<g data-point-label="${id}" data-paired-switch="true"></g>`;continue;}
   const anchor=pointAnchors[id]||Tnear(toLocal(pos.x,pos.y)),R=model.points[id]==='R',manualLock=model.blockedPoints.includes(id),locked=manualLock||overlapPoints.has(id)||Object.keys(model.routes).some(route=>(core.routes[route].pointLocks||[]).includes(id));
-  const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>Tnear(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16).sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
+  const surveyed=inventory[st.id].labels.filter(p=>p[2]===id).map(p=>Tnear(p)).filter(p=>p[0]>=12&&p[0]<=WIDTH-12&&p[1]>=16&&p[1]<=L.H-16&&Math.hypot(p[0]-anchor[0],p[1]-anchor[1])<160)/* 멀리 떨어진 같은 번호(안양 55 신호기 이름)는 선로전환기 번호가 아니다 */.sort((a,b)=>Math.hypot(a[0]-anchor[0],a[1]-anchor[1])-Math.hypot(b[0]-anchor[0],b[1]-anchor[1]))[0];
   const scissors=switches.connectors.find(c=>c.id===id&&c.kind==='scissors');
   const preferred=scissors?[scissors.endpoints[0][0]+(scissors.endpoints[1][0]-scissors.endpoints[0][0])*.25,scissors.endpoints[0][1]+(scissors.endpoints[0][1]<scissors.endpoints[1][1]?-24:24)]:surveyed||[anchor[0],anchor[1]-13];
   const label=takeLabel(id,anchor,'point',id,preferred);
@@ -626,9 +634,10 @@ function render(st,def,core,model,neighbours={}){
  }
  for(const [x,y,id,dir]of wing.signals){if(def.signals.some(s=>s[0]===id.replace(/^0+/,'')))continue;const [X,Y]=T([x,y]);signalSymbols+=`<g class="signal wing" data-wing-signal="${esc(id)}"><path class="mast" d="M${X} ${Y}h${dir*12}"/><circle class="lamp stop" cx="${X}" cy="${Y}" r="7"/><text class="sig-name" x="${X-dir*13}" y="${Y+5}" text-anchor="${dir===1?'end':'start'}">${esc(id)}</text></g>`;}
  // 원본 LS의 노란 화살표: 위 글자는 방향(지하청량리/수원), 아래 글자는 눌렀을 때 열리는 이웃 화면.
+ // 이웃이 역간 감시 화면이면 원본처럼 그 방향의 역 이름을 쓴다 (안양 → 「금정」, 금정 ← 「안양」).
  const arrow=(nb,side)=>{if(!nb)return '';const view=typeof nb==='string'?{id:'',name:nb}:nb,L=side==='left',x0=L?3:157,dx=L?1:-1,body=12,head=26,len=150,cy=28;
   const pts=[[0,0],[head,-head/2],[head,-body/2],[len,-body/2],[len,body/2],[head,body/2],[head,head/2]].map(([px,py])=>[x0+dx*px,cy+py].join(',')).join(' '),tx=x0+dx*(head+(len-head)/2);
-  return `<svg class="ls-nav-arrow" viewBox="0 0 160 56" aria-label="${esc(view.name)} 화면"><g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.name)}</text></g></svg>`;};
+  return `<svg class="ls-nav-arrow" viewBox="0 0 160 56" aria-label="${esc(view.name)} 화면"><g class="nb-arrow" data-nav-side="${side}"${view.id?` data-nav-view="${esc(view.id)}" role="button" tabindex="0"`:''} aria-label="${esc(view.name)} 화면으로"><polygon class="nb-arrow-shape" points="${pts}"/><text class="nb-arrow-dir" x="${tx}" y="${cy-11}" text-anchor="middle">${L?'지하청량리':'수 원'}</text><text class="nb-tag nb-arrow-to" x="${tx}" y="${cy+22}" text-anchor="middle">${esc(view.monitor?(L?view.hostName:view.nextName)||view.name:view.name)}</text></g></svg>`;};
  const around=presets.neighbours?.(neighbours.preset||st.id)||{};
  const navigation={left:arrow(neighbours.left===undefined?around.left:neighbours.left,'left'),right:arrow(neighbours.right===undefined?around.right:neighbours.right,'right')};
  // Extend through horizontal SVG letterboxing without stretching the stable station geometry.

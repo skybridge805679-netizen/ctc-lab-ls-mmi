@@ -116,7 +116,7 @@ html,body{min-width:1280px}.ls-svg{min-width:1080px}.ls-head{flex-wrap:nowrap}
 .ls-svg .annotation.part{font-size:10px;fill:#e5e8e2}
 .ls-svg .sig-name,.ls-svg .signal.shunt .sig-name{font-size:11px;stroke:#686d68;stroke-width:2;fill:#fff}
 .ls-svg .signal-body{fill:#111710}.ls-svg .mast{stroke:#f4f4ef;stroke-width:1.5}.ls-svg .mast-foot{fill:#f4f4ef;stroke:#222;stroke-width:1}
-.ls-svg .lamp{stroke:#18201a;stroke-width:1}.ls-svg .plate{fill:#1d241e;stroke:none}.ls-svg .plate-name{font-size:14px}
+.ls-svg .lamp{stroke:#18201a;stroke-width:1}.ls-svg .lamp.off{fill:#3a403b}.ls-svg .plate{fill:#1d241e;stroke:none}.ls-svg .plate-name{font-size:14px}
 .ls-svg .stn-line{display:none}.ls-svg .nb-tag{stroke:#686d68;font-size:12px}.ls-svg .circuit-boundary{stroke:#686d68}
 
 .ls-svg .sig-name,.ls-svg .signal.shunt .sig-name{font-size:10px}

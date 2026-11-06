@@ -10,7 +10,7 @@ const CORRIDORS=[
 const CORRIDOR='uiwang-suwon';
 const corridorOf=id=>CORRIDORS.find(c=>c.id===id);
 const hosted=station=>CORRIDORS.find(c=>c.host===station);
-function list(){return network().stations.filter(s=>s.controlled).flatMap(s=>{const c=hosted(s.id);return [{id:s.id,station:s.id,name:s.name},...(c?[{id:c.id,station:c.host,name:c.name,monitor:true,plates:sources[c.slide].plates.map(p=>p.name)}]:[])];});}
+function list(){return network().stations.filter(s=>s.controlled).flatMap(s=>{const c=hosted(s.id);return [{id:s.id,station:s.id,name:s.name},...(c?[{id:c.id,station:c.host,name:c.name,monitor:true,hostName:s.name,nextName:network().stations.find(x=>x.id===c.next)?.name,plates:sources[c.slide].plates.map(p=>p.name)}]:[])];});}
 function get(id){return list().find(v=>v.id===id);}
 // 원본 노란 화살표가 가리키는 이웃 화면(역간 감시 화면 포함)
 function neighbours(id){const views=list(),i=views.findIndex(v=>v.id===id);return {left:views[i-1]||null,right:views[i+1]||null};}
