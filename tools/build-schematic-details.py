@@ -70,6 +70,8 @@ for st in info:
  if st['id']=='guro':markers=[m for m in markers if m[2]!='SS']
  # 원본 LS 노량진 화면(slide8)에도 SP 표지가 없다
  if st['id']=='noryangjin':markers=[m for m in markers if m[2]!='SP']
+ # 원본 LS 서울 화면(slide6)에도 SP 표지가 없다
+ if st['id']=='seoul':markers=[m for m in markers if m[2]!='SP']
  # Short white glyph fragments inside a crossover are not track-circuit beds.
  # Keep named sections and long uncontrolled through tracks; reject only short,
  # unnamed fragments off every surveyed horizontal rail centreline.

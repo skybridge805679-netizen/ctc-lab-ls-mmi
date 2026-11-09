@@ -246,6 +246,8 @@ function render(st,def,core,model,neighbours={}){
   let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
   return {x,y,right,height,kind:p[4],central,row};
  })()));
+ // 원본 좌표 화면: 같은 열에 쌓인 구내 승강장은 한쪽 승강장(맨 아래 등)도 원본처럼 같은 높이로 (서울 7T 아래)
+ if(L.xmap)for(const pb of platformBoxes){if(!pb.central)continue;const hs=platformBoxes.filter(q=>q!==pb&&q.central&&!q.side&&Math.abs(q.x-pb.x)<2&&Math.abs(q.right-pb.right)<2).map(q=>q.height),H=hs.find(h=>hs.filter(v=>Math.abs(v-h)<.5).length>=3);if(H&&pb.height<H-.5)pb.height=H;}   // 같은 높이 승강장이 셋 이상 쌓인 열에서만
  // 중간역 승강장(고상홈) 표시는 그 역의 정차 회로(line.js INTERMEDIATE의 전동선 ED·EU) 가운데에 붙인다.
  // 원본 좌표 그대로 두면 역간 폐색 회로가 화면에서 고르게 다시 배치될 때 옆 회로로 어긋난다 (노량진 신길 B938T).
  const tokenCentre=code=>cells.flatMap(c=>{const t=c.label.split(' · ').filter(Boolean),k=t.indexOf(code);return k<0&&c.label.replaceAll(' · ','')!==code?[]:[{cx:k<0?c.x+c.width/2:c.x+c.width*(k+.5)/t.length,y:c.y}];});
