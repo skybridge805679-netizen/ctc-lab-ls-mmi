@@ -93,8 +93,8 @@ const INTERMEDIATE={
  cityhall:{host:'jonggak',slots:{"MD": "B060T", "MU": "B055T"}},
  sinseoldong:{host:'dongmyo',slots:{"MD": "B012T", "MU": "B011T"}},
  dongdaemun:{host:'dongmyo',slots:{"MD": "B020T", "MU": "B021T"}},
- jongno5:{host:'dongmyo',slots:{"MD": "B026T", "MU": "B025T"}},
- jongno3:{host:'dongmyo',slots:{"MD": "B034T", "MU": "B031T"}},
+ jongno5:{host:'dongmyo',slots:{"MD": "B026T", "MU": "B027T"}},   // 원본 LS(slide 3) 고상홈: B026T · B027T
+ jongno3:{host:'dongmyo',slots:{"MD": "B034T", "MU": "B033T"}},   // 원본 LS(slide 3) 고상홈: B034T · B033T
  namyeong:{host:'seoul',slots:{"ED": "B908T", "EU": "B909T", "GD": "B602T", "GU": "B601T"}},
  gasan:{host:'guro',slots:{"ED": "B956T", "GD": "B632T", "GU": "B631T", "EU": "B953T"}},
  doksan:{host:'guro',slots:{"ED": "B962T", "GD": "B636T", "GU": "B637T", "EU": "B959T"}},

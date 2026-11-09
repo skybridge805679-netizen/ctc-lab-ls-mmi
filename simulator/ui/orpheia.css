@@ -225,7 +225,7 @@ dialog[data-variant="confirm"] .dialog-actions button.primary{background:var(--t
 
 /* User-confirmed district colours: underground Cheongnyangni through underground Seoul. */
 .ls-name.metro{background:#2068e6;border-color:#acc8f7}
-#lsStage:is([data-control-station="cheongnyangni"],[data-control-station="dongmyo"],[data-control-station="jonggak"],[data-control-station="underground-seoul"]) .inter-station .plate{fill:#2068e6}
+#lsStage[data-control-station="cheongnyangni"] .inter-station .plate{fill:#2068e6}   /* 원본: 지하청량리 제기동만 파란 판, 동묘앞·종각 중간역은 검은 판 */
 /* ORPHEIA / FTS — character assets, shared surfaces and desktop rhythm. */
 :root{--radius-panel:12px;--radius-control:6px;--radius-window:9px;--shadow:0 3px 14px #173d4208;--window-shadow:0 12px 36px #173d4220}
 body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#edf4f1}

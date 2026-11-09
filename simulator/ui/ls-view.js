@@ -81,7 +81,9 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  const weights=knots.slice(1).map((x,i)=>{const lo=knots[i],mid=(x+lo)/2,span=spans.find(([a,b])=>mid>=a&&mid<=b);return span?Math.max(1,Math.max(100,Math.min(300,span[2]*.85))/((span[1]-span[0])*sx)):1;});
  const cumulative=[0];weights.forEach((w,i)=>cumulative.push(cumulative.at(-1)+(knots[i+1]-knots[i])*w));
  const xAt=x=>{let i=0;while(i<weights.length-1&&x>knots[i+1])i++;return PADDING+(cumulative[i]+(x-knots[i])*weights[i])*(WIDTH-2*PADDING)/cumulative.at(-1);};
- const yAt=y=>top+(y-minY)*sy;
+ /* 이어지는 화면(지하청량리~지하서울)은 본선 두 줄을 모든 화면에서 같은 높이에 둔다 (ls-xmap-overrides rows: 원본 y → 화면 y) */
+ const rowFix=xmap?.rows?.length===2?xmap.rows:null,syR=rowFix?(rowFix[1][1]-rowFix[0][1])/(rowFix[1][0]-rowFix[0][0]):sy;
+ const yAt=rowFix?y=>rowFix[0][1]+(y-rowFix[0][0])*syR:y=>top+(y-minY)*sy;
  if(xmap){const k=WIDTH/xmap.width,orig=xmap.knots.map(([a,b])=>[a,b*k]);let knots=orig;
   // 시저스(X자 건넘선)는 세로 간격에 비해 가로가 좁으면 기둥처럼 보인다: 높이의 0.8배 이상 가로폭을 확보하고, 늘린 만큼 좌우 구간을 비례해 줄인다
   // 원본 좌표 화면에서는 칸 경계를 움직이지 않는다: 시저스가 높이의 0.8배보다 좁으면 X 그림만 양옆으로 늘린다 (금천구청 21·22)
@@ -93,8 +95,8 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
    knots=pts.map(x=>{const g=knotAt(knots,x);if(x<=x0)return [x,G0+(g-G0)*(leftW-dl)/Math.max(1e-6,leftW)];if(x>=x1)return [x,G1-(G1-g)*(rightW-dr)/Math.max(1e-6,rightW)];const a=G0+leftW-dl;return [x,a+(g-g0)*need/Math.max(1e-6,cur)];});}
   // 원본 화면 x(열번칸·폐색 칸의 원본 좌표)에도 같은 보정을 적용하는 함수
   const adjKnots=knots.map(([x,g])=>[knotAt(orig,x),g]).filter((q,i,a)=>i===0||q[0]>a[i-1][0]+1e-6),adj=v=>adjKnots.length>1?knotAt(adjKnots,v):v;
-  return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),xmap,adj,pads,pt:([x,y])=>[+knotAt(knots,x).toFixed(2),+yAt(y).toFixed(2)]};}
- return {sx,sy,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
+  return {sx,sy:syR,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),xmap,adj,pads,pt:([x,y])=>[+knotAt(knots,x).toFixed(2),+yAt(y).toFixed(2)]};}
+ return {sx,sy:syR,H:Math.max(targetH||460,Math.ceil(yAt(maxY)+bottom)),pt:([x,y])=>[+xAt(x).toFixed(2),+yAt(y).toFixed(2)]};
 }
 function intersects(a,b,gap=3){return a[0]<b[2]+gap&&a[2]>b[0]-gap&&a[1]<b[3]+gap&&a[3]>b[1]-gap;}
 function render(st,def,core,model,neighbours={}){
@@ -243,7 +245,7 @@ function render(st,def,core,model,neighbours={}){
    const grp=wing.platforms.filter(q=>Math.abs((q[1]+q[3])/2-cy)<4&&q[2]>=p[0]-80&&q[0]<=p[2]+80&&q[6]!=='central');const gx0=Math.min(...grp.map(q=>q[0])),gx1=Math.max(...grp.map(q=>q[2]));
    if(grp.length>1&&gx1-gx0<120){const f=v=>x0-50+100*(v-gx0)/(gx1-gx0);const nx=grp.map(q=>q[0]).filter(v=>v>p[2]-1&&v-p[2]<4)[0];return {x:f(p[0]),y,right:f(nx??p[2]),height,kind:p[4],central,row:null};}
    return {x:x0-50,y,right:x0+50,height,kind:p[4],central,row:null};}}
-  let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:cell.y+((a+b)/2<cell.y?-28-height:28);}}
+  let row=null;if(!central){const cell=cells.filter(c=>c.x<right&&c.x+c.width>x).sort((c,d)=>Math.abs(c.y-(a+b)/2)-Math.abs(d.y-(a+b)/2))[0];if(cell){row=cell.y;y=prepared.corridor?cell.y+p[5]-height/2:L.xmap?.platformAdjacent?cell.y+((a+b)/2<cell.y?-BAR/2-4-height:BAR/2+4):cell.y+((a+b)/2<cell.y?-28-height:28);}}   /* platformAdjacent: 원본처럼 칸 바로 위/아래(폐색 표식 띠)에 (지하청량리~지하서울) */
   return {x,y,right,height,kind:p[4],central,row};
  })()));
  // 원본 좌표 화면: 같은 열에 쌓인 구내 승강장은 한쪽 승강장(맨 아래 등)도 원본처럼 같은 높이로 (서울 7T 아래)
@@ -287,7 +289,7 @@ function render(st,def,core,model,neighbours={}){
  const captionBoxes=wing.fixed.captions.map(c=>{
   const notesW=c.notes?Math.max(...c.notes.map(t=>t.length))*13+18+22:0,w=Math.max(...c.lines.map(t=>t.length))*15+32+notesW;   /* 22: 원본 두 글자 열 사이 간격 */let h=c.lines.length*22+20;
   let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
-  if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*90;}
+  if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*(L.xmap?.captions?.[c.id]?h/2+12:90);}   /* 원본 위치를 아는 화면은 그 선로 바로 옆 (동묘앞 군자기지 출고선·입고선) */
   { /* 원본 화면 위치를 아는 역은 그 가로 위치에 둔다 (의왕 남부화물기지 A·B선) */ const v=L.xmap?.captions?.[c.id];if(v)x=L.adj(v*WIDTH/L.xmap.width); }
   if(c.id==='depot-lead'){
    const a=def.rails.find(r=>r[4]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
@@ -380,10 +382,10 @@ function render(st,def,core,model,neighbours={}){
   else if(cell){const tokens=cell.label.split(' · ').filter(Boolean),k=Math.max(0,tokens.indexOf(code));cx=tokens.length>1&&tokens.includes(code)?cell.x+cell.width*(k+.5)/tokens.length:cell.x+cell.width/2;cy=cell.y;}
   else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[cx,cy]=T(p);cx+=rail[3]===code?42:rail[4]===code?-42:0;}
   else throw new Error(st.id+' train window anchor missing: '+code);
-  // 가로 좌표가 원본 화면과 같은 역 화면에서는 열번칸을 원본 슬라이드의 그 자리에 둔다 (선로 위 승강장 칸 제외)
-  if(L.xmap&&!beside&&item.sourceWindow&&item.slide===L.xmap.slide)cx=L.adj((item.sourceWindow[0]+item.sourceWindow[2]/2)*WIDTH/L.xmap.width);
+  // 가로 좌표가 원본 화면과 같은 역 화면에서는 열번칸을 원본 슬라이드의 그 자리에 둔다 (선로 끝 옆 칸 포함: 지하청량리 MT)
+  if(L.xmap&&item.sourceWindow&&item.slide===L.xmap.slide)cx=L.adj((item.sourceWindow[0]+item.sourceWindow[2]/2)*WIDTH/L.xmap.width);
   /* 원본 좌표 화면에서는 떨어진 열번칸도 원본 폭(슬라이드 112px ≈ 94)으로 그린다 */
-  const srcW=L.xmap&&!inline&&!beside&&item.sourceWindow&&item.slide===L.xmap.slide?Math.round(item.sourceWindow[2]*WIDTH/L.xmap.width):0;
+  const srcW=L.xmap&&!inline&&item.sourceWindow&&item.slide===L.xmap.slide?Math.round(item.sourceWindow[2]*WIDTH/L.xmap.width):0;
   const width=inline?100:Math.max(80,Math.min(100,srcW)),height=inline?28:20;
   const x=Math.max(4,Math.min(WIDTH-width-4,cx-width/2)),y=cy+(inline?-height/2:item.side==='above'?-50:30);
   windowBoxes.push({item,inline,x,y:beside?cy-10:y,width,height:beside?20:height,cy,beside});
@@ -396,7 +398,8 @@ function render(st,def,core,model,neighbours={}){
  for(const p of edgePorts){if(true)continue;   /* 선로명 표기 삭제(원본에 없음): 자리 예약도 하지 않는다 */const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
  /* 원본 좌표로 고정한 칸 위 열번칸은, 그 x 위/아래로 실제로 지나가는 이웃 선로가 다르면 다른 줄(lane)로 둔다.
     원본도 그렇다: 구로 B628T 위 열번칸은 55T 줄이 없는 곳이라 오른쪽 열번칸보다 높이 있다. */
- const pinnedUnder=b=>cells.some(c=>Math.abs(c.y-b.cy)<3&&c.x<b.x+b.width&&c.x+c.width>b.x&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6));
+ /* 20px 넘게 걸친 고정 칸만 본다 (종각 B043T 열번칸은 AT 고정 칸 끝에 2px 걸칠 뿐) */
+ const pinnedUnder=b=>cells.some(c=>Math.abs(c.y-b.cy)<3&&Math.min(c.x+c.width,b.x+b.width)-Math.max(c.x,b.x)>=20&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6));
  const laneNeighbour=b=>{const x0=b.x-20,x1=b.x+b.width+20,ys=[...new Set([...cells.filter(c=>c.x<x1&&c.x+c.width>x0).map(c=>Math.round(c.y)),...paths.flatMap(pts=>pts.slice(1).flatMap((p,i)=>Math.abs(p[1]-pts[i][1])<2&&Math.min(p[0],pts[i][0])<x1&&Math.max(p[0],pts[i][0])>x0?[Math.round(p[1])]:[]))])];
   return b.item.side==='above'?Math.max(-Infinity,...ys.filter(y=>y<b.cy-3)):Math.min(Infinity,...ys.filter(y=>y>b.cy+3));};
  const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side+(L.xmap&&pinnedUnder(b)?'|'+laneNeighbour(b):'');b.lane=key;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
@@ -616,8 +619,12 @@ function render(st,def,core,model,neighbours={}){
  }
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x);let [X,Y]=sigBase(id,T([x,railLocal]));if(sigAt.has(id))X=sigAt.get(id);
   {const LY=T([0,lampY])[1],body=x0=>[Math.min(x0,x0+dir*18)-4,LY-8,Math.max(x0,x0+dir*18)+12,LY+8];for(let k=0;k<12;k++){const hit=capsulePositions.find(c=>intersects(body(X),c.box,1));if(!hit)break;X+=Math.sign(X-(hit.box[0]+hit.box[2])/2||1)*4;}} /* 폐색 표식과 겹치면 옆으로 비킨다 */return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
+ /* 세로로 바짝 붙은 두 신호기 몸체(높이 14)는 위아래로 벌린다 (줄 간격을 좁힌 화면: 동묘앞 3A·23) */
+ const lampDy=new Map();{const ps=placed.map(s=>({id:s.id,x:s.anchorX,y:T([0,s.lampY])[1]})).sort((a,b)=>a.y-b.y);
+  for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j],gap=b.y-a.y;if(gap>0&&gap<16&&Math.abs(a.x-b.x)<45){const d=(16-gap)/2;lampDy.set(a.id,(lampDy.get(a.id)||0)-d);lampDy.set(b.id,(lampDy.get(b.id)||0)+d);}}}
+ const lampLY=s=>T([0,s.lampY])[1]+(lampDy.get(s.id)||0);
  // Give a tight stack of names its own minimum line spacing, without moving lamps.
- const nameY=new Map(placed.map(s=>[s.id,T([0,s.lampY])[1]])),nameColumns=new Map();
+ const nameY=new Map(placed.map(s=>[s.id,lampLY(s)])),nameColumns=new Map();
  for(const s of placed){const key=s.anchorX.toFixed(1)+'|'+s.dir;if(!nameColumns.has(key))nameColumns.set(key,[]);nameColumns.get(key).push(s);}
  for(const column of nameColumns.values()){
   column.sort((a,b)=>nameY.get(a.id)-nameY.get(b.id));let first=0;
@@ -630,7 +637,7 @@ function render(st,def,core,model,neighbours={}){
  const placedNames=[];
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
-  const reach=sigReach(id,X,dir),LY=T([0,s.lampY])[1],lampX=X+dir*reach;
+  const reach=sigReach(id,X,dir),LY=lampLY(s),lampX=X+dir*reach;
   const labelY=nameY.get(id);
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="${reach+10}" height="14" rx="7"/>${reach>18?`<circle class="lamp off" cx="${lampX-dir*13}" cy="${LY}" r="6"/>`:''}<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
