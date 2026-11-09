@@ -89,7 +89,9 @@ def run(page, url, width, height):
     page.locator('#controlSelect').select_option('route'); page.locator('#mmiSignal').select_option('4A'); page.locator('#mmiRoute').select_option('4A-B968T'); page.locator('input[name="routeAction"][value="select"]').check(); page.locator('#mmiApply').click()
     count = page.locator('#alarmLogBody tr').count()
     page.locator('#resetBtn').click()
-    assert page.locator('#alarmLogBody tr').count() == count
+    page.wait_for_function("()=>!window.SimResetting")   # 전체 초기화는 기록을 모두 지운다: 해정 기록이 새로 생기지 않아야 한다
+    page.wait_for_timeout(500); texts=page.locator('#alarmLogBody tr').all_inner_texts()
+    assert not any('해정' in t or '해제' in t for t in texts), texts
     assert not errors, errors
     print(f'PASS ORPHEIA MMI shell: menus, windows, drag, alarm/event logs at {width}x{height}')
 

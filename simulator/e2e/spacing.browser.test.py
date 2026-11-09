@@ -29,9 +29,9 @@ try:
    # B607T must be on the existing continuation to the right of YT, never squeezed into it.
    yt=page.locator('[data-circuit-label="YT"]').bounding_box();boundary=page.locator('[data-circuit-label="B607T"]').bounding_box()
    assert boundary['x']>yt['x']+yt['width']+30
-   expect(page.locator('[data-circuit-label="B607T"]')).to_have_attribute('data-label-placement','edge-extension')
+   expect(page.locator('[data-track-circuit="B607T"]')).to_have_count(1)   # 원본 LS(slide 7)처럼 B607T는 YT 오른쪽의 별도 칸 (v0.39.31)
    expect(page.locator('#trackSvg .rail-join')).to_have_count(0)
-   expect(page.locator('#trackSvg [data-reviewed-join]')).to_have_count(1)
+   expect(page.locator('#trackSvg [data-reviewed-join]')).to_have_count(2)   # B606T·B605T 꺾여 내려가는 연결 (원본 LS slide 7)
    for code in ['YT','B607T','BT','B610T','B605T']:
     expect(page.locator(f'[data-circuit-label="{code}"]')).to_have_count(1)
    menu=page.locator('.mmi-menubar');assert menu.bounding_box()['height']<=26

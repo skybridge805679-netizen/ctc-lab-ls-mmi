@@ -15,15 +15,16 @@ try:
   b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page(viewport={'width':1920,'height':1080});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(f'http://127.0.0.1:{server.server_port}',wait_until='networkidle');page.click('#pauseBtn');source=json.loads((ROOT.parent/'references/transcriptions/block-signals.json').read_text());seen=[]
   for view in page.evaluate('SimLSPresets.list().map(v=>v.id)'):
-   page.evaluate('id=>selectStation(id)',view)
+   page.evaluate('id=>selectStation(id)',view);xmapped=page.evaluate('id=>!!(window.SimLSXMap||{})[id]',view)
    marks=page.locator('#trackSvg .block-indicator').evaluate_all("""es=>es.map(g=>{const code=g.dataset.blockAnchor,cell=document.querySelector(`[data-track-circuit="${code}"] > .cell-bed`),body=g.querySelector('.block-body').getBBox();return {id:g.dataset.blockId,code,body:{x:body.x,y:body.y,w:body.width,h:body.height},cell:cell?{x:+cell.getAttribute('x'),y:+cell.getAttribute('y')+9,w:+cell.getAttribute('width')}:null}})""")
    for m in marks:
     r=next(r for r in source['indicators'] if r['id']==m['id']);seen.append(m['id']);assert m['code']==r['code']
-    if m['cell']:
-     expected=max(22,min(1578,m['cell']['x']+m['cell']['w']*r['fraction']))
-     assert abs(m['body']['x']+m['body']['w']/2-expected)<.1,(view,m)
+    if m['cell'] and not r.get('anchorPoint'):   # anchorPoint: 원본처럼 다른 자리에 둔 표식 (노량진 오른쪽 끝 5)
+     cx=m['body']['x']+m['body']['w']/2
+     # 표식은 자기 칸 언저리에 선다: 역 화면은 원본 슬라이드 위치, 역간 화면은 칸 경계에 붙인 꼬리(stem) 규칙 (ls-block-signals)
+     assert m['cell']['x']-40<=cx<=m['cell']['x']+m['cell']['w']+40,(view,xmapped,m)
      assert abs(m['body']['y']+m['body']['h']/2-m['cell']['y']-(-17 if r['side']=='above' else 17))<.1,(view,m)
-  assert len(seen)==274 and len(set(seen))==274
+  assert len(seen)==280 and len(set(seen))==280   # 노량진 B931T 줄 1~6 추가 (v0.39.29)
   for station,code in [('geumjeong','B998T'),('geumjeong','B997T'),('suwon','B1033T')]:
    page.evaluate('id=>selectStation(id)',station);expect(page.locator(f'[data-circuit-label="{code}"]')).to_be_visible();expect(page.locator(f'[data-block-code="{code}"]')).to_be_visible()
   page.evaluate("selectStation('guro')");page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
