@@ -1399,30 +1399,12 @@
       "blankCellReview": [
         {
           "at": [
-            155,
-            580.4,
-            29.599999999999994
-          ],
-          "sourceText": "",
-          "status": "unnamed in source"
-        },
-        {
-          "at": [
             997.8,
             528.8,
             80
           ],
           "sourceText": "Y1T",
           "status": "restore"
-        },
-        {
-          "at": [
-            155,
-            528.8,
-            29.599999999999994
-          ],
-          "sourceText": "",
-          "status": "unnamed in source"
         },
         {
           "at": [

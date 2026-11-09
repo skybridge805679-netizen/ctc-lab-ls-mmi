@@ -366,7 +366,8 @@ function render(st,def,core,model,neighbours={}){
  let cached=windowLayouts.get(def)?.get(layoutKey);
  if(!cached){
  const windowBoxes=[];
- const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=sigBase(id,T([x,y]));return [X-48,Y-11,X+48,Y+11];})];
+ const sigObsList=def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=sigBase(id,T([x,y]));return [X-48,Y-11,X+48,Y+11];});
+ const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...sigObsList];
  const capsulePositions=blockView.build(st,def,cells,T,prepared.split);
  for(const b of capsulePositions)obstacles.push(b.box);
  const capsuleBoxes=new Set(capsulePositions.map(b=>b.box));   // 열번칸 자리 찾기: 원본 좌표 화면에서는 폐색 표식 상자를 2px만 좁혀 본다(그려진 폭 ±18)
@@ -402,7 +403,7 @@ function render(st,def,core,model,neighbours={}){
  const pinnedUnder=b=>cells.some(c=>Math.abs(c.y-b.cy)<3&&Math.min(c.x+c.width,b.x+b.width)-Math.max(c.x,b.x)>=20&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6));
  const laneNeighbour=b=>{const x0=b.x-20,x1=b.x+b.width+20,ys=[...new Set([...cells.filter(c=>c.x<x1&&c.x+c.width>x0).map(c=>Math.round(c.y)),...paths.flatMap(pts=>pts.slice(1).flatMap((p,i)=>Math.abs(p[1]-pts[i][1])<2&&Math.min(p[0],pts[i][0])<x1&&Math.max(p[0],pts[i][0])>x0?[Math.round(p[1])]:[]))])];
   return b.item.side==='above'?Math.max(-Infinity,...ys.filter(y=>y<b.cy-3)):Math.min(Infinity,...ys.filter(y=>y>b.cy+3));};
- const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side+(L.xmap&&pinnedUnder(b)?'|'+laneNeighbour(b):'');b.lane=key;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
+ const windowObs=new Set(),windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side+(L.xmap&&pinnedUnder(b)?'|'+laneNeighbour(b):'');b.lane=key;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  // 원본 좌표 화면: 같은 높이 띠라도 멀리 떨어진 열번칸 무리는 높이를 따로 정한다(한쪽 끝 장애물이 반대쪽 끝까지 밀지 않게).
  if(L.xmap)for(const [key,lane] of [...windowLanes]){if(!key.includes('|'))continue;lane.sort((a,b)=>a.x-b.x);let part=0;lane.forEach((b,i)=>{if(i&&b.x-(lane[i-1].x+lane[i-1].width)>400)part++;if(part){const k=key+'#'+part;b.lane=k;if(!windowLanes.has(k))windowLanes.set(k,[]);windowLanes.get(k).push(b);}});windowLanes.set(key,lane.filter(b=>b.lane===key));}
  for(const lane of windowLanes.values()){
@@ -416,7 +417,7 @@ function render(st,def,core,model,neighbours={}){
    for(const dy of deltas){let cost=0,choices=[];
     for(const b of lane){let chosen;
      candidates:for(const width of [...new Set([b.width,80,64,56,48])])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
-      const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,L.xmap&&capsuleBoxes.has(o)?[o[0]+2,o[1],o[2]-2,o[3]]:o,.6)).length;
+      const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,L.xmap&&capsuleBoxes.has(o)?[o[0]+2,o[1],o[2]-2,o[3]]:o,L.xmap&&(windowObs.has(o)||sigObsList.includes(o))?-1:.6)).length;   /* 원본 좌표 화면: 원본처럼 맞닿은 열번칸끼리는 1px까지 허용 (수원 B714T) */
       const score=hits*10000+(b.width-width)*3+Math.abs(dx)*4;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
      }
      cost+=chosen.cost;choices.push(chosen);
@@ -429,7 +430,7 @@ function render(st,def,core,model,neighbours={}){
   let best=band.length?search(band,true):null;
   // 띠 안에 겹치지 않는 자리가 없을 때만 예전 넓은 탐색(이웃 선로 너머 포함)을 쓴다
   if(!best||hitsOf(best)){const fallback=search(wide,false);if(hitsOf(fallback)<hitsOf(best))best=fallback;}
-  lane.forEach((b,i)=>{Object.assign(b,best.choices[i]);obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);});
+  lane.forEach((b,i)=>{Object.assign(b,best.choices[i]);const o=[b.x,b.y,b.x+b.width,b.y+b.height];windowObs.add(o);obstacles.push(o);});
  }
 
  cached={windowBoxes,capsulePositions};if(!windowLayouts.has(def))windowLayouts.set(def,new Map());windowLayouts.get(def).set(layoutKey,cached);if(windowLayouts.get(def).size>4)windowLayouts.get(def).delete(windowLayouts.get(def).keys().next().value);
@@ -609,7 +610,9 @@ function render(st,def,core,model,neighbours={}){
    /* 원본 등이 틈의 등 쪽으로 12px도 안 나가면(원본에서 기둥이 칸 안에 선 신호기, 구로 54·4A) 틈에 세우지 않고 원본 등 자리에서 기둥을 정한다 */
    {const v=L.xmap?.signals?.[id];const pinC=cc=>L.xmap?.pinned?.some(e=>Math.abs(e[0]-cc.source[0])<.6&&Math.abs(e[1]-cc.source[1])<.6),pinnedGap=cells.some(cc=>pinC(cc)&&Math.abs(cc.y-Y)<3&&(Math.abs(cc.x+cc.width-nx)<8||Math.abs(cc.x-nx)<8));
     if(v&&pinnedGap){const lx=L.adj(v[0]*WIDTH/L.xmap.width),d=v[1];if((lx-nx)*d<12){sigAt.set(id,lx-d*(core.signals[id]?.kind==='입환'?12:25));continue;}}}
-   if(capsulePositions.some(c=>intersects([nx-30,LY0-9,nx+30,LY0+9],c.box,2))&&!capsulePositions.some(c=>intersects([X-30,LY0-9,X+30,LY0+9],c.box,2)))continue;   // 폐색 표식과 겹치면 옮기지 않는다
+   {const dd=L.xmap?.signals?.[id]?.[1]??Math.sign(X-nx||1),bodyAt=m=>[Math.min(m,m+dd*36)-6,LY0-9,Math.max(m,m+dd*36)+6,LY0+9];   /* 몸체는 기둥에서 등 쪽으로만 뻗는다 (동묘앞 2A: 반대쪽 폐색 표식 1 때문에 틈에 못 서던 것) */
+    const symAt=m=>[m-30,LY0-9,m+30,LY0+9],blocks=f=>capsulePositions.some(c=>intersects(f(nx),c.box,2))&&!capsulePositions.some(c=>intersects(f(X),c.box,2));
+    if(blocks(bodyAt)&&blocks(symAt))continue;}   // 폐색 표식과 겹치면 옮기지 않는다
    sigAt.set(id,nx);
    if(!hasGap(nx,Y)&&onRail(nx,Y))cellGaps.push([nx,Y]);}
   /* overrides로 원본 위치를 적은 칸(과 그 꺾임 꼬리) 안에는 열 틈을 새로 넣지 않는다 (원본에 없는 틈: 금천구청 1T·3T·4T의 x≈412) */

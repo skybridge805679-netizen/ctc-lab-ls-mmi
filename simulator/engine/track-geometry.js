@@ -30,6 +30,8 @@ function sceneOf(st){
   const weights=strip.widths||codes.map(()=>1),total=weights.reduce((a,b)=>a+b,0);let x=left;
   codes.forEach((label,i)=>{const w=(right-left)*weights[i]/total;next.push([x,y,w-2,label]);x+=w;});cells=next;
  }
+ // 띠 끝에서 잘려 남은 조각도 검토된 무시 목록이면 뺀다 (안양 B653T·B979T 뒤 155: 금천구청에서 가져온 칸의 나머지)
+ for(const [x,y]of data.ignoreCells||[])cells=cells.filter(c=>c[3]||Math.abs(c[0]-x)>1||Math.abs(c[1]-y)>2);
  return {...data,cells:cells.filter(c=>c[2]>=2)};
 }
 const api={railY,sceneOf,sourceSceneOf,GWANAK};if(typeof module!=='undefined')module.exports=api;else root.SimTrackGeometry=api;
