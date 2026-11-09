@@ -1,4 +1,5 @@
 """노트관리 + T/G note boxes + reminder pop-up (실기1 4장 8절, 5장) (Chromium)."""
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -24,7 +25,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     ok = lambda: page.locator('#mmiAlertOk').click()
     menu(page, '열차스케줄', '온라인 열차그래프(O)')
     expect(page.locator('#diaSvg')).to_be_visible()

@@ -1,4 +1,5 @@
 """ORPHEIA MMI shell: menu bar, windows, alarm/event logs (Chromium). Run: python3 simulator/mmi.browser.test.py"""
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -24,7 +25,7 @@ def run(page, url, width, height):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null')  # popups blocked: T/G stays in the MMI window
-    page.goto(url, wait_until='networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
+    page.goto(url, wait_until='networkidle');insert_sample_timetable(page);page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
     # brand: parody, never the school logo
     body = page.locator('body').inner_text()
     assert page.locator('#mmiShell').get_attribute('aria-label') == 'ORPHEIA MMI'

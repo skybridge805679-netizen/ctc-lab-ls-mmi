@@ -1,4 +1,5 @@
 """시나리오 재현: LS 열번창에 등장 열차(방향+번호)를 놓고 진행에 따라 이동시킨다 (Chromium)."""
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -26,7 +27,7 @@ CASES = {
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle'); insert_sample_timetable(page)   # 앱은 빈 시간표로 시작한다
     do = lambda a: page.evaluate('a=>SimMMI.run(a)', a)
     rows = lambda st: page.evaluate("st=>Object.fromEntries(Object.entries(SimLSUI.getModel().stations[st].windows).filter(([k,v])=>v.length).map(([k,v])=>[k,v.map(r=>r.number+':'+r.direction)]))", st)
     for sid, (st, stops, route, siding, start, direction) in CASES.items():
