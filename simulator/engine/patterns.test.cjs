@@ -26,5 +26,7 @@ test('validate refuses wrong order, going-back times and unknown routes',()=>{
  const route=structuredClone(p);route.calls[2].arrivalRoute='9Z_1T';assert.match(P.validate(route),/없는 진입 진로/);
  assert.match(P.validate({...p,name:' '}),/패턴이름/);
  assert.equal(P.nextId(P.seed()),'0129104');
- assert.deepEqual(P.search(P.seed(),{direction:'down',kind:'KTX'}).map(p=>p.id),['0120202','0129103']);
+ assert.deepEqual(P.search(P.seed(),{direction:'down',kind:'KTX'}).map(p=>p.id),['0120202']);
+ assert.deepEqual(P.search(P.seed(),{kind:'전동열차'}).map(p=>p.id),['0119137','0129103','0119103']);   // MA029_01 열차종별 전동열차 검색
+ assert.deepEqual(P.search(P.seed(),{kind:'전동열차',direction:'up'}).map(p=>p.name),['전동차(상행)','전동_상_(수원-청량리)_NEW']);
 });

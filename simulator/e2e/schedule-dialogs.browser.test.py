@@ -26,7 +26,7 @@ def run(page, url):
     win = page.locator('[data-mmi-window="pattern"]')
     expect(win.locator('.mmi-title-text')).to_have_text('[MA007_01] 열차운행패턴 관리')
     expect(win.locator('.mmi-pending')).to_have_count(0)
-    expect(win.locator('#pmList tbody tr')).to_have_count(4)
+    expect(win.locator('#pmList tbody tr')).to_have_count(5)
     win.locator('#pmList tr', has_text='추석').click()
     rows = win.locator('#pmGrid tbody tr')
     expect(rows).to_have_count(23)
@@ -37,15 +37,19 @@ def run(page, url):
     win.locator('input[name="pmDir"][value="down"]').check(); win.locator('#pmFind').click()
     expect(win.locator('#pmList tbody tr')).to_have_count(2)
     win.locator('input[name="pmDir"][value="all"]').check(); win.locator('#pmFind').click()
+    # 열차종별 전동열차 (베타 피드백: 전동 패턴이 KTX로 등록돼 검색에 안 나왔다)
+    win.locator('#pmKind').select_option('전동열차'); win.locator('#pmFind').click()
+    expect(win.locator('#pmList tbody tr')).to_have_count(3); expect(win.locator('#pmList tbody')).to_contain_text('전동차(상행)')
+    win.locator('#pmKind').select_option(''); win.locator('#pmFind').click()
     # 패턴복사 -> edit a row -> 저장 (예)
     win.locator('#pmList tr', has_text='추석').click(); win.locator('#pmCopy').click()
     expect(win.locator('#pmState')).to_contain_text('새 패턴')
     win.locator('#pmName').fill('추석_연습'); win.locator('#pmName').dispatch_event('change')
     win.locator('[aria-label="화서 정차 시간"]').fill('00:00:30'); win.locator('[aria-label="화서 정차 시간"]').dispatch_event('change')
     win.locator('#pmSave').click(); page.locator('#mmiConfirmYes').click(); expect(page.locator('.mmi-alert')).to_contain_text('저장'); ok()
-    expect(win.locator('#pmList tbody tr')).to_have_count(5)
+    expect(win.locator('#pmList tbody tr')).to_have_count(6)
     assert page.evaluate("SimScheduleDialogs.patterns().find(p=>p.name==='추석_연습').calls[1].dwell") == 30
-    assert page.evaluate("JSON.parse(localStorage.getItem('orpheia.patterns.v1')).length") == 5
+    assert page.evaluate("JSON.parse(localStorage.getItem('orpheia.patterns.v1')).length") == 6
     # a wrong route is refused on 저장
     win.locator('#pmEdit').click()
     win.locator('[aria-label="화서 진입 시간"]').fill('00:00:00'); win.locator('[aria-label="화서 진입 시간"]').dispatch_event('change')
@@ -57,7 +61,7 @@ def run(page, url):
     win.locator('[aria-label="2번째 역 이름"]').select_option('noryangjin')
     win.locator('[aria-label="노량진 진입 진로"]').select_option('1B_3T')
     win.locator('#pmSave').click(); page.locator('#mmiConfirmYes').click(); ok()
-    expect(win.locator('#pmList tbody tr')).to_have_count(6)
+    expect(win.locator('#pmList tbody tr')).to_have_count(7)
     # 삭제 needs 예
     win.locator('#pmDel').click(); page.locator('#mmiConfirmYes').click()
     assert not page.evaluate("SimScheduleDialogs.patterns().some(p=>p.name==='연습_하')")

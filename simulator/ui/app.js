@@ -18,6 +18,7 @@ function openAction(title,body,action,label='예 · 실행',variant='',at=null){
  $('dialogConfirm').textContent=label;d.querySelector('[value="cancel"]').textContent=variant==='confirm'?'아니요(N)':'아니오 · 취소';d.dataset.variant=variant;d.classList.toggle('mode-confirm',variant==='confirm');
  if(at){d.style.setProperty('--dx',Math.max(4,Math.min(at.x,innerWidth-200))+'px');d.style.setProperty('--dy',Math.max(4,Math.min(at.y,innerHeight-120))+'px');}
  d.showModal();
+ if(variant==='confirm')$('dialogConfirm').focus();   // 원본 확인창처럼 기본 단추는 「예」: 엔터로 바로 실행
  if(variant==='route'&&at){const box=d.getBoundingClientRect();d.style.setProperty('--dx',Math.max(4,Math.min(at.x,innerWidth-box.width-4))+'px');d.style.setProperty('--dy',Math.max(4,Math.min(at.y,innerHeight-box.height-4))+'px');}
 }
 function routeDetails(id){const r=C.routes[id];return `<div class="route-detail"><b>${escapeHTML(id)}</b><p>${r.pathTracks.join(' → ')}</p><p class="evidence">${r.evidence}</p><p>${r.source.map(escapeHTML).join('<br>')}</p><p class="pending-note">배선 연결 연습 모델 · 경로의 공유 구간·전환기를 쇄정합니다. 실설비 진로표와 세부 연동조건은 별도 검증 대상입니다</p></div>`;}
@@ -121,7 +122,7 @@ $('lsDisplay').onclick=e=>{
  else if(stop)openAction('신호기 일괄정지',N.catalog[selectedStation].name+'의 설정 신호기를 모두 정지합니다. 점유 중인 진로는 쇄정을 유지합니다.',{type:'stopAll',source:'LS'});
 };
 $('actionDialog').addEventListener('click',e=>{const d=$('actionDialog');if(d.dataset.variant==='route'&&e.target===d)d.close();});      // 팝업 밖을 누르면 닫힘
-$('actionDialog').addEventListener('keydown',e=>{const d=$('actionDialog');if(d.dataset.variant!=='confirm')return;if(/^y$/i.test(e.key)){e.preventDefault();$('dialogConfirm').click();}else if(/^n$/i.test(e.key)){e.preventDefault();d.querySelector('[value="cancel"]').click();}});
+$('actionDialog').addEventListener('keydown',e=>{const d=$('actionDialog');if(d.dataset.variant!=='confirm')return;if(e.key==='Enter'&&e.target!==d.querySelector('[value="cancel"]')){e.preventDefault();$('dialogConfirm').click();}else if(/^y$/i.test(e.key)){e.preventDefault();$('dialogConfirm').click();}else if(/^n$/i.test(e.key)){e.preventDefault();d.querySelector('[value="cancel"]').click();}});
 $('lsStage').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
 
 $('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});

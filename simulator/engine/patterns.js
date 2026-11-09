@@ -26,13 +26,24 @@
    ['yeongdeungpo','22:30','0:00','2B_3T','3C_B619T2T'],['singil','24:30'],['daebang','25:30'],['noryangjin','27:00','0:00','2A_4T','3A_B613T'],
    ['yongsan','29:00','0:00','2A_7T','3A_B605T'],['namyeong','30:00'],['seoul','31:00','0:00','2A_7T','']])}
  ];
+ // [MA029_01] 열차운행 패턴설정 사진(2026-11-09, 베타테스트): '전동차(상행)' 0119137 수원→지하청량리, 전동열차.
+ // 사진에 보인 수원~신도림 행(시간·진로)은 그대로, 그 뒤(영등포~청량리)는 이 시뮬레이터 전역정차 운행시간으로 잇는다.
+ const EMU_UP_PHOTO=rows([
+  ['suwon','0:00','0:00','','3B_B1035T'],['hwaseo','2:30','0:30'],['skku','6:00','0:30'],['uiwang','9:30','0:30','2A_5T','3B_B1011T'],['dangjeong','13:00','0:30'],
+  ['gunpo','15:00','0:30'],['geumjeong','18:00','0:30'],['myeonghak','20:30','0:30'],['anyang','23:30','0:30','2A_5T','3B_B981T'],['gwanak','26:30','0:30'],
+  ['seoksu','29:00','0:30'],['geumcheon','32:00','0:30','2A_5T','3A_B963T'],['doksan','34:00','0:30'],['gasan','36:30','0:30'],['guro','41:00','0:30','2A_5T','3A_B949T'],['sindorim','43:30','0:30']]);
+ function emuUp(){
+  const t=T().pattern({id:'X0000',from:'suwon',to:'cheongnyangni',start:0}),k=t.calls.findIndex(c=>c.station==='sindorim'),last=EMU_UP_PHOTO.at(-1),shift=last.arrive+last.dwell-t.calls[k].departure;
+  const rest=t.calls.slice(k+1).map(c=>({station:c.station,arrive:c.arrival+shift,dwell:c.departure-c.arrival,arrivalRoute:c.arrivalRoute||'',departureRoute:c.departureRoute||''}));
+  return {id:'0119137',name:'전동차(상행)',kind:'전동열차',direction:'up',source:'photo',calls:[...structuredClone(EMU_UP_PHOTO),...rest]};
+ }
  // the remaining names of the photographed list whose rows are unknown are not invented
- function simulated(id,name,from,to){
+ function simulated(id,name,from,to,kind='KTX'){
   const t=T().pattern({id:'X0000',from,to,start:0});
-  return {id,name,kind:'KTX',direction:t.direction,source:'simulator',calls:t.calls.map(c=>({station:c.station,arrive:Math.max(0,c.arrival),dwell:c.departure-Math.max(0,c.arrival),arrivalRoute:c.arrivalRoute||'',departureRoute:c.departureRoute||''}))};
+  return {id,name,kind,direction:t.direction,source:'simulator',calls:t.calls.map(c=>({station:c.station,arrive:Math.max(0,c.arrival),dwell:c.departure-Math.max(0,c.arrival),arrivalRoute:c.arrivalRoute||'',departureRoute:c.departureRoute||''}))};
  }
  function seed(){
-  return [...PHOTO,simulated('0129103','전동_하_(청량리-수원)_NEW','cheongnyangni','suwon'),simulated('0119103','전동_상_(수원-청량리)_NEW','suwon','cheongnyangni')]
+  return [...PHOTO,emuUp(),simulated('0129103','전동_하_(청량리-수원)_NEW','cheongnyangni','suwon','전동열차'),simulated('0119103','전동_상_(수원-청량리)_NEW','suwon','cheongnyangni','전동열차')]   // 전동 패턴은 열차종별 전동열차 (MA029_01 검색)
    .map(p=>({line:LINE,...MIG,...structuredClone(p)}));
  }
  const depart=c=>c.arrive+c.dwell;

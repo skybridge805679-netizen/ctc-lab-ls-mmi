@@ -81,6 +81,7 @@ def run(page, url):
     page.wait_for_function("()=>document.querySelectorAll('#scSteps li.sc-do.done').length>=2")
     names = page.evaluate("()=>Object.fromEntries(SimNetwork.stations.map(s=>[s.name,s.id]))")
     win = page.locator('[data-mmi-window="ptnLoad"]')
+    win.locator('[data-pl=kind]').select_option('전동열차')
     win.locator('input[value="down"]' if direction == '하행' else 'input[value="up"]').check(); win.locator('[data-pl=find]').click()
     win.locator('[data-pl-id="0129103"]' if direction == '하행' else '[data-pl-id="0119103"]').click()
     win.locator('[data-pl=from]').select_option(names[frm]); win.locator('[data-pl=to]').select_option(names[to])

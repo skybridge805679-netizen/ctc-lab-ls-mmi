@@ -27,6 +27,8 @@ let patterns=null;
 function patternList(){
  if(patterns)return patterns;
  try{const saved=JSON.parse(localStorage.getItem(PATTERN_KEY)||'null');patterns=Array.isArray(saved)&&saved.length&&saved.every(p=>!P.validate(p))?saved:P.seed();}catch{patterns=P.seed();}
+ // 저장된 목록 갱신(v2): 기본 패턴의 열차종별을 바로잡고(전동 패턴 = 전동열차) 새 기본 패턴(전동차(상행))을 더한다. 사용자가 만든 패턴은 그대로
+ try{if(localStorage.getItem(PATTERN_KEY+'.v')!=='2'){const seed=P.seed();patterns=patterns.map(p=>{const s=seed.find(x=>x.id===p.id);return s&&p.source!=='user'?{...p,kind:s.kind}:p;});for(const s of seed)if(!patterns.some(p=>p.id===s.id))patterns.push(s);localStorage.setItem(PATTERN_KEY+'.v','2');if(localStorage.getItem(PATTERN_KEY))savePatterns();}}catch{}
  return patterns;
 }
 function savePatterns(){try{localStorage.setItem(PATTERN_KEY,JSON.stringify(patterns));}catch{}}

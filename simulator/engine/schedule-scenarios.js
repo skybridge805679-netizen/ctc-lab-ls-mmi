@@ -53,7 +53,7 @@ function createScenario(p){
  const steps=[
   doStep('열차스케줄 → 온라인열차스케줄관리 → 열차스케줄관리(생성)',ctx=>ctx.ui.scheduleOpen&&ctx.ui.scheduleMode==='create','MMI 열차스케줄 → 온라인열차스케줄관리 → 생성'),
   doStep('열차운행패턴선택 창 열기',ctx=>ctx.ui.patternOpen||made(ctx),'열차운행패턴선택 버튼'),
-  doStep(`패턴으로 ${p.id}열차 생성 (${p.dir==='down'?'하행':'상행'}, ${nm(p.from)}~${nm(p.to)}, 시작 ${T.clock(p.start)}) 후 편집적용`,made,'임시열차번호·시작시간 입력 → [열차운행패턴선택] → 열차방향 → 열차패턴조회 → 전동 패턴 선택 → 출발역·종착역 → 확인 → 편집적용',
+  doStep(`패턴으로 ${p.id}열차 생성 (${p.dir==='down'?'하행':'상행'}, ${nm(p.from)}~${nm(p.to)}, 시작 ${T.clock(p.start)}) 후 편집적용`,made,'임시열차번호·시작시간 입력 → [열차운행패턴선택] → 열차종별 전동열차·열차방향 → 열차패턴조회 → 전동 패턴 선택 → 출발역·종착역 → 확인 → 편집적용',
    ctx=>{const t=t0(ctx);if(!t)return '';const w=[];if(t.direction!==p.dir)w.push('운행방향');if(t.calls[0].station!==p.from||t.calls.at(-1).station!==p.to)w.push('운행구간');if(t.calls[0].departure!==p.start)w.push(`시작시각(${T.clock(p.start)} 정각)`);return w.length?`${p.id}열차가 만들어졌지만 ${w.join('·')}이(가) 문제와 다릅니다. 열차스케줄관리(수정)에서 시각을 고치거나 삭제 후 다시 생성하세요.`:'';}),
   doStep(`열차스케줄관리(수정)에서 ${p.id}열차 검색`,ctx=>ctx.ui.scheduleOpen&&ctx.ui.scheduleMode==='edit'&&ctx.ui.scheduleSelected===p.id,'경부선, 오늘, 모두 → 온라인 열차번호 검색 → 확인'),
   doStep(`연계열차 ${p.related||'(없음)'}, 차량수 ${p.carCount}량, 열차등급 ${p.kind}, 운행구분 ${p.service}, 기능열차 ${p.flag} 로 수정 후 편집적용`,props,'선택열차정보에서 값을 바꾸고 편집적용 (분할합병은 이 시뮬레이터에서 지원하지 않습니다)',

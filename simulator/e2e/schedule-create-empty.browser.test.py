@@ -37,6 +37,7 @@ try:
         load = page.locator('[data-mmi-window="ptnLoad"]')
         expect(load.locator('[data-pl-hint]')).to_contain_text('열차패턴조회')            # 조회 전에는 안내가 보인다
         load.locator('input[value="%s"]' % ('down' if direction == '하행' else 'up')).check()
+        load.locator('[data-pl=kind]').select_option('전동열차')
         load.locator('[data-pl=find]').click()
         load.locator('[data-pl-id]', has_text='전동').first.click()
         load.locator('[data-pl=from]').select_option(label=origin); load.locator('[data-pl=to]').select_option(label=dest)

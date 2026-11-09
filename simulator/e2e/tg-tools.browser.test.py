@@ -188,7 +188,10 @@ def run(page, url):
     expect(load.locator('[data-pl-id]')).to_have_count(0)
     assert load.locator('[data-pl=kind]').input_value() == 'KTX' and load.locator('input[value="down"]').is_checked()
     load.locator('[data-pl=find]').click()
-    assert load.locator('[data-pl-id]').count() == 2
+    assert load.locator('[data-pl-id]').count() == 1
+    load.locator('[data-pl=kind]').select_option('전동열차'); load.locator('[data-pl=find]').click()   # 전동 패턴은 열차종별 전동열차
+    assert load.locator('[data-pl-id]').count() == 1 and '전동' in load.locator('[data-pl-id]').first.inner_text()
+    load.locator('[data-pl=kind]').select_option('KTX'); load.locator('[data-pl=find]').click()
     load.locator('[data-pl-id="0120202"]').click()
     expect(load.locator('[data-pl=calls] tbody tr')).to_have_count(23)
     load.locator('[aria-label="영등포 정차시간"]').fill('00:03:00'); load.locator('[aria-label="영등포 정차시간"]').dispatch_event('change')
