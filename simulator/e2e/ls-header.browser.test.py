@@ -22,7 +22,7 @@ try:
     assert rgb('.ls-name')==('rgb(32, 104, 230)' if sid in blue else 'rgb(8, 11, 8)'),sid
     assert page.locator('.ls-name').evaluate('e=>getComputedStyle(e).flexDirection')=='column'
     for rect in page.locator('.inter-station .plate').all():
-     fill=rect.evaluate('e=>getComputedStyle(e).fill');assert fill==('rgb(32, 104, 230)' if sid in blue else 'rgb(29, 36, 30)'),(sid,fill)
+     fill=rect.evaluate('e=>getComputedStyle(e).fill');assert fill==('rgb(32, 104, 230)' if sid=='cheongnyangni' else 'rgb(29, 36, 30)'),(sid,fill)   # 원본: 중간역 이름판은 지하청량리(제기동)만 파란 판
    page.evaluate('(id)=>selectStation(id)','suwon')
    page.locator('[data-mode="CCM"]').click();d=page.locator('#actionDialog');expect(d).to_have_class('mode-confirm')
    expect(page.locator('#dialogTitle')).to_have_text('제어확인');expect(d).to_contain_text('역 운행모드를 CCM 모드로 전환하시겠습니까?')

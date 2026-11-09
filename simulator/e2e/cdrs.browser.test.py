@@ -1,4 +1,5 @@
 """CDRS 해소안 확인/취소 (Chromium)."""
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -16,7 +17,7 @@ class Quiet(SimpleHTTPRequestHandler):
 def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle'); insert_sample_timetable(page)   # 앱은 빈 시간표로 시작한다
     page.evaluate("SimMMI.open('cdrs')")
     expect(page.locator('[data-mmi-window="cdrs"]')).to_be_visible()
     expect(page.locator('#cdrsRows tr.empty')).to_have_count(1)   # default timetable has no conflict

@@ -42,7 +42,7 @@ try:
     assert result=={'clips':[],'overlaps':[],'bracketsNative':True},(width,sid,result)
     if sid in ['guro','noryangjin','dongmyo','uiwang'] and width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/f'docs/preview-v0.18.2-{sid}.png'))
    page.select_option('#stationSelect','guro')
-   expect(page.locator('[data-source-caption="depot-lead"]')).to_have_text('차량기지입출고선')
+   expect(page.locator('[data-source-caption="depot-lead"]')).to_have_text('차량기지[경인 하선]입출고선[경인 상선]')   # 원본 LS(slide 10) 문구
    before=page.locator('[data-source-bracket="52BT-52B"]').evaluate('(el)=>el.outerHTML')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="4A"]').click();page.locator('[data-route-choice="4A-B950T"]').click()
