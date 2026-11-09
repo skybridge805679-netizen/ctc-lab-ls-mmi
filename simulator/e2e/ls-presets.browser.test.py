@@ -44,7 +44,8 @@ try:
   assert entries(main_slot)==[] and entries('B1022T')[0]['number']=='K252'
   win('B1022T').focus();page.keyboard.press('Shift+F10');action('train-properties').click();expect(page.locator('.ls-properties')).to_contain_text('K252');confirm()
   # Blank-space menu still has no field controls, scan or annotation editing.
-  page.locator('.fidelity-note').click(button='right');assert page.locator('[data-context-action="scan-current"],[data-context-action="boards"]').count()==0;page.keyboard.press('Escape')
+  svgbox=page.locator('#trackSvg').bounding_box();page.locator('#trackSvg').click(button='right',position={'x':6,'y':svgbox['height']-6});   # 빈 자리(그림 왼쪽 아래)
+  assert page.locator('[data-context-action="scan-current"],[data-context-action="boards"]').count()==0;page.keyboard.press('Escape')
   assert page.evaluate('JSON.stringify({routes:state.routes,points:state.points,occupied:state.occupied,mode:state.mode})')==equipment
   page.locator('[data-nav-view]').first.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang');assert page.locator('[data-signal]').count()==main_signals
   page.locator('[data-nav-view]').last.click();expect(page.locator('#trackSvg')).to_contain_text('K252');page.locator('[data-nav-view]').last.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','suwon');page.locator('[data-nav-view]').first.click();expect(page.locator('#lsStage')).to_have_attribute('data-preset','uiwang-suwon')

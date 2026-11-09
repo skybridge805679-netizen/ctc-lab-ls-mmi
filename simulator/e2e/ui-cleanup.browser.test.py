@@ -1,4 +1,5 @@
 """Desktop control removal, direct station tabs, annotation identity and browser factory reset."""
+import os
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -34,7 +35,7 @@ try:
     assert footer['y']+footer['height']<=height+1
    page.locator('#stationTabs [data-view="yongsan"]').click()
    assert page.locator('[data-circuit-label="23AT"]').count()==1
-   if width==1920:page.screenshot(path=str(ROOT.parent/'docs/preview-v0.38.0-ls.png'),animations='disabled')
+   if width==1920 and os.environ.get('UPDATE_DOCS_PREVIEWS')=='1':page.screenshot(path=str(ROOT.parent/'docs/preview-v0.38.0-ls.png'),animations='disabled')
    # Yellow arrows, not removed footer controls, retain access to all monitoring presets.
    for main,corridor in [('anyang','anyang-geumjeong'),('gunpo','gunpo-uiwang'),('uiwang','uiwang-suwon')]:
     page.locator(f'#stationTabs [data-view="{main}"]').click()

@@ -1,4 +1,5 @@
 """Desktop station-strip coverage, compact MMI menus and Yongsan boundary labels."""
+import os
 from pathlib import Path
 from functools import partial
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -41,10 +42,10 @@ try:
    page.evaluate("SimMMI.close('field');document.querySelector('.ls-viewport>main').scrollTop=0;window.scrollTo(0,0)")
    page.evaluate('()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
    if width==1920:
-    page.screenshot(path=str(ROOT.parent/'docs/preview-v0.38.1-ls.png'),animations='disabled')
+    if os.environ.get('UPDATE_DOCS_PREVIEWS')=='1':page.screenshot(path=str(ROOT.parent/'docs/preview-v0.38.1-ls.png'),animations='disabled')
     for code,name in [('B605T','b605'),('YT','yt')]:
      b=page.locator(f'[data-circuit-label="{code}"]').first.bounding_box();x=max(0,b['x']-150);y=max(0,b['y']-60)
-     page.screenshot(path=str(ROOT.parent/f'docs/preview-v0.38.1-after-{name}.png'),clip={'x':x,'y':y,'width':min(500,width-x),'height':230},animations='disabled')
+     if os.environ.get('UPDATE_DOCS_PREVIEWS')=='1':page.screenshot(path=str(ROOT.parent/f'docs/preview-v0.38.1-after-{name}.png'),clip={'x':x,'y':y,'width':min(500,width-x),'height':230},animations='disabled')
    measurements.append({'viewport':width,'stripWidth':strip['width'],'stationButtonWidth':boxes[0]['width'],'mmiMenuHeight':menu.bounding_box()['height'],'ytToB607Gap':round(boundary['x']-yt['x']-yt['width'],1)})
    assert not errors,errors;page.close();print('PASS full-width 15 presets, compact usable MMI menu and clean Yongsan boundary at',width)
   browser.close();print(json.dumps(measurements,ensure_ascii=False))

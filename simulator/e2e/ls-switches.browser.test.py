@@ -1,4 +1,5 @@
 """The photographed Seoul crossover changes shape and holds its physical position while locked."""
+import os
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
@@ -17,23 +18,24 @@ try:
    page=b.new_page(viewport={'width':width,'height':1000});page.goto(f'http://127.0.0.1:{server.server_port}');page.wait_for_load_state('networkidle');page.evaluate("SimMMI.open('field');SimShell.drawer(true)")
    page.add_style_tag(content='#toast{display:none!important}');page.click('#pauseBtn');page.select_option('#stationSelect','seoul')
    connector=page.locator('[data-switch-connection="58"]')
-   normal=connector.get_attribute('d');expect(connector).to_have_attribute('data-position','N')
-   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-seoul-switch-normal.png'),style='#toast{visibility:hidden}')
+   normal=connector.get_attribute('data-connected');   # 시저스는 4조각 그림이라 d 대신 연결 상태로 본다
+   expect(connector).to_have_attribute('data-position','N')
+   if width==1440 and os.environ.get('UPDATE_DOCS_PREVIEWS')=='1':page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-seoul-switch-normal.png'),style='#toast{visibility:hidden}')
    page.locator('[data-mode="CCM"]').click();page.click('#dialogConfirm')
    page.locator('[data-signal="4C"]').click();page.locator('[data-route-choice="4C-B902T"]').click()
    expect(connector).to_have_attribute('data-position','R');expect(connector).to_have_attribute('data-locked','true')
-   reverse=connector.get_attribute('d');assert reverse!=normal
+   reverse=connector.get_attribute('data-connected');assert reverse!=normal
    expect(page.locator('[data-switch-gap="58"]')).to_have_count(2)
    expect(page.locator('[data-active-route="4C-B902T"]')).to_have_attribute('data-route-state','set')
-   if width==1440:page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-seoul-switch-route.png'),style='#toast{visibility:hidden}')
+   if width==1440 and os.environ.get('UPDATE_DOCS_PREVIEWS')=='1':page.locator('#lsDisplay').screenshot(path=str(ROOT.parent/'docs/preview-v0.18.0-seoul-switch-route.png'),style='#toast{visibility:hidden}')
    page.locator('[data-approach-toggle="4C"]').click();page.locator('[data-signal="4C"]').click();page.click('#dialogConfirm')
    expect(page.locator('[data-active-route="4C-B902T"]')).to_have_attribute('data-route-state','locked')
-   expect(connector).to_have_attribute('d',reverse)
+   expect(connector).to_have_attribute('data-connected',reverse)
    page.select_option('#controlSelect','point');page.select_option('#mmiPoint','58');page.locator('input[name="pointPosition"][value="N"]').check();page.click('#mmiApply')
    expect(connector).to_have_attribute('data-position','R')
    for _ in range(3):page.click('#skipBtn')
    expect(connector).to_have_attribute('data-position','R');expect(connector).to_have_attribute('data-locked','false')
-   page.click('#mmiApply');expect(connector).to_have_attribute('data-position','N');expect(connector).to_have_attribute('d',normal)
+   page.click('#mmiApply');expect(connector).to_have_attribute('data-position','N');expect(connector).to_have_attribute('data-connected',normal)
    page.close();print(f'PASS {width}px: 4C-B902T changes the 58 crossover geometry, keeps it while locked and permits N after release')
   b.close()
 finally:server.shutdown();server.server_close()
