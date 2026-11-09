@@ -124,7 +124,7 @@ function render(st,def,core,model,neighbours={}){
  const railFix=L.xmap?.railPoints||[],fixPt=([x,y],P)=>{const f=railFix.find(([fx,fy])=>Math.abs(fx-x)<1&&Math.abs(fy-y)<2);return f?[+L.adj(f[2]*WIDTH/L.xmap.width).toFixed(2),P[1]]:P;};
  const [ox,oy,rw,rh]=st.map.referenceWindow,[iw,ih]=def.size;
  const toLocal=(x,y)=>[(x-ox)*iw/rw,(y-oy)*ih/rh];
- const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(T(toLocal(values[i],values[i+1])));return out;};
+ const routePoints=path=>{const values=path.match(/-?\d+(?:\.\d+)?/g).map(Number),out=[];for(let i=0;i<values.length;i+=2)out.push(Tw(toLocal(values[i],values[i+1])));return out;};   /* 선로전환기 그림과 같은 변환(원본 위치로 고정한 점 포함): 시저스 X 위 경로가 X를 따른다 (서울 58·59) */
  const rows=def.rails.flatMap(r=>r[1].slice(1).filter((p,i)=>Math.abs(p[1]-r[1][i][1])<2).map(p=>p[1]));
  // One coordinate model for the throat and all adjoining cells. Extraction drift is snapped to the same centreline.
  const cells=data.cells.map((source,index)=>{
