@@ -169,7 +169,8 @@ function render(st,def,core,model,neighbours={}){
  // 원본처럼 화면 끝으로 나가는 선로는 그 행의 끝 회로 칸이 화면 끝까지 닿는다 (빈 선로 조각을 덧붙이지 않는다)
  for(const port of edgePorts){const [px,py]=T([port.x,port.y]);const row=cells.filter(c=>Math.abs(c.y-py)<3);if(!row.length)continue;
   if(port.side==='left'){const c=row.reduce((a,b)=>a.x<b.x?a:b);if(c.x>0&&c.x<220&&Math.abs(c.x-px)<30){c.width+=c.x;c.x=0;}}
-  else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;if(r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
+  else{const c=row.reduce((a,b)=>a.x+a.width>b.x+b.width?a:b),r=c.x+c.width;const pinnedOther=port.code&&c.label&&port.code!==c.label.replaceAll(' · ','')&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6);   /* 원본 위치를 적은 칸 뒤에 다른 회로(용산 BT 뒤 B610T)가 있으면 늘리지 않는다 */
+   if(!pinnedOther&&r<WIDTH&&r>WIDTH-220&&Math.abs(r-px)<30)c.width=WIDTH-c.x;}}
  // 꺾인 모서리·분기 끝 바로 옆 칸은 그 모서리에서 틈 하나만 띄우고 시작한다 (행별 원본 배치로 벌어진 빈 선로를 없앤다, 서울 B903T·B904T)
  for(const [sx,sy,name] of L.xmap?.relabel||[]){const c=cells.find(c=>Math.abs(c.source[0]-sx)<1&&Math.abs(c.source[1]-sy)<1.5);if(c)c.forceLabel=name;}   // 표시 이름만 원본대로 (회로 식별은 그대로)
  // 'nT · 회로'처럼 두 회로가 한 칸으로 추출된 곳은 원본 경계에서 두 칸으로 나눈다 (노량진 1T·51AT, 3T·52AT, 4T·52BT)
@@ -364,6 +365,7 @@ function render(st,def,core,model,neighbours={}){
  const obstacles=[...fixedObstacles,...cells.map(c=>[c.x,c.y-BAR/2,c.x+c.width,c.y+BAR/2]),...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...def.signals.map(([id,rail,x,y,dir])=>{const [X,Y]=sigBase(id,T([x,y]));return [X-48,Y-11,X+48,Y+11];})];
  const capsulePositions=blockView.build(st,def,cells,T,prepared.split);
  for(const b of capsulePositions)obstacles.push(b.box);
+ const capsuleBoxes=new Set(capsulePositions.map(b=>b.box));   // 열번칸 자리 찾기: 원본 좌표 화면에서는 폐색 표식 상자를 2px만 좁혀 본다(그려진 폭 ±18)
  for(const item of visibleWindows){
   const code=item.anchorCode||item.code,inline=item.side==='inline';
   const cell=cells.find(c=>c.label.split(' · ').includes(code)||c.label.replaceAll(' · ','')===code);
@@ -396,6 +398,8 @@ function render(st,def,core,model,neighbours={}){
  const laneNeighbour=b=>{const x0=b.x-20,x1=b.x+b.width+20,ys=[...new Set([...cells.filter(c=>c.x<x1&&c.x+c.width>x0).map(c=>Math.round(c.y)),...paths.flatMap(pts=>pts.slice(1).flatMap((p,i)=>Math.abs(p[1]-pts[i][1])<2&&Math.min(p[0],pts[i][0])<x1&&Math.max(p[0],pts[i][0])>x0?[Math.round(p[1])]:[]))])];
   return b.item.side==='above'?Math.max(-Infinity,...ys.filter(y=>y<b.cy-3)):Math.min(Infinity,...ys.filter(y=>y>b.cy+3));};
  const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side+(L.xmap&&pinnedUnder(b)?'|'+laneNeighbour(b):'');b.lane=key;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
+ // 원본 좌표 화면: 같은 높이 띠라도 멀리 떨어진 열번칸 무리는 높이를 따로 정한다(한쪽 끝 장애물이 반대쪽 끝까지 밀지 않게).
+ if(L.xmap)for(const [key,lane] of [...windowLanes]){if(!key.includes('|'))continue;lane.sort((a,b)=>a.x-b.x);let part=0;lane.forEach((b,i)=>{if(i&&b.x-(lane[i-1].x+lane[i-1].width)>400)part++;if(part){const k=key+'#'+part;b.lane=k;if(!windowLanes.has(k))windowLanes.set(k,[]);windowLanes.get(k).push(b);}});windowLanes.set(key,lane.filter(b=>b.lane===key));}
  for(const lane of windowLanes.values()){
   // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.
   const side=lane[0].item.side,cy=lane[0].cy,H=20,trackRows=[...new Set(cellRows.map(r=>Math.round(r.y)).concat(rows.map(y=>Math.round(T([0,y])[1]))))];
@@ -407,7 +411,7 @@ function render(st,def,core,model,neighbours={}){
    for(const dy of deltas){let cost=0,choices=[];
     for(const b of lane){let chosen;
      candidates:for(const width of [...new Set([b.width,80,64,56,48])])for(const dx of [0,-8,8,-16,16,-24,24,-32,32,-48,48,-64,64]){
-      const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,o,.6)).length;
+      const x=Math.max(EDGE,Math.min(WIDTH-width-EDGE,b.x+(b.width-width)/2+dx)),y=b.cy+dy,box=[x,y,x+width,y+20],hits=[...obstacles,...choices.map(c=>[c.x,c.y,c.x+c.width,c.y+20]),...lane.filter(other=>other!==b).map(other=>[other.x+other.width/2-24,y,other.x+other.width/2+24,y+20])].filter(o=>intersects(box,L.xmap&&capsuleBoxes.has(o)?[o[0]+2,o[1],o[2]-2,o[3]]:o,.6)).length;
       const score=hits*10000+(b.width-width)*3+Math.abs(dx)*4;if(!chosen||score<chosen.cost)chosen={x,y,width,cost:score};if(score===0)break candidates;
      }
      cost+=chosen.cost;choices.push(chosen);
@@ -485,7 +489,7 @@ function render(st,def,core,model,neighbours={}){
   // An unnamed boundary segment belongs beyond the local endpoint, on the existing
   // horizontal screen continuation. Never push B607T back into the named YT circuit.
   const port=offset<0&&/^B\d{3,4}T(?:[12]T)?$/.test(name)&&edgePorts.find(p=>p.side==='right'&&p.code===name&&Math.abs(T([p.x,p.y])[1]-y)<2);
-  const edgeX=port?T([port.x,port.y])[0]:null,extension=port&&WIDTH-12-edgeX>width+8;
+  const edgeX=port?Math.max(T([port.x,port.y])[0],...cells.filter(c=>Math.abs(c.y-y)<3&&c.x<WIDTH-40).map(c=>c.x+c.width)):null,extension=port&&WIDTH-12-edgeX>width+8;   /* 확장 구간은 그 줄 마지막 칸 뒤부터 (용산 BT 뒤 B610T) */
   if(extension){intervals=[[edgeX+4+GAP/2,WIDTH-12]];if(cellGaps.length)cellGaps.push([edgeX+GAP/2,y]);else symbols+=`<path class="circuit-boundary" data-boundary-label="${esc(name)}" d="M${edgeX} ${y-BAR/2}V${y+BAR/2}"/>`;}
   const pb=!extension&&platformBox(name),onRow=pb&&Math.abs(pb.cy-y)<4;
   // 칸이 없는 선로 끝 구간의 이름은 그 빈 구간(화면 끝~첫 칸) 가운데에 둔다 (수원 B1036T가 XT에 붙지 않게)
