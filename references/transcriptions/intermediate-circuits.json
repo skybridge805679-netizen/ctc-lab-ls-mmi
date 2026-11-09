@@ -681,7 +681,13 @@
           "slide": 10
         }
       ],
-      "joins": []
+      "joins": [],
+      "ignoreCells": [
+        [
+          14.8,
+          777
+        ]
+      ]
     },
     "geumcheon": {
       "strips": [

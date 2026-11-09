@@ -72,7 +72,7 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  // 시저스(X자)가 걸친 선로 사이는 화면에서 120px 안쪽으로: 더 벌리면 X가 기둥처럼 길어진다 (지하청량리~지하서울)
  const xspan=Math.max(0,...def.links.filter(([id,a,x,b,z])=>def.links.some(([o,c,u,d,v])=>o!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>Math.abs(railY(def,a,x)-railY(def,b,z))));
  const syCap=xspan?Math.min(SY_MAX,120/xspan):SY_MAX;
- const bottom=64,fill=targetH?(targetH-top-bottom)/Math.max(1,maxY-minY):null,sy=targetH?Math.max(48/pitch,Math.min(syCap,fill)):Math.max(sx,80/pitch);
+ const bottom=64,fill=targetH?(targetH-top-bottom)/Math.max(1,maxY-minY):null,sy=targetH?Math.max(40/pitch,Math.min(syCap,fill)):Math.max(sx,80/pitch);   /* 줄이 많은 화면(구로 8줄)도 화면 높이 안에: 원본 줄 간격은 약 39px */
  if(targetH&&fill>sy)top+=Math.floor((fill-sy)*(maxY-minY)/2);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
@@ -109,7 +109,7 @@ function render(st,def,core,model,neighbours={}){
  const edgePorts=seams.ports(st,def,data);
  // 원본 슬라이드의 빨간 등 위치(tools/build-ls-xmap.py)가 있으면 그 자리를 신호기 기준으로 쓴다
  // 원본 위치로 고정한 선로 꼭짓점(railPoints)이 있는 선로는, 그 선로 위의 모든 점(선로전환기 틈·번호)을 같은 원본 위치로 옮긴다
- const Tw=p=>{const sp=(L.pads||[]).find(s=>(Math.abs(p[0]-s.x0)<.6||Math.abs(p[0]-s.x1)<.6)&&(Math.abs(p[1]-s.ya)<2||Math.abs(p[1]-s.yb)<2));if(sp){const P=T(p);return [P[0]+(Math.abs(p[0]-sp.x0)<.6?-sp.pad:sp.pad),P[1]];}if(!railFix.length)return T(p);const F=v=>fixPt(v,T(v));
+ const Tw=p=>{{const ex=railFix.find(([fx,fy])=>Math.abs(fx-p[0])<.6&&Math.abs(fy-p[1])<2);if(ex)return [L.adj(ex[2]*WIDTH/L.xmap.width),T(p)[1]];}   /* 원본 위치를 직접 적은 점이 먼저 */const sp=(L.pads||[]).find(s=>(Math.abs(p[0]-s.x0)<.6||Math.abs(p[0]-s.x1)<.6)&&(Math.abs(p[1]-s.ya)<2||Math.abs(p[1]-s.yb)<2));if(sp){const P=T(p);return [P[0]+(Math.abs(p[0]-sp.x0)<.6?-sp.pad:sp.pad),P[1]];}if(!railFix.length)return T(p);const F=v=>fixPt(v,T(v));
   for(const r of def.rails)for(let i=1;i<r[1].length;i++){const a=r[1][i-1],b=r[1][i],dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;if(!L2)continue;const t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2;if(t<-.02||t>1.02)continue;
    const qx=a[0]+t*dx,qy=a[1]+t*dy;if(Math.hypot(p[0]-qx,p[1]-qy)>3)continue;if(Math.abs(dy)<2)continue;   /* 가로 구간은 공통 배치(T) */const A=F(a),B=F(b);if(A[0]===T(a)[0]||B[0]===T(b)[0])continue;return [A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t];}   /* 양 끝이 다 고정된 구간(꺾인 사선)만 그대로 보간 */
   const P=T(p),f=railFix.map(([fx,fy,ox])=>({d:Math.hypot(fx-p[0],fy-p[1]),dx:L.adj(ox*WIDTH/L.xmap.width)-T([fx,fy])[0]})).sort((a,b)=>a.d-b.d)[0];return f&&f.d<30?[P[0]+f.dx,P[1]]:P;};   /* 고정 꼭짓점 근처(선로전환기 틈)는 그 꼭짓점만큼 */
@@ -139,7 +139,7 @@ function render(st,def,core,model,neighbours={}){
   const byRow=new Map();for(const c of cells){const key=Math.round(c.y);if(!byRow.has(key))byRow.set(key,[]);byRow.get(key).push(c);}
   // 분기 사선·꺾인 연결이 붙는 칸 끝은 공통 함수 자리에 고정한다 (선이 끊기지 않게)
   /* 건넘선 끝은 원본 칸 끝(refX)이 그 근처일 때만 칸 끝을 끌어당긴다 (금천구청 24AT·25BT는 25 건넘선과 떨어져 있다) */
-  const linkPts=def.links.flatMap(([id,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])]);
+  const linkPts=def.links.flatMap(([id,a,x,b,z])=>[Tw([x,railY(def,a,x)]),Tw([z,railY(def,b,z)])]);   /* 실제로 그려지는 건넘선 끝 */
   const fixedPts=[...def.rails.flatMap(r=>r[1].filter((p,i,a)=>(i>0&&Math.abs(a[i-1][1]-p[1])>=2)||(i<a.length-1&&Math.abs(a[i+1][1]-p[1])>=2)).map(p=>fixPt(p,T(p)))),...(data.joins||[]).flatMap(j=>j.map(p=>fixPt(p,T(p))))];
   /* 원본 칸이 그 점을 넘어 덮으면(사선이 칸 가운데에 내려앉는 곳) 고정하지 않는다 */
   const near=(x,y,refX)=>([px,py],k)=>Math.abs(py-y)<4&&(Math.abs(px-refX)<10||(k>=linkPts.length&&Math.abs(px-x)<10)),allPts=[...linkPts,...fixedPts];
@@ -203,6 +203,9 @@ function render(st,def,core,model,neighbours={}){
     if(L1.label&&L1.label===R1.label){if(gap>0)L1.width=R1.x-L1.x;continue;}
     const platSlot=n=>/^\d+T$/.test(n)&&(trainWindows.data[st.id]||[]).some(w=>w.side==='inline'&&(w.slot===n||w.code===n));
     if((!L1.label&&platSlot(R1.label))||(!R1.label&&platSlot(L1.label))){if(gap>0)L1.width=R1.x-L1.x;continue;}   // 승강장 칸과 그 nT는 한 회로   // 같은 회로 조각은 잇는다
+    /* overrides로 원본 위치를 적은 두 칸이 틈보다 넓게 떨어져 있으면(사이에 괄호·세로 선로) 옮기지 않고 양쪽 끝에 틈을 둔다 (구로 52BT·52AT) */
+    const pin=c=>!!L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6);
+    if(gap>GAP+4&&pin(L1)&&pin(R1)){cellGaps.push([end+GAP/2,y],[R1.x-GAP/2,y]);continue;}
     let b=(end+R1.x)/2;   /* 경계는 칸(원본 배치)이 정한다; 신호기는 아래에서 이 틈으로 옮긴다 */
     b=Math.max(L1.x+12,Math.min(R1.x+R1.width-12,b));const r=R1.x+R1.width;L1.width=b-GAP/2-L1.x;R1.x=b+GAP/2;R1.width=r-R1.x;cellGaps.push([b,y]);}}}
  // 틈 열(여러 선로의 틈이 한 세로줄로 맞춰진 곳)을 찾고, 승강장 옆 열은 하나로 모아 칸 경계도 함께 옮긴다 (칸을 그리기 전에)
@@ -251,7 +254,8 @@ function render(st,def,core,model,neighbours={}){
  // 중간역 이름판은 그 역 하선 승강장 표시 위(열번칸 자리를 띄우고)에 둔다. 위쪽 선로와 겹치면 예전처럼 화면 위 띠에 둔다.
  // 이름판도 화면 좌우 끝 선로명 자리(62px)는 비운다
  const plateX=(x,w)=>Math.max(62+w/2,Math.min(WIDTH-62-w/2,x));
- const plateAt=(plate,x)=>{const v=L.xmap?.captions?.[plate.name];return v?L.adj(v*WIDTH/L.xmap.width):x;};   /* 원본 화면 가운데 x를 아는 이름판 (금천구청 석수) */
+ const plateAt=(plate,x)=>{const v=L.xmap?.captions?.[plate.name];if(Array.isArray(v))return L.adj((v[0]+v[1])/2*WIDTH/L.xmap.width);return v?L.adj(v*WIDTH/L.xmap.width):x;};
+ const plateW=(plate,w)=>{const v=L.xmap?.captions?.[plate.name];return Array.isArray(v)?L.adj(v[1]*WIDTH/L.xmap.width)-L.adj(v[0]*WIDTH/L.xmap.width):w;};   /* [왼쪽, 오른쪽]이면 폭도 원본대로 */   /* 원본 화면 가운데 x를 아는 이름판 (금천구청 석수) */
  // 하선 승강장 표시가 없는 중간역 이름판(서울 남영 등)은 원본처럼 이름판 아래 첫 선로의 열번칸 바로 위에 둔다.
  const plateOverRow=(plate,fallback)=>{const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),w=Math.max(b-a,plate.name.length*16+18),w2=w,mid=(a+b)/2;
   const under=cells.filter(c=>c.x<mid+w/2&&c.x+c.width>mid-w/2).sort((p,q)=>p.y-q.y)[0];if(!under)return fallback;
@@ -277,19 +281,22 @@ function render(st,def,core,model,neighbours={}){
  };
  const captionBlockers=def.signals.map(([id,rail,x,lampY])=>{const [X,Y]=T([x,lampY]);return [X-48,Y-12,X+48,Y+12];});
  const captionBoxes=wing.fixed.captions.map(c=>{
-  const w=Math.max(...c.lines.map(t=>t.length))*15+32,h=c.lines.length*22+20;
+  const notesW=c.notes?Math.max(...c.notes.map(t=>t.length))*13+18+22:0,w=Math.max(...c.lines.map(t=>t.length))*15+32+notesW;   /* 22: 원본 두 글자 열 사이 간격 */let h=c.lines.length*22+20;
   let [x,y]=T(c.at);const anchor=captionAnchors[c.id];
   if(anchor){const rail=def.rails.find(r=>r[0]===anchor.rail),left=rail[1][0],end=anchor.end??rail[1].at(-1)[0];[x,y]=T([((anchor.start??left[0])+end)/2,left[1]]);y+=anchor.side*90;}
   { /* 원본 화면 위치를 아는 역은 그 가로 위치에 둔다 (의왕 남부화물기지 A·B선) */ const v=L.xmap?.captions?.[c.id];if(v)x=L.adj(v*WIDTH/L.xmap.width); }
   if(c.id==='depot-lead'){
    const a=def.rails.find(r=>r[4]==='F1T')[1].at(-1),b=def.rails.find(r=>r[0]==='4T')[1].at(-1);
    const right=T([Math.max(a[0],b[0]),a[1]])[0];y=(T(a)[1]+T(b)[1])/2;x=right+32+w/2;
+   /* 원본: 글자 줄이 F1T·F2T 선로 높이에 하나씩 (차량기지 [경인 하선] / 입출고선 [경인 상선]) */
+   c={...c,rowYs:[T(a)[1],T(b)[1]]};h=Math.abs(T(b)[1]-T(a)[1])+40;
+   { const v=L.xmap?.captions?.[c.id];if(v)x=L.adj(v*WIDTH/L.xmap.width); }
   }
   const preferred=y,direction=anchor?.side||1;for(const offset of [0,...Array.from({length:10},(_,i)=>(i+1)*14*direction),...Array.from({length:10},(_,i)=>-(i+1)*14*direction)]){const next=preferred+offset,box=[x-w/2,next-h/2,x+w/2,next+h/2];if(box[1]<8||captionBlockers.some(other=>intersects(box,other,6)))continue;y=next;break;}
-  const box=[x-w/2,y-h/2,x+w/2,y+h/2];captionBlockers.push(box);return {...c,x,y,box};
+  const box=[x-w/2,y-h/2,x+w/2,y+h/2];captionBlockers.push(box);return {...c,x,y,box,notesW};
  });
  // Keep bottom captions within the same comfortable canvas inset as the upper bays.
- L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+52)));
+ L.H=Math.max(L.H,...captionBoxes.map(c=>Math.ceil(c.box[3]+12)));   /* 화면 높이를 넘으면 그림 전체가 줄어든다 (동묘앞·의왕 98%) */
  const fixedObstacles=[...bracketBoxes.map(b=>b.box),...captionBoxes.map(c=>c.box)];
  const switches=switchView.build(st,def,core,model,Tw,{width:WIDTH});
  const projectRoute=(points,destination)=>{
@@ -371,15 +378,20 @@ function render(st,def,core,model,neighbours={}){
  }
  // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
- for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=Math.max(b-a,plate.name.length*16+18),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(a+b)/2,w)),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
+ for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=plateW(plate,Math.max(b-a,plate.name.length*16+18)),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(a+b)/2,w)),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
  for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
  for(const p of edgePorts){if(true)continue;   /* 선로명 표기 삭제(원본에 없음): 자리 예약도 하지 않는다 */const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
- const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
+ /* 원본 좌표로 고정한 칸 위 열번칸은, 그 x 위/아래로 실제로 지나가는 이웃 선로가 다르면 다른 줄(lane)로 둔다.
+    원본도 그렇다: 구로 B628T 위 열번칸은 55T 줄이 없는 곳이라 오른쪽 열번칸보다 높이 있다. */
+ const pinnedUnder=b=>cells.some(c=>Math.abs(c.y-b.cy)<3&&c.x<b.x+b.width&&c.x+c.width>b.x&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6));
+ const laneNeighbour=b=>{const x0=b.x-20,x1=b.x+b.width+20,ys=[...new Set([...cells.filter(c=>c.x<x1&&c.x+c.width>x0).map(c=>Math.round(c.y)),...paths.flatMap(pts=>pts.slice(1).flatMap((p,i)=>Math.abs(p[1]-pts[i][1])<2&&Math.min(p[0],pts[i][0])<x1&&Math.max(p[0],pts[i][0])>x0?[Math.round(p[1])]:[]))])];
+  return b.item.side==='above'?Math.max(-Infinity,...ys.filter(y=>y<b.cy-3)):Math.min(Infinity,...ys.filter(y=>y>b.cy+3));};
+ const windowLanes=new Map();for(const b of windowBoxes.filter(b=>b.beside))obstacles.push([b.x,b.y,b.x+b.width,b.y+b.height]);for(const b of windowBoxes.filter(b=>!b.inline&&!b.beside)){const key=b.cy.toFixed(0)+b.item.side+(L.xmap&&pinnedUnder(b)?'|'+laneNeighbour(b):'');b.lane=key;if(!windowLanes.has(key))windowLanes.set(key,[]);windowLanes.get(key).push(b);}
  for(const lane of windowLanes.values()){
   // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.
   const side=lane[0].item.side,cy=lane[0].cy,H=20,trackRows=[...new Set(cellRows.map(r=>Math.round(r.y)).concat(rows.map(y=>Math.round(T([0,y])[1]))))];
-  const neighbour=side==='above'?Math.max(-Infinity,...trackRows.filter(y=>y<cy-3)):Math.min(Infinity,...trackRows.filter(y=>y>cy+3));
+  const neighbour=lane[0].lane.includes('|')?laneNeighbour(lane[0]):side==='above'?Math.max(-Infinity,...trackRows.filter(y=>y<cy-3)):Math.min(Infinity,...trackRows.filter(y=>y>cy+3));
   const near=BAR/2+3,far=Number.isFinite(neighbour)?Math.abs(neighbour-cy)-BAR/2-3-H:110;
   const band=far>=near?Array.from({length:Math.floor((far-near)/2)+1},(_,i)=>side==='above'?-(near+H+i*2):near+i*2):[];
   const EDGE=4,preferred=side==='above'?-50:30,wide=Array.from({length:41},(_,i)=>side==='above'?-28-i*2:20+i*2).sort((a,b)=>Math.abs(a-preferred)-Math.abs(b-preferred));
@@ -407,9 +419,9 @@ function render(st,def,core,model,neighbours={}){
  }
  const {windowBoxes,capsulePositions}=cached;
  occupiedBoxes.push(...capsulePositions.map(p=>p.box));
- for(const {item,inline,x,y,width,height,cy}of windowBoxes){
+ for(const {item,inline,x,y,width,height,cy,lane}of windowBoxes){
   occupiedBoxes.push([x-3,y-3,x+width+3,y+height+3]);
-  trainShapes+=`<g class="ls-train-slot ${inline?'inline':'detached'}" data-train-slot="${esc(item.slot)}" data-window-code="${esc(item.code)}" data-window-side="${item.side}" data-window-rail-y="${cy}" role="button" tabindex="0" aria-label="${esc(item.code)} 열차번호 입력"><rect x="${x}" y="${y}" width="${width}" height="${height}"/><title>${esc(item.code)} 열차번호 입력</title></g>`;
+  trainShapes+=`<g class="ls-train-slot ${inline?'inline':'detached'}" data-train-slot="${esc(item.slot)}" data-window-code="${esc(item.code)}" data-window-side="${item.side}" data-window-rail-y="${cy}" data-window-lane="${esc(lane||"")}" role="button" tabindex="0" aria-label="${esc(item.code)} 열차번호 입력"><rect x="${x}" y="${y}" width="${width}" height="${height}"/><title>${esc(item.code)} 열차번호 입력</title></g>`;
  }
 
  for(const p of platformBoxes){
@@ -532,7 +544,7 @@ function render(st,def,core,model,neighbours={}){
  if(!cellGaps.length)for(const [x,y]of boundaries)symbols+=`<path class="circuit-boundary" d="M${x} ${y-BAR/2}V${y+BAR/2}"/>`;
  const topRow=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){
-  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],width=Math.max(right-left,plate.name.length*16+18),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(left+right)/2,width));
+  const [left]=T([plate.box[0],0]),[right]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],width=plateW(plate,Math.max(right-left,plate.name.length*16+18)),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(left+right)/2,width));
   // 이름판은 자기 역 하선 승강장 위 (자리가 없으면 화면 위 띠)
   const y=plateY(plate,Math.max(8,topRow-plateGap));
   plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
@@ -549,7 +561,7 @@ function render(st,def,core,model,neighbours={}){
   symbols+=`<g class="source-bracket-pair" data-source-symbol="bracket-pair" data-source-bracket="${esc(b.id)}" pointer-events="none"><path d="${shape(x,1)}"/><path d="${shape(right,-1)}"/><title>원본 대향 괄호 표식 · ${esc(b.id)}</title></g>`;
  }
  for(const c of captionBoxes){
-  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none"><rect class="caption-surface" x="${c.box[0]}" y="${c.box[1]}" width="${c.box[2]-c.box[0]}" height="${c.box[3]-c.box[1]}" rx="6"/><path class="caption-accent" d="M${c.box[0]+1} ${c.box[1]+11}V${c.box[3]-11}"/>${c.lines.map((line,i)=>`<text x="${c.x}" y="${c.y+(i-(c.lines.length-1)/2)*22}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`).join('')}</g>`;
+  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none"><rect class="caption-surface" x="${c.box[0]}" y="${c.box[1]}" width="${c.box[2]-c.box[0]}" height="${c.box[3]-c.box[1]}" rx="6"/><path class="caption-accent" d="M${c.box[0]+1} ${c.box[1]+11}V${c.box[3]-11}"/>${c.lines.map((line,i)=>{const ly=c.rowYs?c.rowYs[i]+(c.y-(c.rowYs[0]+c.rowYs.at(-1))/2):c.y+(i-(c.lines.length-1)/2)*22,lx=c.notes?c.box[0]+16+Math.max(...c.lines.map(t=>t.length))*15/2:c.x;return `<text x="${lx}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`+(c.notes?.[i]?`<text class="caption-note" x="${c.box[2]-16-(c.notesW-22)/2}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(c.notes[i])}</text>`:'');}).join('')}</g>`;
  }
  symbols+=blockView.render(capsulePositions);
  const segments=[...paths.flatMap(poly=>poly.slice(1).map((p,i)=>[poly[i],p])),...def.links.map(([,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])])];
@@ -577,6 +589,9 @@ function render(st,def,core,model,neighbours={}){
    const own=cellGaps.filter(([gx,gy])=>Math.abs(gy-Y)<3&&Math.abs(gx-X)<45).sort((a,b)=>Math.abs(a[0]-X)-Math.abs(b[0]-X))[0];
    const col=strong.filter(c=>Math.abs(c.x-X)<40).sort((a,b)=>Math.abs(a.x-X)-Math.abs(b.x-X))[0];
    const nx=own?own[0]:col?col.x:null;if(nx==null)continue;
+   /* 원본 등이 틈의 등 쪽으로 12px도 안 나가면(원본에서 기둥이 칸 안에 선 신호기, 구로 54·4A) 틈에 세우지 않고 원본 등 자리에서 기둥을 정한다 */
+   {const v=L.xmap?.signals?.[id];const pinC=cc=>L.xmap?.pinned?.some(e=>Math.abs(e[0]-cc.source[0])<.6&&Math.abs(e[1]-cc.source[1])<.6),pinnedGap=cells.some(cc=>pinC(cc)&&Math.abs(cc.y-Y)<3&&(Math.abs(cc.x+cc.width-nx)<8||Math.abs(cc.x-nx)<8));
+    if(v&&pinnedGap){const lx=L.adj(v[0]*WIDTH/L.xmap.width),d=v[1];if((lx-nx)*d<12){sigAt.set(id,lx-d*(core.signals[id]?.kind==='입환'?12:25));continue;}}}
    if(capsulePositions.some(c=>intersects([nx-30,LY0-9,nx+30,LY0+9],c.box,2))&&!capsulePositions.some(c=>intersects([X-30,LY0-9,X+30,LY0+9],c.box,2)))continue;   // 폐색 표식과 겹치면 옮기지 않는다
    sigAt.set(id,nx);
    if(!hasGap(nx,Y)&&onRail(nx,Y))cellGaps.push([nx,Y]);}
@@ -598,6 +613,7 @@ function render(st,def,core,model,neighbours={}){
    first=end;
   }
  }
+ const placedNames=[];
  for(const s of placed){
   const {id,dir,Y,anchorX}=s,X=anchorX,kind=core.signals[id].kind;
   const reach=sigReach(id,X,dir),LY=T([0,s.lampY])[1],lampX=X+dir*reach;
@@ -606,19 +622,21 @@ function render(st,def,core,model,neighbours={}){
   const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="${reach+10}" height="14" rx="7"/>${reach>18?`<circle class="lamp off" cx="${lampX-dir*13}" cy="${LY}" r="6"/>`:''}<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+reach+7,LY+8]:[X-reach-7,LY-8,X+30,LY+8];
   // 신호기 이름이 승강장 표시에 걸리면 마스트 반대쪽에 쓴다 (동묘앞 23)
-  const nameAt=d=>d===1?[X-8-id.length*7.5,labelY-8,X-8,labelY+8]:[X+8,labelY-8,X+8+id.length*7.5,labelY+8];
+  // 원본: 이름은 등 반대쪽. 열번창·승강장에 조금 걸리면 위아래로 8px까지 비키고, 그래도 안 되면 등 너머(몸체 밖)에 쓴다 (구로 3C·4A)
+  const nameOff=d=>d===dir?8:reach+14,nameAt=(d,dy=0)=>d===1?[X-nameOff(d)-id.length*7.5,labelY-8+dy,X-nameOff(d),labelY+8+dy]:[X+nameOff(d),labelY-8+dy,X+nameOff(d)+id.length*7.5,labelY+8+dy];
   const keepOut=[...platformBoxes.map(p=>[p.x,p.y,p.right,p.y+p.height]),...windowBoxes.filter(b=>b.inline).map(b=>[b.x,b.y,b.x+b.width,b.y+b.height]),...capsulePositions.map(c=>c.box)];   // 승강장·승강장 열번창
-  const nameDir=keepOut.some(b=>intersects(nameAt(dir),b,1))&&!keepOut.some(b=>intersects(nameAt(-dir),b,1))?-dir:dir;
-  occupiedBoxes.push(nameAt(nameDir));
+  const hitK=b=>[...keepOut,...placedNames].some(k=>intersects([b[0],b[1]-.5,b[2],b[3]-1.5],k,.3)),dys=[0,...Array.from({length:32},(_,i)=>((i>>1)+1)*.5*(i%2?-1:1))];   /* 글자 실제 상자(기준선 -12~+3), 0.5px씩 비킨다 */   /* 글자 실제 높이로, 1px씩 비킨다. 먼저 쓴 신호기 이름도 피한다 */let nameDir=dir,nameDy=dys.find(dy=>!hitK(nameAt(dir,dy)));
+  if(nameDy===undefined){const f=dys.find(dy=>!hitK(nameAt(-dir,dy)));if(f!==undefined){nameDir=-dir;nameDy=f;}else nameDy=0;}
+  occupiedBoxes.push(nameAt(nameDir,nameDy));placedNames.push(nameAt(nameDir,nameDy));
   occupiedBoxes.push(dir===1?[X-8-id.length*7.5,LY-8,X+reach+5,LY+8]:[X-reach-5,LY-8,X+8+id.length*7.5,LY+8]);
-  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY-LY}" x="${X-nameDir*8}" y="${labelY+3.5}" text-anchor="${nameDir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
+  signalSymbols+=`<g class="signal ${kind==='입환'?'shunt':'main'}" data-signal-view="${id}" data-anchor-x="${X}" data-lamp-y="${LY}"><path class="mast" d="M${X} ${Y+s.side*7}V${LY}H${lampX}"/>${shape}<circle class="mast-foot" cx="${X}" cy="${LY}" r="3"/><text class="sig-name" data-label-kind="signal" data-label-id="${id}" data-label-offset-y="${labelY+nameDy-LY}" x="${X-nameDir*nameOff(nameDir)}" y="${labelY+nameDy+3.5}" text-anchor="${nameDir===1?'end':'start'}">${id}</text><g class="signal-hit" data-signal="${id}" role="button" tabindex="0" aria-label="${esc(st.name)} ${id} ${kind}신호기"><rect x="${box[0]}" y="${LY-8}" width="${box[2]-box[0]}" height="16" fill="transparent"/><title>${id} ${kind}신호기</title></g></g>`;
  }
  const takeLabel=(text,anchor,kind,id,preferred=anchor)=>{
   // Resolve dense labels locally only. Never detach an annotation from its turnout.
   const width=text.length*7+2;
   preferred=[Math.max(20,Math.min(WIDTH-20,preferred[0])),Math.max(20,Math.min(L.H-20,preferred[1]))];
   let [x,y]=preferred;
-  const offsets=[[0,0]];
+  const offsets=[[0,0],[0,-4],[0,4],[0,-8],[0,8]];   /* 선로에 1~2px 닿을 때 멀리 뛰지 않게 (구로 21B) */
   for(let d=12;d<=72;d+=12)offsets.push([d,0],[-d,0],[0,-d],[0,d],[d,-12],[-d,-12],[d,12],[-d,12]);
   for(const [dx,dy]of offsets){
    const xx=preferred[0]+dx,yy=preferred[1]+dy,box=[xx-width/2,yy-7,xx+width/2,yy+7];

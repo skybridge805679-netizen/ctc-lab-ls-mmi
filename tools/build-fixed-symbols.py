@@ -12,7 +12,7 @@ for sid,entry in source['stations'].items():
  out[sid]={'brackets':[],'captions':[]}
  for b in entry.get('brackets',[]):
   x,y,w,h=b['bounds'];out[sid]['brackets'].append({'id':b['id'],'bounds':[*local(x,y),round(w*iw/rw,3),round(h*ih/rh,3)]})
- for c in entry.get('captions',[]):out[sid]['captions'].append({'id':c['id'],'at':local(*c['at']),'lines':c['lines']})
+ for c in entry.get('captions',[]):out[sid]['captions'].append({'id':c['id'],'at':local(*c['at']),'lines':c['lines'],**({'notes':c['notes']} if 'notes' in c else {})})
 js="(function(root){'use strict';\n// Generated from references/transcriptions/fixed-symbols.json by tools/build-fixed-symbols.py.\nconst data="+json.dumps(out,ensure_ascii=False,separators=(',',':'))+";\nif(typeof module!=='undefined')module.exports=data;else root.SimFixedSymbols=data;\n})(typeof window!=='undefined'?window:globalThis);\n"
 (ROOT/'simulator/ui/fixed-symbols.js').write_text(js)
 print('Built',sum(len(s['brackets']) for s in out.values()),'bracket pairs and',sum(len(s['captions']) for s in out.values()),'captions')
