@@ -7131,6 +7131,168 @@
       "fraction": 0.888,
       "stem": "right",
       "reviewed": true
+    },
+    {
+      "id": "photo-8-B931T-1",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1224,
+        829,
+        131,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B931T",
+      "number": 1,
+      "code": "B931T",
+      "anchorCode": "B931T",
+      "side": "below",
+      "fraction": -0.21,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1177.99,
+        851,
+        37,
+        15
+      ]
+    },
+    {
+      "id": "photo-8-B931T-2",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1224,
+        829,
+        131,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B931T",
+      "number": 2,
+      "code": "B931T",
+      "anchorCode": "B931T",
+      "side": "below",
+      "fraction": 0.85,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1316.85,
+        851,
+        37,
+        15
+      ]
+    },
+    {
+      "id": "photo-8-B933T-3",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1360,
+        829,
+        120,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B933T",
+      "number": 3,
+      "code": "B933T",
+      "anchorCode": "B933T",
+      "side": "below",
+      "fraction": 0.87,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1445.9,
+        851,
+        37,
+        15
+      ]
+    },
+    {
+      "id": "photo-8-B935T-4",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1485,
+        829,
+        125,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B935T",
+      "number": 4,
+      "code": "B935T",
+      "anchorCode": "B935T",
+      "side": "below",
+      "fraction": 0.87,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1575.25,
+        851,
+        37,
+        15
+      ]
+    },
+    {
+      "id": "photo-8-B937T-5",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1615,
+        829,
+        142,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B937T",
+      "number": 5,
+      "code": "B937T",
+      "anchorCode": "B937T",
+      "side": "below",
+      "fraction": 0.87,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1720.04,
+        851,
+        37,
+        15
+      ]
+    },
+    {
+      "id": "photo-8-B939T-6",
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceCell": [
+        1762,
+        829,
+        143,
+        17
+      ],
+      "ocrNumber": "",
+      "ocrCode": "B939T",
+      "number": 6,
+      "code": "B939T",
+      "anchorCode": "B939T",
+      "side": "below",
+      "fraction": 0.83,
+      "stem": "right",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인",
+      "sourceSymbol": [
+        1862.19,
+        851,
+        37,
+        15
+      ]
     }
   ]
 }

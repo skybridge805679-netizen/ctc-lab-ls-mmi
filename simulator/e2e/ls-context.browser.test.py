@@ -94,7 +94,7 @@ try:
     assert checks,station+' window baseline/inline geometry'
     pairs=page.evaluate('''()=>{const ws=[...document.querySelectorAll('#trackSvg [data-train-slot]')].map(e=>({id:e.dataset.trainSlot,b:e.querySelector('rect').getBBox()})),bad=[];for(let i=0;i<ws.length;i++)for(let j=i+1;j<ws.length;j++){const a=ws[i].b,b=ws[j].b;if(Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x)>.5&&Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y)>.5)bad.push([ws[i].id,ws[j].id]);}return bad}''')
     assert not pairs,(station,'overlapping train windows',pairs)
-   assert total==276,total
+   assert total==279,total
    # Mouse menu placement at the viewport edge keeps its entire submenu visible.
    page.select_option('#stationSelect','jonggak'); background(); action('boards').hover()
    bounds=action('boards').locator('..').locator('.ls-submenu').bounding_box(); assert bounds['x']>=0 and bounds['x']+bounds['width']<=width

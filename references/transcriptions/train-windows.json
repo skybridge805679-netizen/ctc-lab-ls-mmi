@@ -6076,6 +6076,75 @@
       "fraction": 0.6448,
       "slot": "B1031T",
       "reviewed": true
+    },
+    {
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceWindow": [
+        1236,
+        870,
+        112,
+        29
+      ],
+      "sourceCell": [
+        1224,
+        829,
+        131,
+        17
+      ],
+      "candidate": "B931T",
+      "code": "B931T",
+      "side": "below",
+      "fraction": 0.52,
+      "slot": "B931T",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인"
+    },
+    {
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceWindow": [
+        1463,
+        870,
+        112,
+        29
+      ],
+      "sourceCell": [
+        1485,
+        829,
+        125,
+        17
+      ],
+      "candidate": "B935T",
+      "code": "B935T",
+      "side": "below",
+      "fraction": 0.27,
+      "slot": "B935T",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인"
+    },
+    {
+      "station": "noryangjin",
+      "slide": 8,
+      "sourceWindow": [
+        1641,
+        870,
+        112,
+        29
+      ],
+      "sourceCell": [
+        1615,
+        829,
+        142,
+        17
+      ],
+      "candidate": "B937T",
+      "code": "B937T",
+      "side": "below",
+      "fraction": 0.58,
+      "slot": "B937T",
+      "reviewed": true,
+      "note": "슬라이드 아래 끝에서 잘림: 실제 화면 사진으로 확인"
     }
   ]
 }

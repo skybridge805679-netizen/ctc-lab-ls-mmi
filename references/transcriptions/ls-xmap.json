@@ -48,6 +48,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -373,6 +374,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -836,6 +838,7 @@
   ],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -1464,6 +1467,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -1838,6 +1842,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -2529,6 +2534,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [],
   "knots": [
    [
@@ -3089,6 +3095,12 @@
     1752
    ]
   ],
+  "gaps": [
+   [
+    1151.5,
+    541
+   ]
+  ],
   "railPoints": [
    [
     800,
@@ -3184,6 +3196,11 @@
     672,
     490,
     889.1
+   ],
+   [
+    1293,
+    541,
+    1816
    ]
   ],
   "knots": [
@@ -4265,6 +4282,7 @@
     1800
    ]
   ],
+  "gaps": [],
   "railPoints": [
    [
     635,
@@ -5572,6 +5590,7 @@
     653
    ]
   ],
+  "gaps": [],
   "railPoints": [
    [
     714,
@@ -7378,6 +7397,7 @@
     1733
    ]
   ],
+  "gaps": [],
   "railPoints": [
    [
     391,
@@ -9008,6 +9028,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [
    [
     155,
@@ -10511,6 +10532,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [
    [
     150,
@@ -11397,6 +11419,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [
    [
     40,
@@ -12315,6 +12338,7 @@
    "freight-b": 370
   },
   "platforms": [],
+  "gaps": [],
   "railPoints": [
    [
     70,
@@ -13549,6 +13573,7 @@
   "relabel": [],
   "captions": {},
   "platforms": [],
+  "gaps": [],
   "railPoints": [
    [
     38,

@@ -194,7 +194,7 @@ function render(st,def,core,model,neighbours={}){
    else if(right){const nr=right[0]-BAR/2-TAIL-7;if(Math.abs(nr-(c.x+c.width))>1&&nr>c.x+24){c.width=nr-c.x;cornerGaps.push([nr+3.5,c.y]);cornerTails.push([[nr,c.y],[right[0],c.y]]);}}}}
  // 회로 칸 사이 틈 (원본 LS): 같은 줄의 서로 다른 회로 경계마다 같은 폭(GAP)의 틈을 두고, 신호기·입환표지는 그 틈에 선다.
  // 떼지 않는 곳: 같은 회로 조각(이름이 같은 칸), 승강장 열번창과 그 nT(한 회로), 꺾인 연결·분기 사선(칸 끝에 붙음).
- const cellGaps=[...cornerGaps];
+ const cellGaps=[...cornerGaps,...(L.xmap?.gaps||[]).map(([sx,py])=>[L.adj(sx*WIDTH/L.xmap.width),T([0,py])[1]])];   /* 칸 없이 선로만 있는 곳의 원본 틈 (노량진 4T 괄호 사이) */
  if(!neighbours.overview){
   const sigX=def.signals.map(([id,rail,x])=>{const [X,Y]=T([x,railY(def,rail,x)]);return {id,X,Y};});
   const rowMap=new Map();for(const c of cells){const k=[...rowMap.keys()].find(y=>Math.abs(y-c.y)<3)??c.y;if(!rowMap.has(k))rowMap.set(k,[]);rowMap.get(k).push(c);}
@@ -318,7 +318,14 @@ function render(st,def,core,model,neighbours={}){
  const active=Object.entries(model.routes).map(([id,state])=>({id,state:state.occupied?'occupied':state.lock?'locked':'set',points:projectRoute(routePoints(core.routes[id].path),core.routes[id].destination)}));
  const onRoute=cell=>active.find(route=>route.points.slice(1).some((b,i)=>{const a=route.points[i];return Math.abs(a[1]-b[1])<.5&&Math.abs(a[1]-cell.y)<5&&Math.min(a[0],b[0])<cell.x+cell.width-2&&Math.max(a[0],b[0])>cell.x+2;}));
  const snapJoin=([x,y])=>{const nearest=rows.filter(row=>Math.abs(row-y)<2).sort((a,b)=>Math.abs(a-y)-Math.abs(b-y))[0];return fixPt([x,y],T([x,nearest??y]));};
- const paths=[...def.rails.map(r=>r[1].map(p=>fixPt(p,T(p)))),...(data.joins||[]).map(poly=>poly.map(snapJoin))];
+ // 꺾인 연결선의 가로 구간이 화면에서 0 길이로 겹치면(양 끝이 같은 세로 선로에 고정) 모서리 바깥 칸이 비어 계단처럼 보인다:
+ // 원래 가로였던 방향으로 짧은 앞 구간을 붙여 모서리를 채운다 (노량진 B930T·B929T·B619T1T)
+ const fillCorner=(src,pts)=>{const out=pts.filter((p,i)=>!i||Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1])>.5);
+  const fix=(a,b,srcA,srcB)=>Math.abs(srcA[1]-srcB[1])<2&&Math.abs(srcA[0]-srcB[0])>2&&Math.abs(a[0]-b[0])<1?Math.sign(srcB[0]-srcA[0]):0;
+  if(out.length>=2&&src.length>=2&&Math.abs(out[0][0]-out[1][0])<1){const d=fix(pts[0],pts[1],src[0],src[1]);if(d)out.unshift([out[0][0]-d*BAR/2,out[0][1]]);}
+  const n=out.length,m=src.length;if(n>=2&&m>=2&&Math.abs(out[n-1][0]-out[n-2][0])<1){const d=fix(pts.at(-2),pts.at(-1),src[m-2],src[m-1]);if(d)out.push([out[n-1][0]+d*BAR/2,out[n-1][1]]);}
+  return out;};
+ const paths=[...def.rails.map(r=>r[1].map(p=>fixPt(p,T(p)))),...(data.joins||[]).map(poly=>fillCorner(poly,poly.map(snapJoin)))];
  paths.push(...cornerTails);   // 모서리 꼬리 (앞 회로 색으로 이어진다)
  const pointAnchors={};
  for(const [id,a,x,b,z]of def.links){const p=T([x,railY(def,a,x)]),q=T([z,railY(def,b,z)]);pointAnchors[id]=[(p[0]+q[0])/2,(p[1]+q[1])/2];}

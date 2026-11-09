@@ -4,7 +4,7 @@ const inventory=require('../engine/block-signals'),N=require('../engine/network'
 const source=require('../../references/transcriptions/block-signals.json');
 test('block identifiers retain reviewed PPT evidence, including supplemental intermediate-station slides',()=>{
  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'../..',source.source))).digest('hex'),source.sha256);
- assert.equal(source.indicators.length,274);assert.equal(new Set(source.indicators.map(r=>r.id)).size,274);
+ assert.equal(source.indicators.length,280);assert.equal(new Set(source.indicators.map(r=>r.id)).size,280);   // 274 + 노량진 B931T 줄 6개(슬라이드 아래 끝에서 잘려 실제 화면 사진으로 확인)
  assert.ok([13,16,18].every(slide=>source.indicators.some(r=>r.slide===slide)));
  for(const r of source.indicators){assert.equal(r.reviewed,true);assert.equal(r.sourceSymbol.length,4);assert.ok(r.number>0);const item=inventory[r.station].find(i=>i.id===r.id);assert.equal(item.number,r.number);assert.equal(item.code,r.code);}
 });
