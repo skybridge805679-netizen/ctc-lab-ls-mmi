@@ -157,6 +157,7 @@ function render(st,def,core,model,neighbours={}){
    for(const c of row){const s0=c.source[0],s1=c.source[0]+c.source[2];
     if(isBlock(c)&&good.has(c)){const [a,b]=good.get(c);primary.push([s0,a],[s1,b]);}
     else if(isBlock(c)){}
+    else if(ref.has(c)&&L.xmap?.pinned?.some(e=>Math.abs(e[0]-c.source[0])<.6&&Math.abs(e[1]-c.source[1])<.6)){const [a,b]=ref.get(c);secondary.push([s0,a],[s1,b]);}   /* overrides로 원본 위치를 직접 적은 칸은 그대로 */
     else if(ref.has(c)){const [a,b]=ref.get(c);secondary.push([s0,!pinned(c.x,c.y,a,-1)?a:pinX(c.x,c.y,a)],[s1,!pinned(c.x+c.width,c.y,b,1)?b:pinX(c.x+c.width,c.y,b)-BAR/2]);}
     else secondary.push([s0,c.x],[s1,c.x+c.width]);}
    if(!ref.has(row[0]))primary.push([row[0].source[0],row[0].x]);if(!ref.has(row.at(-1)))primary.push([row.at(-1).source[0]+row.at(-1).source[2],row.at(-1).x+row.at(-1).width]);   /* 행 끝 칸이 원본 좌표를 가지면 그쪽을 따른다 */
