@@ -3,6 +3,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from threading import Thread
 from pathlib import Path
+import re
 from playwright.sync_api import sync_playwright,expect
 import _previews  # noqa: F401  (docs/ previews only with UPDATE_DOCS_PREVIEWS=1)
 ROOT=Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ try:
   page.click('#assessmentStatus');expect(page.locator('#actionDialog')).not_to_be_visible()
   page.evaluate('SimRemote.command({type:"assessment",op:"finish"})');assert page.evaluate('SimAssessmentUI.snapshot().session.status')=='ended'
   # A source-timed refuge exercise starts its 4m30s timer, not an invented operation-subject duration.
-  page.evaluate("SimMMI.open('scenario')");page.select_option('#scSelect','geumcheon-6');expect(page.locator('#scTimeLimit')).to_have_value('270');page.click('#scStart');page.click('#pauseBtn');assert page.evaluate('SimAssessmentUI.snapshot().task.limitSeconds')==270;expect(page.locator('#assessmentPhase')).to_contain_text('04:30')
+  page.evaluate("SimMMI.open('scenario')");page.select_option('#scSelect','geumcheon-6');expect(page.locator('#scTimeLimit')).to_have_value('270');page.click('#scStart');page.click('#pauseBtn');assert page.evaluate('SimAssessmentUI.snapshot().task.limitSeconds')==270;expect(page.locator('#assessmentPhase')).to_contain_text(re.compile(r'04:(30|29)'))   # 시작~일시정지 사이 실제 1초는 허용
   page.screenshot(path=str(ROOT.parent/'docs/preview-v0.27.0-countdown-scenario.png'))
   assert not errors,errors;print('PASS legacy menu removed, read-only countdown, shared total budget, ranged scenario limit, pause/skip/navigation, source 4m30 refuge, expiry without false pass or LS blocking');b.close()
 finally:server.shutdown()

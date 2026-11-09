@@ -144,7 +144,7 @@ $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('cont
  }
  if(type==='scan')run({type,scope:checked('mmiScope'),source:'MMI'});
 };
-$('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!paused;window.SimRemote.command({type:'clock',paused});$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
+$('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!window.SimRemote.snapshot.clock.paused;   /* 엔진의 지금 상태 기준 (시나리오 시작 직후 화면 변수가 아직 안 바뀐 때 반대로 눌리던 것) */window.SimRemote.command({type:'clock',paused});$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
 $('resetBtn').onclick=async()=>{
  if(!confirm('프로그램을 완전히 초기화할까요?\n\n모든 역의 진로·열차번호·설비, 교육 진행·결과, 추가한 문제·상황·시나리오·스케줄, 사용자·환경설정을 삭제합니다. 시간표와 진행 중인 교육이 없는 빈 상태로 돌아가며 저장된 자동 복구 백업도 새 상태로 교체합니다. FTS 선택용 프리셋은 유지합니다. 이 작업은 되돌릴 수 없습니다.'))return;
  const button=$('resetBtn');button.disabled=true;window.SimResetting=true;

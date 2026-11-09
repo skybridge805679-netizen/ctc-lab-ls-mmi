@@ -1,4 +1,5 @@
 """관제 실기 시나리오 (부본선 대피 5종) (Chromium)."""
+from sample_timetable_fixture import insert_sample_timetable
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -17,7 +18,7 @@ def run(page, url):
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.clock.install()
-    page.goto(url, wait_until='networkidle')
+    page.goto(url, wait_until='networkidle'); insert_sample_timetable(page)   # 앱은 빈 시간표로 시작한다
     page.locator('#pauseBtn').click()
     page.evaluate("SimMMI.open('scenario')")
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')

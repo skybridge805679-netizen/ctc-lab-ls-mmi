@@ -26,7 +26,7 @@ function defaults(){
 function persist(){const r=remote({op:'library',library:lib});if(!r.ok){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);alert(r.message);return false;}save(KEY.lib,lib);return true;}
 const activeLibrary=()=>root.SimRemote.snapshot.ftsRunLibrary||lib;
 function remote(action){const result=root.SimRemote.command({type:'fts',...action});syncRemote();return result;}
-function syncRemote(){const value=root.SimRemote.snapshot.fts;if(!value)return;if(remoteRevision!==value.revision){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);remoteRevision=value.revision;}session=value.session;users=structuredClone(value.users);history=structuredClone(value.history);}
+function syncRemote(){const value=root.SimRemote.snapshot.fts;if(!value)return;if(remoteRevision!==value.revision&&root.SimRemote.snapshot.ftsLibrary){lib=structuredClone(root.SimRemote.snapshot.ftsLibrary);remoteRevision=value.revision;}   /* 초기화 직후 라이브러리가 아직 안 왔으면 지금 것을 두고 다음 동기화에서 받는다 (lib=null로 FTS 화면 오류) */session=value.session;users=structuredClone(value.users);history=structuredClone(value.history);}
 
 const SECTIONS=['지하청량리-수원','지하청량리-영등포','지하청량리-지하서울','노량진-금천구청','용산-수원','영등포-수원'];
 
@@ -497,7 +497,8 @@ function init(api){
  timer=setInterval(()=>{try{tick();const el=$('mElapsed'),pb=$('pbElapsed');if(session&&!session.finished){const it=session.items[session.current];if(it?.startedAt!=null){if(el)el.value=clockText(now()-it.startedAt);if(pb)pb.textContent=clockText(now()-it.startedAt);}}}catch(e){console.error(e);}},500);
 }
 function open(){
- if(!panel())return false;go(page);
+ if(!panel()||!lib||!users)return false;   // 초기화(전체 초기화 후 다시 올라오는 중) 전에는 열지 않는다
+ go(page);
  if(root.SimWorkspace?.openFts?.())return true;           // independent window
  panel().hidden=false;panel().classList.add('fts-inline');panel().scrollIntoView({block:'start'});return true;   // pop-ups blocked: in the LS page
 }

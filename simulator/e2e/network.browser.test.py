@@ -139,8 +139,9 @@ def check(page, url, screenshot=False):
     with page.expect_download() as download_info:
         page.locator('#graphExport').click()
     exported = json.loads(Path(download_info.value.path()).read_text())
-    assert len(exported['trains']) == 12 and exported['sampleSchedule']
-    assert exported['changes'][0] == {'type': 'delay', 'id': 'K1131', 'station': 'guro', 'minutes': 2}
+    assert len(exported['trains']) == 12 and exported['schemaVersion'] == 1 and exported['kind'] == 'CTC LAB training timetable'   # sampleSchedule 표시는 빈 시작(v0.39.x) 때 없어졌다
+    assert exported['changes'][0] == {'type': 'import', 'count': 12}   # 시간표 불러오기도 변경 기록에 남는다
+    assert exported['changes'][1] == {'type': 'delay', 'id': 'K1131', 'station': 'guro', 'minutes': 2}
     page.locator('#graphFrom').select_option('suwon')
     page.locator('#graphTo').select_option('guro')
     expect(page.locator('#graphMessage')).to_contain_text('시작역')
