@@ -51,7 +51,7 @@ try:
                 box = page.evaluate("""()=>{const s=document.querySelector('#trackSvg').getBoundingClientRect(),h=document.querySelector('#lsStage').getBoundingClientRect(),g=document.querySelector('#trackSvg').getBBox(),v=document.querySelector('#trackSvg').viewBox.baseVal;return {fill:s.width/h.width,left:g.x,right:v.width-(g.x+g.width),top:g.y,bottom:v.height-(g.y+g.height)}}""")
                 if width == 1440:
                     assert box['fill'] > 0.9, box
-                assert stage.locator('#trackSvg').evaluate('(s)=>s.getBoundingClientRect().width <= s.parentElement.clientWidth+1'), 'diagram is cropped inside station screen'
+                assert page.evaluate("()=>{const s=document.querySelector('#lsStage #trackSvg');return s.getBoundingClientRect().width <= s.parentElement.clientWidth+1}"), 'diagram is cropped inside station screen'   # 다시 그려져도 지금 그림으로 본다
                 assert abs(box['left'] - box['right']) < 90, box
                 assert abs(box['top'] - box['bottom']) < 100, (station, box)   # 무대 비율을 따라 높아진 화면에서도 그림은 위아래 가운데
                 assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'page scrolls horizontally'
