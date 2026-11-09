@@ -47,7 +47,10 @@ function drawTracks(){
  if(window.SimExtraLS)document.title='ORPHEIA · LS · '+window.SimLSPresets.get(selectedView).name;
  $('lsStage').innerHTML=head+`<svg id="trackSvg" class="ls-svg" data-monitor="${monitor}" viewBox="0 0 ${view.width} ${view.height}" role="img" aria-label="${escapeHTML(window.SimLSPresets.get(selectedView).name)} LS 선로 배선">${view.svg}</svg>`;
  window.SimLSUI.decorate();drawBoard();if(!monitor)window.SimEquipment?.paint(selectedStation);
+ fitControls();
 }
+// 무대가 좁으면(옆 패널을 연 경우 등) 위 제어 단추 줄을 칸에 맞게 줄인다: 넘치면 양옆 노란 화살표를 덮어 누를 수 없었다
+function fitControls(){const c=$('lsStage').querySelector('.ls-controls');if(!c||!c.children.length)return;c.style.zoom='';const gap=parseFloat(getComputedStyle(c).columnGap)||0,need=[...c.children].reduce((s,e)=>s+e.getBoundingClientRect().width,0)+gap*(c.children.length-1);if(need>c.clientWidth+1)c.style.zoom=String(Math.max(.5,(c.clientWidth-2)/need));}
 $('routeEvidence').onclick=e=>{const tg=e.target.closest('[data-approach-toggle]');if(tg){run({type:'approach',signal:tg.dataset.approachToggle,present:!state.approach?.[tg.dataset.approachToggle],source:'모의운행'});return;}const enter=e.target.closest('[data-sim-enter]'),clear=e.target.closest('[data-sim-clear]');if(enter)run({type:'occupy',id:enter.dataset.simEnter,source:'모의운행'});if(clear)run({type:'clear',id:clear.dataset.simClear,source:'모의운행'});};
 function selectStation(id,scroll=true){
  const view=window.SimLSPresets.get(id);if(!view)return;id=view.station;

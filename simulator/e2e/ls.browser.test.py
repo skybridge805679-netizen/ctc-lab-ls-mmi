@@ -53,7 +53,7 @@ try:
                     assert box['fill'] > 0.9, box
                 assert stage.locator('#trackSvg').evaluate('(s)=>s.getBoundingClientRect().width <= s.parentElement.clientWidth+1'), 'diagram is cropped inside station screen'
                 assert abs(box['left'] - box['right']) < 90, box
-                assert box['top'] < 160 and box['bottom'] < 250, box
+                assert abs(box['top'] - box['bottom']) < 100, (station, box)   # 무대 비율을 따라 높아진 화면에서도 그림은 위아래 가운데
                 assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'page scrolls horizontally'
                 stage.locator('[data-mode="CCM"]').click(); page.locator('#dialogConfirm').click()
                 expect(page.locator('#stateMode')).to_have_text('CCM')

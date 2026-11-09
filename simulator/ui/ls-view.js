@@ -83,7 +83,9 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  const xAt=x=>{let i=0;while(i<weights.length-1&&x>knots[i+1])i++;return PADDING+(cumulative[i]+(x-knots[i])*weights[i])*(WIDTH-2*PADDING)/cumulative.at(-1);};
  /* 이어지는 화면(지하청량리~지하서울)은 본선 두 줄을 모든 화면에서 같은 높이에 둔다 (ls-xmap-overrides rows: 원본 y → 화면 y) */
  const rowFix=xmap?.rows?.length===2?xmap.rows:null,syR=rowFix?(rowFix[1][1]-rowFix[0][1])/(rowFix[1][0]-rowFix[0][0]):sy;
- const yAt=rowFix?y=>rowFix[0][1]+(y-rowFix[0][0])*syR:y=>top+(y-minY)*sy;
+ /* 화면이 기본(713)보다 높으면 네 화면 모두 같은 만큼 내려 가운데에 둔다 (이음은 유지) */
+ const rowShift=rowFix&&targetH?Math.max(0,Math.round((targetH-713)/2)):0;
+ const yAt=rowFix?y=>rowFix[0][1]+rowShift+(y-rowFix[0][0])*syR:y=>top+(y-minY)*sy;
  if(xmap){const k=WIDTH/xmap.width,orig=xmap.knots.map(([a,b])=>[a,b*k]);let knots=orig;
   // 시저스(X자 건넘선)는 세로 간격에 비해 가로가 좁으면 기둥처럼 보인다: 높이의 0.8배 이상 가로폭을 확보하고, 늘린 만큼 좌우 구간을 비례해 줄인다
   // 원본 좌표 화면에서는 칸 경계를 움직이지 않는다: 시저스가 높이의 0.8배보다 좁으면 X 그림만 양옆으로 늘린다 (금천구청 21·22)
