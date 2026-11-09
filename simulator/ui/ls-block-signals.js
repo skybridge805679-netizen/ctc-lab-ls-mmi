@@ -7,7 +7,8 @@ function build(st,def,cells,T,visibleOnly=false){
   const cell=cells.find(c=>c.label.replaceAll(' · ','')===code);
   const rail=def.rails.find(r=>r[3]===code||r[4]===code||r[0]===code);
   let x,y;
-  let cellY;if(cell){x=cell.x+cell.width*item.fraction;y=cell.y;cellY=cell.y;}
+  let cellY;if(item.anchorPoint){[x,y]=T(item.anchorPoint);x-=20;cellY=y;item={...item,railEnd:'right'};}   /* 칸 없는 꺾인 선로 줄 끝 (노량진 B619T1T 위 줄의 5) */
+  else if(cell){x=cell.x+cell.width*item.fraction;y=cell.y;cellY=cell.y;}
   else if(rail){const p=rail[3]===code?rail[1][0]:rail[4]===code?rail[1].at(-1):[rail[2],railY(def,rail[0],rail[2])];[x,y]=T(p);x+=rail[3]===code?20:/^B\d+T/.test(code)?20:-20;cellY=y;item={...item,railEnd:rail[3]===code?'left':rail[4]===code?'right':null};}   /* 칸 없는 선로 회로도 그 줄 경계에 맞춘다 */
   else {if(visibleOnly)return null;throw new Error(st.id+' block number anchor missing: '+code);}
   x=Math.max(22,Math.min(1578,x));y+=item.side==='above'?-17:17;

@@ -2445,7 +2445,12 @@
       "side": "below",
       "fraction": 0.9089,
       "stem": "right",
-      "reviewed": true
+      "reviewed": true,
+      "anchorPoint": [
+        1346,
+        407.9
+      ],
+      "note": "원본: B619T1T가 꺾여 올라간 줄(slide y 452~469)의 오른쪽 끝 아래"
     },
     {
       "id": "ppt-8-32-505",

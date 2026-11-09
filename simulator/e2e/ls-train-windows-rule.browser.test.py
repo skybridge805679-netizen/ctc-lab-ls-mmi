@@ -28,8 +28,8 @@ try:
             for r in page.evaluate(JS):
                 rows += 1; centred += abs(r['dx']) <= 40   # 원본 위치에서 40px 안 (시저스 폭 보정·화면 끝 여백)
                 if r['crossed']: crossed.append(f"{st} {r['slot']}")
-        # 노량진 B618T2T 하나는 원본에서도 선로가 화면 끝에서 꺾여 올라가는 자리라 띠가 없다 (예외로 둔다)
-        assert crossed == ['noryangjin B618T2T'], crossed
+        # 노량진 B618T2T도 원본처럼 1T 위 줄로 올라가 예외가 없다
+        assert crossed == [], crossed
         assert rows >= 160 and centred / rows >= .85, (rows, centred)
         # 꺾이는 곳: 어느 역에서도 가로선이 꺾인 꼭짓점 바깥으로 1~40px 튀어나오지 않는다 (구로 55T 모서리 포함)
         STUB = """()=>{const P=[...document.querySelectorAll('#trackSvg .rail-network path')].map(p=>(p.getAttribute('d').match(/-?[\\d.]+/g)||[]).map(Number)).map(a=>{const o=[];for(let i=0;i+1<a.length;i+=2)o.push([a[i],a[i+1]]);return o;});
