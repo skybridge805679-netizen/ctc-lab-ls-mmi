@@ -657,7 +657,9 @@ function render(st,def,core,model,neighbours={}){
   const reach=sigReach(id,X,dir),LY=lampLY(s),lampX=X+dir*reach;
   const labelY=nameY.get(id);
   const go=model.signals[id]==='GO',locked=Object.entries(model.routes).some(([rid,r])=>r.lock&&core.routes[rid].signal===id);
-  const shape=`<rect class="signal-body" x="${Math.min(X,lampX)-3}" y="${LY-7}" width="${reach+10}" height="14" rx="7"/>${reach>18?`<circle class="lamp off" cx="${lampX-dir*13}" cy="${LY}" r="6"/>`:''}<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
+  /* 입환표지는 등이 기둥에서 멀어도(구로 23) 등 하나짜리 짧은 몸체: 몸체는 등 쪽 끝에만, 기둥에서 몸체까지는 마스트 선 */
+  const shunt=kind==='입환'&&reach>18,bodyX=shunt?lampX-dir*18:X,bodyR=shunt?18:reach;
+  const shape=`<rect class="signal-body" x="${Math.min(bodyX,lampX)-3}" y="${LY-7}" width="${bodyR+10}" height="14" rx="7"/>${reach>18&&!shunt?`<circle class="lamp off" cx="${lampX-dir*13}" cy="${LY}" r="6"/>`:''}<circle class="lamp ${go?'go':'stop'} ${locked?'lock':''}" cx="${lampX}" cy="${LY}" r="6"/>`;
   const box=dir===1?[X-30,LY-8,X+reach+7,LY+8]:[X-reach-7,LY-8,X+30,LY+8];
   // 신호기 이름이 승강장 표시에 걸리면 마스트 반대쪽에 쓴다 (동묘앞 23)
   // 원본: 이름은 등 반대쪽. 열번창·승강장에 조금 걸리면 위아래로 8px까지 비키고, 그래도 안 되면 등 너머(몸체 밖)에 쓴다 (구로 3C·4A)
