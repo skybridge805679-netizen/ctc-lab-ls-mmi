@@ -64,12 +64,10 @@ for st in info:
  caps=[local(p) for p in symbols[st['page']] if bx<=p[0]<=bx+bw and by<=p[1]<=by+bh]
  markers={2:[[20,350,'SP']],3:[[1310,104,'SP'],[443,435,'SS']],4:[[315,295,'SP'],[1190,270,'SS']]}
  markers=[local(p) for p in markers[st['page']] if bx<=p[0]<=bx+bw and by<=p[1]<=by+bh]
- # 원본 LS 안양 화면(slide12)에는 SP 표지가 없다 (전체노선 배선도에만 있음)
- if st['id']=='anyang':markers=[m for m in markers if m[2]!='SP']
- # 원본 LS 구로 화면(slide10)에도 SS 표지가 없다
- if st['id']=='guro':markers=[m for m in markers if m[2]!='SS']
- # 원본 LS 노량진(slide8)·서울(slide6) 역 화면에는 SP 표지가 없고, 제어영역 전체 화면(LS2 오버뷰, 2026-11-10 사진)에는 있다: 오버뷰 전용으로 표시
- if st['id'] in ('noryangjin','seoul'):markers=[m+['overview'] if m[2]=='SP' else m for m in markers]
+ # 원본 LS 역 화면(서울 slide6·노량진 slide8·구로 slide10·안양 slide12)에는 SP/SS 표지가 없고,
+ # 제어영역 전체 화면(LS2 오버뷰·GS DLP, 2026-11-10 사진)에는 있다: 오버뷰 전용으로 표시
+ overview_only={'seoul':'SP','noryangjin':'SP','anyang':'SP','guro':'SS'}
+ if st['id'] in overview_only:markers=[m+['overview'] if m[2]==overview_only[st['id']] else m for m in markers]
  # Short white glyph fragments inside a crossover are not track-circuit beds.
  # Keep named sections and long uncontrolled through tracks; reject only short,
  # unnamed fragments off every surveyed horizontal rail centreline.
