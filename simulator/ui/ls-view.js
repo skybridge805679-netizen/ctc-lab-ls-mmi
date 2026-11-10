@@ -412,7 +412,9 @@ function render(st,def,core,model,neighbours={}){
   // 열번칸은 자기 선로와 그쪽 이웃 선로 사이(띠)에만 둔다 — 다른 선로를 건너가지 않는다. 띠 안에서는 선로에 가장 가까운 빈자리.
   const side=lane[0].item.side,cy=lane[0].cy,H=20,trackRows=[...new Set(cellRows.map(r=>Math.round(r.y)).concat(rows.map(y=>Math.round(T([0,y])[1]))))];
   const neighbour=lane[0].lane.includes('|')?laneNeighbour(lane[0]):side==='above'?Math.max(-Infinity,...trackRows.filter(y=>y<cy-3)):Math.min(Infinity,...trackRows.filter(y=>y>cy+3));
-  const near=BAR/2+3,far=Number.isFinite(neighbour)?Math.abs(neighbour-cy)-BAR/2-3-H:110;
+  /* 원본 좌표 화면에서 줄 간격이 좁으면(넓은 창의 구로 등) 원본처럼 선로에 바짝(1px) 붙여서라도 줄 사이에 둔다: 안 그러면 다른 선로 너머로 밀린다 */
+  const m0=3,m1=L.xmap&&Number.isFinite(neighbour)&&Math.abs(neighbour-cy)-BAR-2*m0-H<0?1:m0;
+  const near=BAR/2+m1,far=Number.isFinite(neighbour)?Math.abs(neighbour-cy)-BAR/2-m1-H:110;
   const band=far>=near?Array.from({length:Math.floor((far-near)/2)+1},(_,i)=>side==='above'?-(near+H+i*2):near+i*2):[];
   const EDGE=4,preferred=side==='above'?-50:30,wide=Array.from({length:41},(_,i)=>side==='above'?-28-i*2:20+i*2).sort((a,b)=>Math.abs(a-preferred)-Math.abs(b-preferred));
   const search=(deltas,inBand)=>{let best;
@@ -581,7 +583,7 @@ function render(st,def,core,model,neighbours={}){
   symbols+=`<g class="source-bracket-pair" data-source-symbol="bracket-pair" data-source-bracket="${esc(b.id)}" pointer-events="none"><path d="${shape(x,1)}"/><path d="${shape(right,-1)}"/><title>원본 대향 괄호 표식 · ${esc(b.id)}</title></g>`;
  }
  for(const c of captionBoxes){
-  annotations+=`<g class="source-caption" data-source-caption="${esc(c.id)}" pointer-events="none"><rect class="caption-surface" x="${c.box[0]}" y="${c.box[1]}" width="${c.box[2]-c.box[0]}" height="${c.box[3]-c.box[1]}" rx="6"/><path class="caption-accent" d="M${c.box[0]+1} ${c.box[1]+11}V${c.box[3]-11}"/>${c.lines.map((line,i)=>{const ly=c.rowYs?c.rowYs[i]+(c.y-(c.rowYs[0]+c.rowYs.at(-1))/2):c.y+(i-(c.lines.length-1)/2)*22,lx=c.notes?c.box[0]+16+Math.max(...c.lines.map(t=>t.length))*15/2:c.x;return `<text x="${lx}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`+(c.notes?.[i]?`<text class="caption-note" x="${c.box[2]-16-(c.notesW-22)/2}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(c.notes[i])}</text>`:'');}).join('')}</g>`;
+  annotations+=`<g class="source-caption${L.xmap?" plain":""}" data-source-caption="${esc(c.id)}" pointer-events="none"><rect class="caption-surface" x="${c.box[0]}" y="${c.box[1]}" width="${c.box[2]-c.box[0]}" height="${c.box[3]-c.box[1]}" rx="6"/><path class="caption-accent" d="M${c.box[0]+1} ${c.box[1]+11}V${c.box[3]-11}"/>${c.lines.map((line,i)=>{const ly=c.rowYs?c.rowYs[i]+(c.y-(c.rowYs[0]+c.rowYs.at(-1))/2):c.y+(i-(c.lines.length-1)/2)*22,lx=c.notes?c.box[0]+16+Math.max(...c.lines.map(t=>t.length))*15/2:c.x;return `<text x="${lx}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(line)}</text>`+(c.notes?.[i]?`<text class="caption-note" x="${c.box[2]-16-(c.notesW-22)/2}" y="${ly}" dominant-baseline="central" text-anchor="middle">${esc(c.notes[i])}</text>`:'');}).join('')}</g>`;
  }
  symbols+=blockView.render(capsulePositions);
  const segments=[...paths.flatMap(poly=>poly.slice(1).map((p,i)=>[poly[i],p])),...def.links.map(([,a,x,b,z])=>[T([x,railY(def,a,x)]),T([z,railY(def,b,z)])])];

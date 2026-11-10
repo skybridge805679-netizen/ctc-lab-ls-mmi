@@ -7671,7 +7671,7 @@
    ]
   ],
   "rows": [],
-  "platformAdjacent": false,
+  "platformAdjacent": true,
   "knots": [
    [
     9.6,
