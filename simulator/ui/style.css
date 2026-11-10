@@ -175,7 +175,8 @@ main{margin-left:0;max-width:none;width:100%;padding:20px 24px 0}header{margin-b
 /* Keep right-angle yard returns square; acute switch strokes retain their own join rule. */
 .ls-svg .rail-network path{stroke-linejoin:miter;stroke-miterlimit:2}
 
-.ls-overview{max-width:none;width:98vw;height:94vh;background:#686d68;padding:10px 14px;overflow:hidden;color:#f4f4ef}
+.ls-overview{max-width:none;max-height:none;width:100vw;height:100vh;margin:0;border:0;border-radius:0;background:#686d68;padding:6px 10px;overflow:hidden;color:#f4f4ef}   /* 화면 전체 (베타 피드백) */
+.ls-overview-tools{display:flex;gap:6px;align-items:center}.ls-overview-tools span{min-width:52px;text-align:center;font-size:13px}.ls-overview-canvas{cursor:grab}.ls-overview-canvas.panning{cursor:grabbing}
 .ls-overview[open]{display:flex;flex-direction:column}.ls-overview header{flex:none;height:36px;margin:0}.ls-overview h2{font-size:15px;margin:0}.ls-overview header button{padding:4px 18px;background:#e5efeb;color:#173b40}
 .ls-overview-canvas{flex:1;min-height:0;overflow:hidden}.ls-overview-canvas>.overview-network{width:100%;height:100%;min-width:0;display:block}
 .overview-link{fill:none;stroke:#f4f4ef;stroke-width:18;stroke-linejoin:miter;stroke-miterlimit:2;stroke-linecap:butt}

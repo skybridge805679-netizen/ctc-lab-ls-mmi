@@ -7,7 +7,7 @@ test('continuous overview uses native source scale, correct boundary families an
  for(const j of v.joins){const a=v.panels.find(p=>p.id===j.fromStation),b=v.panels.find(p=>p.id===j.toStation),pa=a.ports.find(p=>p.side==='right'&&p.key===j.trunk),pb=b.ports.find(p=>p.side==='left'&&p.key===j.trunk);assert(pa&&pb);assert(Math.hypot(j.from[0]-a.x-pa.at[0]*a.scale,j.from[1]-a.y-pa.at[1]*a.scale)<1e-7);assert(Math.hypot(j.to[0]-b.x-pb.at[0]*b.scale,j.to[1]-b.y-pb.at[1]*b.scale)<1e-7);for(let i=1;i<j.points.length;i++)assert(j.points[i][0]===j.points[i-1][0]||j.points[i][1]===j.points[i-1][1]);}
 });
 test('photo regions have the exact station ranges and row breaks, fill each row and center vertically',()=>{
- const expected=[['north',[5,3],8,16],['south',[4,3],10,20],['central',[4],4,12]];
+ const expected=[['north',[4,4],8,18],['south',[4,3],10,20],['central',[4],4,12]];
  for(const [key,lengths,targets,links]of expected){
   const region=O.REGIONS.find(r=>r.id===key),v=O.build(region.rows.flat(),states,{}, {aspect:1.6});
   assert.equal(v.region,key);assert.deepEqual(v.rows.map(r=>r.panels.length),lengths);assert.deepEqual(v.rows.map(r=>r.panels.map(p=>p.id)),region.rows);

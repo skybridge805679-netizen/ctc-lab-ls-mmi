@@ -55,14 +55,23 @@ function scan(scope){cancelPending();closeMenu();host.openAction('베이스스�
 function refreshOverview(){
  const occupied=Object.fromEntries(overviewIds.map(id=>[id,new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[id],t.uid))).map(([slot])=>slot))]));
  const focused=document.activeElement?.closest('[data-overview-station]')?.dataset.overviewStation;
- const canvas=dialog.querySelector('.ls-overview-canvas'),view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied,{aspect:canvas.clientWidth/canvas.clientHeight});canvas.innerHTML=view.svg;dialog.querySelector('h2').textContent='L/S Overview · '+(root.SimLSOverview.REGIONS.find(r=>r.id===view.region)?.name||'전체 관제구간');
+ const canvas=dialog.querySelector('.ls-overview-canvas'),view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied,{aspect:canvas.clientWidth/canvas.clientHeight});canvas.innerHTML=view.svg;overviewView(view);dialog.querySelector('h2').textContent='L/S Overview · '+(root.SimLSOverview.REGIONS.find(r=>r.id===view.region)?.name||'전체 관제구간');
  for(const svg of dialog.querySelectorAll('[data-overview-detail]'))decorate(svg,svg.dataset.overviewDetail,true);
  if(focused)dialog.querySelector(`[data-overview-station="${focused}"]`)?.focus({preventScroll:true});
 }
+// 오버뷰 확대·이동 (베타 피드백: 더 크게 보고 싶다): 휠·+/− 단추로 확대, 끌어서 이동, 「맞춤」으로 전체. 1초마다 다시 그려도 보던 자리를 지킨다
+let ovZoom=null;
+function overviewView(view){const svg=dialog.querySelector('.overview-network');if(!svg)return;const full=[0,0,view.width,view.height];if(!ovZoom||ovZoom.full[2]!==view.width||ovZoom.full[3]!==view.height)ovZoom={full,box:[...full]};svg.setAttribute('viewBox',ovZoom.box.join(' '));const z=dialog.querySelector('#lsOverviewZoom');if(z)z.textContent=Math.round(ovZoom.full[2]/ovZoom.box[2]*100)+'%';}
+function zoomOverview(f,cx=.5,cy=.5){if(!ovZoom)return;const [fx,fy,fw,fh]=ovZoom.full,[x,y,w,h]=ovZoom.box,nw=Math.min(fw,Math.max(fw/8,w/f)),nh=nw*fh/fw,px=x+w*cx,py=y+h*cy;ovZoom.box=[Math.min(fx+fw-nw,Math.max(fx,px-nw*cx)),Math.min(fy+fh-nh,Math.max(fy,py-nh*cy)),nw,nh];overviewView({width:fw,height:fh});}
 function overview(ids){
- cancelPending();closeMenu();clearInterval(overviewTimer);overviewIds=ids;dialog.innerHTML='<header><h2>L/S Overview</h2><button type="button" id="lsOverviewClose">닫기</button></header><div class="ls-overview-canvas"></div>';
+ cancelPending();closeMenu();clearInterval(overviewTimer);overviewIds=ids;ovZoom=null;dialog.innerHTML='<header><h2>L/S Overview</h2><div class="ls-overview-tools"><button type="button" data-ov-zoom="out" aria-label="축소">−</button><span id="lsOverviewZoom">100%</span><button type="button" data-ov-zoom="in" aria-label="확대">+</button><button type="button" data-ov-zoom="fit">맞춤</button><button type="button" id="lsOverviewClose">닫기</button></div></header><div class="ls-overview-canvas"></div>';
+ dialog.querySelectorAll('[data-ov-zoom]').forEach(b=>b.onclick=()=>{const k=b.dataset.ovZoom;if(k==='fit'){ovZoom.box=[...ovZoom.full];overviewView({width:ovZoom.full[2],height:ovZoom.full[3]});}else zoomOverview(k==='in'?1.4:1/1.4);});
  $('lsOverviewClose').onclick=()=>dialog.close();const canvas=dialog.querySelector('.ls-overview-canvas');
- const select=e=>{const target=e.target.closest('[data-overview-station]');if(target){dialog.close();host.selectStation(target.dataset.overviewStation);}};canvas.onclick=select;canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}};
+ let pan=null;canvas.onwheel=e=>{e.preventDefault();const r=canvas.querySelector('.overview-network').getBoundingClientRect();zoomOverview(e.deltaY<0?1.2:1/1.2,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);};
+ canvas.onpointerdown=e=>{if(e.button!==0||!ovZoom)return;pan={x:e.clientX,y:e.clientY,box:[...ovZoom.box],moved:false};};
+ canvas.onpointermove=e=>{if(!pan)return;const r=canvas.querySelector('.overview-network').getBoundingClientRect(),k=pan.box[2]/r.width,dx=(e.clientX-pan.x)*k,dy=(e.clientY-pan.y)*k;if(Math.abs(e.clientX-pan.x)+Math.abs(e.clientY-pan.y)>4)pan.moved=true;if(!pan.moved)return;const [fx,fy,fw,fh]=ovZoom.full,[x,y,w,h]=pan.box;ovZoom.box=[Math.min(fx+fw-w,Math.max(fx,x-dx)),Math.min(fy+fh-h,Math.max(fy,y-dy)),w,h];overviewView({width:fw,height:fh});canvas.classList.add('panning');};
+ canvas.onpointerup=()=>{setTimeout(()=>{pan=null;canvas.classList.remove('panning');},0);};
+ const select=e=>{if(pan?.moved)return;const target=e.target.closest('[data-overview-station]');if(target){dialog.close();host.selectStation(target.dataset.overviewStation);}};canvas.onclick=select;canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}};
  dialog.showModal();refreshOverview();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
 }
 function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id);return [

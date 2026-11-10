@@ -68,10 +68,8 @@ for st in info:
  if st['id']=='anyang':markers=[m for m in markers if m[2]!='SP']
  # 원본 LS 구로 화면(slide10)에도 SS 표지가 없다
  if st['id']=='guro':markers=[m for m in markers if m[2]!='SS']
- # 원본 LS 노량진 화면(slide8)에도 SP 표지가 없다
- if st['id']=='noryangjin':markers=[m for m in markers if m[2]!='SP']
- # 원본 LS 서울 화면(slide6)에도 SP 표지가 없다
- if st['id']=='seoul':markers=[m for m in markers if m[2]!='SP']
+ # 원본 LS 노량진(slide8)·서울(slide6) 역 화면에는 SP 표지가 없고, 제어영역 전체 화면(LS2 오버뷰, 2026-11-10 사진)에는 있다: 오버뷰 전용으로 표시
+ if st['id'] in ('noryangjin','seoul'):markers=[m+['overview'] if m[2]=='SP' else m for m in markers]
  # Short white glyph fragments inside a crossover are not track-circuit beds.
  # Keep named sections and long uncontrolled through tracks; reject only short,
  # unnamed fragments off every surveyed horizontal rail centreline.

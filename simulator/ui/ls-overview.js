@@ -3,7 +3,7 @@ const node=typeof module!=='undefined',N=node?require('../engine/network'):root.
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const median=a=>[...a].sort((x,y)=>x-y)[Math.floor(a.length/2)]||0;
 const REGIONS=[
- {id:'north',name:'[청량리 - 영등포]',rows:[['cheongnyangni','dongmyo','jonggak','underground-seoul','seoul'],['yongsan','noryangjin','yeongdeungpo']]},
+ {id:'north',name:'[청량리 - 영등포]',rows:[['cheongnyangni','dongmyo','jonggak','underground-seoul'],['seoul','yongsan','noryangjin','yeongdeungpo']]},   // 실제 LS2 제어영역 화면(2026-11-10 사진): 4역씩 두 줄
  {id:'south',name:'[구로 - 수원]',rows:[['guro','geumcheon','anyang','geumjeong'],['gunpo','uiwang','suwon']]},
  {id:'central',name:'[노량진 - 금천구청]',rows:[['noryangjin','yeongdeungpo','guro','geumcheon']]}
 ];

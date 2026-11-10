@@ -65,7 +65,8 @@ test('source station tracks, platforms, circuit identifiers and SP/SS symbols ar
  for(const st of controlled){const C=Core.forStation(st.id),svg=LS.render(st,W.data[st.id],C,C.initial()).svg;
   assert(svg.includes('data-track-section='),st.id);assert(svg.includes('data-circuit-label='),st.id);
   assert.equal((svg.match(/class="platform /g)||[]).length,LS.wingOf(st,W.data[st.id]).platforms.length,st.id);
-  for(const [,,label]of details[st.id].markers)assert(svg.includes('data-source-symbol="'+label+'"'),st.id+' '+label);
+  for(const [,,label,only]of details[st.id].markers)if(only!=='overview')assert(svg.includes('data-source-symbol="'+label+'"'),st.id+' '+label);
+  if(details[st.id].markers.some(m=>m[3]==='overview'))assert(LS.render(st,W.data[st.id],C,C.initial(),{overview:true}).svg.includes('data-source-symbol="SP"'),st.id+' overview SP');   // 서울·노량진 SP는 오버뷰에만
  }
  const C=Core.forStation('geumjeong'),svg=LS.render(N.catalog.geumjeong,W.data.geumjeong,C,C.initial()).svg;
  assert(svg.includes('B996T'));assert(svg.includes('B995T'));

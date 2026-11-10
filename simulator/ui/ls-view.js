@@ -57,7 +57,7 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  for(const p of wing.platforms){xs.push(p[0],p[2]);ys.push(p[1],p[3]);}
  for(const p of wing.plates)xs.push(p.box[0],p.box[2]);
  for(const s of wing.signals){xs.push(s[0]);ys.push(s[1]);}
- for(const [x,y]of wing.markers||[]){xs.push(x-14,x+14);}
+ for(const [x,y,,only]of wing.markers||[]){if(only==='overview'&&!native)continue;xs.push(x-14,x+14);}
  for(const b of wing.fixed?.brackets||[]){const [x,y,w,h]=b.bounds;xs.push(x,x+w);ys.push(y,y+h);}
  for(const c of wing.fixed?.captions||[]){xs.push(c.at[0]-55,c.at[0]+55);ys.push(c.at[1]-10,c.at[1]+10);}
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
@@ -401,7 +401,7 @@ function render(st,def,core,model,neighbours={}){
  // A shared baseline for each rail/side prevents staircase placement. Reserve signals and platforms first.
  const windowTop=Math.min(...paths.flat().map(p=>p[1]));
  for(const plate of wing.plates){const [a]=T([plate.box[0],0]),[b]=T([plate.box[2],0]),own=platformBoxes.filter(pb=>pb.stop?.name===plate.name).sort((a,b)=>a.y-b.y)[0],w=plateW(plate,Math.max(b-a,plate.name.length*16+18)),x=plateAt(plate,plateX(own?(own.x+own.right)/2:(a+b)/2,w)),py=plateY(plate,Math.max(8,windowTop-plateGap));obstacles.push([x-w/2,py,x+w/2,py+25]);}
- for(const [x,y,kind]of data.markers){const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
+ for(const [x,y,kind,only]of data.markers){if(only==='overview'&&!neighbours.overview)continue;const [X]=T([x,y]),Y=Math.max(44,windowTop-44,T([x,y])[1]);obstacles.push([X-17,Y-26,X+17,Y+26]);}
  // 화면 좌우 끝 선로명(하1선·상1선 …)이 들어갈 자리를 먼저 비워 둔다: 하선 이름은 선로 위, 상선 이름은 선로 아래 (ls-seams와 같은 규칙)
  for(const p of edgePorts){if(true)continue;   /* 선로명 표기 삭제(원본에 없음): 자리 예약도 하지 않는다 */const [,py]=T([p.x,p.y]),lw=p.name.includes(' · ')?104:48,lx=p.side==='left'?6:WIDTH-6-lw,dy=/^상/.test(p.name)?34:-18;obstacles.push([lx-8,py+dy-22,lx+lw+8,py+dy+11]);/* 창 상자(±3)와 이름 검사(±3) 여유까지 */}
  /* 원본 좌표로 고정한 칸 위 열번칸은, 그 x 위/아래로 실제로 지나가는 이웃 선로가 다르면 다른 줄(lane)로 둔다.
@@ -577,7 +577,8 @@ function render(st,def,core,model,neighbours={}){
   plates+=`<g class="inter-station" data-inter-station="${esc(plate.name)}"><rect class="plate" x="${x-width/2}" y="${y}" width="${width}" height="25" rx="3"/><text class="plate-name" x="${x}" y="${y+18}" text-anchor="middle">${esc(plate.name)}</text><title>${esc(plate.name)} · 관할 중간역</title></g>`;
   occupiedBoxes.push([x-width/2-3,y-4,x+width/2+3,y+36]);
  }
- for(const [x,y,label]of data.markers){
+ for(const [x,y,label,only]of data.markers){if(only==='overview'&&!neighbours.overview)continue;   // 오버뷰 전용 표지 (서울·노량진 SP)
+
   const [X]=T([x,y]),Y=Math.max(44,topRow-44,T([x,y])[1]);
   symbols+=`<g data-source-symbol="${label}">${label==='SP'?`<path d="M${X-13} ${Y-23}H${X+13}L${X} ${Y}Z" class="sp-board"/><text x="${X}" y="${Y-10}" class="board-label" text-anchor="middle">SP</text>`:`<rect x="${X-9}" y="${Y-23}" width="18" height="28" class="ss-board"/><path d="M${X-8} ${Y+3}L${X+8} ${Y-21}" class="ss-stripe"/><text x="${X}" y="${Y-29}" class="board-label" text-anchor="middle">SS</text>`}<title>원본 ${label} 표지</title></g>`;
   occupiedBoxes.push([X-16,Y-38,X+16,Y+6]);
