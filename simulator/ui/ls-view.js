@@ -72,8 +72,13 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  // 시저스(X자)가 걸친 선로 사이는 화면에서 120px 안쪽으로: 더 벌리면 X가 기둥처럼 길어진다 (지하청량리~지하서울)
  const xspan=Math.max(0,...def.links.filter(([id,a,x,b,z])=>def.links.some(([o,c,u,d,v])=>o!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>Math.abs(railY(def,a,x)-railY(def,b,z))));
  const syCap=xspan?Math.min(SY_MAX,120/xspan):SY_MAX;
- const bottom=64,fill=targetH?(targetH-top-bottom)/Math.max(1,maxY-minY):null,sy=targetH?Math.max(40/pitch,Math.min(syCap,fill)):Math.max(sx,80/pitch);   /* 줄이 많은 화면(구로 8줄)도 화면 높이 안에: 원본 줄 간격은 약 39px */
- if(targetH&&fill>sy)top+=Math.floor((fill-sy)*(maxY-minY)/2);
+ /* 줄이 많아 화면 높이에 맞추면 줄 간격이 좁아지는 화면(구로 8줄): 선로 묶음 사이의 큰 빈 간격(줄 3개 넘게)만 1.9줄로 줄여 줄 간격을 넓힌다.
+    신호기·열번칸이 선로에 바짝 붙어 칸을 가리던 것 (다른 역은 줄 간격이 넉넉해 그대로) */
+ const span0=Math.max(1,maxY-minY),fill0=targetH?(targetH-top-64)/span0:null,cramped=!!xmap&&targetH&&!(xmap.rows?.length)&&Math.min(syCap,fill0)*pitch<56;
+ const gapCut=cramped?railRows.slice(1).map((y,i)=>[railRows[i],y]).filter(([a,b])=>b-a>3*pitch).map(([a,b])=>[a,b,b-a-1.9*pitch]):[];
+ const yC=y=>{let v=y;for(const [a,b,cut] of gapCut){if(y>=b)v-=cut;else if(y>a)v-=cut*(y-a)/(b-a);}return v;};
+ const bottom=64,fill=targetH?(targetH-top-bottom)/Math.max(1,yC(maxY)-yC(minY)):null,sy=targetH?Math.max(40/pitch,Math.min(syCap,fill)):Math.max(sx,80/pitch);   /* 줄이 많은 화면(구로 8줄)도 화면 높이 안에: 원본 줄 간격은 약 39px */
+ if(targetH&&fill>sy)top+=Math.floor((fill-sy)*(yC(maxY)-yC(minY))/2);
  // Reserve the original broad scissors footprint after increasing the rail spacing.
  // One monotone X transform moves rails, cells, signals and active routes together.
  const spans=def.links.filter(([id,a,x,b,z])=>def.links.some(([other,c,u,d,v])=>other!==id&&a===d&&b===c&&Math.abs(x-u)<5&&Math.abs(z-v)<5)).map(([,a,x,b,z])=>[Math.min(x,z),Math.max(x,z),Math.abs(railY(def,a,x)-railY(def,b,z))*sy,railY(def,a,x),railY(def,b,z)]);
@@ -85,7 +90,7 @@ function layout(def,wing,aspect,top=108,native=false,xmap=null){   // top: 원�
  const rowFix=xmap?.rows?.length===2?xmap.rows:null,syR=rowFix?(rowFix[1][1]-rowFix[0][1])/(rowFix[1][0]-rowFix[0][0]):sy;
  /* 화면이 기본(713)보다 높으면 네 화면 모두 같은 만큼 내려 가운데에 둔다 (이음은 유지) */
  const rowShift=rowFix&&targetH?Math.max(0,Math.round((targetH-713)/2)):0;
- const yAt=rowFix?y=>rowFix[0][1]+rowShift+(y-rowFix[0][0])*syR:y=>top+(y-minY)*sy;
+ const yAt=rowFix?y=>rowFix[0][1]+rowShift+(y-rowFix[0][0])*syR:y=>top+(yC(y)-yC(minY))*sy;
  if(xmap){const k=WIDTH/xmap.width,orig=xmap.knots.map(([a,b])=>[a,b*k]);let knots=orig;
   // 시저스(X자 건넘선)는 세로 간격에 비해 가로가 좁으면 기둥처럼 보인다: 높이의 0.8배 이상 가로폭을 확보하고, 늘린 만큼 좌우 구간을 비례해 줄인다
   // 원본 좌표 화면에서는 칸 경계를 움직이지 않는다: 시저스가 높이의 0.8배보다 좁으면 X 그림만 양옆으로 늘린다 (금천구청 21·22)
@@ -627,7 +632,12 @@ function render(st,def,core,model,neighbours={}){
  const placed=def.signals.map(([id,rail,x,lampY,dir])=>{const railLocal=railY(def,rail,x);let [X,Y]=sigBase(id,T([x,railLocal]));if(sigAt.has(id))X=sigAt.get(id);
   {const LY=T([0,lampY])[1],body=x0=>[Math.min(x0,x0+dir*18)-4,LY-8,Math.max(x0,x0+dir*18)+12,LY+8];for(let k=0;k<12;k++){const hit=capsulePositions.find(c=>intersects(body(X),c.box,1));if(!hit)break;X+=Math.sign(X-(hit.box[0]+hit.box[2])/2||1)*4;}} /* 폐색 표식과 겹치면 옆으로 비킨다 */return {id,rail,dir,lampY,railLocal,X,Y,anchorX:X,side:Math.sign(lampY-railLocal||1)};});
  /* 세로로 바짝 붙은 두 신호기 몸체(높이 14)는 위아래로 벌린다 (줄 간격을 좁힌 화면: 동묘앞 3A·23) */
- const lampDy=new Map();{const ps=placed.map(s=>({id:s.id,x:s.anchorX,y:T([0,s.lampY])[1]})).sort((a,b)=>a.y-b.y);
+ const lampDy=new Map();
+ /* 신호기 몸체(높이 14)가 자기 선로 칸(높이 18)에 겹치지 않게 선로에서 최소 17px: 원본 칸은 얇아 원본 간격 그대로면 칸을 가린다 (구로 2A·53·1A 등).
+    같은 기둥 줄(같은 쪽)의 바깥 신호기도 같은 만큼 옮겨 쌓인 순서를 지킨다 */
+ {const CLR=BAR/2+8;for(const s of placed){const ly=T([0,s.lampY])[1],d=ly-s.Y,side=Math.sign(d)||s.side||1;if(Math.abs(d)>=CLR)continue;const shift=side*CLR-d;
+   for(const o of placed){const oy=T([0,o.lampY])[1],od=oy-o.Y;if(o===s||(Math.abs(o.anchorX-s.anchorX)<45&&Math.abs(o.Y-s.Y)<3&&Math.sign(od)===side&&Math.abs(od)>=Math.abs(d)&&Math.abs(od)<Math.abs(d)+40))lampDy.set(o.id,Math.max(Math.abs(lampDy.get(o.id)||0),Math.abs(shift))*side);}}}
+ {const ps=placed.map(s=>({id:s.id,x:s.anchorX,y:T([0,s.lampY])[1]+(lampDy.get(s.id)||0)})).sort((a,b)=>a.y-b.y);
   for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j],gap=b.y-a.y;if(gap>0&&gap<16&&Math.abs(a.x-b.x)<45){const d=(16-gap)/2;lampDy.set(a.id,(lampDy.get(a.id)||0)-d);lampDy.set(b.id,(lampDy.get(b.id)||0)+d);}}}
  const lampLY=s=>T([0,s.lampY])[1]+(lampDy.get(s.id)||0);
  // Give a tight stack of names its own minimum line spacing, without moving lamps.
