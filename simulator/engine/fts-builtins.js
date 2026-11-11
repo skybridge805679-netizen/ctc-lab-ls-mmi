@@ -78,9 +78,54 @@ function gateRoutes(list){
 const reference=steps=>'참고 순서(예시 — 실제 순서는 관제사가 상황을 보고 판단):\n'+steps.map((s,i)=>`${i+1}. ${s}`).join('\n');
 
 // ---------------------------------------------------------------- 비상시 조치 9종
+// 한 대본에서 문제 세 갈래를 만든다 (베타 피드백 · 시험 대비):
+//   기본          P-em-XX            대본을 그대로 따라간다 (관제사가 운행선 변경·단선지령식을 건의)
+//   감독관 지시형  P-em-XX-order      열차 통제가 끝나면 관제팀장(감독관)이 운행선 변경·단선지령식을 직접 지시한다 (대본의 B형 문구)
+//   상황별        P-em-XX-<상황>     「상황별 대응 요령」의 상황 하나가 정해진 시점에 저절로 일어난다 (기본 문제에서는 교수가 주입)
+// 상황이 일어나는 시점: 원문에 시점이 적힌 것은 그 통보·진로·열차 출발 뒤, 없는 것은 문제 시작 직후
+const ANCHOR={
+ '02':{'v-derail-k602':{type:'communication',id:'n7'},'v-point-23b':{type:'communication',id:'n13'}},
+ '03':{'v-g450-first':{type:'reaction',id:'r-g0450'}},
+ '04':{'v-delay':{type:'reaction',id:'r-n17'},'v-a1005':{type:'communication',id:'n12'}},
+ '05':{'v-bogie':{type:'communication',id:'n12'},'v-before-platform':{type:'communication',id:'n6'}},
+ '06':{'v-change-after-control':{type:'communication',id:'n6'},'v-change-during-rescue':{type:'communication',id:'n15'},'v-self-run-first':{type:'communication',id:'n10'},'v-self-run-late':{type:'objective',id:'route-anyang-3B-B655T'}},
+ '06-1':{'v-change-after-control':{type:'communication',id:'n6'},'v-change-during-rescue':{type:'communication',id:'n15'},'v-self-run-first':{type:'communication',id:'n10'},'v-self-run-late':{type:'objective',id:'route-anyang-3B-B655T'}}
+};
+const WITH={'02':{'v-point-23b':['v-derail-k602']}};      // 23B 선로전환기 불량은 K0602 탈선에 이어지는 상황
+// 대본의 관제팀장 지시(B형): 「(관제팀장) 열차지연이 가중되니 … 운행선 변경 하세요!」
+function supervisorOrder(sc){
+ const st=sc.steps.find(s=>s.kind==='say'&&s.tag&&s.lines.some(l=>/^\s*\(관제팀장\)/.test(l)));if(!st)return null;
+ const lines=st.lines.map(l=>l.trim().replace(/\s+/g,' ')),heads=lines.map((l,i)=>/^\(관제팀장\)/.test(l)?i:-1).filter(i=>i>=0),from=heads.at(-1),out=[];
+ for(let i=from;i<lines.length;i++){out.push(lines[i].replace(/^\(관제팀장\)\s*/,'').replace(/^관제사님!\s*/,''));if(/(하세요|운행하세요)[.!]*$/.test(lines[i]))break;}
+ const control=sc.steps.find(s=>s.kind==='say'&&s.tag&&s.lines.some(l=>/추가\s*정차/.test(l)));
+ return control?{tag:st.tag,control:control.tag,text:out.filter(Boolean).join(' '),single:/지령식/.test(out.join(' '))}:null;
+}
 function emergency({limits={}}={}){
  const E=EM();
- return E.list.map(sc=>{
+ return E.list.flatMap(sc=>{
+  const base=emergencyBase(sc,limits),out=[base],order=supervisorOrder(sc);
+  if(order&&base.communications.some(c=>c.id===order.tag)&&base.communications.some(c=>c.id===order.control)){
+   const p=structuredClone(base),kind=order.single?'단선지령식':'운행선 변경';
+   Object.assign(p,{id:base.id+'-order',variant:'order',name:`${base.name} · 감독관 지시 ${kind}`,branches:[],
+    situation:base.situation+`\n※ 감독관 지시형: 관제사가 먼저 건의하지 않는다. 열차 통제가 끝나면 관제팀장(감독관)이 ${kind}을 직접 지시하고, 관제사는 복명한 뒤 시행한다.`});
+   p.communications=p.communications.filter(c=>c.id!=='proactive');
+   const c=p.communications.find(c=>c.id===order.tag);c.label='관제팀장 지시 복명 · '+c.label;
+   p.reactions.push({id:'r-order',label:`관제팀장(감독관)의 ${kind} 지시`,when:{type:'communication',id:order.control},after:15,do:[{type:'notice',text:'관제팀장: '+order.text}]});
+   out.push(p);
+  }
+  for(const b of base.branches){
+   const p=structuredClone(base),ids=[...(WITH[sc.key]?.[b.id]||[]),b.id];
+   Object.assign(p,{id:base.id+'-'+b.id.replace(/^v-/,''),variant:'branch',name:`${base.name} · ${b.label}`,
+    situation:base.situation+`\n※ 상황별 대응: 진행 중에 「${b.label}」 상황이 일어난다.`,
+    branches:ids.map(id=>({...structuredClone(base.branches.find(x=>x.id===id)),when:ANCHOR[sc.key]?.[id]||{type:'elapsed',seconds:5}}))});
+   out.push(p);
+  }
+  return out;
+ });
+}
+function emergencyBase(sc,limits){
+ const E=EM();
+ {
   const book=objectiveBook(),comms=[],reactions=[],order=[],tagTo={};
   // 대본 seed 가운데 연동 조건으로 설정되지 않는 진로의 신호기는 처음부터 정지 상태라 취소할 신호가 없다
   const castAt=st=>new Set(E.castFor(sc).filter(c=>c.station===st).map(c=>c.slot));
@@ -146,7 +191,7 @@ function emergency({limits={}}={}){
    objectives:book.list,communications:[...comms,...(VB()?.proactiveFor(sc.key)||[])],reactions,
    // 상황별 대응 요령: 감독관이 상황을 바꾸는 분기 (교수가 모니터링에서 주입)
    branches:VB()?.branchesFor(sc.key)||[]};
- });
+ }
 }
 
 // ---------------------------------------------------------------- 부본선 대피 5종

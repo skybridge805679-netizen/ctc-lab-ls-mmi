@@ -33,7 +33,7 @@ function create(host){
    for(const l of ph.legs||[])error(host.apply({type:'scenario:move',auto:true,action:{op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.rescue?{rescue:true}:{})}}));
    if(ph.exit)error(host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid}}));break;}
   case 'alarm':host.alarm(ph.text);break;
-  case 'notice':session.notice=ph.text;break;
+  case 'notice':session.notice=ph.text;announce('notice',ph.text,'안내 · '+ph.text);break;
   default:throw Error('지원하지 않는 현상');
  }log('현상 발생 · '+F.PHENOMENA[ph.type].label);}
  function loadTimetable(t,relative=false){

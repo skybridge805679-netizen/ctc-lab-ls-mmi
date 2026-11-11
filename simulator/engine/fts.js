@@ -321,7 +321,7 @@ function seed({scripts=[],limits={}}={}){
   'sch-create':['지금 시간표에 새 열차를 만들어야 합니다. 열차를 생성하고 편집적용하시오.','열차스케줄 → 패턴을 불러와 열차를 생성 → 편집적용']};
  const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');x.setup={};return id;});
 
- const emergency=active.filter(p=>p.subject==='비상 시 조치').map(p=>p.id);
+ const emergency=active.filter(p=>p.subject==='비상 시 조치'&&!p.variant).map(p=>p.id),emergencyVariants=active.filter(p=>p.variant).map(p=>p.id);
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
  const s4=sit({id:'S-04',name:'시나리오 상황#4',scheduleId:'01178',limit:3600,problems:[c1,c2,c3,c4,c5]});
  const sTg=sit({id:'S-TG',name:'#1-열차운행계획-009(구술)',scheduleId:'01105',limit:600,problems:[g1]});
@@ -329,20 +329,23 @@ function seed({scripts=[],limits={}}={}){
  const sOral=sit({id:'S-ORAL',name:'#2-철도관제시스템운용실무(구술)',section:'지하청량리-영등포',scheduleId:'01105',limit:300,problems:[o1,o2,o3]});
  const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
  const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
+ const sEmV=emergencyVariants.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));   // 감독관 지시형 · 상황별 (종합 시나리오에는 넣지 않는다)
  const scen=(o)=>{SC.push({author:'C001',createdAt:'2026-10-30 00:00:00',...o});};
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
- for(const id of [...sEvac,...sEm]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
+ for(const id of [...sEvac,...sEm,...sEmV]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
  const schedules=[];
  // A problem may replace the timetable explicitly; follow-up edits of C4201 keep the work done before them.
- const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict',...active.map(p=>p.id)]);
+ const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict',...active.filter(p=>!p.variant).map(p=>p.id)]);
  for(const p of P)if(starters.has(p.id)){
   const id=String(90001+schedules.length);p.setup={...p.setup,scheduleId:id};delete p.setup.clearTimetable;delete p.setup.baseTimetable;
   schedules.push({id,name:p.name+' · 교육 시간표',relative:true,generated:true,timing:'대본 열번·방향·초기 위치에 맞춘 교육용 생성 시각 (+10분, 열차 간격 3분)',timetable:B.timetableFor(p)});
  }
+ // 감독관 지시형 · 상황별 문제는 같은 대본의 기본 문제 시간표를 함께 쓴다 (스케줄 ID가 밀리지 않는다)
+ for(const p of P)if(p.variant){const base=P.filter(b=>!b.variant&&p.id.startsWith(b.id+'-')).sort((a,b)=>b.id.length-a.id.length)[0];p.setup={...p.setup,scheduleId:base.setup.scheduleId};delete p.setup.clearTimetable;delete p.setup.baseTimetable;}
  for(const sit of S){const first=P.find(p=>p.id===sit.problems[0]);sit.scheduleId=first?.setup?.scheduleId||'';}
  for(const x of [...P,...S,...SC,...schedules])x.builtin=BUILTIN+'#'+stamp(x);
  return {version:VERSION,problems:P,situations:S,scenarios:SC,schedules};

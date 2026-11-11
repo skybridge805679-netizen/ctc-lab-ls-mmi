@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const R=require('./runtime.cjs'),F=require('./fts.js'),B=require('./fts-builtins.js'),EM=require('./emergency.js'),SC=require('./scenarios.js');
 // 대피 5종 · 비상 9종 대본을 바꾼 능동형 문제: 형식이 맞고, 대본과 다른 순서로 조작해도 모두 풀린다.
-const problems=B.all({});
+const everything=B.all({}),problems=everything.filter(p=>!p.variant);      // 풀이 시험은 기본 문제로, 감독관 지시형·상황별은 아래 따로
 const libraryOf=p=>{const next=structuredClone(p);delete next.setup.clearTimetable;next.setup.scheduleId='TEST';return {version:F.VERSION,problems:[next],situations:[{id:'S',name:'S',section:'',scheduleId:'',limit:0,timetable:null,problems:[p.id]}],scenarios:[{id:'SC',name:'SC',situations:['S']}],schedules:[{id:'TEST',relative:true,timetable:B.timetableFor(p)}]};};
 const refs=(c,out=[])=>{if(!c)return out;if(c.type==='objective')out.push(c.id);(c.conditions||[]).forEach(k=>refs(k,out));refs(c.condition,out);return out;};
 // 선행 조건(목표 · 상황 반응)을 벗긴 실제 조건
@@ -144,5 +144,41 @@ test('비상 04 starts with the straight routes; 통보 12 sends the adjacent tr
  for(let i=0;i<120&&at().length;i++)r.command({type:'tick',seconds:5});
  assert.deepEqual(at(),[],'4B 해정 · AUTO 복귀 뒤 A1005가 자동 진로로 통과한다');assert.notEqual(item().obj['a1005-passed'],undefined);
  assert.deepEqual(where('K0811'),['anyang:2T'],'K0811은 운행선 변경 진로를 받을 때까지 안양 2T에 선다');
+});
+// 한 대본에서 갈라 낸 문제: 감독관 지시형과 상황별 (기본 문제에서는 교수가 주입하던 상황이 정해진 시점에 저절로 일어난다)
+const startOne=p=>{const r=R.create();assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p)}).ok,p.id);assert.ok(r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false}).ok);r.command({type:'tick',seconds:1});return r;};
+const leafOf=(c,type)=>!c?null:c.type===type?c:(c.conditions||[]).map(k=>leafOf(k,type)).find(Boolean)||leafOf(c.condition,type);
+test('every emergency script also comes as a supervisor-ordered problem and one problem per 상황별 대응 situation',()=>{
+ const variants=everything.filter(p=>p.variant);assert.equal(everything.filter(p=>p.variant==='order').length,9);assert.equal(everything.filter(p=>p.variant==='branch').length,32);
+ for(const p of variants){assert.deepEqual(F.validate(libraryOf(p)),[],p.id);assert.equal(new Set(everything.map(x=>x.id)).size,everything.length);}
+ for(const base of problems.filter(p=>p.id.startsWith('P-em-')))for(const b of base.branches)assert.ok(everything.some(p=>p.variant==='branch'&&p.branches.at(-1).id===b.id&&p.id.startsWith(base.id+'-')),base.id+' '+b.id);
+});
+for(const p of everything.filter(p=>p.variant==='order'))test(`${p.id}: the supervisor's order comes after train control ends, not before`,()=>{
+ const r=startOne(p),S=()=>r.snapshot().fts,rx=p.reactions.find(x=>x.id==='r-order');
+ r.command({type:'tick',seconds:60});assert.ok(!S().session.notice,'통제가 끝나기 전에는 지시가 없다');
+ assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+rx.when.id,checked:true}).ok);r.command({type:'tick',seconds:10});assert.ok(!S().session.notice);
+ r.command({type:'tick',seconds:10});assert.match(S().session.notice,/^관제팀장: .*(운행선 변경|지령식)/);assert.equal(S().notice.kind,'notice');
+ assert.ok(!p.communications.some(c=>c.id==='proactive'));assert.match(p.communications.find(c=>/관제팀장 지시 복명/.test(c.label)).text,/관제팀장/);
+});
+for(const p of everything.filter(p=>p.variant==='branch'))test(`${p.id}: the situation happens by itself at its point of the script`,()=>{
+ const r=startOne(p),item=()=>r.snapshot().fts.session.items[0],b=p.branches.at(-1),on=()=>Object.keys(item().branch||{});
+ const comm=leafOf(b.when,'communication'),need=b.when.type!=='elapsed';
+ if(need){r.command({type:'tick',seconds:30});assert.ok(!on().includes(b.id),'시점 전에는 일어나지 않는다');}
+ if(comm){for(const x of p.branches){const c=leafOf(x.when,'communication');if(c)assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+c.id,checked:true}).ok);}r.command({type:'tick',seconds:5});}   // 앞선 상황(탈선)의 시점도 함께
+ else if(!need)r.command({type:'tick',seconds:10});
+ else return;      // 진로·열차 출발 뒤에 일어나는 상황(3개)은 아래 시험에서 따로 본다
+ assert.ok(on().includes(b.id),b.id);for(const x of p.branches)assert.ok(on().includes(x.id),x.id);
+ const view=F.view(r.snapshot().ftsRunLibrary.problems[0],item());for(const c of b.communications)assert.ok(view.communications.some(x=>x.id===c.id),c.id);
+});
+test('situations anchored on a route or a departing train happen right after it',()=>{
+ // 03: G0450이 떠난 뒤 「G0450 발차 후 K0456 운행선 변경」
+ let p=everything.find(x=>x.id==='P-em-03-g450-first'),r=startOne(p),item=()=>r.snapshot().fts.session.items[0];
+ const row=n=>{for(const [station,s] of Object.entries(r.snapshot().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid};return null;};
+ r.command({type:'tick',seconds:30});assert.deepEqual(Object.keys(item().branch||{}),[]);
+ assert.ok(r.command({type:'numbers',action:{op:'rename',...row('K0450'),number:'G0450'}}).ok);r.command({type:'tick',seconds:10});assert.ok(item().branch['v-g450-first']!=null);
+ // 06: 운행선 변경 진로(안양 3B-B655T)를 낸 뒤 「자력 운행 가능 수보」
+ p=everything.find(x=>x.id==='P-em-06-self-run-late');r=startOne(p);const ctl=a=>r.command({type:'control',station:'anyang',action:{...a,source:'LS'}});
+ ctl({type:'mode',value:'CCM'});ctl({type:'stop',id:'3B'});ctl({type:'stop',id:'3C'});r.command({type:'tick',seconds:40});assert.deepEqual(Object.keys(item().branch||{}),[]);
+ assert.ok(ctl({type:'route',id:'3B-B655T'}).ok);r.command({type:'tick',seconds:5});assert.ok(item().branch['v-self-run-late']!=null);
 });
 module.exports={solve,problems};

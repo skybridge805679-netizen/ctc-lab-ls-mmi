@@ -2,8 +2,8 @@
 // 비상시 조치 9문제를 원문 대본의 순서 그대로(통보 → 조작) FTS에서 끝까지 푼다.
 // 열차는 지시를 받으면 본선을 따라 이어 달리고, 그 때문에 목표가 막히거나 가짜 열차번호 중복 알람이 나지 않아야 한다.
 const {test}=require('node:test'),assert=require('node:assert/strict'),R=require('./runtime.cjs'),E=require('./emergency.js');
-function play(sc){
- const r=R.create();r.command({type:'fts',op:'bootstrap'});const ok=r.command({type:'fts',op:'start',scenario:'SC-'+sc.id,professor:'001',student:'tester',autoRun:false});assert.ok(ok.ok,ok.message);
+function play(sc,suffix=''){
+ const r=R.create();r.command({type:'fts',op:'bootstrap'});const ok=r.command({type:'fts',op:'start',scenario:'SC-'+sc.id+suffix,professor:'001',student:'tester',autoRun:false});assert.ok(ok.ok,ok.message);
  const S=()=>r.snapshot(),item=()=>S().fts.session?.items[0],tick=n=>{for(let i=0;i<n;i+=5)r.command({type:'tick',seconds:5});};
  const row=n=>{for(const [station,s] of Object.entries(S().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid,direction:x.direction};return null;};
  const ctl=(station,action)=>r.command({type:'control',station,action:{...action,source:'LS'}}),standing=(st,id)=>Object.keys(S().states[st].routes).some(k=>k.startsWith(id+'-')),notes=[];
@@ -25,7 +25,7 @@ function play(sc){
  }
  r.command({type:'alarm:ack',texts:['열차번호 중복']});tick(60);
  const it=S().fts.session.items[0],p=S().ftsRunLibrary.problems.find(p=>p.id===it.problem);
- return {status:it.status,score:it.score,error:it.error,notes,missing:p.objectives.filter(o=>(it.obj||{})[o.id]==null).map(o=>o.id),
+ return {notice:S().fts.session.notice,status:it.status,score:it.score,error:it.error,notes,missing:p.objectives.filter(o=>(it.obj||{})[o.id]==null).map(o=>o.id),
   alarms:S().events.filter(e=>e.kind==='alarm'&&/중복/.test(e.text)).map(e=>(e.text.match(/[A-Z]\d{4}/g)||[]).join('+'))};
 }
 // 대본이 만드는 중복 알람: 충돌·추돌과 구원연결뿐이다
@@ -33,4 +33,9 @@ const ALARMS={'em-02':['K0602+K0604','K0604+G0606'],'em-03':['K0450+K0452','K045
 for(const sc of E.list)test(`${sc.id} completes with full marks in the script order`,()=>{
  const o=play(sc);assert.equal(o.error,undefined);assert.deepEqual(o.notes,[]);assert.deepEqual(o.missing,[]);assert.equal(o.status,'완료');assert.equal(o.score,100);
  assert.deepEqual(o.alarms,ALARMS[sc.id]||[]);
+});
+// 감독관 지시형: 같은 대본을 따라가되 운행선 변경(단선지령식)은 관제팀장의 지시가 나온 뒤 복명하고 시행한다
+for(const sc of E.list)test(`${sc.id} (감독관 지시형) completes with full marks and shows the supervisor's order`,()=>{
+ const o=play(sc,'-order');assert.equal(o.error,undefined);assert.deepEqual(o.notes,[]);assert.deepEqual(o.missing,[]);assert.equal(o.status,'완료');assert.equal(o.score,100);
+ assert.match(o.notice,/^관제팀장: /);assert.deepEqual(o.alarms,ALARMS[sc.id]||[]);
 });

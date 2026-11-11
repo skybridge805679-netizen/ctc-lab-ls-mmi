@@ -392,7 +392,9 @@ function ctxFor(item){const p=activeLibrary().problems.find(x=>x.id===item.probl
 function startSession(){const r=remote({op:'start',...setup});if(!r.ok){alert(r.message);return;}go('monitor');tick();}
 function tick(){
   syncRemote();const state=root.SimRemote.snapshot.fts;if($('ftsSessionStatus'))$('ftsSessionStatus').textContent=session&&!session.finished?'교육 진행 · '+(session.current+1)+' / '+session.items.length+' 문제':session?'교육 종료':'교육 전 준비';if(session&&!session.finished&&!root.SimExtraLS){const ui=uiState(),sig=JSON.stringify(ui);if(tick.ui!==sig){tick.ui=sig;remote({op:'ui',ui});}}
-  if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}}
+  if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}
+   // 감독관 지시·상황 변경은 음성으로 알리고 문제 창을 앞에 띄운다
+   else if(['notice','branch'].includes(state.notice?.kind)){speak(state.notice.text);showProblem();}}
   if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}if(problemOpen())renderProblem();}
 function finishSession(){remote({op:'stop'});tick();}
 
