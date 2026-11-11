@@ -59,7 +59,7 @@ def run(page, url):
     page.locator('#idmOffline').click(); expect(page.locator('.mmi-confirm, .mmi-alert').last).to_contain_text('온라인상(오늘/내일)에 올라가 있는 DATA를 수정')
     page.locator('#mmiConfirmYes').click(); expect(page.locator('.mmi-alert')).to_contain_text('90011'); ok()
     expect(page.locator('#idmSetId')).to_have_value('90011')
-    assert page.evaluate("SimRemote.snapshot.timetable.trains.map(t=>t.id).sort().join()")=='A1001,A1002,K0401,K0450,K0454,K0456'
+    assert page.evaluate("SimRemote.snapshot.timetable.trains.map(t=>t.id).sort().join()")=='A1001,A1002,K0399,K0401,K0446,K0448,K0450,K0454,K0456'   # 앞 열차(추가정차 대상)까지 든다
     # 예약적용: 다른 날짜에 ID 예약
     page.locator('#idmList tr[data-sid="90004"]').click()
     free = page.locator('#idmCal button:not(.set)[data-date]').nth(20)
@@ -125,10 +125,11 @@ def run(page, url):
     # 열차정보수정: cells that already have 실적 are read-only, the train number is locked (실기1 p.139)
     menu(page, '열차스케줄', '온라인열차스케줄 관리', '온라인 열차스케줄관리(G)')
     page.locator('input[name="scheduleMode"][value="edit"]').check()
-    page.locator('#scheduleList').select_option('K1131')
-    expect(page.locator('#scheduleCalls [data-call="0"][data-field="arrival"]')).to_be_disabled()
+    page.evaluate("SimMMI.run({type:'tick',seconds:60})")   # 시발역을 떠난 뒤
+    page.locator('#scheduleList').select_option('K1131'); page.locator('#scheduleLoad').click()
+    expect(page.locator('#scheduleCalls [data-call="0"][data-field="departure"]')).to_be_disabled()
     expect(page.locator('#scheduleCalls [data-call="5"][data-field="arrival"]')).to_be_enabled()
-    expect(page.locator('#scheduleNumber')).to_have_attribute('readonly', '')
+    expect(page.locator('#scheduleNumber')).to_be_disabled()   # 수정에서는 생성복사열차정보가 회색
     page.locator('[data-mmi-window="schedule"] .mmi-close').click()
     # 제어 확인: a control command outside CCM is refused with the modal error box
     page.locator('#stationSelect').select_option('uiwang')

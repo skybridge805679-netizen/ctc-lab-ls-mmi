@@ -56,9 +56,9 @@ def run(page, url):
         if change_routes:
             for field, kind in (('arrivalRoute', 'arrival'), ('departureRoute', 'departure')):
                 cur = page.locator(f'#scheduleCalls [data-call="{idx}"][data-field="{field}"]')
-                options = page.evaluate(f"SimScheduleRoutes.options('{station_id}','{kind}')")
+                options = [o for o in cur.locator('option').all_inner_texts() if o]
                 new = next(o for o in options if o != cur.input_value())
-                cur.fill(new)
+                cur.select_option(new)
         page.locator('#scheduleApply').click(); expect(page.locator('.mmi-alert')).to_contain_text('편집 적용 완료'); ok()
         page.locator('[data-mmi-window="schedule"] .mmi-close').click()
         page.evaluate("SimMMI.open('conflictDrill')")

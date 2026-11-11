@@ -19,8 +19,8 @@ CASES = {
     'yongsan-5': ('yongsan', ['2A'], '2A-5T', '5T', 'B607T', 'up'),
     'yongsan-4': ('yongsan', ['1B'], '1B-4T', '4T', 'B606T', 'down'),
     'yeongdeungpo-1': ('yeongdeungpo', ['1A', '4B'], '1A-1T', '1T', 'B620T', 'down'),
-    'geumcheon-1': ('geumcheon', ['1B', '4B'], '1B-1T', '1T', 'B642T', 'down'),
-    'geumcheon-6': ('geumcheon', ['2B'], '2B-6T', '6T', 'B641T', 'up'),
+    'geumcheon-1': ('geumcheon', ['1B', '1A', '4B'], '1B-1T', '1T', 'B642T', 'down'),
+    'geumcheon-6': ('geumcheon', ['2B', '2A'], '2B-6T', '6T', 'B641T', 'up'),
 }
 
 

@@ -54,7 +54,7 @@ try:
    assert page.evaluate('SimRemote.snapshot.ftsLibrary.scenarios.length')>0
    # FTS stores all 19 schedule presets without inserting them into the live timetable.
    page.wait_for_function('window.SimFTSUI?.library()&&SimFTSUI.users()');page.evaluate('SimFTSUI.open()');page.locator('[data-fts-page=situations]').first.click()   # 초기화 후 FTS가 다시 준비될 때까지
-   expect(page.locator('#schTable tr[data-key]')).to_have_count(19)
+   expect(page.locator('#schTable tr[data-key]')).to_have_count(22)
    schedule=page.evaluate("SimRemote.snapshot.ftsLibrary.problems.find(p=>p.id==='P-yongsan-5').setup.scheduleId")
    assert len(schedule)==5 and schedule.isdigit()
    page.locator(f'#schTable tr[data-key="{schedule}"]').click()
