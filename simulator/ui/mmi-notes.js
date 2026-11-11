@@ -83,7 +83,7 @@ function save(){
  if(a&&N.catalog[a].order>N.catalog[b].order){mmi().alertBox('표시구간의 시작역은 마지막역보다 앞이어야 합니다.');return;}
  const fields={kind,target:kind==='열차번호'?target.toUpperCase():target,title,fontSize:Number($('neFont').value),fromSec,toSec:toSecV,fromStation:a,toStation:b,reminder:$('neReminder').checked,journal:$('neJournal').checked};
  if(editing){Object.assign(editing,fields);if(editing.entries.length===1)editing.entries[0].text=body;delete was[editing.id];mmi().log('event',`노트 ${editing.id} 수정`);journal(editing,'수정');}
- else{const n={id:'N'+String(++seq).padStart(4,'0'),created:stamp(),author:'관제사',entries:[{time:stamp(),text:body}],...fields};notes.unshift(n);managerSelected=n.id;mmi().log('event',`노트 ${n.id} 생성 · ${title}`);journal(n,body);}
+ else{const n={id:'N'+String(++seq).padStart(4,'0'),created:stamp(),author:'관제사',entries:[{time:stamp(),text:body}],...fields};notes.unshift(n);managerSelected=n.id;root.SimRemote?.command({type:'practice',name:'note',id:n.id,source:'MMI'});mmi().log('event',`노트 ${n.id} 생성 · ${title}`);journal(n,body);}
  mmi().close('noteEdit');publish();if($('ntRows'))draw();
 }
 function remove(id){const i=notes.findIndex(n=>n.id===id);if(i<0)return;notes.splice(i,1);delete was[id];if(selected===id)selected='';if(managerSelected===id)managerSelected='';mmi().log('event',`노트 ${id} 삭제`);publish();draw();}

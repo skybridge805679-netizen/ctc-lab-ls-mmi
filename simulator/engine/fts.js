@@ -41,7 +41,9 @@ const CONDITIONS={
  windowOpen:{label:'MMI 창 열림',fields:['window'],test:(c,x)=>!!x.ui?.windows?.includes(c.window),text:c=>`${c.window} 창 열기`},
  graphTrain:{label:'그래프 열차 선택',fields:['train'],test:(c,x)=>x.ui?.graphTrain===c.train&&!!x.ui?.windows?.includes('graph'),text:c=>`열차그래프에서 ${c.train} 검색`},
  trainRun:{label:'열차 운행 도착 (진로·신호 또는 전령법으로 실제 운행)',fields:['number','station'],test:(c,x)=>(x.events||[]).some(e=>e.type==='trainRun'&&e.number===c.number&&e.station===c.station&&(!c.slot||e.slot===c.slot)),text:c=>`${c.number} 열차가 ${nm(c.station)}역${c.slot?' '+c.slot:''}까지 운행 (열번 수동 이동은 인정 안 함)`},
- event:{label:'조작 기록',fields:['eventType'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.type===c.eventType&&(!c.station||e.station===c.station)&&(c.id===undefined||String(e.id)===String(c.id))&&(c.value===undefined||e.value===c.value)),text:c=>`${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
+ event:{label:'조작 기록',fields:['eventType'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.type===c.eventType&&(!c.station||e.station===c.station)&&(c.id===undefined||String(e.id)===String(c.id))&&(c.value===undefined||e.value===c.value)
+  // source: 조작한 화면('LS' · 'MMI') — 평가서 Ⅱ의 「L/S에서 … · MMI에서 …」 지정 과제. op: 열번창·표지판 조작 종류(insert · boardAdd …)
+  &&(c.source===undefined||e.source===c.source)&&(c.op===undefined||e.operation?.op===c.op)&&(c.slot===undefined||e.operation?.slot===c.slot)),text:c=>`${c.source?c.source+'에서 ':''}${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.op?' '+c.op:''}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
  signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll')))
   // orStopped: 그 신호로 열차가 이미 지나가 정지로 돌아와 있으면 취소할 것이 없다 — 정지 확인으로 인정한다
   ||!!c.orStopped&&CONDITIONS.signalStop.test(c,x),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
@@ -309,6 +311,58 @@ function seed({scripts=[],limits={}}={}){
  const o1=prob({id:'P-ORAL-MODE',subject:'철도관제시스템 운용',name:'제어모드의 종류에 대해 설명하시오',limit:60,actions:'AUTO(자동) · CCM(중앙 수동) · LOCAL(역 취급) 모드 설명',checks:[{label:'제어모드 구술',condition:{type:'manual',label:'제어모드 구술'}}]});
  const o2=prob({id:'P-ORAL-SCAN',subject:'철도관제시스템 운용',name:'베이스스캔에 대하여 설명하시오',limit:60,actions:'현장 설비 상태를 다시 수신해 LS 표시를 갱신하는 기능 설명',checks:[{label:'베이스스캔 구술',condition:{type:'manual',label:'베이스스캔 구술'}}]});
  const o3=prob({id:'P-ORAL-TRACE',subject:'철도관제시스템 운용',name:'열차추적에 대하여 설명하시오',limit:90,actions:'열차번호를 궤도회로 점유에 따라 따라가며 표시하는 기능 설명',checks:[{label:'열차추적 구술',condition:{type:'manual',label:'열차추적 구술'}}]});
+ // 철도관제시스템 운용 — 실기 10항목 (관제교육훈련 실기평가서 Ⅱ: 항목당 2점). 「L/S에서 …」「MMI에서 …」는 따로 지정되는 두 과제다.
+ // 의왕역에서 한다(대피·비상 시나리오와 겹치지 않는 역). 지적확인 환호는 교수가 확인한다.
+ const OPS='uiwang',ev=(eventType,extra={})=>({type:'event',eventType,station:OPS,...extra}),call=id=>({id:'call',label:'지적확인 환호 시행 (교수 확인)',condition:{type:'manual',label:'지적확인 환호',key:'call-'+id},points:1});
+ const op=(id,name,actions,objectives,setup={})=>prob({id:'P-OP-'+id,subject:'철도관제시스템 운용',name,limit:180,actions,objectives,communications:[],reactions:[],setup:{reset:[OPS],modes:[{station:OPS,value:'AUTO'}],...setup}});
+ const ops=[
+  op('MODE','의왕역 제어모드를 AUTO → CCM → LOCAL로 전환한 뒤 CCM을 거쳐 AUTO로 되돌리시오','L/S 상단 또는 MMI 현장설비제어 → 역제어모드: CCM → LOCAL(현장 인계 응답 처리) → CCM → AUTO',[
+   {id:'ccm',label:'AUTO → CCM 전환',condition:ev('mode',{value:'CCM'}),points:1},{id:'local',label:'CCM → LOCAL 전환 (현장 인계)',condition:{type:'mode',station:OPS,value:'LOCAL'},points:1},
+   {id:'auto',label:'CCM을 거쳐 AUTO 복귀',condition:{type:'all',conditions:[{type:'objective',id:'local'},ev('mode',{value:'AUTO'}),{type:'mode',station:OPS,value:'AUTO'}]},points:1,final:true}]),
+  op('ROUTE','의왕역 진로제어: L/S에서 1A-2T 진로를, MMI에서 2A-5T 진로를 설정하시오','CCM 전환 → L/S: 1A 신호기 → 1A-2T / MMI: 현장설비제어 → 진로제어 → 2A-5T 선택',[
+   {id:'ls',label:'L/S에서 1A-2T 진로 설정',condition:ev('route',{id:'1A-2T',source:'LS'}),points:1},{id:'mmi',label:'MMI에서 2A-5T 진로 설정',condition:ev('route',{id:'2A-5T',source:'MMI'}),points:1}]),
+  op('POINT','의왕역 선로전환기 제어: L/S에서 21호를, MMI에서 22호를 반위로 전환하시오','CCM 전환 → L/S: 21호 선로전환기 → 반위 / MMI: 현장설비제어 → 선로전환기 제어 → 22 반위',[
+   {id:'ls',label:'L/S에서 21호 반위 전환',condition:{type:'all',conditions:[{type:'point',station:OPS,point:'21',value:'R'},ev('point',{source:'LS'})]},points:1},
+   {id:'mmi',label:'MMI에서 22호 반위 전환',condition:{type:'all',conditions:[{type:'point',station:OPS,point:'22',value:'R'},ev('point',{source:'MMI'})]},points:1}]),
+  op('NUMBER','의왕역 열차번호 제어: L/S에서 2T 열번창에 K9001을, MMI에서 5T 열번창에 K9002를 입력하시오','L/S: 2T 열번창 우클릭 → 열차번호 입력 / MMI: 열차제어 → 열차번호제어 → 5T · 입력',[
+   {id:'ls',label:'L/S에서 2T 열번창에 K9001 입력',condition:{type:'all',conditions:[{type:'trainAt',number:'K9001',station:OPS,slot:'2T'},ev('lsOperation',{op:'insert',slot:'2T',source:'LS'})]},points:1},
+   {id:'mmi',label:'MMI에서 5T 열번창에 K9002 입력',condition:{type:'all',conditions:[{type:'trainAt',number:'K9002',station:OPS,slot:'5T'},ev('lsOperation',{op:'insert',slot:'5T',source:'MMI'})]},points:1}],{clear:['K9001','K9002']}),
+  op('TRACE','K9005열차를 열차추적 하시오','MMI 열차제어 → 열차추적 → K9005 → 추적시작 (L/S에 추적 표시)',[
+   {id:'trace',label:'K9005 열차추적 시작 (L/S 화면에 표출)',condition:{type:'event',eventType:'trace',id:'K9005'},points:1},call('trace')],{clear:['K9005'],trains:[{station:OPS,slot:'3T',number:'K9005',direction:'down'}]}),
+  op('SCAN','베이스스캔을 L/S와 MMI에서 각각 실행하시오','L/S: 빈 곳 우클릭 → 베이스스캔 / MMI: 현장설비제어 → 베이스스캔',[
+   {id:'ls',label:'L/S에서 베이스스캔 실행',condition:{type:'event',eventType:'scan',source:'LS'},points:1},{id:'mmi',label:'MMI에서 베이스스캔 실행',condition:{type:'event',eventType:'scan',source:'MMI'},points:1}]),
+  op('SIGN','의왕역 구간에 L/S 표지판(선로일시사용정지)을 설정하시오','L/S 의왕역 화면 빈 곳 우클릭 → L/S 표지판 → 종류 선택 → 내용 입력 → 확인',[
+   {id:'sign',label:'의왕역 화면에 L/S 표지판 설정',condition:ev('lsOperation',{op:'boardAdd'}),points:1},call('sign')]),
+  op('RESTART','L/S 화면을 재실행하시오','L/S 화면 빈 곳 우클릭 → L/S 재실행',[
+   {id:'restart',label:'L/S 재실행',condition:{type:'event',eventType:'lsRestart'},points:1},call('restart')]),
+  op('OVERVIEW','[구로 - 수원] 구간 오버뷰를 실행하시오','L/S 화면 빈 곳 우클릭 → L/S Overview → [구로 - 수원]',[
+   {id:'overview',label:'[구로 - 수원] 오버뷰 실행',condition:{type:'event',eventType:'overview',id:'south'},points:1},call('overview')]),
+  op('NOTE','열차운행 그래프에 노트를 생성하시오','열차스케줄 → 온라인 열차그래프 → 노트관리 → 새노트작성 → 제목·내용 → 확인',[
+   {id:'note',label:'그래프 노트 생성',condition:{type:'event',eventType:'note'},points:1},call('note')])];
+ // 구술: 교수님 구술 문항(references/scenarios/구술(관제)_열차운행계획,운용및 실무.hwp)과 평가서 Ⅱ 예시. 답은 조치사항에 있고 교수가 답변을 확인한다.
+ const oral=(id,name,answer,limit=90)=>prob({id:'P-ORAL-'+id,subject:'철도관제시스템 운용',name,limit,actions:answer,checks:[{label:name.replace(/(에 대하여|에 대해|을|를)? ?설명하시오$/,'')+' 구술',condition:{type:'manual',label:name.replace(/(에 대하여|에 대해|을|를)? ?설명하시오$/,'')+' 구술'}}]});
+ const orals=[
+  oral('SIGN','L/S 표지판에 대하여 설명하시오','L/S 화면상에 표지판 심벌(선로일시사용중지 등)을 설정하는 기능. 열차 운행 중 선로 지장 정보를 제공하여 열차운행에 안정성을 제공한다. 종류: 선로일시사용중지, 폐색방식변경, 열간작업, 전차선단전, 사용자입력, 서행속도표시'),
+  oral('OVERVIEW','오버뷰에 대하여 설명하시오','각 콘솔별 제어역 전체의 열차운행상태, 현장설비 상태 등을 한번에 볼 수 있도록 표시하는 기능'),
+  oral('RESTART','L/S 재실행과 베이스스캔의 차이점을 설명하시오','L/S 재실행: 3개의 L/S 화면 중 1개 이상이 비정상적으로 다운되었을 때 L/S를 새로 실행시키지 않고 다운된 화면만 재실행하는 기능. 베이스스캔: 현장설비의 모든 정보상태를 재수신 받을 때 쓰는 기능. 차이점: L/S 재실행은 L/S에서만 실행, 베이스스캔은 MMI 및 L/S에서 실행'),
+  oral('NOTE','온라인 열차그래프의 노트에 대하여 설명하시오','열차그래프에 사용자가 어떤 구간에 대한 공사내용이나 중요한 내용을 열차그래프 안에 메시지 박스 형식으로 표시하는 것'),
+  oral('RUNQUERY','열차운행 관련 조회에 대하여 설명하시오','열차운행계획 대비 실적을 바탕으로 열차운행 흐름을 파악하고 상황대처를 위해 역실적, 열차실적, 임시열차, 지연열차, 운휴열차 등의 실적 및 상황을 조회하는 기능'),
+  oral('GRAPHMODE','열차그래프 화면모드를 설명하고 기능을 실행하시오','특정열차의 기본정보를 간단히 보여주거나 특정부분을 확대하거나 마우스 위치의 키로정·시간을 보여주는 기능. 툴팁 보기: 선택한 열차의 기본정보(열차번호, 종류, 시발종착, 출발·도착시각, 연계열번) 표시. 십자선 보기: 선택한 부분의 시간과 키로정 표시. 돋보기 기능: 보고 싶은 부분을 확대 (화면설정 → 화면모드설정)',120),
+  oral('APPROACH','접근쇄정에 대하여 설명하시오','열차가 신호기 외방 일정구간에 진입한 뒤 신호를 취소하여도 철도시설물 및 열차를 보호하기 위해 신호기 정지를 현시한 후 장내 90초, 출발 30초간 진로를 쇄정하는 것'),
+  oral('OVERLAP','오버랩(조사쇄정)에 대하여 설명하시오','장내 진입하는 열차가 전방의 출발신호기 정지를 무시하고 과주할 경우에 대비하여, 안전확보를 위해 출발신호기 전방 일정거리 내의 선로전환기를 안전측으로 쇄정하는 것'),
+  oral('MANUALLOG','수동제어 이력조회에 대하여 설명하시오','운영자가 현장설비 및 열차번호, 장비절체, 로그재생 이력, 선로지장스케줄 조작이력 등을 관리·조회하는 기능. 종류: 열차번호 제어이력, 역모드 제어이력, 현장설비 제어이력, 장비계절체 이력, 장비고장 복구이력 등'),
+  oral('REPLAY','로그재생을 설명하고 실행하시오','서버에 저장된 열차운행 관련 로그를 바탕으로 조건에 따라 검색된 역의 열차 운행상황을 다시 확인할 수 있도록 재현하는 다시보기 기능. 사고발생 원인 검증이나 재발방지 교육에 쓴다',120),
+  oral('OPQUERY','운용자 조작 관련 조회에 대하여 설명하시오','운영자가 L/S나 MMI에서 조작하는 열차번호, 역모드, 현장설비, 수동조작이력 등은 운영자 정보와 함께 DB에 저장된다. 수동제어 이력조회는 이 조작정보에 쉽게 접근하도록 일정한 형식의 폼으로 관리한다'),
+  oral('POSITION','열차위치목록 조회에 대하여 설명하시오','관할 영역 안에서 운행 중·운행 대기 중·운행 완료된 모든 열차의 운행상황을 파악하도록 정보를 제공하며, 운행 중인 열차는 점유역, 점유 열번창, 점유 궤도회로 등 상세정보를 제공한다'),
+  oral('STAFF','관제업무종사자의 정의를 설명하시오','철도교통의 안전과 질서를 유지하기 위하여 철도차량의 운행을 집중 제어, 감시하는 자'),
+  oral('ADJUSTDEF','「철도교통관제운영규정」상의 운전정리의 정의를 설명하시오','철도사고등으로 열차운행에 혼란이 발생하거나 혼란의 염려가 있을 경우 열차의 운행조건 및 일정 등을 변경하여 열차가 정상적으로 운행할 수 있도록 행하는 수단'),
+  oral('ADJUSTKIND','「철도교통관제운영규정」상의 운전정리의 종류를 설명하시오','운전휴지, 운행순서변경, 운행선로변경, 단선운행, 운행시각변경, 열차합병, 특발, 교행변경, 대피변경, 열차번호변경, 폐색구간 또는 폐색방식변경, 임시서행, 임시정차, 편성차량변경, 임시열차운전, 그 밖에 철도교통의 안전과 질서유지에 필요한 사항'),
+  oral('ROUTE','진로제어에 대하여 설명하시오','운행열차에 대해 선로를 확보해 주는 중요한 기능으로 해당역의 진로를 선택적으로 설정 및 해정할 수 있다'),
+  oral('ENTRY','진입열차 예고 관리에 대하여 설명하시오','운행대기 중인 열차를 관리하는 기능으로, 열차정리 및 운행 대기열에 임시열차 등록을 통해 운행대기 열을 조정하여 운행순서를 정할 수 있다'),
+  oral('PROPERTY','열차속성 조회에 대하여 설명하시오','열차의 상태정보 및 운행스케줄 정보를 제공한다. 조회정보: 열차번호, 종별, 출발역, 마지막역, 시발시각, 종착시각, 열차상태, 현재위치, 열차계획/실적정보 등'),
+  oral('POINT','선로전환기 제어(Local 취급)에 대하여 설명하시오','선로전환기: 역구내 및 중간건넘선의 분기기를 전환하여 열차의 운행선로를 변경하는 설비. 선로전환기 전환: CCM모드에서 현장역으로 전환요청을 하여 정/반위 제어를 할 수 있는 기능. Local 취급 시: 시간(00시부터 00시까지), 목적(긴급점검을 위해), 승인번호 부여(관제승인 1호로 Local 취급)'),
+  oral('ALARM','알람/이벤트 조회에 대하여 설명하시오','시스템 운영과정의 각종 경고메시지는 중요도와 사용목적, 사용빈도에 따라 분류되고 메시지 코드에 따라 처리된다. 알람/이벤트는 DB에 저장되어 필요시 검색하여 확인할 수 있다. 중요도: 중대한 오류(F), 오류(E), 경고(W)'),
+  oral('NUMBER','열차번호 제어에 대하여 설명하시오','L/S 열번창 또는 MMI 열차번호제어 창에서 열차번호를 입력·수정·삭제·이동·교환하는 기능 (평가서 Ⅱ 구술 예시 — 교수님 구술 문항에는 답안이 없어 기능 설명으로 적음)')];
  // built-in scripts
  const titles={'yongsan-5':'용산역 부본선(5번) 대피','yongsan-4':'용산역 부본선(하 4번선) 대피','yeongdeungpo-1':'영등포역 부본선(1번) 대피','geumcheon-1':'금천구청역 부본선(1번) 대피','geumcheon-6':'금천구청역 부본선(6번) 대피','sch-conflict':'경합 해소','sch-create':'스케줄 생성'};
  const scriptProblem=(sid,subject,name)=>prob({id:'P-'+sid,subject,name,limit:limits[sid]||600,script:sid,actions:'실기 시나리오 대본의 조작·구술 단계',checks:[]});
@@ -327,6 +381,8 @@ function seed({scripts=[],limits={}}={}){
  const sTg=sit({id:'S-TG',name:'#1-열차운행계획-009(구술)',scheduleId:'01105',limit:600,problems:[g1]});
  const sPlan=plan.length?sit({id:'S-PLAN',name:'#1-열차운행계획-004(스케줄)',scheduleId:'01106',limit:1800,problems:plan}):null;
  const sOral=sit({id:'S-ORAL',name:'#2-철도관제시스템운용실무(구술)',section:'지하청량리-영등포',scheduleId:'01105',limit:300,problems:[o1,o2,o3]});
+ const sOp=sit({id:'S-OP',name:'#2-철도관제시스템운용-실기 10항목',section:'군포-수원',limit:2400,problems:ops});
+ const sOralAll=sit({id:'S-ORAL-ALL',name:'#2-철도관제시스템운용-구술 전체',limit:3000,problems:[o1,o2,o3,...orals]});
  const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
  const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
  const sEmV=emergencyVariants.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));   // 감독관 지시형 · 상황별 (종합 시나리오에는 넣지 않는다)
@@ -334,6 +390,8 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
+ scen({id:'SC-OP',name:'#2-철도관제시스템운용-실기 10항목',situations:[sOp]});
+ scen({id:'SC-ORAL',name:'#2-철도관제시스템운용-구술 전체',situations:[sOralAll]});
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
  for(const id of [...sEvac,...sEm,...sEmV]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다

@@ -72,13 +72,13 @@ function overview(ids){
  canvas.onpointermove=e=>{if(!pan)return;const r=canvas.querySelector('.overview-network').getBoundingClientRect(),k=pan.box[2]/r.width,dx=(e.clientX-pan.x)*k,dy=(e.clientY-pan.y)*k;if(Math.abs(e.clientX-pan.x)+Math.abs(e.clientY-pan.y)>4)pan.moved=true;if(!pan.moved)return;const [fx,fy,fw,fh]=ovZoom.full,[x,y,w,h]=pan.box;ovZoom.box=[Math.min(fx+fw-w,Math.max(fx,x-dx)),Math.min(fy+fh-h,Math.max(fy,y-dy)),w,h];overviewView({width:fw,height:fh});canvas.classList.add('panning');};
  canvas.onpointerup=()=>{setTimeout(()=>{pan=null;canvas.classList.remove('panning');},0);};
  const select=e=>{if(pan?.moved)return;const target=e.target.closest('[data-overview-station]');if(target){dialog.close();host.selectStation(target.dataset.overviewStation);}};canvas.onclick=select;canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(e);}};
- dialog.showModal();refreshOverview();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
+ dialog.showModal();root.SimRemote.command({type:'practice',name:'overview',id:root.SimLSOverview.REGIONS.find(r=>r.rows.flat().length===ids.length&&r.rows.flat().every(x=>ids.includes(x)))?.id||'all',source:'LS'});refreshOverview();overviewTimer=setInterval(()=>{if(dialog.open)refreshOverview();else clearInterval(overviewTimer);},1000);
 }
 function backgroundMenu(point){const ids=root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id);return [
  {label:'현재역 베이스스캔',id:'scan-current',action:()=>scan('current')},
  {label:'화면인쇄',id:'print',action:()=>{closeMenu();root.print();}},
  {label:'전체역 베이스스캔',id:'scan-all',action:()=>scan('all')},
- {label:'L/S 재실행',id:'restart',action:()=>{closeMenu();host.render();host.toast('L/S 화면 재표시 · 설정된 진로·열차번호·표지판 유지');}},
+ {label:'L/S 재실행',id:'restart',action:()=>{closeMenu();root.SimRemote.command({type:'practice',name:'lsRestart',station:ctx().station,source:'LS'});host.render();host.toast('L/S 화면 재표시 · 설정된 진로·열차번호·표지판 유지');}},
  {label:'L/S 표지판',id:'boards',children:root.SimLSOperations.boardTypes.map((kind,i)=>({label:kind,id:'board-'+i,action:()=>editBoard(kind,point)}))},
  {label:'L/S Overview',id:'overview',children:[{label:'전체 관제구간',id:'overview-all',action:()=>overview(ids)},...root.SimLSOverview.REGIONS.map(r=>({label:r.name,id:'overview-'+r.id,action:()=>overview(r.rows.flat())}))]}
  ];}

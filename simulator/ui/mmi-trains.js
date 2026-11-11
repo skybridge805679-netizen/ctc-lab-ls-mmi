@@ -30,7 +30,7 @@ function init(api){
  $('mmiTrainOp').onchange=()=>{refresh();if($('mmiTrainOp').value==='rename')fillNumber();};
  $('mmiTrainSlot').onchange=()=>{refresh();fillNumber();};$('mmiTrainEntry').onchange=fillNumber;
  $('mmiTrainClose').onclick=()=>root.SimMMI.close('trainNumber');
- $('mmiTrainForm').onsubmit=e=>{e.preventDefault();const operation={op:$('mmiTrainOp').value,station:station(),slot:$('mmiTrainSlot').value,uid:$('mmiTrainEntry').value,number:$('mmiTrainNumber').value,direction:$('mmiTrainDirection').value,targetStation:$('mmiTrainTargetStation').value,targetSlot:$('mmiTrainTargetSlot').value,targetUid:$('mmiTrainTargetEntry').value};host.openAction('열차번호 '+$('mmiTrainOp').selectedOptions[0].textContent,`<p>${esc(N.catalog[operation.station].name)} · ${esc(operation.slot)} 열번창에 적용하시겠습니까?</p>`,{type:'lsOperation',operation,source:'MMI'});};
+ $('mmiTrainForm').onsubmit=e=>{e.preventDefault();const operation={source:'MMI',op:$('mmiTrainOp').value,station:station(),slot:$('mmiTrainSlot').value,uid:$('mmiTrainEntry').value,number:$('mmiTrainNumber').value,direction:$('mmiTrainDirection').value,targetStation:$('mmiTrainTargetStation').value,targetSlot:$('mmiTrainTargetSlot').value,targetUid:$('mmiTrainTargetEntry').value};host.openAction('열차번호 '+$('mmiTrainOp').selectedOptions[0].textContent,`<p>${esc(N.catalog[operation.station].name)} · ${esc(operation.slot)} 열번창에 적용하시겠습니까?</p>`,{type:'lsOperation',operation,source:'MMI'});};
  $('mmiTrainProperty').onclick=()=>{const t=rows(station(),$('mmiTrainSlot').value).find(t=>t.uid===$('mmiTrainEntry').value);if(!t)return;root.SimTrainStatusUI.properties(host,t.number,host.context().state.clock);};
  refresh();
 }
