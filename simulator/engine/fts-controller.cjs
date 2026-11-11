@@ -26,6 +26,7 @@ function create(host){
   case 'moveTrain':{let found=null;for(const [station,s]of Object.entries(c.ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)found={station,slot,uid:r.uid};
    if(!found)throw Error(ph.number+' 열차번호가 LS에 없습니다');if(found.station!==ph.station||found.slot!==ph.slot)error(host.apply({type:'numbers',action:{op:'move',station:found.station,slot:found.slot,uid:found.uid,targetStation:ph.station,targetSlot:ph.slot}}));break;}
   case 'resetStation':host.resetStation(ph.station);break;
+  case 'resetAll':host.resetAll();break;
   case 'clearTimetable':error(host.apply({type:'timetable',method:'import',args:[{serviceDate:c.model.serviceDate,trains:[]}]}));break;
   case 'runTrain':{let f=null;for(const [station,s]of Object.entries(host.context().ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)f={station,slot,uid:r.uid};
    if(!f)throw Error(ph.number+' 열차번호가 LS에 없습니다');

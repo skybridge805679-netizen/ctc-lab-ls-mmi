@@ -140,7 +140,7 @@ function emergency({limits={}}={}){
   return {id:'P-'+sc.id,subject:'비상 시 조치',name:`비상시 조치 ${sc.title}`,limit:limits[sc.id]||900,score:100,voice:sc.problem,
    situation:[sc.problem,...sc.trains,...sc.notes].join('\n'),actions:reference(order),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
-   setup:{clearTimetable:true,reset:[...sc.stations],clear:E.numbersOf(sc),routes:setupRoutes,approach:[],modes:sc.stations.map(station=>({station,value:'AUTO'})),
+   setup:{clearTimetable:true,resetAll:true,reset:[...sc.stations],clear:E.numbersOf(sc),routes:setupRoutes,approach:[],modes:sc.stations.map(station=>({station,value:'AUTO'})),
     trains:E.castFor(sc).map(c=>({station:c.station,slot:c.slot,number:c.number,direction:c.dir}))},
    objectives:book.list,communications:[...comms,...(VB()?.proactiveFor(sc.key)||[])],reactions,
    // 상황별 대응 요령: 감독관이 상황을 바꾸는 분기 (교수가 모니터링에서 주입)
@@ -188,7 +188,7 @@ function evacuation({limits={}}={}){
    situation:[fill(sc.problem),...cast.map(c=>`${c.id} : ${{fault:'고장열차',other:c.label||'다른 선 열차'}[c.key]||c.label||'후속열차'} (${nm(sc.station)}역 ${c.slot})`)].join('\n'),
    actions:reference(order)+'\n\n'+sc.notes.join('\n'),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),
-   setup:{clearTimetable:true,reset:[sc.station],clear:cast.map(c=>c.id),routes:seeded.routes,approach:seeded.approach,modes:[{station:sc.station,value:'AUTO'}],
+   setup:{clearTimetable:true,resetAll:true,reset:[sc.station],clear:cast.map(c=>c.id),routes:seeded.routes,approach:seeded.approach,modes:[{station:sc.station,value:'AUTO'}],
     trains:cast.map(c=>({station:sc.station,slot:c.slot,number:c.id,direction:c.dir}))},
    objectives:book.list,communications:comms,reactions};
  });

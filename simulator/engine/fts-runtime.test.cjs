@@ -22,3 +22,19 @@ test('scenario setup is idempotent for an already selected mode and can set a ro
 test('schedule-operation conditions are fed by the native timetable command path',()=>{const r=setup(library([{id:'P',checks:[{condition:{type:'event',eventType:'schedule',id:'K1131'}}]}]));const t=r.snapshot().timetable.trains.find(x=>x.id==='K1131');assert(r.command({type:'timetable',method:'update',args:[t.id,{...t,kind:'회송열차'}]}).ok);assert.equal(state(r).history[0].got,100);});
 test('saved drafts do not invalidate the installed library or the selected complete scenario',()=>{const l=library([{id:'P'}]);l.situations.push({id:'DRAFT',name:'작성 중',problems:[]});assert.equal(F.validate(l,{drafts:true}).length,0);const r=setup(l),copy=R.create();copy.restore(r.checkpoint());assert(copy.snapshot().ftsLibrary.situations.some(s=>s.id==='DRAFT'));});
 test('the master session owns the clock and other exercises cannot replace its assessment task',()=>{const r=setup(library([{id:'P'}])),key=r.snapshot().assessment.task.key;assert.equal(r.command({type:'assessment',op:'start',options:{seconds:60}}).ok,false);r.command({type:'drill:create'});assert.equal(r.snapshot().assessment.task.key,key);r.command({type:'clock',paused:true});assert.equal(r.snapshot().clock.paused,true);command(r,{op:'stop'});assert(r.command({type:'assessment',op:'start',options:{seconds:60}}).ok);});
+test('chained 비상시조치 problems each start on a clean LS: earlier routes and trains never leak into the next one (beta feedback)',()=>{
+ const r=R.create();r.command({type:'fts',op:'bootstrap'});const lib=r.snapshot().ftsLibrary;
+ assert(r.command({type:'fts',op:'start',scenario:'SC-04',professor:'001',student:'tester',autoRun:true}).ok);
+ const rows=()=>{const out=[];for(const [st,s]of Object.entries(r.snapshot().ls.stations))for(const [slot,rs]of Object.entries(s.windows))for(const x of rs)out.push({number:x.number,st,slot});return out;};
+ let seen=0;
+ for(;;){const s=state(r).session;if(!s||s.finished)break;const p=lib.problems.find(p=>p.id===s.items[s.current].problem),own=new Set(require('./emergency').numbersOf(require('./emergency').list.find(x=>'P-'+x.id===p.id)));
+  for(const t of p.setup.trains)assert(rows().some(x=>x.number===t.number),p.id+' '+t.number+' missing');
+  for(const x of rows())assert(own.has(x.number),p.id+' leftover '+x.number);
+  const allowed=new Set(p.setup.routes.map(x=>x.station+':'+x.route));
+  for(const [id,st]of Object.entries(r.snapshot().states))for(const k of Object.keys(st.routes))assert(allowed.has(id+':'+k)||require('./emergency').list.find(x=>'P-'+x.id===p.id).stations.includes(id),p.id+' leftover route '+id+':'+k);
+  seen++;r.command({type:'tick',seconds:90});r.command({type:'fts',op:'next'});}
+ assert.equal(seen,9);
+ // 문제 하나만 골라 시작할 수 있다
+ for(const id of ['SC-em-04','SC-em-05','SC-EVAC-1'])assert(lib.scenarios.some(s=>s.id===id&&s.situations.length===1),id);
+ assert.equal(require('./emergency').castFor(require('./emergency').list.find(x=>x.id==='em-04')).find(c=>c.number==='K0809').slot,'2T');
+});

@@ -72,7 +72,8 @@ const OVERLAY={
    26:[move('G0454','geumcheon',SEOKSU_UP2,'G0454 열차번호를 K0452가 있는 석수역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G0454','geumcheon')],
    27:[rename('K0452','G0452','geumcheon')]}},
  '04':{station:'anyang',stations:['anyang','gunpo','geumjeong'],
-  cast:[['K0809','geumjeong'],['K0811','anyang','2T'],['A1003','anyang','2T'],['K0813','anyang','B978T'],['K1114','gunpo'],['K1116','gunpo','B1005T']],
+  cast:[['K0809','geumjeong','2T'],   // 원문: 금정역 하2선 진입 중 사상사고 — 하2선(전동차선)은 2T
+        ['K0811','anyang','2T'],['A1003','anyang','2T'],['K0813','anyang','B978T'],['K1114','gunpo'],['K1116','gunpo','B1005T']],
   seeds:{anyang:['4B','4C','1B'],gunpo:['1A','1B']},
   before:{
    16:[mode('anyang','CCM'),stop('anyang',['4B'],' (필요시 4C 출발·1B 장내도 정지)'),mode('gunpo','CCM'),stop('gunpo',['1A','1B'])],

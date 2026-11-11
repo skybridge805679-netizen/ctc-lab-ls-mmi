@@ -31,6 +31,10 @@ function create(){
   pause:value=>{paused=value;},auto:on=>root.SimAutoUI.set(on),startAssessment:()=>assessment.start({subject:'integrated'},now()),beginTask:o=>assessment.begin(o,now()),endTask:(key,status)=>{if(key)assessment.finishTask(now(),status,key);},finishAssessment:()=>assessment.finish(now()),
   stopScript:()=>root.SimScenarioUI.stop(),
   resetStation:st=>{const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});},
+  // 새 문제는 깨끗한 LS에서: 모든 역의 진로·모드·점유와 열차번호, 운행 중이던 시나리오 열차를 지운다
+  resetAll:()=>{root.SimScenarioUI.stop();const a=root.SimAutoUI.checkpoint();root.SimAutoUI.restore({...a,transit:[]});
+   for(const st of Object.keys(states)){const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});ls.stations[st]={windows:{},boards:[]};}
+   windowUids.clear();refresh();},
   startScript:(id,number,key,ui)=>{const sc=root.SimScenarios.list.find(s=>s.id===id);if(!number&&sc)number=root.SimScenarios.candidates(sc,model)[0];const r=root.SimScenarioUI.start(id,number,ui);if(r.ok){const run=root.SimScenarioUI.snapshot().run;run.assessmentKey=key;tableDirty=true;
    // 경합·스케줄생성 대본은 시작할 때 열차번호·구간·시각을 새로 정한다: 그 문제 문장을 FTS 문제 화면에 넘긴다
    if(run.sc?.group==='schedule'&&run.sc.problem)return {...r,problem:run.sc.problem};}return r;},

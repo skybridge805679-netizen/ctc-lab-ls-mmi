@@ -73,6 +73,7 @@ const PHENOMENA={
  moveTrain:{label:'열차번호 이동',fields:['number','station','slot']},
  runTrain:{label:'열차 운행 (진로를 기다려 이동)',fields:['number','legs']},
  resetStation:{label:'역 상태 초기화',fields:['station']},
+ resetAll:{label:'LS 전체 초기화 (모든 역 진로·모드·열차번호)',fields:[]},
  clearTimetable:{label:'시간표 비우기 (대본 열차만 남김)',fields:[]},
  alarm:{label:'알람 발생',fields:['text']},
  notice:{label:'안내 메시지',fields:['text']}
@@ -156,6 +157,7 @@ function checkActive(p,w,errors){
   (st.reset||[]).forEach((x,i)=>checkStation(x,`${where} 초기화 ${i+1}`,errors));
   for(const k of ['reset','modes','routes','approach','trains','clear'])if(st[k]!==undefined&&(!Array.isArray(st[k])||st[k].length>200))errors.push(`${where}: ${k}는 배열`);
   if(st.clearTimetable!==undefined&&typeof st.clearTimetable!=='boolean')errors.push(`${where}: clearTimetable은 true/false`);
+  if(st.resetAll!==undefined&&typeof st.resetAll!=='boolean')errors.push(`${where}: resetAll은 true/false`);
   if(st.scheduleId!==undefined&&typeof st.scheduleId!=='string')errors.push(`${where}: scheduleId는 스케줄 ID 문자열`);
   (st.modes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'mode'},`${where} 모드 ${i+1}`,errors));
   (st.routes||[]).forEach((x,i)=>checkPhenomenon({...x,type:'route'},`${where} 진로 ${i+1}`,errors));
@@ -210,7 +212,8 @@ const problemOf=(lib,item)=>lib.problems.find(p=>p.id===item.problem);
 // 초기 상태 → 현상 목록 (지울 번호 → 진로 → 접근 열차 → 제어모드 → 열번 표시)
 function setupActions(st){
  if(!st)return [];
- return [...(st.clearTimetable?[{type:'clearTimetable'}]:[]),...(st.reset||[]).map(station=>({type:'resetStation',station})),...(st.clear||[]).map(number=>({type:'deleteTrain',number})),...(st.routes||[]).map(x=>({...x,type:'route'})),...(st.approach||[]).map(x=>({...x,type:'approach'})),
+ // resetAll: 앞 문제가 남긴 진로·모드·열차번호·운행 중 열차를 모두 지우고 새 LS에서 시작한다 (구간이 겹치는 문제를 이어 풀 때 열차 증발 방지)
+ return [...(st.clearTimetable?[{type:'clearTimetable'}]:[]),...(st.resetAll?[{type:'resetAll'}]:[]),...(st.reset||[]).map(station=>({type:'resetStation',station})),...(st.clear||[]).map(number=>({type:'deleteTrain',number})),...(st.routes||[]).map(x=>({...x,type:'route'})),...(st.approach||[]).map(x=>({...x,type:'approach'})),
   ...(st.modes||[]).map(x=>({...x,type:'mode'})),...(st.trains||[]).map(x=>({...x,type:'insertTrain'}))];
 }
 // 상황 변경(분기): 교수가 주입하거나(조건 키 branch:<id>) when 조건이 맞으면 켜진다. 켜진 분기의 목표·통보·반응이 더해지고
@@ -328,6 +331,8 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
+ // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
+ for(const id of [...sEvac,...sEm]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
  const schedules=[];
  // A problem may replace the timetable explicitly; follow-up edits of C4201 keep the work done before them.
