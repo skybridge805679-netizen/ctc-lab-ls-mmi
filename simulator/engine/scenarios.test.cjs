@@ -4,8 +4,8 @@ const flows={
  'yongsan-5':[['mode','CCM'],['stop','2A'],['tick',90],['route','2A-5T'],['mode','AUTO'],['sched','yongsan','3C_B605T']],
  'yongsan-4':[['mode','CCM'],['stop','1B'],['tick',90],['route','1B-4T'],['mode','AUTO'],['sched','yongsan','4C_B610T']],
  'yeongdeungpo-1':[['mode','CCM'],['stop','1A'],['stop','4B'],['tick',90],['route','1A-1T'],['mode','AUTO'],['sched','yeongdeungpo','4A_B622T']],
- 'geumcheon-1':[['mode','CCM'],['stop','1B'],['stop','4B'],['tick',90],['route','1B-1T'],['mode','AUTO'],['mode','CCM'],['route','4A-B644T'],['mode','AUTO']],
- 'geumcheon-6':[['mode','CCM'],['stop','2B'],['tick',90],['route','2B-6T'],['mode','AUTO'],['mode','CCM'],['stop','2B'],['tick',90],['route','3A-B639T'],['mode','AUTO']]
+ 'geumcheon-1':[['mode','CCM'],['stop','1B'],['stop','1A'],['stop','4B'],['tick',90],['route','1B-1T'],['mode','AUTO'],['mode','CCM'],['route','4A-B644T'],['mode','AUTO']],
+ 'geumcheon-6':[['mode','CCM'],['stop','2B'],['stop','2A'],['tick',90],['route','2B-6T'],['mode','AUTO'],['mode','CCM'],['stop','2B'],['tick',90],['route','3A-B639T'],['mode','AUTO']]
 };
 assert.strictEqual(S.list.length,5);
 for(const sc of S.list){
