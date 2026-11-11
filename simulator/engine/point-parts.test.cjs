@@ -11,7 +11,7 @@ test('every source crossover has both controllable A/B ends and all declared bra
  const W=require('./wiring').data,survey=require('../../references/transcriptions/switch-survey.json');
  for(const [station,def]of Object.entries(W)){const C=Core.forStation(station);assert.deepEqual(Object.keys(C.points).sort(),survey.stations[station].groups);
   for(const [id]of def.links){const parts=Object.entries(C.pointParts).filter(([,group])=>group===id).map(([part])=>part);assert.equal(parts.length,2,station+' '+id+' both source ends');assert.deepEqual(parts.map(p=>p.slice(0,-1)),[parts[0].slice(0,-1),parts[0].slice(0,-1)]);}
-  for(const id of new Set([...def.links.map(l=>l[0]),...def.rails.flatMap(r=>r[5]||[])]))assert(C.points[id],station+' source blade '+id+' lost from engine');
+  for(const id of new Set([...def.links.map(l=>l[0]),...def.rails.flatMap(r=>r[5]||[])].filter(Boolean)))assert(C.points[id],station+' source blade '+id+' lost from engine');
  }
 });
 test('reviewed scissors source IDs select the correct physical diagonal',()=>{

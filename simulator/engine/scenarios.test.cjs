@@ -1,7 +1,7 @@
 const assert=require('assert');
 const S=require('./scenarios.js'),Core=require('./core.js'),T=require('./timetable.js');
 const flows={
- 'yongsan-5':[['mode','CCM'],['stop','2A'],['tick',90],['route','2A-5T'],['mode','AUTO'],['sched','yongsan','3C_B605T']],
+ 'yongsan-5':[['mode','CCM'],['stop','2A'],['refused','2A-5T'],['pass','1B-3T'],['pass','4B-B610T'],['tick',90],['route','2A-5T'],['mode','AUTO'],['sched','yongsan','3C_B605T']],
  'yongsan-4':[['mode','CCM'],['stop','1B'],['tick',90],['route','1B-4T'],['mode','AUTO'],['sched','yongsan','4C_B610T']],
  'yeongdeungpo-1':[['mode','CCM'],['stop','1A'],['stop','4B'],['tick',90],['route','1A-1T'],['mode','AUTO'],['sched','yeongdeungpo','4A_B622T']],
  'geumcheon-1':[['mode','CCM'],['stop','1B'],['stop','1A'],['stop','4B'],['tick',90],['route','1B-1T'],['mode','AUTO'],['mode','CCM'],['route','4A-B644T'],['mode','AUTO']],
@@ -23,6 +23,9 @@ for(const sc of S.list){
   else if(f[0]==='stop'){const r=c.dispatch(state,{type:'stop',id:f[1],source:'LS'});assert.ok(r.ok,sc.id+' stop '+f[1]+' '+r.message);emit({type:'stop',id:f[1]});}
   else if(f[0]==='tick'){c.dispatch(state,{type:'tick',seconds:f[1]});S.advance(run,{state,model});}
   else if(f[0]==='route'){const r=c.dispatch(state,{type:'route',id:f[1],source:'LS'});assert.ok(r.ok,sc.id+' route '+f[1]+' '+r.message);emit({type:'route',id:f[1]});}
+  // 열차 없이 조작만 재현하는 시험: 하2선 열차가 지나가며 그 진로가 풀리는 것(pass)과, 그 전에는 대피 진로가 거부되는 것(refused)을 흉내 낸다
+  else if(f[0]==='refused'){const trial=structuredClone(state);assert.equal(c.dispatch(trial,{type:'mode',value:'CCM'})&&c.dispatch(trial,{type:'route',id:f[1],source:'LS'}).ok,false,sc.id+' '+f[1]+' 는 하2선 열차가 지나가기 전에는 서지 않는다');}
+  else if(f[0]==='pass'){assert.ok(state.routes[f[1]],sc.id+' '+f[1]);let r=c.dispatch(state,{type:'occupy',id:f[1],number:'A1001',seconds:1,source:'SCENARIO'});assert.ok(r.ok!==false,r.message);r=c.dispatch(state,{type:'clear',id:f[1],source:'SCENARIO'});assert.ok(r.ok!==false,r.message);assert.ok(!state.routes[f[1]]);}
   else if(f[0]==='sched'){const t=model.trains.find(x=>x.id===train),call=t.calls.find(x=>x.station===f[1]);call.departureRoute=f[2];S.advance(run,{state,model});}
  }
  const done=run.done.filter((d,i)=>d&&sc.steps[i].kind==='do').length;

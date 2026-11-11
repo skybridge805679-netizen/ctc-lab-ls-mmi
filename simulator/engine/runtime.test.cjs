@@ -5,7 +5,7 @@ test('the complete headless runtime owns controls, timetable, numbers and scenar
  assert.ok(r.command({type:'scenario:start',id:'yongsan-5',train:t.id}).ok);
  for(const action of [{type:'mode',value:'CCM'},{type:'stop',id:'2A'}])assert.ok(r.command({type:'control',station:'yongsan',action}).ok);
  r.command({type:'tick',seconds:90});assert.ok(r.command({type:'control',station:'yongsan',action:{type:'route',id:'2A-5T'}}).ok);
- assert.equal(r.snapshot().scenario.jobs[0].phase,'moving');r.command({type:'tick',seconds:60});
+ assert.equal(r.snapshot().scenario.jobs.find(j=>j.number===t.id).phase,'moving');r.command({type:'tick',seconds:60});      // jobs[0]은 통보 뒤 먼저 지나간 하2선 열차
  assert.ok(r.snapshot().scenario.jobs.every(j=>j.phase==='done'));assert.ok(r.snapshot().ls.stations.yongsan.windows['5T'].some(row=>row.number===t.id));
  const train=r.snapshot().timetable.trains[0];assert.ok(r.command({type:'timetable',method:'delay',args:[train.id,train.calls[0].station,2]}).ok);assert.equal(r.snapshot().timetable.trains[0].calls[0].departure,train.calls[0].departure+120);
 });

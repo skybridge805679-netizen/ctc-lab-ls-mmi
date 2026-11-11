@@ -30,3 +30,11 @@ test('approach lock comes from the train in the section, not only from the manua
  ({s,r}=run({}));assert.equal(s.routes['2A-7T'],undefined);       // no train in rear: released at once
  ({s,r}=run({B608T:['X']}));assert.equal(s.routes['2A-7T'],undefined); // a train on another line does not count
 });
+test('용산: 2A-7T and 4B-B610T stand together; 1B-3T locks point 52 so the refuge routes 2A-5T/2A-6T are refused (real LS, 2026-11-11)',()=>{
+ const C=Core.forStation('yongsan'),fresh=()=>{const s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});return s;},set=(s,id)=>C.dispatch(s,{type:'route',id});
+ assert.deepEqual(C.routes['2A-7T'].pointPositions,{'51':'N','55':'N'});      // YT는 7T로 그대로 이어진다 — 51호 건넘선을 반위로 쓰지 않는다
+ let s=fresh();assert.ok(set(s,'2A-7T').ok);assert.ok(set(s,'4B-B610T').ok);assert.ok(set(s,'1B-3T').ok);
+ s=fresh();assert.ok(set(s,'1B-3T').ok);const r=set(s,'2A-5T');assert.equal(r.ok,false);assert.match(r.message,/SW-52 선로전환 오방향 쇄정 상태\[수동진로설정불가\]/);assert.match(r.message,/1B-3T/);
+ assert.equal(set(s,'2A-6T').ok,false);
+ s=fresh();assert.ok(set(s,'4B-B610T').ok);assert.equal(set(s,'2A-5T').ok,false);      // 원문: 상2선 2A-부본선과 하2선(1B-3T · 4B-B610T)의 상관관계
+});

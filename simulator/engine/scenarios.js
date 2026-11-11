@@ -30,16 +30,17 @@ const doStep=(text,check,hint)=>({kind:'do',...parse(text),check,hint});
 const list=[
  {id:'yongsan-5',title:'용산역 부본선(5번) 대피',station:'yongsan',source:'용산역 부본선(5,6번)대피.hwp',
   problem:'{고장}열차(교재 A1002) 차량고장이 발생했습니다. 조치하세요.',direction:'up',
-  seed:{routes:['2A-7T'],approach:['2A']},
+  // 하2선 열차(A1001)의 1B-3T · 4B-B610T도 진행 중이다. 대피 진로 2A-5T는 3T를 가로지르므로 A1001이 지나간 뒤에만 선다 (원문 ※ 상관관계)
+  seed:{routes:['2A-7T','1B-3T','4B-B610T'],approach:['2A']},
   cast:[{role:'fault',dir:'up',slot:'B607T'},{role:'follow',dir:'up',slot:'B607T',fallback:'A1004'},{role:'follow',dir:'up',slot:'B607T',fallback:'A1006'},{role:'other',dir:'down',slot:'B606T',fallback:'A1001',label:'하2선 열차'}],
-  beats:{route:[['fault','5T']],enter:[['follow1','7T'],['follow1','B605T',30],['follow1',null,30],['other','3T'],['other','B610T',30],['other',null,30]],repair:[['follow2','7T'],['follow2','B605T',30],['follow2',null,30]],edit:[['fault','B605T']],end:[['fault',null]]},
+  beats:{route:[['fault','5T']],other:[['other','3T'],['other','B610T',20],['other',null,20]],enter:[['follow1','7T'],['follow1','B605T',30],['follow1',null,30]],repair:[['follow2','7T'],['follow2','B605T',30],['follow2',null,30]],edit:[['fault','B605T']],end:[['fault',null]]},
   steps:[
    say('{고장}열차 차량고장으로 관제승인 1호로 용산역 5번 부본선 대피합니다. 용산역 장내신호기 앞에 정차합니다. 장내신호기 정지됩니다. 관제 이상!'),
    doStep('용산역 CCM 전환',sawMode('yongsan','CCM'),'MMI 현장설비제어 → 역제어모드 설정 → CCM, 또는 LS 상단 CCM → 예'),
    say('용산역 CCM 전환, CCM 전환 확인!'),
    doStep('2A 해정 (접근쇄정이 걸립니다)',stopped(['2A']),'LS에서 2A 신호기를 눌러 정지 확인창 [예]'),
    say('후속열차, 관제 이상! 선행 {고장}열차 용산역 부본선 대피 대기중입니다. 주의운전 하시고 안내방송 하시기 바랍니다.'),
-   say('하2선 열차, 관제 이상! 부본선 대피하는 열차 있습니다. 빠르게 운행 바랍니다. 관제 이상!'),      // 원문 4번 (A1001 하2선)
+   say('§other§하2선 열차, 관제 이상! 부본선 대피하는 열차 있습니다. 빠르게 운행 바랍니다. 관제 이상!'),      // 원문 4번 (A1001 하2선)
    say('용산역, 관제 이상! {고장}열차 차량고장으로 5번 부본선 대피합니다. 안내방송 하시고 기동검수 통보 바랍니다.'),
    doStep('접근쇄정 90초가 지나 2A 진로가 해정됨',released(['2A']),'+10초 버튼으로 90초 경과시키기'),
    doStep('§route§2A-5T 장내 진행 (5번 부본선)',routeSet('2A-5T'),'CCM → 2A → RT_2A_5T'),
