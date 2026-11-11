@@ -43,7 +43,7 @@ const CONDITIONS={
  trainRun:{label:'열차 운행 도착 (진로·신호 또는 전령법으로 실제 운행)',fields:['number','station'],test:(c,x)=>(x.events||[]).some(e=>e.type==='trainRun'&&e.number===c.number&&e.station===c.station&&(!c.slot||e.slot===c.slot)),text:c=>`${c.number} 열차가 ${nm(c.station)}역${c.slot?' '+c.slot:''}까지 운행 (열번 수동 이동은 인정 안 함)`},
  event:{label:'조작 기록',fields:['eventType'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.type===c.eventType&&(!c.station||e.station===c.station)&&(c.id===undefined||String(e.id)===String(c.id))&&(c.value===undefined||e.value===c.value)
   // source: 조작한 화면('LS' · 'MMI') — 평가서 Ⅱ의 「L/S에서 … · MMI에서 …」 지정 과제. op: 열번창·표지판 조작 종류(insert · boardAdd …)
-  &&(c.source===undefined||e.source===c.source)&&(c.op===undefined||e.operation?.op===c.op)&&(c.slot===undefined||e.operation?.slot===c.slot)),text:c=>`${c.source?c.source+'에서 ':''}${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.op?' '+c.op:''}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
+  &&(c.source===undefined||e.source===c.source)&&(c.op===undefined||e.operation?.op===c.op)&&(c.slot===undefined||e.operation?.slot===c.slot)&&(c.kind===undefined||e.operation?.kind===c.kind)),text:c=>`${c.source?c.source+'에서 ':''}${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.op?' '+c.op:''}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
  signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll')))
   // orStopped: 그 신호로 열차가 이미 지나가 정지로 돌아와 있으면 취소할 것이 없다 — 정지 확인으로 인정한다
   ||!!c.orStopped&&CONDITIONS.signalStop.test(c,x),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
@@ -363,6 +363,53 @@ function seed({scripts=[],limits={}}={}){
   oral('POINT','선로전환기 제어(Local 취급)에 대하여 설명하시오','선로전환기: 역구내 및 중간건넘선의 분기기를 전환하여 열차의 운행선로를 변경하는 설비. 선로전환기 전환: CCM모드에서 현장역으로 전환요청을 하여 정/반위 제어를 할 수 있는 기능. Local 취급 시: 시간(00시부터 00시까지), 목적(긴급점검을 위해), 승인번호 부여(관제승인 1호로 Local 취급)'),
   oral('ALARM','알람/이벤트 조회에 대하여 설명하시오','시스템 운영과정의 각종 경고메시지는 중요도와 사용목적, 사용빈도에 따라 분류되고 메시지 코드에 따라 처리된다. 알람/이벤트는 DB에 저장되어 필요시 검색하여 확인할 수 있다. 중요도: 중대한 오류(F), 오류(E), 경고(W)'),
   oral('NUMBER','열차번호 제어에 대하여 설명하시오','L/S 열번창 또는 MMI 열차번호제어 창에서 열차번호를 입력·수정·삭제·이동·교환하는 기능 (평가서 Ⅱ 구술 예시 — 교수님 구술 문항에는 답안이 없어 기능 설명으로 적음)')];
+ // 열차운행선 관리 — 지장작업 5단계 (실기평가서 Ⅲ: 단계마다 5점, 감점 한 줄 = 채점 항목 하나).
+ // 교수님 대본이 없는 과목이라 실기평가서의 감점 문장과 실무 교재(운행선관리 제3장 업무 진행 순서)로 만들었다. 구간·시각·열차는 연습용 설정이다:
+ //   금천구청~안양역간 하2선 선로일시사용중지 (전차선 단전 동반 · 장비 투입), 양 끝 역(금천구청 · 안양)을 LOCAL로 이관한다.
+ // 다섯 문제는 한 상황으로 이어진다(LOCAL · 표지판이 다음 단계로 넘어간다). 통보는 교수가 확인하고, 화면 조작은 실제 조작으로 채점한다.
+ const WK=['geumcheon','anyang'],say=(id,label,text)=>({id,label,text,points:1}),done=(id,label,condition)=>({id,label,condition,points:1});
+ const work=(n,name,situation,actions,objectives,communications,extra={})=>prob({id:'P-WORK-'+n,subject:'운행선 관리',name,limit:600,situation,actions,objectives,communications,reactions:[],...extra});
+ const WORK='금천구청~안양역간 하2선 선로일시사용중지 작업 (전차선 단전 동반, 장비 투입) · 작업시간 01:00~04:00';
+ const works=[
+  work(1,'지장작업 계획을 수립하시오',WORK+'\n운전명령으로 시달된 작업이다. 작업시간대에 하2선을 운행하는 열차가 있다.','작업 구분(선로일시사용중지 / 각 열차 사이 차단) → 단전·장비 구분 → 경합 확인 · 운행조정 결정 통보 → L/S 표지판 · T/G 노트 표기 → 작업책임자 확인 · 인수인계',[
+    done('sign','L/S 표지판 [선로일시사용정지] 설정 (금천구청 또는 안양 화면)',{type:'any',conditions:WK.map(station=>({type:'event',eventType:'lsOperation',station,op:'boardAdd',kind:'선로일시사용정지'}))}),
+    done('note','T/G 노트 작성 (작업구간 · 시간)',{type:'event',eventType:'note'})],[
+    say('c1','① 선로일시사용중지와 각 열차 사이 차단작업 구분','금일 01시 00분부터 04시 00분까지 금천구청~안양역간 하2선 작업은 열차운행을 중지하고 시행하는 선로일시사용중지 작업입니다. (각 열차 사이 차단작업 아님)'),
+    say('c2','② 전차선 단전 · 장비운행 필요 여부 구분','전차선 단전이 필요한 작업이고, 장비 운행이 필요한 작업입니다.'),
+    say('c3','③ 열차운행계획과 경합 확인 · 운행조정 결정 통보','(관) 금천구청역, 안양역. 관제 이상!\n(관) 금일 01시 00분부터 04시 00분까지 금천구청~안양역간 하2선 선로일시사용중지 작업 있습니다. 전차선 단전 동반, 장비 투입 작업입니다. 작업시간대 하2선 열차는 하1선으로 운행조정합니다. 관제 이상!\n   (역) 수신 이상!'),
+    say('c5','⑤ 작업책임자 통해 영향 사항 확인 · 중요사항 인수인계','(관) 작업책임자 통해 장비 운행순서와 특이사항 확인 후 통보 바랍니다. 관제 이상!\n(교대 시) 금천구청~안양역간 01시 00분 지장작업, L/S 표지판 · T/G 노트 설정 완료, 단전 예정 01시 00분입니다.')],
+   {setup:{clearTimetable:true,resetAll:true,reset:[...WK],modes:WK.map(station=>({station,value:'AUTO'}))}}),
+  work(2,'전차선 단전 및 지장작업 시행을 승인하시오',WORK+'\n시행시간이 임박했다. 작업구간에 열차가 없다.','작업구간 열차 없음 확인 → 단전 준비 확인 → 전기운용자 단전 요청 · 단전 통보(직 · 성명 기록) → 주의사항 통보 · 승인번호 부여 → 양 끝 역 LOCAL 이관 확인 · 감시',[
+    ...WK.map(station=>done('local-'+station,`${nm(station)}역 LOCAL 이관 (현장이 제어권을 받았는지 확인)`,{type:'mode',station,value:'LOCAL'})),
+    done('power','L/S 표지판 [전차선단전] 설정',{type:'any',conditions:WK.map(station=>({type:'event',eventType:'lsOperation',station,op:'boardAdd',kind:'전차선단전'}))})],[
+    say('c1','① 작업구간에 열차 · 차량 운행, 특이사항 없음 확인','금천구청~안양역간 하2선 작업구간 열차 및 차량 운행 없음, 특이사항 없음. 확인!'),
+    say('c2','② 단전 준비사항 확인 (차량 정비 · 청소 · 입고)','(관) 안양역. 관제 이상!\n(관) 01시 00분 금천구청~안양역간 하2선 전차선 단전 예정입니다. 해당 구간 주박차량 정비 · 청소 · 입고 완료되었습니까? 관제 이상!\n   (역) 정비 · 청소 · 입고 완료되었습니다. 이상!'),
+    say('c3','③ 전기운용자 단전 요청 · 단전시각 · 구간 통보, 통고받은 자 직 · 성명 기록','(관) 전기운용자. 관제 이상!\n(관) 금천구청~안양역간 하2선 단전준비 완료되었습니다. 단전 바랍니다. 관제 이상!\n(관) 금천구청역, 안양역. 관제 이상! 금천구청~안양역간 하2선 01시 00분 단전되었습니다. 단전구간으로 전기차 운행하지 않도록 하시고, 통고받은 분 직 · 성명 말씀해 주세요. 관제 이상!'),
+    say('c4','④ 운전취급상 주의사항 통보 · 승인번호 부여','(관) 금천구청역, 안양역. 관제 이상!\n(관) 금천구청~안양역간 하2선 선로일시사용중지 작업, 관제승인 1호로 승인합니다. 작업시간 01시 00분부터 04시 00분까지입니다. 차단장비 이동, 인접선 열차 서행, 열차감시원 배치 확인 바랍니다. 역 조작취급은 관제승인 2호로 Local 취급합니다. 관제 이상!\n   (역) 수신 이상!')]),
+  work(3,'지장작업 중 열차를 통제하시오',WORK+'\n작업이 진행 중이다. 인접선(하1선)으로 열차가 운행한다.','단전구간 진입 신호 정지 지시 → 디젤 · 장비도 관제 지시 후 취급 → 인접선 열차 속도준수 · 주의운전 통보 → 장비 위치 감시, 승인 · 주의사항은 운행 직전에 → 규정 준수 감시',[
+    done('slow','L/S 표지판 [서행표시] 설정 (인접선 서행)',{type:'any',conditions:WK.map(station=>({type:'event',eventType:'lsOperation',station,op:'boardAdd',kind:'서행표시'}))})],[
+    say('c1','① 단전구간 진입 신호기 정지 현시 지시','(관) 금천구청역. 관제 이상!\n(관) 단전구간 진입 하2선 출발신호기 정지 유지 바랍니다. 관제 이상!\n   (역) 금천구청역 수신 이상!'),
+    say('c2','② 단전과 관련 없는 차량(디젤 · 장비)도 신호현시 전 관제 지시','(관) 디젤차 · 장비도 신호 현시 전 관제 지시 받고 취급하시기 바랍니다. 관제 이상!'),
+    say('c3','③ 인접선 열차에 속도준수 · 주의운전 통보','(관) 하1선 운행열차. 관제 이상!\n(관) 금천구청~안양역간 하2선 작업 중입니다. 인접선 규정 속도 준수하시고, 작업원 있으니 주의운전 하시기 바랍니다. 관제 이상!\n   (기) 수신 이상!'),
+    say('c4','④ 장비 위치 · 이동 감시, 관제승인 · 주의사항은 열차운행 직전에 부여','장비 작업위치 확인, 이동 감시. 폐색방식 변경 · 단선운전 · 선로변경이 있으면 관제승인과 주의사항은 열차운행 직전에 부여합니다.'),
+    say('c5','⑤ 현장 역 · 소와 열차의 규정 준수 감시','작업구간 현장 역 · 소 및 열차 운행 규정 준수 여부 DLP · L/S로 감시. 확인!')]),
+  work(4,'지장작업 완료 및 전차선 급전을 처리하시오',WORK+'\n작업책임자가 작업 완료를 통보했다.','작업구간 장비 · 차량 없음 확인 → 철수 · 급전 지장 없음 확인 → 완료시각 상호 기록, LOCAL → CCM → AUTO → 급전준비 확인 · 전기운용자 통보 → 급전시각 통보 · 출고 지시 → 표지판 철거',[
+    ...WK.map(station=>({id:'auto-'+station,label:`${nm(station)}역 CTC 취급 복귀 (LOCAL → CCM → AUTO)`,condition:{type:'all',conditions:[{type:'event',eventType:'mode',station,value:'AUTO'},{type:'mode',station,value:'AUTO'}]},points:1,final:true})),
+    done('remove','L/S 표지판 철거',{type:'any',conditions:WK.map(station=>({type:'event',eventType:'lsOperation',station,op:'boardDelete'}))})],[
+    say('c1','① 작업구간 내 장비 · 차량 운행 없음 확인 (DLP · L/S)','작업완료 통보 수신. 작업구간 내 장비 및 차량 운행 없음. 확인!'),
+    say('c2','② 장비 · 작업자 철수 완료, 급전하여도 문제 없음 확인','(관) 안양역. 관제 이상!\n(관) 작업완료 통보 받았습니다. 작업원 · 장비 철수 완료되었습니까? 전차선 급전하여도 문제 없습니까? 관제 이상!\n   (역) 철수 완료, 급전 지장 없습니다. 이상!'),
+    say('c3','③ 작업완료시각 상호 기록 · 제어권 인수','(관) 작업완료시각 04시 00분으로 상호 기록합니다. 제어권 관제로 넘겨 주시기 바랍니다. 관제 이상!\n금천구청역 · 안양역 CCM 전환, AUTO 전환. 확인!'),
+    say('c4','④ 급전 준비 완료 확인 → 전기운용자 통보','(관) 전기운용자. 관제 이상!\n(관) 금천구청~안양역간 하2선 작업 완료, 현장 역 급전준비 완료되었습니다. 급전 바랍니다. 관제 이상!'),
+    say('c5','⑤ 급전시각 통보 · 주박차량 기동 · 열차 출고 지시','(관) 금천구청역, 안양역. 관제 이상!\n(관) 04시 05분 급전 완료되었습니다. 주박차량 기동하시고 열차 출고 준비 바랍니다. 관제 이상!\n   (역) 수신 이상!')]),
+  work(5,'작업 완료 후 최초열차를 운행시키시오',WORK+'\n작업과 급전이 끝났다. K0401열차가 작업구간을 지나는 최초열차다 (금천구청역 하2선 정차 중).','최초열차 특정 · 통제 → 작업책임자에게 최초열차 감시 지시 → 역에 최초열차 · 주의사항 통보 지시 → 통과 감시 · 현장상태 확인 → 이상 유무를 작업책임자에게 통보하도록 지시',[
+    done('passed','K0401(최초열차) 작업구간 통과 — 안양역 도착',{type:'all',conditions:[{type:'reaction',id:'r-first'},{type:'not',condition:{type:'trainAt',number:'K0401',station:'geumcheon'}}]})],[
+    say('c1','① 작업구간 최초 운행 열차 통제','작업구간 최초열차는 금천구청역 하2선 K0401열차. 확인!'),
+    say('c2','② 작업책임자에게 최초열차 운행상황 면밀히 감시하도록 지시','(관) 금천구청역. 관제 이상!\n(관) 작업책임자에게 최초열차 통과상태를 면밀히 감시하도록 하시기 바랍니다. 관제 이상!'),
+    say('c3','③ 역에 최초열차임과 주의사항 통보 지시','(관) K0401열차가 금천구청~안양역간 작업 완료 후 최초열차입니다. 기관사에게 작업 후 최초열차임과 주의운전을 통보하시기 바랍니다. 관제 이상!\n   (역) 금천구청역 수신 이상!'),
+    say('c4','④ 최초열차 운행상황 감시 · 통과 후 현장상태 확인','(관) 금천구청역, 안양역. 관제 이상! K0401열차 작업구간 통과 확인했습니다. 현장 이상 유무 확인 바랍니다. 관제 이상!'),
+    say('c5','⑤ 이상 유무를 작업책임자에게 통보하도록 지시','(관) 이상 유무 확인 결과는 작업책임자에게 통보 바랍니다. 관제 이상!\n   (역) 수신 이상!')],
+   {setup:{clear:['K0401'],trains:[{station:'geumcheon',slot:'2T',number:'K0401',direction:'down'}]},
+    reactions:[{id:'r-first',label:'최초열차 통보 뒤 K0401 출발',when:{type:'communication',id:'c3'},do:[{type:'runTrain',number:'K0401',legs:[],exit:true}]}]})];
  // built-in scripts
  const titles={'yongsan-5':'용산역 부본선(5번) 대피','yongsan-4':'용산역 부본선(하 4번선) 대피','yeongdeungpo-1':'영등포역 부본선(1번) 대피','geumcheon-1':'금천구청역 부본선(1번) 대피','geumcheon-6':'금천구청역 부본선(6번) 대피','sch-conflict':'경합 해소','sch-create':'스케줄 생성'};
  const scriptProblem=(sid,subject,name)=>prob({id:'P-'+sid,subject,name,limit:limits[sid]||600,script:sid,actions:'실기 시나리오 대본의 조작·구술 단계',checks:[]});
@@ -383,6 +430,7 @@ function seed({scripts=[],limits={}}={}){
  const sOral=sit({id:'S-ORAL',name:'#2-철도관제시스템운용실무(구술)',section:'지하청량리-영등포',scheduleId:'01105',limit:300,problems:[o1,o2,o3]});
  const sOp=sit({id:'S-OP',name:'#2-철도관제시스템운용-실기 10항목',section:'군포-수원',limit:2400,problems:ops});
  const sOralAll=sit({id:'S-ORAL-ALL',name:'#2-철도관제시스템운용-구술 전체',limit:3000,problems:[o1,o2,o3,...orals]});
+ const sWork=sit({id:'S-WORK',name:'#3-열차운행선관리-지장작업 5단계',section:'구로-수원',limit:3000,problems:works});
  const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
  const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
  const sEmV=emergencyVariants.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));   // 감독관 지시형 · 상황별 (종합 시나리오에는 넣지 않는다)
@@ -390,6 +438,7 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-01',name:'#1-열차운행계획-(종합)02',situations:[s4,sTg,...(sPlan?[sPlan]:[])]});
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
+ scen({id:'SC-03',name:'#3-열차운행선관리-지장작업(종합)01',situations:[sWork]});
  scen({id:'SC-OP',name:'#2-철도관제시스템운용-실기 10항목',situations:[sOp]});
  scen({id:'SC-ORAL',name:'#2-철도관제시스템운용-구술 전체',situations:[sOralAll]});
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
