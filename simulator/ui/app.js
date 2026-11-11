@@ -61,7 +61,7 @@ function selectStation(id,scroll=true){
  $('stationSelect').value=id;
  fields();render();taskView();
 }
-const stationOptions=N.stations.filter(st=>st.controlled).map(st=>`<option value="${st.id}">${st.name}${st.controlled?' ['+st.code+']':' · 비연동'}</option>`).join('');
+const stationOptions=N.stations.filter(st=>st.controlled).map(st=>`<option value="${st.id}">${st.id==='cheongnyangni'?'지하청량리':st.name}[${st.code}]</option>`).join('');
 $('stationSelect').innerHTML=stationOptions;
 $('stationSelect').value=selectedStation;
 $('stationSelect').onchange=e=>selectStation(e.target.value);
@@ -79,7 +79,7 @@ function render(){
  const viewInfo=window.SimLSPresets.get(selectedView),hostedCorridor=window.SimLSPresets.CORRIDORS.find(c=>c.host===selectedStation),ownIntermediate=st.map.view.intermediate.filter(name=>!(hostedCorridor&&window.SimLSPresets.get(hostedCorridor.id).plates.includes(name)));
  $('stationScope').textContent=viewInfo.monitor?`${viewInfo.name} · ${viewInfo.plates.join(' · ')}`:`${st.name} · ${ownIntermediate.join(' · ')||'구내 및 역간'}`;
  SimDOM.document.querySelectorAll('#stationTabs [data-station]').forEach(b=>{const s=stationStates[b.dataset.station],monitor=!!window.SimLSPresets.get(b.dataset.view).monitor,n=monitor?0:Object.keys(s.routes).length;b.classList.toggle('selected',b.dataset.view===selectedView);b.querySelector('.tab-dot').className='tab-dot '+(monitor?'monitor':s.mode.toLowerCase());b.querySelector('.tab-count').textContent=n?n:'';b.title=monitor?window.SimLSPresets.get(b.dataset.view).name+' · 역간 운행 감시':`${N.catalog[b.dataset.station].name} · ${s.mode} · ${n}개 진로`;});
- SimDOM.document.querySelector('.window-caption').innerHTML=`현장설비제어 <span>${st.name} [${st.code}]</span>`;
+ SimDOM.document.querySelector('.window-caption').textContent=window.SimMMI?.stationInfo?.(st.id).name||st.name;
  const monitor=!!window.SimLSPresets.get(selectedView).monitor;$('topStation').textContent=window.SimLSPresets.get(selectedView).name;$('topCode').textContent=monitor?'':st.code;
  if($('drawerBtn'))$('drawerBtn').hidden=monitor;if(monitor&&window.SimShell)window.SimShell.drawer(false);
  window.SimAssessmentUI?.render();$('stateMode').textContent=st.controlled?state.mode:'비연동';$('stateOwner').textContent=state.mode==='LOCAL'?'현장역':'관제실';$('stateRoutes').textContent=Object.keys(state.routes).length+'개 설정';$('stateScan').textContent=state.clock<state.scanUntil?'재수신 완료':'정상';
@@ -88,14 +88,21 @@ function render(){
  $('handoverBar').hidden=monitor||!state.pending;if(state.pending)$('handoverBar').innerHTML=`<span>${state.pending} 요청 · 가상 현장 응답 대기</span><button data-handover="yes">현장 수락</button><button data-handover="no">현장 거절</button>`;
  $('completedCount').textContent=`${completed.length} / ${tasks.length} 완료`;drawTracks();$('routeEvidence').innerHTML+='<p class="point-states">전환기 조작 상태: '+Object.entries(state.points).map(([id,v])=>id+' '+(v==='N'?'정위':'반위')).join(' · ')+'</p>';renderLogs();window.SimDiagram?.render();window.SimMMI?.refresh();
 }
-function routeOptions(){if(!Object.keys(C.routes).length){$('mmiRoute').innerHTML='';$('mmiRouteEvidence').textContent='이 역에는 수동 진로제어가 없습니다.';return;}$('mmiRoute').innerHTML=Object.keys(C.routes).filter(id=>C.routes[id].signal===$('mmiSignal').value).map(id=>`<option>${id}</option>`).join('');$('mmiRoute').onchange=()=>{$('mmiRouteEvidence').innerHTML=routeDetails($('mmiRoute').value);};$('mmiRouteEvidence').innerHTML=routeDetails($('mmiRoute').value);}
-function fields(){const type=$('controlSelect').value;$('mmiApply').disabled=!N.catalog[selectedStation].controlled&&type!=='scan';let html='';$('mmiApply').textContent='확인 · 명령 실행';
- if(type==='mode')html='<span class="field-label">제어모드</span><div class="radio-row">'+['AUTO','CCM','LOCAL'].map(v=>`<label><input type="radio" name="mmiMode" value="${v}" ${v==='CCM'?'checked':''}>${v}</label>`).join('')+'</div>';
- if(type==='route'){html='<label class="field-label" for="mmiSignal">신호기 목록</label><select id="mmiSignal">'+[...new Set(Object.values(C.routes).map(r=>r.signal))].map(id=>`<option>${id}</option>`).join('')+'</select><label class="field-label" for="mmiRoute">진로 · 배선 연결 경로</label><select id="mmiRoute"></select><div class="radio-row"><label><input name="routeAction" type="radio" value="select" checked>설정</label><label><input name="routeAction" type="radio" value="withdraw">해정</label></div><label class="field-label" for="routeControl">제어종류</label><select id="routeControl"><option value="single">진로제어</option><option value="continuous">연속진로제어</option></select><div id="mmiRouteEvidence" class="compact-evidence"></div>';$('mmiApply').textContent='확인 · 진로 제어';}
- if(type==='point'){html='<label class="field-label" for="mmiPoint">원본 선로전환기 목록</label><select id="mmiPoint">'+Object.entries(C.points).map(([id,p])=>{const names=Object.keys(C.pointParts).filter(part=>C.pointParts[part]===id);return `<option value="${id}">${names.length?names.join(' / '):id}</option>`;}).join('')+Object.keys(C.pointParts).sort().map(part=>`<option value="${part}">SW_${part} · A/B 동시 전환</option>`).join('')+'</select><div class="radio-row"><label><input type="radio" name="pointPosition" value="N" checked>정위 N</label><label><input type="radio" name="pointPosition" value="R">반위 R</label></div><div class="radio-row"><label><input name="pointAction" type="radio" value="move" checked>전환</label><label><input name="pointAction" type="radio" value="lock">쇄정</label><label><input name="pointAction" type="radio" value="unlock">해제</label></div><p>전환기 위치는 N/R로 표시합니다. 설정·점유 진로가 사용하는 전환기는 움직일 수 없습니다.</p>';$('mmiApply').textContent='확인 · 전환기 제어';}
- if(type==='stopAll')html='<p>선택역의 모든 설정 신호기를 정지합니다. 점유 중인 진로는 쇄정을 유지합니다.</p>';
- if(type==='scan')html='<span class="field-label">제어구분</span><div class="radio-row"><label><input type="radio" name="mmiScope" value="current" checked>선택역</label><label><input type="radio" name="mmiScope" value="all">전체 제어역</label></div>';
- $('mmiFields').innerHTML=html;if(type==='route'){routeOptions();$('mmiSignal').onchange=routeOptions;}
+// [CA014_01] 현장설비제어 (사진 2026-11-11): 네 가지 제어 중 하나를 고르면 그 묶음만 살아나고, 신호기·진로·선로전환기는 목록에서 고른다
+function routeOptions(){$('mmiRoute').innerHTML=Object.keys(C.routes).filter(id=>C.routes[id].signal===$('mmiSignal').value).map(id=>`<option value="${id}">RT_${id.replace('-','_')}</option>`).join('');if($('mmiRoute').options.length)$('mmiRoute').selectedIndex=0;}
+function fields(){
+ const type=$('controlSelect').value,doc=SimDOM.document,nat=(a,b)=>a.localeCompare(b,'en',{numeric:true});
+ $('mmiApply').disabled=!N.catalog[selectedStation].controlled&&type!=='scan';
+ for(const r of doc.querySelectorAll('input[name="fcKind"]'))r.checked=r.value===type;
+ for(const box of doc.querySelectorAll('.fc-win [data-fc]')){const on=box.dataset.fc===type;box.classList.toggle('off',!on);for(const el of box.querySelectorAll('input:not([name="fcKind"]),select'))el.disabled=!on;}
+ const station=$('mmiSignal').dataset.station!==selectedStation;$('mmiSignal').dataset.station=selectedStation;
+ const sig=$('mmiSignal').value,signals=[...new Set(Object.values(C.routes).map(r=>r.signal))];
+ $('mmiSignal').innerHTML=signals.map(id=>`<option>${id}</option>`).join('');if(!station&&signals.includes(sig))$('mmiSignal').value=sig;else if(signals.length)$('mmiSignal').selectedIndex=0;
+ const route=$('mmiRoute').value;routeOptions();if(!station&&[...$('mmiRoute').options].some(o=>o.value===route))$('mmiRoute').value=route;
+ const point=$('mmiPoint').value,parts=Object.keys(C.pointParts),whole=Object.keys(C.points).filter(id=>!parts.some(p=>C.pointParts[p]===id));
+ const list=[...parts,...whole].sort(nat);$('mmiPoint').innerHTML=list.map(id=>`<option value="${id}" data-sw="${C.pointParts[id]||id}">SW_${id}</option>`).join('');if(!station&&list.includes(point))$('mmiPoint').value=point;else if(list.length)$('mmiPoint').selectedIndex=0;
+ // 제어 종류나 역을 바꾸면 고른 값은 처음 상태로 돌아간다 (설정 · 정위 · 선택역)
+ const key=type+'|'+selectedStation;if(fields.key!==key){fields.key=key;$('mmiSignalStop').checked=false;for(const [n,v] of [['routeAction','select'],['pointPosition','N'],['mmiScope','current']])doc.querySelector(`input[name="${n}"][value="${v}"]`).checked=true;$('routeControl').value='single';}
 }
 function signalAction(id,at){
  const active=Object.keys(state.routes).find(key=>C.routes[key].signal===id);
@@ -130,10 +137,13 @@ $('lsStage').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e
 
 $('actionDialog').addEventListener('close',()=>{if(!dialogAction||$('actionDialog').open)return;const a=typeof dialogAction==='function'?dialogAction():dialogAction;dialogAction=null;if($('actionDialog').returnValue==='confirm')run(a);else run({type:'cancel',target:a.type,id:a.id,source:'LS'});});
 $('handoverBar').onclick=e=>{const b=e.target.closest('[data-handover]');if(b)run({type:'handover',accept:b.dataset.handover==='yes',source:'현장'});};
-$('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>SimDOM.document.querySelector(`input[name="${n}"]:checked`).value;
- if(type==='mode')run({type,value:checked('mmiMode'),source:'MMI'});
- if(type==='route')run({type:checked('routeAction')==='select'?'route':'withdraw',id:$('mmiRoute').value,control:$('routeControl').value,source:'MMI'});
- if(type==='point'){const op=checked('pointAction');run({type:op==='move'?'point':'pointLock',id:$('mmiPoint').value,value:checked('pointPosition'),lock:op==='lock',source:'MMI'});}
+$('controlSelect').onchange=fields;$('mmiSignal').onchange=routeOptions;
+for(const r of SimDOM.document.querySelectorAll('input[name="fcKind"]'))r.onchange=()=>{$('controlSelect').value=r.value;fields();};
+$('mmiClose').onclick=()=>window.SimMMI.close('field');
+$('mmiApply').onclick=()=>{const type=$('controlSelect').value,checked=n=>SimDOM.document.querySelector(`input[name="${n}"]:checked`).value;
+ if(type==='mode'){const v=checked('mmiMode');run(v==='ECTC'?{type,value:'CCM',emergency:true,source:'MMI'}:{type,value:v,source:'MMI'});}
+ if(type==='route'){if($('mmiSignalStop').checked)run({type:'stop',id:$('mmiSignal').value,source:'MMI'});else run({type:checked('routeAction')==='select'?'route':'withdraw',id:$('mmiRoute').value,control:$('routeControl').value,source:'MMI'});}
+ if(type==='point')run({type:'point',id:$('mmiPoint').value,value:checked('pointPosition'),source:'MMI'});
  if(type==='stopAll'){
   // LS may change stations while this MMI dialog remains open. Keep its target.
   const target=selectedStation;
@@ -147,7 +157,7 @@ $('controlSelect').onchange=fields;$('mmiApply').onclick=()=>{const type=$('cont
  }
  if(type==='scan')run({type,scope:checked('mmiScope'),source:'MMI'});
 };
-$('mmiCancel').onclick=()=>{run({type:'cancel',source:'MMI'});fields();};$('pauseBtn').onclick=()=>{paused=!window.SimRemote.snapshot.clock.paused;   /* 엔진의 지금 상태 기준 (시나리오 시작 직후 화면 변수가 아직 안 바뀐 때 반대로 눌리던 것) */window.SimRemote.command({type:'clock',paused});$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
+$('pauseBtn').onclick=()=>{paused=!window.SimRemote.snapshot.clock.paused;   /* 엔진의 지금 상태 기준 (시나리오 시작 직후 화면 변수가 아직 안 바뀐 때 반대로 눌리던 것) */window.SimRemote.command({type:'clock',paused});$('pauseBtn').textContent=paused?'▶ 계속':'Ⅱ 일시정지';};$('skipBtn').onclick=()=>run({type:'tick',seconds:10});
 $('resetBtn').onclick=async()=>{
  if(!confirm('프로그램을 완전히 초기화할까요?\n\n모든 역의 진로·열차번호·설비, 교육 진행·결과, 추가한 문제·상황·시나리오·스케줄, 사용자·환경설정을 삭제합니다. 시간표와 진행 중인 교육이 없는 빈 상태로 돌아가며 저장된 자동 복구 백업도 새 상태로 교체합니다. FTS 선택용 프리셋은 유지합니다. 이 작업은 되돌릴 수 없습니다.'))return;
  const button=$('resetBtn');button.disabled=true;window.SimResetting=true;

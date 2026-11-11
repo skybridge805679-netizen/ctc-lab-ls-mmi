@@ -166,6 +166,38 @@ def run(page, url):
     page.locator('.mmi-alarm input[data-alarm-i]').first.check(); page.locator('#alarmOk').click()
     expect(box).to_contain_text('미확인 알람 갯수 : 1개')
     page.locator('.mmi-alarm input[data-alarm-i]').first.check(); page.locator('#alarmOk').click(); expect(box).to_be_hidden()
+    # ---- [CA012_01] 운행열차목록 표 (사진 2026-11-11): 칸을 누르면 그 열번창과 열차가 선택되고, 작업구분은 둥근 단추
+    page.locator('.mmi-alarm input[data-alarm-i]').first.check() if page.locator('.mmi-alarm:visible').count() else None
+    if page.locator('#alarmOk:visible').count(): page.locator('#alarmOk').click()
+    expect(page.locator('#mmiTrainGrid thead th')).to_have_text(['열차번호창', '1', '2', '3', '4'])
+    expect(page.locator('#mmiTrainGrid tbody tr')).to_have_count(page.locator('#mmiTrainSlot option').count())
+    page.locator('input[name="mmiTrainOpR"][value="rename"]').check()
+    cell = page.locator('#mmiTrainGrid td[data-tn-uid]', has_text='K0604'); cell.click()
+    expect(page.locator('#mmiTrainGrid td.hit')).to_contain_text('K0604')
+    expect(page.locator('#mmiTrainOp')).to_have_value('rename'); expect(page.locator('#mmiTrainGuide')).to_contain_text('수정 :')
+    expect(page.locator('#mmiTrainNumber')).to_have_value('K0604'); expect(page.locator('#mmiTrainNew')).to_be_enabled()
+    page.locator('#mmiTrainClose').click()
+    # ---- [CA014_01] 현장설비제어: 네 가지 제어 중 고른 묶음만 살아나고, 신호기·진로·선로전환기는 목록
+    menu(page, '현장제어', '현장설비제어(A)')
+    expect(page.locator('[data-mmi-window="field"] .mmi-title-text')).to_have_text('[CA014_01]현장설비제어')
+    page.locator('#stationSelect').select_option('cheongnyangni')
+    expect(page.locator('#stationSelect option').first).to_have_text('지하청량리[010000]'); expect(page.locator('#fcStationName')).to_have_text('지하청량리')
+    assert page.locator('input[name="mmiMode"]').evaluate_all('e=>e.map(x=>x.value)') == ['AUTO', 'CCM', 'LOCAL', 'ECTC']
+    page.locator('input[name="fcKind"][value="mode"]').check()
+    expect(page.locator('#mmiSignal')).to_be_disabled()
+    page.locator('input[name="fcKind"][value="route"]').check()
+    expect(page.locator('#mmiSignal')).to_be_enabled(); expect(page.locator('input[name="mmiMode"]').first).to_be_disabled()
+    assert page.locator('#mmiSignal option').all_inner_texts()[:5] == ['1A', '2A', '3A', '4A', '4B']
+    page.locator('input[name="fcKind"][value="point"]').check()
+    assert page.locator('#mmiPoint option').all_inner_texts() == ['SW_21A', 'SW_21B', 'SW_22', 'SW_51A', 'SW_51B', 'SW_52A', 'SW_52B']
+    # 신호기 정지: 설정한 진로의 신호기를 고르고 체크한 뒤 [확인]
+    page.locator('input[name="fcKind"][value="mode"]').check(); page.locator('input[name="mmiMode"][value="CCM"]').check(); page.locator('#mmiApply').click()
+    page.locator('input[name="fcKind"][value="route"]').check(); page.locator('#mmiSignal').select_option('4A')
+    route = page.locator('#mmiRoute option').first.get_attribute('value'); page.locator('#mmiRoute').select_option(route); page.locator('#mmiApply').click()
+    expect(page.locator('#mmiState')).to_contain_text('1개 진로 설정')
+    page.locator('#mmiSignalStop').check(); page.locator('#mmiApply').click()
+    expect(page.locator('#mmiState')).to_contain_text('0개 진로 설정')
+    page.locator('#mmiClose').click(); expect(page.locator('[data-mmi-window="field"]')).to_be_hidden()
     assert not errors, errors
 
 

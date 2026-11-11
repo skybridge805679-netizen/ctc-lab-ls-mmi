@@ -48,6 +48,7 @@ def exercise(page, url):
         if index != 1:
             ccm()
         if index == 1:
+            page.locator('input[name="mmiMode"][value="CCM"]').check()
             page.locator('#mmiApply').click()
             expect(page.locator('#stateMode')).to_have_text('CCM')
         elif index == 2:
@@ -73,7 +74,7 @@ def exercise(page, url):
         elif index == 5:
             page.locator('#controlSelect').select_option('point')
             for point in ['21', '22']:
-                page.locator('#mmiPoint').select_option(point)
+                page.locator('#mmiPoint').select_option(page.evaluate("p=>[...document.querySelectorAll('#mmiPoint option')].find(o=>o.dataset.sw===p).value", point))
                 page.locator('input[name="pointPosition"][value="R"]').check()
                 page.locator('#mmiApply').click()
                 expect(page.locator('.point-states')).to_contain_text(point+' 반위')
@@ -84,7 +85,9 @@ def exercise(page, url):
                 page.locator(f'[data-handover="{response}"]').click()
             expect(page.locator('#stateMode')).to_have_text('LOCAL')
         elif index == 7:
-            page.locator('#lsDisplay .fidelity-note').click(button='right')
+            # LS 빈 바탕을 우클릭한다 (열번칸·표지판 위면 다른 메뉴가 뜬다)
+            spot = page.evaluate("()=>{const s=document.querySelector('#trackSvg'),r=s.getBoundingClientRect();for(let y=12;y<r.height-12;y+=14)for(let x=12;x<r.width-12;x+=14){if(document.elementFromPoint(r.x+x,r.y+y)===s)return {x:r.x+x,y:r.y+y};}return {x:r.x+20,y:r.y+20};}")
+            page.mouse.click(spot['x'], spot['y'], button='right')
             page.locator('[data-context-action="scan-current"]').click()
             confirm()
             page.locator('#controlSelect').select_option('scan')

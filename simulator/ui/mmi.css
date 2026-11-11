@@ -339,3 +339,29 @@
 .tg-lens{width:200px!important;height:200px!important;border:1px solid #9aa0a6!important;border-radius:0!important;background:#fff;box-shadow:none!important}
 .src-dlg{padding:8px 12px}.src-dlg fieldset{border:1px solid #c9c9c5;padding:8px 12px 12px;margin:0 0 12px}.src-row{display:flex;align-items:center;gap:14px;margin:8px 0}.src-row>span{min-width:56px}.src-row input[type=text],.src-row #fdNumber{flex:1;min-width:0}.src-btns{display:flex;justify-content:flex-end;gap:10px}.src-btns .sched-btn{min-width:86px}
 .tg-detached .graph-scroll{margin:0;border:0;max-height:calc(100vh - 62px);overflow:auto}.tg-detached .tg-body{align-items:stretch}
+/* [CA014_01] 현장설비제어 · [CA012_01] 열차번호제어 (사진 2026-11-11): 왼쪽 제어영역리스트, 오른쪽 제어 묶음 */
+.mmi-win .fc-win{display:grid!important;grid-template-columns:200px minmax(0,1fr)!important;gap:10px!important;padding:10px!important;font-size:12px;color:#111}
+.fc-win fieldset{margin:0;padding:4px 6px 6px;border:1px solid #b9b9b4;min-width:0}.fc-win legend{padding:0 4px;font-size:12px}
+.fc-picked{display:flex;justify-content:space-between;gap:8px;padding:4px 6px 8px}.fc-picked b{font-weight:400}
+.fc-head{padding:3px 6px;text-align:center;background:linear-gradient(#f4f4f1,#cfcfca);border:1px solid #9a9a96;border-radius:4px 4px 0 0}.fc-head.flat{border-radius:0;background:#e9e9e5}
+.fc-win select[size]{display:block;width:100%;height:auto;padding:0;border:1px solid #9a9a96;border-top:0;border-radius:0;background:#fff;font-size:12px;overflow-y:auto}
+.fc-win select[size] option{padding:1px 6px}.fc-win #stationSelect option::before,.tn-win #mmiTrainStation option::before{content:"▣ ";color:#c0392b}
+.fc-win #mmiSignal option,.fc-win #mmiRoute option,.fc-win #mmiPoint option{text-align:center}
+.fc-win #mmiSignal option:checked{background:#d62a22 linear-gradient(#d62a22,#d62a22);color:#fff}
+.fc-right{display:flex;flex-direction:column;gap:6px;min-width:0}.fc-top,.fc-mid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:8px}
+.fc-kind{display:flex;align-items:center;gap:4px;font-size:13px;margin-bottom:3px}.fc-opts{display:flex;gap:12px;flex-wrap:wrap;padding:5px 8px;border:1px solid #c9c9c5}
+.fc-opts label,.fc-row label{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.fc-sub{padding:1px 4px 3px}.fc-lists{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fc-lists #routeControl{width:100%;margin-top:3px;height:22px;min-height:0;padding:0 4px;border-radius:0;font-size:12px}
+.fc-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 4px 0}.fc-row span{display:flex;gap:12px}.fc-row.center{justify-content:space-around}
+.fc-win .off{color:#8a8a86}.fc-win .off .fc-head{color:#8a8a86}.fc-win .off .fc-kind{color:#111}
+.fc-win .mmi-state{min-height:20px;padding:2px 6px;border:1px solid #c9c9c5;background:#f1f1ee;font-size:11.5px;margin:0}
+.fc-win .mmi-actions{display:flex;justify-content:flex-end;gap:2px;position:relative;margin:0}.fc-win .mmi-actions .sched-btn{min-width:92px;padding:4px 12px}
+.fc-src{position:absolute;left:0;bottom:0;width:20px;height:8px;opacity:0;pointer-events:none}
+.mmi-win .tn-win{grid-template-columns:200px minmax(0,1fr)!important}.tn-left-btns{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.tn-ops{display:flex;justify-content:space-between;padding:4px 40px 4px 20px}.tn-ops label,.tn-fields label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.tn-fields{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:4px 6px}.tn-fields input{width:96px;height:21px;min-height:0;padding:0 4px;border-radius:0;font-size:12px}.tn-fields select{height:21px;min-height:0;padding:0 4px;border-radius:0;font-size:12px}
+.tn-fields input[readonly],.tn-fields input:disabled{background:#dcdcd8}
+.tn-grid{height:268px;overflow:auto;border:1px solid #9a9a96;border-top:0;background:#fff}.tn-grid table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.tn-grid th,.tn-grid td{border:1px solid #b9b9b4;height:20px;padding:0 6px;text-align:center;font-weight:400;white-space:nowrap;overflow:hidden}.tn-grid thead th{background:#e9e9e5;position:sticky;top:0}.tn-grid th:first-child{width:118px}
+.tn-grid tbody tr{cursor:pointer}.tn-grid tr.sel th,.tn-grid tr.sel td{background:#1a237e;color:#fff}.tn-grid tr.sel th{background:#1f3fd6}.tn-grid tr.sel td.hit{background:#d62a22}
+.tn-src{width:60px;display:flex;overflow:hidden}.tn-src select{width:20px;height:8px;min-height:0;padding:0}

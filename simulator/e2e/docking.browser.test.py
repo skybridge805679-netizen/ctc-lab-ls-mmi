@@ -42,7 +42,7 @@ try:
    win=lambda slot:page.locator(f'#trackSvg [data-train-slot="{slot}"]')
    win('B965T').dblclick();page.fill('#lsTrainNumber','K1131');confirm();uid=entries('geumcheon','B965T')[0]['uid']
    numbers();page.select_option('#mmiTrainSlot','B965T');expect(page.locator('#mmiTrainEntry option')).to_have_count(1)
-   page.select_option('#mmiTrainOp','rename');page.fill('#mmiTrainNumber','K1133');page.select_option('#mmiTrainDirection','down');page.click('#mmiTrainApply');page.locator('#actionDialog [value="cancel"]').click();page.wait_for_function('dialogAction===null');assert entries('geumcheon','B965T')[0]['number']=='K1131'
+   page.select_option('#mmiTrainOp','rename');page.fill('#mmiTrainNew','K1133');page.select_option('#mmiTrainDirection','down');page.click('#mmiTrainApply');page.locator('#actionDialog [value="cancel"]').click();page.wait_for_function('dialogAction===null');assert entries('geumcheon','B965T')[0]['number']=='K1131'
    page.click('#mmiTrainApply');confirm();expect(win('B965T').locator('text')).to_have_text('>K1133');assert entries('geumcheon','B965T')[0]['uid']==uid
    page.select_option('#mmiTrainOp','move');page.select_option('#mmiTrainTargetStation','anyang');page.select_option('#mmiTrainTargetSlot','1T');page.click('#mmiTrainApply');confirm();assert not entries('geumcheon','B965T');assert entries('anyang','1T')[0]['uid']==uid
    page.select_option('#mmiTrainStation','anyang');expect(page.locator('#stationSelect')).to_have_value('anyang');expect(win('1T').locator('text')).to_have_text('>K1133')

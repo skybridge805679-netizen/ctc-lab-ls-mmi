@@ -31,7 +31,7 @@ try:
    page.locator('[data-approach-toggle="4C"]').click();page.locator('[data-signal="4C"]').click();page.click('#dialogConfirm')
    expect(page.locator('[data-active-route="4C-B902T"]')).to_have_attribute('data-route-state','locked')
    expect(connector).to_have_attribute('data-connected',reverse)
-   page.select_option('#controlSelect','point');page.select_option('#mmiPoint','58');page.locator('input[name="pointPosition"][value="N"]').check();page.click('#mmiApply')
+   page.select_option('#controlSelect','point');page.select_option('#mmiPoint',page.evaluate("p=>[...document.querySelectorAll('#mmiPoint option')].find(o=>o.dataset.sw===p).value", '58'));page.locator('input[name="pointPosition"][value="N"]').check();page.click('#mmiApply')
    expect(connector).to_have_attribute('data-position','R')
    for _ in range(3):page.click('#skipBtn')
    expect(connector).to_have_attribute('data-position','R');expect(connector).to_have_attribute('data-locked','false')

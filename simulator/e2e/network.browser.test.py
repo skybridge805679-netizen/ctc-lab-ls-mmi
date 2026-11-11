@@ -53,7 +53,7 @@ def check(page, url, screenshot=False):
     for station in stations:
         page.evaluate('(id)=>selectStation(id)',station['id'])
         expect(page.locator('#stationSelect')).to_have_value(station['id'])
-        expect(page.locator('#stationScope')).to_contain_text(station['label'].split(' [')[0].split(' ·')[0])
+        expect(page.locator('#stationScope')).to_contain_text(station['label'].split('[')[0].replace('지하청량리', '청량리'))   # 목록은 실물 표기(지하청량리[010000])
         # The LS is drawn as vector; no background image may be used.
         expect(page.locator('#trackSvg image')).to_have_count(0)
         expect(page.locator('#trackSvg .bed-inner path').first).to_be_attached()

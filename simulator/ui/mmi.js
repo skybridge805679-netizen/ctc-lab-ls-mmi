@@ -239,7 +239,7 @@ function init(){
  old.parentNode.insertBefore(shell,old);
  // hosted windows keep their element ids so the existing handlers and tests continue to work
  field.classList.add('mmi-field');
- createWindow('field',{title:'현장설비제어',x:18,y:14,width:560,host:field});
+ createWindow('field',{title:'[CA014_01]현장설비제어',x:18,y:14,width:760,host:field});
  windows.field.docked=true;windows.field.el.classList.add('docked');
  if(graph){
   root.SimTG.init(graph);

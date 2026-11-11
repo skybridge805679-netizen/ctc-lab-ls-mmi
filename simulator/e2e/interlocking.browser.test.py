@@ -67,7 +67,7 @@ def exercise(page, url, width):
 
     # Overlap point cannot be moved while the route (or its lock) exists.
     page.locator('#controlSelect').select_option('point')
-    page.locator('#mmiPoint').select_option('26')
+    page.locator('#mmiPoint').select_option(page.evaluate("p=>[...document.querySelectorAll('#mmiPoint option')].find(o=>o.dataset.sw===p).value", '26'))
     page.locator('input[name="pointPosition"][value="R"]').check()
     page.locator('#mmiApply').click()
     expect(page.locator('#toast')).to_contain_text('오버랩 쇄정 전환기')
