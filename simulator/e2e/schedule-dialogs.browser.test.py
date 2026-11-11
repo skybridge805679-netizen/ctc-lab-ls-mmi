@@ -69,7 +69,7 @@ def run(page, url):
     # ---- [CA028_02]: photographed columns, ■운휴 check box, 인쇄, 실적입력
     page.evaluate("SimScheduleUI.open('edit','K1131')")
     heads = page.locator('#scheduleCalls thead th').all_inner_texts()
-    assert heads == ['역명', '방향', '도착일', '도착시간', '정차시간', '출발일', '출발시간', '도착진로', '출발진로', '운휴', '실적도착시간', '실적정차시간', '실적출발시간'], heads
+    assert heads == ['역명', '방향', '도착일', '도착시간', '정차시간', '출발일', '출발시간', '도착진로', '출발진로', '운휴', '실적도착시간', '실적정차시간', '실적출발시간', '실적도착진로', '실적출발진로'], heads
     page.locator('#scheduleCalls [aria-label="동묘앞 정차시간"]').fill('00:01:00'); page.locator('#scheduleCalls [aria-label="동묘앞 정차시간"]').dispatch_event('change')
     assert page.locator('#scheduleCalls [aria-label="동대문 도착시간"]').input_value() == '08:10:30'
     page.locator('#scheduleCalls [aria-label="수원 운휴"]').check()

@@ -295,3 +295,47 @@
 .fts-pb-cap{padding:6px 10px 2px;color:#555}.fts-pb-box{background:#0b1d9e;color:#fff;font-size:18px;line-height:1.6;padding:12px 16px;margin:0 10px 6px;min-height:40px}
 .fts-picker{padding:8px 12px;font-size:12px}
 .fts-grid2 label,.fts-edit-row label{white-space:nowrap}.fts-table td{vertical-align:top}
+
+/* [CA028_02] 배치를 실물 사진(2026-11-11)대로: 표 아래 세 묶음, 오른쪽에 관리·검색조건·열차번호 목록·생성복사열차정보 */
+#schedulePanel .sched-grid{display:grid;grid-template-columns:minmax(0,1fr) 262px;grid-template-rows:auto auto;gap:6px 10px;padding:8px 10px 2px}
+#schedulePanel .sched-info{grid-column:1;grid-row:1}#schedulePanel .sched-side{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;gap:5px;min-width:0}
+#schedulePanel .sched-lower{grid-column:1;grid-row:2;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) minmax(0,1fr);gap:8px;padding:0;align-items:start}
+#schedulePanel fieldset{margin:0;padding:3px 8px 6px;min-width:0}
+#schedulePanel .sched-cap{background:none;color:inherit;font-weight:400;padding:0 2px 3px;letter-spacing:0;font-size:12px}
+#schedulePanel .sched-calls{height:372px;min-height:0;max-height:none;flex:none;overflow:auto}
+#schedulePanel .sched-calls table{width:max-content;min-width:100%;font-size:12px}
+#schedulePanel .sched-calls th{padding:2px 5px;font-size:12px;font-weight:400}
+#schedulePanel .sched-calls td{padding:0 3px;height:19px;line-height:19px;text-align:center}
+#schedulePanel .sched-calls td:first-child{text-align:left;min-width:74px}
+#schedulePanel .sched-calls input[type=text]{width:62px;height:18px;padding:0 2px;border:0;border-radius:0;background:transparent;font:inherit;text-align:center;box-shadow:none}
+#schedulePanel .sched-calls input[type=text]:focus{outline:1px solid #0a2b9e;background:#fff}
+#schedulePanel .sched-calls select{width:86px;max-width:none;height:18px;padding:0 0 0 2px;border:0;border-radius:0;background-color:transparent;font:inherit;min-height:0}
+#schedulePanel .sched-calls select:focus,#schedulePanel .sched-calls select:hover:not(:disabled){outline:1px solid #7b8794;background-color:#fff}
+#schedulePanel .sched-calls select{appearance:none;background-image:none}#schedulePanel .sched-calls select:focus,#schedulePanel .sched-calls select:hover:not(:disabled){appearance:auto}#schedulePanel .sched-calls select:disabled{color:inherit;opacity:1}
+#schedulePanel .sched-cx{display:inline-flex;align-items:center;gap:2px}#schedulePanel .sched-cx input{margin:0;width:11px;height:11px}
+#schedulePanel .sched-row{display:flex;align-items:center;gap:6px;margin:3px 0;min-height:20px}#schedulePanel .sched-row.end{justify-content:flex-end}
+#schedulePanel .sched-row label{display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+#schedulePanel label.sched-row input,#schedulePanel label.sched-row select{flex:1;min-width:0}
+#schedulePanel .sched-k{flex:0 0 auto;min-width:50px;white-space:nowrap}#schedulePanel #scheduleCreateBox .sched-k{min-width:74px}
+#schedulePanel input:not([type=radio]):not([type=checkbox]),#schedulePanel select{height:21px;min-height:0;padding:0 4px;font-size:12px;border-radius:0}
+#schedulePanel input[readonly],#schedulePanel input:disabled,#schedulePanel select:disabled{background:#dcdcd8;color:#333}
+#schedulePanel .sched-listbox{flex:1;display:flex;flex-direction:column;min-height:0}
+#schedulePanel #scheduleList{flex:1;width:100%;min-height:150px;height:auto;padding:0;border-radius:0;font-size:12px}
+#schedulePanel #scheduleList option{padding:2px 4px}#schedulePanel #scheduleList option::before{content:"▣ ";color:#c0392b}
+#schedulePanel .sched-count{margin:0;min-height:16px;font-size:11.5px}
+#schedulePanel #scheduleFind{color:#c81e1e;font-weight:700}
+#schedulePanel .sched-fields{display:grid;grid-template-columns:1fr 1.15fr;gap:2px 10px}
+#schedulePanel .sched-fields>label{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center;gap:4px;flex-direction:row}
+#schedulePanel .sched-flagrow{display:grid;grid-template-columns:62px auto auto;justify-content:start;align-items:center;gap:8px;white-space:nowrap}
+#schedulePanel .sched-flagrow label{display:inline-flex;flex-direction:row;align-items:center;gap:2px}
+#schedulePanel .sched-sub{margin:5px 0 1px;padding-top:4px;border-top:1px solid #9a9a96}
+#schedulePanel .sched-btn{padding:3px 12px;border-radius:2px}
+.sched-win .sched-buttons{padding:4px 10px 6px}.sched-win .sched-buttons span{gap:2px}
+.sched-win #scheduleMessage{padding:2px 10px;min-height:16px;font-size:11.5px}
+/* T/G 독립 창: 실물처럼 메뉴 바로 아래가 그래프. 교육용 조작판(구간·지연 적용 등)은 그래프 아래로 */
+.tg-detached .graph-panel{display:flex;flex-direction:column}.tg-detached .graph-panel>.panel-title,.tg-detached .graph-panel>.graph-notice{display:none}
+.tg-detached .graph-panel>.tg-menubar{order:0}.tg-detached .graph-panel>.tg-body{order:1}.tg-detached .graph-panel>.tg-status{order:2}
+.tg-detached .graph-panel>#graphMessage{order:3}.tg-detached .graph-panel>.graph-toolbar{order:4}.tg-detached .graph-panel>#graphDetails{order:5}
+.tg-lens{width:200px!important;height:200px!important;border:1px solid #9aa0a6!important;border-radius:0!important;background:#fff;box-shadow:none!important}
+.src-dlg{padding:8px 12px}.src-dlg fieldset{border:1px solid #c9c9c5;padding:8px 12px 12px;margin:0 0 12px}.src-row{display:flex;align-items:center;gap:14px;margin:8px 0}.src-row>span{min-width:56px}.src-row input[type=text],.src-row #fdNumber{flex:1;min-width:0}.src-btns{display:flex;justify-content:flex-end;gap:10px}.src-btns .sched-btn{min-width:86px}
+.tg-detached .graph-scroll{margin:0;border:0;max-height:calc(100vh - 62px);overflow:auto}.tg-detached .tg-body{align-items:stretch}

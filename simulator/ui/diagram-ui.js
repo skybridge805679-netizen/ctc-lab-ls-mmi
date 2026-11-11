@@ -13,6 +13,7 @@
   const optionKey=model.trains.map(t=>t.id).join('|');if(optionKey!==trainOptionKey){trainOptionKey=optionKey;$('graphTrain').innerHTML=model.trains.map(t=>`<option>${escape(t.id)}</option>`).join('');}$('graphTrain').value=selected;
   if(!model.trains.length){$('diaSvg').innerHTML='';$('graphDetails').textContent='등록된 열차가 없습니다. 시간표를 열거나 열차를 생성하세요.';message('등록된 열차 0개');return;}
   if($('graphPanel').hidden)return;
+  if($('graphMessage').textContent==='등록된 열차 0개')message('');
   const from=N.catalog[$('graphFrom').value].order,to=N.catalog[$('graphTo').value].order;
   const parts=$('graphStart').value.split(':').map(Number),span=Number($('graphSpan').value)*60;
   if(parts.length!==2||!parts.every(Number.isFinite)||from>to){message('시작역은 종착역 앞에, 시작시각은 올바른 시각으로 지정하세요.');$('diaSvg').innerHTML='';return;}
@@ -50,13 +51,15 @@
    const style=options_.styles[options_.styleKey?options_.styleKey(train):train.kind]||{},ink=train.cancelled?'#94a3a0':(style.color||'#1b2a78'),pts=points(train.calls);
    if(options_.plan)svg+=`<path d="${path(points(train.plan))}" stroke="#c6c6c6" stroke-dasharray="5 4" stroke-width="1" fill="none"/>`;
    let currentPath=path(pts);if(!train.cancelled&&train.calls.some(c=>c.cancelled)){currentPath='';for(let i=0;i<train.calls.length;i++){const c=train.calls[i],n=train.calls[i+1];if(!c.cancelled)currentPath+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(n&&!c.cancelled&&!n.cancelled)currentPath+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(n.arrival),y(N.catalog[n.station].order)]]);}}
-   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.7}" stroke-dasharray="${train.cancelled?'8 5':(DASH[style.dash]??'2 3')}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 연계열번 ${escape(train.relatedTrain||'없음')}</title>`:''}</path>`;
+   svg+=`<path data-dia-train="${train.id}" d="${currentPath}" stroke="${ink}" stroke-width="${selected===train.id?2.8:1.8}" stroke-dasharray="${train.cancelled?'8 5':(DASH[style.dash]??'5 3')}" fill="none">${options_.tooltips?`<title>${train.id} · ${train.kind} · ${train.direction==='down'?'하행':'상행'}${train.cancelled?' · 운휴':''} · ${N.catalog[train.calls[0].station].name} ${T.clock(train.calls[0].departure)} → ${N.catalog[train.calls.at(-1).station].name} ${T.clock(train.calls.at(-1).arrival)} · 연계열번 ${escape(train.relatedTrain||'없음')}</title>`:''}</path>`;
    // Cancelled calls and their connecting legs are shown separately on the same online model.
    if(!train.cancelled)for(let i=0;i<train.calls.length;i++){const c=train.calls[i],next=train.calls[i+1];let p='';if(c.cancelled)p+=path([[x(c.arrival),y(N.catalog[c.station].order)],[x(c.departure),y(N.catalog[c.station].order)]]);if(next&&(c.cancelled||next.cancelled))p+=path([[x(c.departure),y(N.catalog[c.station].order)],[x(next.arrival),y(N.catalog[next.station].order)]]);if(p)svg+=`<path data-dia-cancelled-segment="${train.id}" data-dia-select="${train.id}" d="${p}" stroke="#8b969c" stroke-width="3" stroke-dasharray="7 4" fill="none"/>`;}
-   // train number rotated along the longest visible segment
-   let best=null;for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1);if(len>12&&Math.max(x1,x2)>left&&Math.min(x1,x2)<left+plotW&&(!best||len>best.len))best={len,x1,y1,x2,y2};}
-   if(best&&options_.numbers){let ang=Math.atan2(best.y2-best.y1,best.x2-best.x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;const mx=(best.x1+best.x2)/2,my=(best.y1+best.y2)/2;
-    svg+=`<text transform="translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;}
+   // 열차번호는 선을 따라 기울여 여러 번 적힌다 (사진 2026-11-11: 대략 다섯 역마다 한 번)
+   if(options_.numbers){let shown=0,best=null;const label=(x1,y1,x2,y2)=>{let ang=Math.atan2(y2-y1,x2-x1)*180/Math.PI;if(ang>90)ang-=180;if(ang<-90)ang+=180;svg+=`<text transform="translate(${((x1+x2)/2).toFixed(1)} ${((y1+y2)/2).toFixed(1)}) rotate(${ang.toFixed(1)})" text-anchor="middle" dy="-3" fill="${ink}" font-size="10" pointer-events="none">${train.id}${train.cancelled?' 운휴':''}</text>`;};
+    for(let i=1;i<pts.length;i++){const [x1,y1]=pts[i-1],[x2,y2]=pts[i],len=Math.hypot(x2-x1,y2-y1),mx=(x1+x2)/2,my=(y1+y2)/2;if(len<=12||mx<left||mx>left+plotW||my<plotTop||my>plotTop+plotH)continue;
+     if(!best||len>best.len)best={len,x1,y1,x2,y2};
+     if(i%2===0&&(i/2)%5===2){label(x1,y1,x2,y2);shown++;}}
+    if(!shown&&best)label(best.x1,best.y1,best.x2,best.y2);}
    // 툴팁보기로 선택한 열차: every station point is marked with a red dot (photo 2026-10-30)
    if(options_.marks&&selected===train.id)for(const [px,py] of pts)svg+=`<circle data-dia-mark="${train.id}" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#e0201b" pointer-events="none"/>`;
    const pos=(root.SimAutoUI?.position||T.position)(train,context.clock());if(pos&&options_.position)svg+=`<circle data-dia-position="${train.id}" cx="${x(context.clock())}" cy="${y(pos.order)}" r="3.6" fill="${ink}" stroke="white"/>`;

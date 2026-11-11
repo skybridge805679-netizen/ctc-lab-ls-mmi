@@ -178,9 +178,10 @@ def check(page, url, screenshot=False):
     page.locator('input[name="scheduleEditType"][value="single"]').check()
     page.locator('#scheduleCalls [data-call="3"][data-field="departure"]').fill('09:07:40')
     valid_route = page.evaluate("SimScheduleRoutes.options('dongmyo','arrival')[1]")
-    page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]').fill('9z_9t')
-    page.locator('#scheduleApply').click(); expect(page.locator('.mmi-alert')).to_contain_text('없는 도착진로'); page.locator('#mmiAlertOk').click()
-    page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]').fill(valid_route.lower())
+    # 진로 칸은 그 역의 진로만 고르는 목록이다 (사진 2026-11-11): 없는 진로는 넣을 수 없다
+    cell = page.locator('#scheduleCalls [data-call="3"][data-field="arrivalRoute"]')
+    assert cell.locator('option').all_inner_texts() == [''] + page.evaluate("SimScheduleRoutes.choices('dongmyo','arrival','down')")
+    cell.select_option(valid_route)
     page.locator('#scheduleKind').select_option('회송열차')
     page.locator('#scheduleCars').fill('8')
     page.locator('#scheduleRelated').fill('K1002')
@@ -197,7 +198,7 @@ def check(page, url, screenshot=False):
     page.locator('#scheduleCalls [data-call="4"][data-field="arrival"]').press('Tab')
     after = page.locator('#scheduleCalls [data-call="5"][data-field="departure"]').input_value()
     assert before != after
-    page.locator('#scheduleDiscard').click()
+    page.locator('#scheduleLoad').click()   # 다시 검색하면 고치던 내용은 버려진다
     assert page.locator('#scheduleCalls [data-call="5"][data-field="departure"]').input_value() == before
     # partial 운휴 then whole-train 운휴
     page.locator('input[name="scheduleCancelType"][value="part"]').check()
@@ -216,7 +217,7 @@ def check(page, url, screenshot=False):
     expect(page.locator('#graphDetails h3')).to_contain_text('운휴')
     expect(page.locator('#scheduleList option[value="K2001"]')).to_contain_text('미운행열차')
     page.locator('#scheduleCars').fill('7')
-    page.locator('#scheduleDiscard').click()
+    page.locator('#scheduleLoad').click()   # 다시 검색하면 고치던 내용은 버려진다
     expect(page.locator('#scheduleCars')).to_have_value('8')
     mode('copy')
     page.locator('#scheduleStart').fill('10:00:00')

@@ -244,7 +244,7 @@ function init(){
  if(graph){
   root.SimTG.init(graph);
   const w=createWindow('graph',{title:'ORPHEIA CTC ONLINE T/G',x:6,y:6,width:Math.min(1480,Math.max(900,desktop.clientWidth-14)),host:graph});w.opener=()=>{$('onlineGraphBtn')?.click();};w.closer='closeGraph';w.docked=true;w.el.classList.add('docked');}
- if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:300,y:420,width:1100,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
+ if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:120,y:40,width:1180,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
  root.SimScheduleDialogs.init();root.SimFTSUI.init(host);root.SimNotes.init(host);root.SimDrill.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
  root.SimMMIWindows.init(host);

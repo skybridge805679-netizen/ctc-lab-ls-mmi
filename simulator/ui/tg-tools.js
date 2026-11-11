@@ -74,7 +74,7 @@ function applyMode(){
  D().setOptions(mode==='tooltip'?{tooltips:true}:{tooltips:false,marks:false});
  clearOverlays();
 }
-function setMode(m){mode=mode===m?'':m;crossPt=null;applyMode();status(mode?`${{tooltip:'툴팁보기',cross:'십자선보기',magnify:'돋보기',area:'영역확대'}[mode]} · ${{tooltip:'열차를 선택하면 기본정보가 표시됩니다.',cross:'그래프를 클릭하면 시간과 위치가 표시됩니다.',magnify:'확대할 곳을 클릭하세요.',area:'확대할 영역을 끌어서 지정하세요.'}[mode]}`:'화면모드 해제');}
+function setMode(m){mode=mode===m?'':m;crossPt=null;applyMode();status(mode?`${{tooltip:'툴팁보기',cross:'십자선보기',magnify:'돋보기',area:'영역확대'}[mode]} · ${{tooltip:'열차를 선택하면 기본정보가 표시됩니다.',cross:'마우스가 있는 곳의 시간과 위치가 표시됩니다.',magnify:'마우스가 있는 곳이 확대되어 보입니다.',area:'확대할 영역을 끌어서 지정하세요.'}[mode]}`:'화면모드 해제');}
 const ACTIONS={
  help(){root.SimMMI.alertBox('툴팁보기로 열차선을 클릭해 선택한 뒤 F5: 열차 스케줄 수정 · Ctrl+C 후 Ctrl+V: 그 열차로 채운 스케줄 추가 · Ctrl+A / [열차생성]: 열차패턴선택 → 스케줄 추가 · 경합은 십자선보기로 시각과 위치를 읽어 확인합니다 · 이전화면/다음화면: 그래프를 한 화면씩 좌우로 이동.');},
  openDialog(){dialog('tgOpen','[OPN] 온라인 열차스케줄 열기',`<div class="pat-dlg"><fieldset><legend>조건선택</legend><label><span>노선선택</span><select id="opnLine"><option>경부선</option></select></label></fieldset><div><button type="button" class="sched-btn primary" id="opnOk">확인</button> <button type="button" class="sched-btn" id="opnCancel">취소</button></div></div>`,()=>{
@@ -138,15 +138,17 @@ const ACTIONS={
    dialogs.fillStyle=fill;
   },760);
   dialogs.fillStyle(D().getOption('styleKey')?D().getOption('styles'):null);},
- findDialog(){dialog('tgFind','열차검색',`<div class="pat-dlg"><label><span>열차번호</span><input id="fdNumber" list="fdList" maxlength="6" autocomplete="off"><datalist id="fdList"></datalist></label><div><button type="button" class="sched-btn primary" id="fdGo">검색</button> <button type="button" class="sched-btn" id="fdClose">닫기</button></div></div>`,()=>{
+ // [ON_TRN_SRC] 온라인 열차스케줄 검색 (사진 2026-11-11, Ctrl+F): 날짜선택 어제/오늘/내일, 열차번호 목록 상자, 검색·취소
+ findDialog(){dialog('tgFind','[ON_TRN_SRC] 온라인 열차스케줄 검색',`<div class="pat-dlg src-dlg"><fieldset><legend>열차번호검색</legend><div class="src-row"><span>날짜선택</span><label><input type="radio" name="fdDay" value="yesterday">어제</label><label><input type="radio" name="fdDay" value="today" checked>오늘</label><label><input type="radio" name="fdDay" value="tomorrow">내일</label></div><label class="src-row"><span>열차번호</span><input id="fdNumber" list="fdList" maxlength="6" autocomplete="off"><datalist id="fdList"></datalist></label></fieldset><div class="src-btns"><button type="button" class="sched-btn" id="fdGo">검색</button><button type="button" class="sched-btn" id="fdClose">취소</button></div></div>`,()=>{
    $('fdClose').onclick=()=>closeDialog('tgFind');
+   $('fdNumber').onkeydown=e=>{if(e.key==='Enter')$('fdGo').click();};
    $('fdGo').onclick=()=>{
-    const id=$('fdNumber').value.trim().toUpperCase(),t=D().getModel().trains.find(x=>x.id===id);
+    const id=$('fdNumber').value.trim().toUpperCase(),today=doc.querySelector('input[name="fdDay"]:checked')?.value==='today',t=today&&D().getModel().trains.find(x=>x.id===id);
     if(!t){root.SimMMI.alertBox(`${id||'열차번호'} 열차를 찾을 수 없습니다.`);return;}
     $('graphDirection').value='all';$('graphFrom').value=N().stations[0].id;$('graphTo').value=N().stations.at(-1).id;
     $('graphStart').value=hhmm(Math.max(-8*3600,t.calls[0].arrival-300));D().selectTrain(id);fire('graphStart');status(`${id} 열차로 이동했습니다.`);closeDialog('tgFind');
    };
-  });$('fdList').innerHTML=D().getModel().trains.map(t=>`<option value="${esc(t.id)}">`).join('');},
+  },380);$('fdList').innerHTML=D().getModel().trains.map(t=>`<option value="${esc(t.id)}">`).join('');const first=D().getModel().trains[0];if(first&&!$('fdNumber').value)$('fdNumber').value=first.id;$('fdNumber').focus();$('fdNumber').select();},
  favSet(){store.set({from:$('graphFrom').value,to:$('graphTo').value,start:$('graphStart').value,span:$('graphSpan').value,row:$('graphRow').value});status('즐겨찾기를 설정했습니다. 다음 실행 때도 이 화면으로 열립니다.');},
  favGo(){const f=store.get();if(!f){status('저장된 즐겨찾기가 없습니다.');return;}applyFav(f);status('즐겨찾기로 이동했습니다.');},
  't:plan'(b){toggle('plan',b);},'t:numbers'(b){toggle('numbers',b);},'t:position'(b){toggle('position',b);}
@@ -174,7 +176,8 @@ function clearOverlays(){$('diaCross')?.remove();doc.querySelector('.tg-lens')?.
 function drawOverlay(){
  const svg=$('diaSvg'),L=D().layout();svg.querySelector('#diaCross')?.remove();if(!L)return;
  let g='';
- if(mode==='cross'&&crossPt){const right=crossPt.x>L.left+L.plotW-170;g+=`<line x1="${L.left}" y1="${crossPt.y}" x2="${L.left+L.plotW}" y2="${crossPt.y}" stroke="#111" stroke-width=".8"/><line x1="${crossPt.x}" y1="${L.plotTop}" x2="${crossPt.x}" y2="${L.plotTop+L.plotH}" stroke="#111" stroke-width=".8"/><text id="diaCrossLabel" x="${crossPt.x+(right?-6:6)}" y="${crossPt.y-5}" text-anchor="${right?'end':'start'}" font-size="11" font-weight="700" fill="#111">${crossLabel(crossPt)}</text>`;}
+ // 십자선보기 (사진 2026-11-11): 가는 검은 선이 그래프 끝에서 끝까지, 글자는 마우스 위쪽에 굵게
+ if(mode==='cross'&&crossPt){const lx=Math.max(L.left+78,Math.min(L.left+L.plotW-78,crossPt.x)),ly=crossPt.y-L.plotTop<60?crossPt.y+52:crossPt.y-44;g+=`<line x1="${L.left}" y1="${crossPt.y}" x2="${L.left+L.plotW}" y2="${crossPt.y}" stroke="#111" stroke-width=".8"/><line x1="${crossPt.x}" y1="${L.plotTop}" x2="${crossPt.x}" y2="${L.plotTop+L.plotH}" stroke="#111" stroke-width=".8"/><text id="diaCrossLabel" x="${lx}" y="${ly}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#111" stroke="#fff" stroke-width="3" paint-order="stroke">${crossLabel(crossPt)}</text>`;}
  if(area){const x1=L.left+(Math.min(area.t1,area.t2)-L.start)/L.span*L.plotW,x2=L.left+(Math.max(area.t1,area.t2)-L.start)/L.span*L.plotW,y1=L.top+(Math.min(area.o1,area.o2)-L.from)*L.row,y2=L.top+(Math.max(area.o1,area.o2)-L.from)*L.row;g+=`<rect x="${x1}" y="${y1}" width="${x2-x1}" height="${y2-y1}" fill="rgba(49,106,197,.18)" stroke="#316ac5" stroke-dasharray="4 3"/>`;}
  if(g)svg.insertAdjacentHTML('beforeend',`<g id="diaCross" pointer-events="none">${g}</g>`);
 }
@@ -194,13 +197,14 @@ function showInfo(train,e){
  box.innerHTML=`열차번호 : ${esc(t.id)}(${t.direction==='down'?'하행':'상행'})<br>열차종류 : ${esc(t.kind)}<br>시발종착 : ${esc(info(t.calls[0].station).name)}발 -&gt;${esc(info(t.calls.at(-1).station).name)}<br>출발시각 : ${hms(t.calls[0].departure)}<br>도착시각 : ${hms(t.calls.at(-1).arrival)}<br>연계열선 : ${esc(t.relatedTrain||'없음')}`;
  const host=doc.querySelector('.tg-body'),r=host.getBoundingClientRect();box.style.left=Math.min(e.clientX-r.left+12,r.width-230)+'px';box.style.top=(e.clientY-r.top+12)+'px';host.appendChild(box);
 }
+// 돋보기 (사진 2026-11-11): 마우스를 가운데 둔 정사각형 안이 약 4배로 보인다
 function showLens(d,e){
  doc.querySelector('.tg-lens')?.remove();
- const svg=$('diaSvg'),host=doc.querySelector('.tg-body'),r=host.getBoundingClientRect(),w=150,h=100;
+ const svg=$('diaSvg'),host=doc.querySelector('.tg-body'),r=host.getBoundingClientRect(),size=200,zoom=4,scale=svg.getScreenCTM().a||1,w=size/zoom/scale;
  const lens=doc.createElement('div');lens.className='tg-lens';
- lens.innerHTML=`<svg viewBox="${d.x-w/2} ${d.y-h/2} ${w} ${h}" width="300" height="200" aria-hidden="true">${svg.innerHTML}</svg>`;
+ lens.innerHTML=`<svg viewBox="${d.x-w/2} ${d.y-w/2} ${w} ${w}" width="${size}" height="${size}" aria-hidden="true">${svg.innerHTML}</svg>`;
  lens.firstChild.querySelector('#diaCross')?.remove();
- lens.style.left=Math.max(0,Math.min(e.clientX-r.left+14,r.width-304))+'px';lens.style.top=Math.max(0,e.clientY-r.top+14)+'px';host.appendChild(lens);
+ lens.style.left=(e.clientX-r.left-size/2)+'px';lens.style.top=(e.clientY-r.top-size/2)+'px';host.appendChild(lens);
 }
 function bindPlot(){
  const svg=$('diaSvg');let drag=null;
@@ -208,7 +212,11 @@ function bindPlot(){
   const d=toData(e);
   if(mode==='area'&&d){drag={t:d.t,o:d.o};area={t1:d.t,o1:d.o,t2:d.t,o2:d.o};svg.setPointerCapture(e.pointerId);e.preventDefault();}
  });
- svg.addEventListener('pointermove',e=>{if(drag){const d=toData(e);if(d){area={t1:drag.t,o1:drag.o,t2:d.t,o2:d.o};drawOverlay();}}});
+ svg.addEventListener('pointermove',e=>{
+  if(mode==='cross'){const d=toData(e);if(d){crossPt=d;drawOverlay();}return;}
+  if(mode==='magnify'){const d=toData(e);if(d)showLens(d,e);else doc.querySelector('.tg-lens')?.remove();return;}
+  if(drag){const d=toData(e);if(d){area={t1:drag.t,o1:drag.o,t2:d.t,o2:d.o};drawOverlay();}}});
+ svg.addEventListener('pointerleave',()=>{if(mode==='magnify')doc.querySelector('.tg-lens')?.remove();});
  svg.addEventListener('pointerup',()=>{if(drag){drag=null;if(area&&Math.abs(area.t1-area.t2)<30&&Math.abs(area.o1-area.o2)<.3)area=null;if(area)zoomArea();else status('영역을 지정하지 못했습니다.');drawOverlay();}});
  svg.addEventListener('click',e=>{
   const d=toData(e);
@@ -247,7 +255,7 @@ function init(panel){
   if(e.target.closest('input,select,textarea'))return;
   const k=e.key,lk=k.toLowerCase();
   const modifier=e.ctrlKey||e.metaKey;if(modifier&&lk==='z'){e.preventDefault();ACTIONS[e.shiftKey?'redo':'undo']();return;}
-  const map=modifier?{c:'copy',v:'paste',a:'create',n:'note',r:'edit',o:'openDialog',p:'print'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
+  const map=modifier?{c:'copy',v:'paste',a:'create',n:'note',r:'edit',o:'openDialog',p:'print',f:'findDialog'}:{F5:'edit',F9:'jumpNow','+':'timeIn','=':'timeIn','-':'timeOut','/':'stationOut','*':'stationIn'};
   const name=map[modifier?lk:k];if(name){e.preventDefault();ACTIONS[name]();}
  });
  graph.tabIndex=-1;

@@ -105,12 +105,18 @@ def run(page, url):
     page.locator('#diaSvg').click(position={'x': box['width'] * .4, 'y': box['height'] * .5})
     expect(page.locator('#diaCross')).to_have_count(1)
     assert re.fullmatch(r'\(\d\d시 \d\d분 , \d+\.\d{3}Km \)', page.locator('#diaCrossLabel').text_content()), page.locator('#diaCrossLabel').text_content()
+    # 십자선은 마우스를 따라 움직인다 (사진 2026-11-11): 누르지 않아도 글자가 바뀐다
+    first = page.locator('#diaCrossLabel').text_content()
+    x, y = plot_point(page, .6, .7); page.mouse.move(x, y)
+    expect(page.locator('#diaCrossLabel')).not_to_have_text(first)
     page.locator('.tg-tool[title="십자선보기"]').click()
     expect(page.locator('#diaCross')).to_have_count(0)
     # 돋보기: click -> magnified box
     page.locator('.tg-tool[title="돋보기"]').click()
-    x, y = plot_point(page, .3, .4); page.mouse.click(x, y)
+    x, y = plot_point(page, .3, .4); page.mouse.move(x, y)
     expect(page.locator('.tg-lens')).to_have_count(1)
+    lens = page.locator('.tg-lens').bounding_box()   # 마우스를 가운데 둔 정사각형
+    assert abs(lens['width'] - lens['height']) < 2 and abs(lens['x'] + lens['width'] / 2 - x) < 3 and abs(lens['y'] + lens['height'] / 2 - y) < 3, lens
     page.locator('.tg-tool[title="돋보기"]').click()
     expect(page.locator('.tg-lens')).to_have_count(0)
     # 영역확대: dragging an area enlarges it at once
@@ -174,6 +180,8 @@ def run(page, url):
     page.locator('.tg-menubar').click(); page.keyboard.press('F9')
     # 열차검색
     tg(page, '화면설정', '열차검색')
+    expect(page.locator('[data-mmi-window="tgFind"] .mmi-title-text, #tgFind .mmi-title-text').first).to_have_text('[ON_TRN_SRC] 온라인 열차스케줄 검색')
+    assert page.locator('input[name="fdDay"]').count() == 3 and page.locator('#fdClose').inner_text() == '취소'
     page.locator('#fdNumber').fill('Z9999'); page.locator('#fdGo').click(); expect(page.locator('.mmi-alert')).to_contain_text('찾을 수 없습니다'); page.locator('#mmiAlertOk').click()
     page.locator('#fdNumber').fill('K1135'); page.locator('#fdGo').click()
     assert page.locator('#graphTrain').input_value() == 'K1135'

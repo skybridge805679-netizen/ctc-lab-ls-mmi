@@ -54,8 +54,8 @@ def run(page, url):
     dep.fill(f'{total // 3600:02d}:{total % 3600 // 60:02d}:{total % 60:02d}')
     for field, kind in (('arrivalRoute', 'arrival'), ('departureRoute', 'departure')):
         cur = page.locator(f'#scheduleCalls [data-call="{idx}"][data-field="{field}"]')
-        options = page.evaluate(f"SimScheduleRoutes.options('{nearest}','{kind}')")
-        cur.fill(next(o for o in options if o != cur.input_value()))
+        options = [o for o in cur.locator('option').all_inner_texts() if o]
+        cur.select_option(next(o for o in options if o != cur.input_value()))
     page.locator('#scheduleApply').click(); expect(page.locator('.mmi-alert')).to_contain_text('편집 적용 완료'); ok()
     page.evaluate("()=>{const s=document.querySelector('#stationSelect');s.value='%s';s.dispatchEvent(new Event('change'))}" % nearest)
     expect(page.locator('#scSteps li.sc-do.done')).to_have_count(8, timeout=5000)

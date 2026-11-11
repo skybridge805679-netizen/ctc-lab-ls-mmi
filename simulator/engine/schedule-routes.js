@@ -47,7 +47,14 @@ function options(stationId,kind){
  const want=kind==='arrival'?'장내':'출발';
  return Object.keys(C.routes).filter(id=>C.signals[C.routes[id].signal].kind===want).sort((a,b)=>a.localeCompare(b,'en',{numeric:true})).map(name);
 }
+// What the [CA028_02] 도착진로/출발진로 cell offers (photo 2026-11-11, 동묘앞 하행: 도착 1A_1T·1B_1T, 출발 3A_…·4A_B016T):
+// arrivals are the home routes of the running direction, departures are every starter route of the station.
+function choices(stationId,kind,direction){
+ let C;try{C=core().forStation(stationId);}catch{return [];}
+ const dir=direction==='down'?1:-1,want=kind==='arrival'?'장내':'출발';
+ return Object.keys(C.routes).filter(id=>{const s=C.signals[C.routes[id].signal];return s.kind===want&&(kind!=='arrival'||s.dir===dir);}).sort((a,b)=>a.localeCompare(b,'en',{numeric:true})).map(name);
+}
 function validate(stationId,route,kind){const list=options(stationId,kind);return !route||list===null||list.includes(route);}
-const api={OBSERVED,routesFor,estimate,options,validate};
+const api={OBSERVED,routesFor,estimate,options,choices,validate};
 if(typeof module!=='undefined')module.exports=api;else root.SimScheduleRoutes=api;
 })(typeof window!=='undefined'?window:globalThis);
