@@ -13,7 +13,9 @@ function audit(){
    // a rule-derived overlap is already given by an exit route that was set first (출발 먼저 → 장내), so the decision depends on the order
    const ruleHits=(x,y,ySetFirst)=>{const rule=IL.rulesFor(st.id,x.id);if(!rule||rule.derived&&ySetFirst&&rule.exits.includes(y.signal))return false;
     return rule.clearSignals?.includes(y.signal)||Object.entries(rule.points||{}).some(([p,v])=>y.pointLocks.includes(p)&&y.pointPositions[p]!==v);};
-   const base=a.signal===b.signal||sharedTracks.length>0||points.some(p=>!(a.pointPositions[p]==='N'&&b.pointPositions[p]==='N'));
+   const base=a.signal===b.signal||sharedTracks.length>0||points.some(p=>!(a.pointPositions[p]==='N'&&b.pointPositions[p]==='N'))
+    // 대향진로: 같은 선에 반대 방향에서 들어오는 진로 (실물 2026-11-11)
+    ||a.destination===b.destination&&!/^B\d/.test(a.destination)&&st.signals[a.signal]?.dir!==st.signals[b.signal]?.dir;
    const blockedWhen=(first,second)=>base||ruleHits(first,second,false)||ruleHits(second,first,true);
    const blocked=blockedWhen(a,b)&&blockedWhen(b,a);
    const outcomes=[];

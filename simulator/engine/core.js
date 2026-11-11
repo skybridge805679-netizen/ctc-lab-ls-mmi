@@ -16,17 +16,19 @@
  const remaining=(s,r)=>Math.max(0,Math.ceil(r.lock.until-s.clock));
  function overlapBlocker(s,id,skip){
   const requested=overlapOf(id,s),candidate=routes[id];
-  for(const other of Object.keys(s.routes)){
+  // 전환기는 출발신호기에서 가까운 순서(order)로, 실물에서 확인한 오버랩(checked)을 계산한 것보다 먼저 본다 — 실제 문구가 가리키는 전환기와 같게
+  const pts=ov=>{const e=Object.entries(ov?.points||{});return ov?.order?e.sort((a,b)=>(ov.order.indexOf(a[0])+99)%99-(ov.order.indexOf(b[0])+99)%99):e;};
+  for(const pass of [true,false])for(const other of Object.keys(s.routes)){
    if(other===skip)continue;
    const active=routes[other],existing=overlapOf(other,s);
-   for(const [pid,pos]of Object.entries(requested?.points||{})){
-    if((active.pointLocks||[]).includes(pid)&&active.pointPositions[pid]!==pos)return {route:other,point:pid};
-    if(existing?.points[pid]&&existing.points[pid]!==pos)return {route:other,point:pid};
+   if(!!existing?.checked===pass)for(const [pid,pos]of pts(existing)){
+    if((candidate.pointLocks||[]).includes(pid)&&candidate.pointPositions[pid]!==pos)return {route:other,point:existing.parts?.[pid]||pid};
    }
-   for(const [pid,pos]of Object.entries(existing?.points||{})){
-    if((candidate.pointLocks||[]).includes(pid)&&candidate.pointPositions[pid]!==pos)return {route:other,point:pid};
+   if(!!requested?.checked===pass)for(const [pid,pos]of pts(requested)){
+    if((active.pointLocks||[]).includes(pid)&&active.pointPositions[pid]!==pos)return {route:other,point:requested.parts?.[pid]||pid};
+    if(existing?.points[pid]&&existing.points[pid]!==pos)return {route:other,point:requested.parts?.[pid]||existing.parts?.[pid]||pid};
    }
-   if(existing?.clearSignals?.includes(candidate.signal))return {route:other,point:''};
+   if(pass&&existing?.clearSignals?.includes(candidate.signal))return {route:other,point:''};
   }
   return null;
  }
@@ -101,6 +103,9 @@
    if(ov?.clearSignals){const open=Object.keys(s.routes).find(id=>ov.clearSignals.includes(routes[id].signal));if(open)return log(false,'오버랩 구간의 '+routes[open].signal+' 신호를 먼저 해정하세요. ('+ov.note+')');}
    // 실제 MMI 문구 그대로: 「안양(010100)역 RT_4A_B984T진로22 요구중 SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]」 (어느 진로 때문인지는 알려 주지 않는다)
    const ob=overlapBlocker(s,a.id);if(ob)return log(false,ob.point?`${config.name}(${config.code})역 RT_${a.id.replace('-','_')}진로 22 요구중 SW_${ob.point}선로전환기 오방향 쇄정 상태[수동진로설정불가]`:'오버랩 쇄정 전환기가 '+ob.route+' 진로와 충돌합니다.');
+   // 대향진로: 같은 선에 반대 방향에서 들어오는 진로는 함께 서지 못한다 (실물 2026-11-11 · 금천구청 2B-4T 중 1B-4T)
+   const facing=Object.keys(s.routes).find(id=>routes[id].destination===r.destination&&signals[routes[id].signal]?.dir!==signals[r.signal]?.dir&&!/^B\d/.test(r.destination));
+   if(facing)return log(false,`${config.name}(${config.code})역 RT_${a.id.replace('-','_')}진로 요구중 대향진로( ) 설정상태 [수동진로설정불가]`);
    for(const [pid,pos] of Object.entries(ov?.points||{}))if(s.blockedPoints.includes(pid)&&s.points[pid]!==pos)return log(false,'오버랩 전환기 '+pid+'이 수동 쇄정되어 있습니다.');
    for(const [id,position]of Object.entries({...(r.pointPositions||{}),...(ov?.points||{})}))s.points[id]=position;
    s.routes[a.id]={status:'SET',control:a.control||'single',occupied:false};s.signals[r.signal]='GO';

@@ -12,26 +12,38 @@ const overlap={
  },
  // 사용자 실물 LS 확인 · 2026-11-11: 1B-3T 설정 중 2A-5T를 내면 「SW-52 선로전환 오방향 쇄정 상태[수동진로설정불가]」로 거부된다.
  // 하1선 3T 도착 열차의 과주 구간(4B 출발 쪽)에 있는 52호를 정위로 쇄정한다. 같은 관찰에서 2A-7T와 4B-B610T는 함께 설정된다.
+ // 용산 하선 도착(3번선·4번선)은 52호 너머 51호 건넘선의 하선 쪽 끝(51B)까지 정위로 쇄정한다.
+ //   1B-3T 중 2A-5T 거부(SW-52), 1B-3T 중 2A-3T 거부(SW_51B), 1B-4T 중 2A-5T 거부(SW_51B), 2A-5T 중 1B-4T 거부(SW_51B).
+ //   같은 출구를 쓰는 5번선·6번선(1B-5T · 1B-6T)은 4번선에서 유추했다.
  yongsan:{
-  '1B-3T':{points:{'52':'N'},note:'전방 52 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 설정 중 2A-5T 거부(SW-52 오방향 쇄정)'}
+  '1B-3T':{points:{'52':'N','51':'N'},order:['52','51'],parts:{'51':'51B'},note:'전방 52 · 51B 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 중 2A-5T 거부(SW-52), 2A-3T 거부(SW_51B)'},
+  '1B-4T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-4T 중 2A-5T 거부, 2A-5T 중 1B-4T 거부(SW_51B)'},
+  '1B-5T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩) · 4번선에서 유추',source:'1B-4T 실물 확인에서 유추 (같은 출구)'},
+  '1B-6T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩) · 4번선에서 유추',source:'1B-4T 실물 확인에서 유추 (같은 출구)'}
  },
- // 사용자 실물 LS 확인 · 2026-11-11: 안양 1A-2T 설정 중 4A-B984T는 「SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]」로 거부된다.
- // 1B-2T는 같은 도착선(2T)이라 같은 오버랩으로 두었다(직접 확인한 것은 1A-2T).
+ // 안양: 2번선 도착(1A-2T · 1B-2T 둘 다 확인)은 55 정위, 1번선 도착(1A-1T 확인, 1B-1T는 같은 도착선)은 55 반위. 3번선 도착(1B-3T)은 오버랩이 없다(4A-B660T 함께 설정).
  anyang:{
-  '1A-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1A-2T 설정 중 4A-B984T 거부(SW_55 오방향 쇄정)'},
-  '1B-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩) · 1A-2T와 같은 도착선',source:'1A-2T 실물 확인에서 유추 (같은 도착선 2T · 출발 4B)'}
+  '1A-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1A-2T 중 4A-B984T · 4A-B660T 거부(SW_55)'},
+  '1B-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-2T 중 4A-B984T 거부(SW_55)'},
+  '1A-1T':{points:{'55':'R'},note:'1번선 끝 55 선로전환기 반위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1A-1T 중 4B-B984T 거부(SW_55)'},
+  '1B-1T':{points:{'55':'R'},note:'1번선 끝 55 선로전환기 반위 쇄정(오버랩) · 1A-1T와 같은 도착선',source:'1A-1T 실물 확인에서 유추 (같은 도착선)'},
+  '1B-3T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 중 4A-B660T 설정 가능'}
  },
  yeongdeungpo:{
+  '2A-4T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 2A-4T 중 3C-B619T2T 설정 가능'},
+  '2B-4T':{none:true,points:{},note:'오버랩 없음 · 2A-4T와 같은 도착선',source:'2A-4T 실물 확인에서 유추 (같은 도착선)'},
   '1A-1T':{points:{},clearSignals:['4B'],note:'4B 출발신호기 해정 후 진행(오버랩 때문)',source:'실무5 영등포 1번 대피 대본 해설(1A 해정 후 4B 오버랩 해정)'}
  }
 };
 // Simultaneous routes confirmed by the user's observation of the real LS.
 // This is a regression observation for the generic shared-N rule, not a route-pair exception.
 const SEEN='사용자 실물 LS 확인 · 2026-11-11 · 앞 진로 설정 중 뒤 진로 설정 가능 (오버랩 아님)';
-const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}],
- geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
+const parallel={
+ anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'},{routes:['1B-3T','4A-B660T'],source:SEEN}],
+ gunpo:[{routes:['1A-1T','4A-B680T'],source:SEEN}],
+ geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1A-2T','4B-B644T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
  yongsan:[{routes:['2A-7T','4B-B610T'],source:SEEN},{routes:['2B-2T','1B-1T'],source:SEEN},{routes:['2A-4T','3C-B605T'],source:SEEN}],
- yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN}],
+ yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN},{routes:['2A-4T','3C-B619T2T'],source:SEEN}],
  guro:[{routes:['2A-5T','3B-B949T'],source:SEEN}]};
 const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
 // ---------------------------------------------------------------- general rules, every station
@@ -82,7 +94,10 @@ function orderedPoints(st,r){const out=[];for(const res of r.resources||[]){cons
 function derivedOverlap(station,routeId){
  const key=station+'|'+routeId;if(cache.overlap.has(key))return cache.overlap.get(key);
  const N=lib('network'),st=N.catalog[station],r=st?.routes[routeId],sig=r&&st.signals[r.signal];let out=null;
- if(sig?.kind==='장내'){
+ // 실물 확인(2026-11-11): 제 방향 본선으로 들어오는 도착은 계산 규칙이 맞지 않았다(안양 3번선 · 영등포 4번선은 없고, 안양 2번선 · 용산 3번선은 규칙이 못 찾음).
+ // 본선 도착의 오버랩은 실물에서 확인한 것만 둔다. 부본선(막힌 선 · 건너 들어가는 선) 도착은 확인된 4건이 모두 규칙대로여서 계산을 유지한다.
+ const own=Object.entries(lib('line')?.line?.stations?.[station]?.trunks||{}).some(([t,v])=>v.rails.includes(r?.destination)&&(t.endsWith('D')?1:-1)===sig?.dir);
+ if(sig?.kind==='장내'&&!own){
   const exits=lib('wiring').data[station].signals.filter(x=>x[1]===r.destination&&st.signals[x[0]]?.dir===sig.dir&&st.signals[x[0]].kind==='출발').map(x=>x[0]);
   const deps=Object.values(st.routes).filter(x=>exits.includes(x.signal)).map(x=>({x,pts:orderedPoints(st,x)}));
   const points={};
@@ -98,9 +113,11 @@ function derivedOverlap(station,routeId){
  }
  cache.overlap.set(key,out);return out;
 }
+function exitsOf(station,route){const st=lib('network').catalog[station],r=st?.routes[route],sig=r&&st.signals[r.signal];return sig?lib('wiring').data[station].signals.filter(x=>x[1]===r.destination&&st.signals[x[0]]?.dir===sig.dir&&st.signals[x[0]].kind==='출발').map(x=>x[0]):[];}
 function rulesFor(station,route){
  const explicit=overlap[station]?.[route],derived=derivedOverlap(station,route);
- if(explicit)return {...explicit,points:{...(derived?.points||{}),...explicit.points},exits:derived?.exits||[],checked:true};
+ if(explicit?.none)return null;      // 실물에서 오버랩이 없다고 확인한 도착선
+ if(explicit)return {...explicit,points:{...(derived?.points||{}),...explicit.points},exits:derived?.exits||exitsOf(station,route),checked:true};
  return derived;
 }
 const api={approach,overlap,parallel,parallelFor,rulesFor,derivedOverlap,approachSection,approachTrain,approachWindows};

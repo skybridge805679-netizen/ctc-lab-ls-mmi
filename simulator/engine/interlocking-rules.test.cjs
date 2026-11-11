@@ -6,7 +6,7 @@ test('overlap rule reproduces every case of the scripts',()=>{
  assert.deepEqual(IL.derivedOverlap('yeongdeungpo','1A-1T').points,{'57':'R'});// 4B 진로(57 정위)는 해정해야 함
  assert.deepEqual(IL.derivedOverlap('yongsan','2A-6T').points,{'26':'N'});     // 6번 통과: 출발을 먼저
  let routes=0;for(const s of N.stations.filter(s=>s.controlled))for(const id of Object.keys(s.routes))if(IL.derivedOverlap(s.id,id))routes++;
- assert.ok(routes>=30,'rule applies at many stations, not only the scripted ones');
+ assert.ok(routes>=12&&routes<30,'계산 규칙은 부본선 도착에만 남긴다 (본선 도착은 실물에서 확인한 것만) — '+routes);
 });
 test('용산 6번 통과: exit route first, then 장내; the other order is refused by the overlap',()=>{
  const C=Core.forStation('yongsan');
@@ -43,5 +43,11 @@ test('real LS observations of 2026-11-11: 안양 1A-2T locks point 55 against 4A
  const r=pair('anyang','1A-2T','4A-B984T');assert.equal(r.ok,false);assert.equal(r.message,'안양(010100)역 RT_4A_B984T진로 22 요구중 SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]');
  assert.ok(pair('anyang','4C-B660T','4A-B984T').ok);
  for(const [st,rules] of Object.entries(IL.parallel))for(const {routes:[a,b]} of rules)assert.ok(pair(st,a,b).ok,`${st} ${a} 설정 중 ${b}`);
- assert.equal(Object.values(IL.parallel).flat().length,9);
+ assert.equal(Object.values(IL.parallel).flat().length,13);
+ // 2차 확인: 안양 1번선·2번선(55), 3번선은 없음. 용산 하선 도착은 51B까지. 문구가 가리키는 전환기도 실물과 같다
+ const sw=(st,a,b)=>pair(st,a,b).message.replace(/.*요구중 /,'');
+ assert.match(sw('anyang','1B-2T','4A-B984T'),/^SW_55선로전환기/);assert.match(sw('anyang','1A-2T','4A-B660T'),/^SW_55선로전환기/);assert.match(sw('anyang','1A-1T','4B-B984T'),/^SW_55선로전환기/);
+ assert.match(sw('yongsan','2A-5T','1B-4T'),/^SW_51B선로전환기/);assert.match(sw('yongsan','1B-4T','2A-5T'),/^SW_51B선로전환기/);assert.match(sw('yongsan','1B-3T','2A-3T'),/^SW_51B선로전환기/);assert.match(sw('yongsan','1B-3T','2A-5T'),/^SW_52선로전환기/);
+ // 대향진로: 같은 선에 반대 방향에서 들어오는 진로
+ assert.equal(pair('geumcheon','2B-4T','1B-4T').message,'금천구청(010090)역 RT_1B_4T진로 요구중 대향진로( ) 설정상태 [수동진로설정불가]');
 });
