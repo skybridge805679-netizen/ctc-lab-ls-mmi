@@ -17,7 +17,9 @@ test('signal stop with a train standing on the platform or in the rear block win
 });
 test('K0456 changes line only along the routes the controller gives, then the rescue train runs to the collision on the rescue order',()=>{
  const r=start('P-em-03');
- ctl(r,'anyang',{type:'mode',value:'CCM'});ctl(r,'anyang',{type:'stop',id:'3B'});ctl(r,'geumcheon',{type:'mode',value:'CCM'});ctl(r,'geumcheon',{type:'stop',id:'2A'});
+ // 시작 진로는 정상 진로다: 3B는 상2선(B981T), 3C는 상1선(B655T). 운행선 변경용 3B-B655T나 2B-6T가 미리 서 있지 않다
+ assert.deepEqual(Object.keys(r.snapshot().states.anyang.routes).sort(),['3B-B981T','3C-B655T']);
+ ctl(r,'anyang',{type:'mode',value:'CCM'});ctl(r,'anyang',{type:'stop',id:'3B'});ctl(r,'anyang',{type:'stop',id:'3C'});ctl(r,'geumcheon',{type:'mode',value:'CCM'});ctl(r,'geumcheon',{type:'stop',id:'2A'});
  tick(r,95);assert.equal(row(r,'K0456').slot,'5T');
  assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);
  assert.equal(row(r,'K0456').station,'geumcheon');assert.equal(row(r,'K0456').slot,'B641T','2B-5T 진로 없이는 금천구청 4T 방면에서 기다린다');
@@ -61,11 +63,11 @@ test('a schedule problem after an emergency problem that emptied the timetable r
  const it=r.snapshot().fts.session.items[1];assert.equal(it.error,undefined,it.error);assert.equal(it.status,'진행');
  assert.ok(r.snapshot().timetable.trains.some(t=>t.id==='B0000'),'경합 임시열차 B0000');
 });
-test('비상 03 in the inspector order: 통보 14 before stopping 2B closes 2B as missed (0점) instead of blocking; after 합병 출발 the 회송 trains leave',()=>{
+test('비상 03 in the inspector order: 통보 14 before stopping 3C closes 3C as missed (0점) instead of blocking; after 합병 출발 the 회송 trains leave',()=>{
  const r=start('P-em-03'),c=id=>assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+id,checked:true}).ok);
  ctl(r,'anyang',{type:'mode',value:'CCM'});ctl(r,'anyang',{type:'stop',id:'3B'});ctl(r,'geumcheon',{type:'mode',value:'CCM'});ctl(r,'geumcheon',{type:'stop',id:'2A'});
  c('n14');tick(r,120);
- assert.equal(item(r).obj['stop-anyang-2B'],undefined);assert.notEqual(item(r).missed['stop-anyang-2B'],undefined,'2B 취소는 놓침으로 닫힌다');
+ assert.equal(item(r).obj['stop-anyang-3C'],undefined);assert.notEqual(item(r).missed['stop-anyang-3C'],undefined,'3C 취소는 놓침으로 닫힌다 (A1002가 3C 진로로 이미 지나감)');
  assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);assert.ok(ctl(r,'geumcheon',{type:'route',id:'2B-5T'}).ok);
  rename(r,'K0450','G0450');rename(r,'K0454','G0454');c('n24');tick(r,60);
  assert.ok(r.command({type:'alarm:ack',texts:['열차번호 중복']}).ok);

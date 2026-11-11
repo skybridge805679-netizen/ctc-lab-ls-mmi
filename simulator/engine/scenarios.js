@@ -95,7 +95,8 @@ const list=[
   problem:'{고장}열차(교재 B3191) 차량고장으로 금천구청역 부본선 대피, 후속 후속열차는 통과시키세요.',direction:'down',
   seed:{routes:['1B-3T','4B-B968T'],approach:['1B']},
   cast:[{role:'fault',dir:'down',slot:'B642T'},{role:'follow',dir:'down',slot:'B642T',fallback:'B3193'},{role:'other',dir:'down',slot:'B966T',fallback:'K0455',label:'하2선 열차'}],
-  beats:{route:[['fault','1T']],enter:[['follow1','3T'],['follow1','B968T',30],['follow1',null,30]],enter2:[['other','2T'],['other','B968T',30],['other',null,30]],out:[['fault',null]]},
+  // 후속열차는 하1선(3T)으로 통과해 4C-B644T로 나간다. 금천구청 화면에는 B644T 열번창이 없어 3T에서 바로 관제구간 밖으로 (하2선 B968T로 건너뛰지 않는다)
+  beats:{route:[['fault','1T']],enter:[['follow1','3T'],['follow1',null,30]],enter2:[['other','2T'],['other','B968T',30],['other',null,30]],out:[['fault',null]]},
   steps:[
    say('{고장}열차 차량고장으로 관제승인 1호로 금천구청역 1번 부본선 대피합니다. 금천구청역 장내신호기 앞에 정차 바랍니다. 장내신호기 정지됩니다. 관제 이상!'),
    doStep('금천구청역 CCM 전환',sawMode('geumcheon','CCM')),

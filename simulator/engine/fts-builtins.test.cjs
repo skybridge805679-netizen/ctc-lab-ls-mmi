@@ -10,13 +10,15 @@ const waits=(c,out=[])=>{if(!c)return out;if(c.type==='reaction')out.push(c.id);
 const leaf=(c,type)=>c.type===type?c:(c.conditions||[]).map(k=>leaf(k,type)).find(Boolean)||(c.condition&&leaf(c.condition,type))||null;
 
 // 대본과 다른 순서: 목표는 목록 뒤쪽(나중 역 · 나중 단계)부터 할 수 있는 것을 고르고, 통보는 그 뒤에 대본과 거꾸로 확인한다.
-function solve(p0,{log=false,branches=[]}={}){
+function solve(p0,{log=false,branches=[],first=[]}={}){
  const p1=p0;
  const r=R.create(),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
  assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p0)}).ok);
  const started=r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false});assert.ok(started.ok,started.message);
  r.command({type:'tick',seconds:1});
  // 상황 변경: 교수가 모니터링에서 주입한 것처럼 켠 뒤, 그 분기가 반영된 목표·통보로 푼다
+ // 상황 변경이 주입되는 시점까지 이미 한 통보 (예: 비상 04 — 통보 12로 A1003이 떠난 뒤에 후속 A1005가 근접한다)
+ for(const id of first){assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+id,checked:true}).ok);for(let i=0;i<24;i++)r.command({type:'tick',seconds:5});}
  for(const id of branches){const x=r.command({type:'fts',op:'manual',key:'branch:'+id});assert.ok(x.ok,x.message);}
  r.command({type:'tick',seconds:0});
  assert.deepEqual(Object.keys(item().branch||{}).sort(),[...branches].sort());
@@ -110,22 +112,32 @@ test('emergency problems carry the situation-change branches of the response gui
  assert.equal(F.view(em['P-em-05'],{branch:{}}),em['P-em-05']);
  assert.ok(em['P-em-03'].communications.find(c=>c.id==='proactive')?.optional);
 });
-for(const [id,branches] of [['P-em-05',['v-bogie']],['P-em-04',['v-delay','v-a1005']],['P-em-01',['v-k1008-approach','v-k1006-passed']],['P-em-01',['v-k1008-far']],['P-em-06',['v-self-run-first']],['P-em-02',['v-derail-k604','v-point-23b']]])
+for(const [id,branches,first=[]] of [['P-em-05',['v-bogie']],['P-em-04',['v-delay','v-a1005'],['n12']],['P-em-01',['v-k1008-approach','v-k1006-passed']],['P-em-01',['v-k1008-far']],['P-em-06',['v-self-run-first']],['P-em-02',['v-derail-k604','v-point-23b']]])
  test(`${id} with ${branches.join('+')}: solvable after the situation changes`,()=>{
-  const p=problems.find(x=>x.id===id),{item,missing,error}=solve(p,{branches});
+  const p=problems.find(x=>x.id===id),{item,missing,error}=solve(p,{branches,first});
   assert.equal(error,undefined);assert.deepEqual(missing,[]);assert.equal(item.status,'완료');
  });
-test('A1005 cannot pass Anyang while the K0811 route 4B-B660T stands; cancelling 4B and returning AUTO lets its automatic routes through',()=>{
+test('비상 04 starts with the straight routes; 통보 12 sends the adjacent trains off; A1005 passes Anyang on automatic routes only in AUTO',()=>{
  const p=problems.find(x=>x.id==='P-em-04'),r=R.create(),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
  assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p)}).ok);assert.ok(r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false}).ok);
- r.command({type:'tick',seconds:1});assert.ok(r.command({type:'fts',op:'manual',key:'branch:v-a1005'}).ok);r.command({type:'tick',seconds:2});
- const at=()=>Object.entries(S().ls.stations).flatMap(([st,x])=>Object.entries(x.windows).filter(([,rows])=>rows.some(t=>t.number==='A1005')).map(([slot])=>st+':'+slot));
- assert.deepEqual(at(),['anyang:B658T']);assert.ok(S().states.anyang.routes['4B-B660T']);
- r.command({type:'tick',seconds:300});assert.deepEqual(at(),['anyang:B658T'],'4B-B660T가 서 있으면 A1005는 들어오지 못한다');
- r.command({type:'control',station:'anyang',action:{type:'mode',value:'CCM'}});assert.ok(r.command({type:'control',station:'anyang',action:{type:'stop',id:'4B'}}).ok!==false);
- r.command({type:'tick',seconds:60});assert.deepEqual(at(),['anyang:B658T'],'CCM에서는 자동 진로가 서지 않는다');
- r.command({type:'control',station:'anyang',action:{type:'mode',value:'AUTO'}});
+ r.command({type:'tick',seconds:1});
+ // 시작: K0811은 하2선 정상 출발 진로(4B-B984T), 운행선 변경용 4B-B660T는 서 있지 않다. A1003은 하1선 3T
+ assert.ok(S().states.anyang.routes['4B-B984T']);assert.equal(S().states.anyang.routes['4B-B660T'],undefined);
+ const where=n=>Object.entries(S().ls.stations).flatMap(([st,x])=>Object.entries(x.windows).filter(([,rows])=>rows.some(t=>t.number===n)).map(([slot])=>st+':'+slot));
+ assert.deepEqual(where('A1003'),['anyang:3T']);assert.deepEqual(where('K0809'),['geumjeong:2T']);
+ // 통보 12 「각 열차 신호 확인 출발」: A1003·A0346·K1114·K1116·K1118이 떠난다
+ assert.ok(r.command({type:'fts',op:'manual',key:'comm:n12',checked:true}).ok);for(let i=0;i<40;i++)r.command({type:'tick',seconds:5});
+ for(const n of ['A1003','A0346','K1114','K1116','K1118'])assert.deepEqual(where(n),[],n+' 출발');
+ // 후속 A1005 근접(상황2): 4B만 해정하고 1B·4C는 진행을 유지해야 A1005가 지나간다 — CCM에서는 자동 진로가 서지 않고, AUTO로 돌리면 1B-3T · 4C-B660T 자동 진로로 통과한다
+ const anyang=a=>r.command({type:'control',station:'anyang',action:a});
+ anyang({type:'mode',value:'CCM'});assert.ok(anyang({type:'stop',id:'4B'}).ok!==false);
+ assert.ok(r.command({type:'fts',op:'manual',key:'branch:v-a1005'}).ok);r.command({type:'tick',seconds:2});
+ const at=()=>where('A1005');
+ assert.deepEqual(at(),['anyang:B658T']);
+ r.command({type:'tick',seconds:120});assert.deepEqual(at(),['anyang:B658T'],'CCM에서는 자동 진로가 서지 않는다');
+ anyang({type:'mode',value:'AUTO'});
  for(let i=0;i<120&&at().length;i++)r.command({type:'tick',seconds:5});
  assert.deepEqual(at(),[],'4B 해정 · AUTO 복귀 뒤 A1005가 자동 진로로 통과한다');assert.notEqual(item().obj['a1005-passed'],undefined);
+ assert.deepEqual(where('K0811'),['anyang:2T'],'K0811은 운행선 변경 진로를 받을 때까지 안양 2T에 선다');
 });
 module.exports={solve,problems};

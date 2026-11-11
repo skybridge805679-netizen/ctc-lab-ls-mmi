@@ -60,7 +60,8 @@ function seedRoutes(station,signals,approach=[],occupied=new Set()){
   const departure=c.signals[sig]?.kind==='출발';
   const L=node?require('./line.js'):root.SimLine,wrong=r=>!!L?.wrongDirection?.(station,c.routes[r].destination);   // 반대 방향(단선 운전) 진로는 고르지 않는다
   // 처음부터 열번창에 열차가 서 있는 선로로 들어가는 진로는 고르지 않는다 (본선 신호는 점유 선로에 진행을 내지 않는다)
-  const id=typeof sig==='string'&&c.routes[sig]?sig:Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure&&!occupied.has(c.routes[r].destination)).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig&&!occupied.has(c.routes[r].destination));
+  const straight=EM().straightRoute(station,sig);if(straight&&occupied.has(c.routes[straight].destination)){continue;}   // 정상 진로의 도착 선로에 열차가 서 있으면 그 신호는 정지로 둔다
+  const id=typeof sig==='string'&&c.routes[sig]?sig:straight||Object.keys(c.routes).filter(r=>c.routes[r].signal===sig&&/^B/.test(c.routes[r].destination)===departure&&!occupied.has(c.routes[r].destination)).sort((a,b)=>Number(wrong(a))-Number(wrong(b))||a.localeCompare(b,'en',{numeric:true}))[0]||Object.keys(c.routes).find(r=>c.routes[r].signal===sig&&!occupied.has(c.routes[r].destination));
   if(id&&c.dispatch(s,{type:'route',id,source:'SCENARIO'}).ok)out.push({station,route:id});
  }
  return {routes:out,approach:approach.map(signal=>({station,signal}))};
