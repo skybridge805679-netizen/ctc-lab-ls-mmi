@@ -64,7 +64,10 @@ const BRANCHES={
   {id:'v-derail-k602',label:'충돌 시 열차탈선 · K0602 23B 선로전환기 탈선 (2차 확인 시)',at:[117,139],head:'충돌시 열차탈선',drop:['n8'],
    comms:[['v8','8 · K0602·K0604 운행중지 · 동묘앞역 승객 대피',120,129],['v8-report','관제팀장·관제운영실 보고 · 탈선복구장비 출동',129,133],['v8-recover','사고복구반 탈선 복구 확인',133,139]]},
   {id:'v-point-23b',label:'탈선 복구 확인 중 23B 선로전환기 불량',at:[139,150],head:'※ 탈선 복구 완료 확인 중 23B 선로전환기 불량 수보',
-   comms:[['v23b-key','23B 정위 키볼트 쇄정 지시 · 45km/h 서행',139,144],['v23b-hand','동묘앞역 상출발 수신호 현시 · G0602 발차 지시',144,150]]},
+   comms:[['v23b-key','23B 정위 키볼트 쇄정 지시 · 45km/h 서행',139,144],['v23b-hand','동묘앞역 상출발 수신호 현시 · G0602 발차 지시',144,150]],
+   // 원문 「관제승인 00호로 상출발 수신호 현시 … 확인하고 출발하세요」: G0602는 번호를 고쳤다고 떠나지 않고, 수신호 발차 지시를 받은 뒤 출발신호기 진로 없이 떠난다
+   drop:['r-g0602'],
+   reactions:[{id:'r-g0602-hand',label:'수신호 발차 지시 뒤 G0602 출발 (출발신호기 진로 없이)',when:{type:'all',conditions:[{type:'communication',id:'v23b-hand'},{type:'objective',id:'rename-G0602'},{type:'not',condition:{type:'trainGone',number:'G0602'}},{type:'not',condition:{type:'trainGone',number:'K0606'}}]},do:[{type:'runTrain',number:'G0602',legs:[],exit:true,handSignal:true},{type:'runTrain',number:'K0606',legs:[{station:'dongmyo',slot:'B017T'}]}]}]},
   {id:'v-derail-k604',label:'충돌 시 열차탈선 · K0604 탈선 (최초 수보 시)',at:[151,205],head:'충돌시 열차탈선',drop:['n1','n5','n6','n11','n24'],
    comms:[['v1','1 · K0604 운행중지 · 선로반대편 하차 / K0602 상황 확인',154,162],['v5','5 · 동묘앞역 초기대응 · 전차선 단전 여부',162,172],['v6','6 · 비상 전파 · 탈선복구장비 지원',172,177],['v11','11 · 대피 완료 확인 · 무선방호 해제',177,187],['v-recover21','탈선사고 복구 상황 확인 (#21-1)',187,196],['v24','24 · 구원연결 · 합병승인 · G0604 회송',196,205]]}],
  // 석수화재 (06 구원연결 · 06-1 역간정차)

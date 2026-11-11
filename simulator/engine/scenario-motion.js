@@ -72,7 +72,7 @@ function create(host){
   if(action.op==='delete'&&!manual&&!action.runOn){      // 자동 출발: 본선을 따라 이어 달린 뒤 관제구간 밖으로
    const from=previous?.action.op==='move'?{station:previous.action.targetStation||previous.station,slot:previous.action.targetSlot}:{station:f.station,slot:f.slot};
    const legs=onward(from.station,from.slot,f.train.direction);let result=null;
-   for(const [i,l] of legs.entries()){const r=request({op:'move',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.exitCode?{exitCode:l.exitCode}:{}),...(l.clear?{clear:l.clear}:{}),runOn:true,background:i>0},false);result??=r;if(!r.ok)break;}
+   for(const [i,l] of legs.entries()){const r=request({op:'move',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.exitCode?{exitCode:l.exitCode}:{}),...(l.clear?{clear:l.clear}:{}),...(i===0&&action.handSignal?{handSignal:true}:{}),runOn:true,background:i>0},false);result??=r;if(!r.ok)break;}
    const last=request({...action,runOn:true,background:legs.length>0},false);return result||last;
   }
   const j={id:'SCM'+(++serial),uid:action.uid,number:f.train.number,background:!!action.background,station:f.station,fromStation:previous?.action.targetStation||f.station,from:previous?.action.targetSlot||f.slot,to:action.targetSlot||'관제구간 밖',action:{...action},manual,phase:'waiting',reason:'앞 열차 통과 대기'};jobs.push(j);step();return {ok:true,pending:j.phase!=='done',message:f.train.number+' 이동 접수 · '+(j.reason||'진행 중')};
@@ -98,6 +98,8 @@ function create(host){
   const C=cachedCore(f.station),s=states()[f.station];
   const a=point(f.station,f.slot),b=point(target,to),def=W.data[f.station];
   // 구원운전(전령법): 관제 지시로 전령자가 승차한 구원열차는 신호 없이 사고 열차가 있는 폐색 구간에 들어가 연결한다
+  // 수신호 출발: 관제 승인으로 역이 출발 수신호를 현시한 열차는 출발신호기 진로 없이 떠난다 (상황별 대응 요령 · 동묘앞 23B 선로전환기 불량)
+  if(j.action.handSignal&&a&&b&&target===f.station){j.phase='handover';j.fromTime=s.clock;j.until=s.clock+30;j.reason='수신호 출발 · '+to;(s.scenarioMotions??=[]).push({id:j.id,uid:j.uid,number:j.number,points:[a,b],from:s.clock,to:s.clock+30});return;}
   if(j.action.rescue&&a&&b){j.phase='handover';j.fromTime=s.clock;j.until=s.clock+40;j.reason='구원운전 (전령법) · '+(target===f.station?'':N.catalog[target]?.name+'역 ')+to+' 사고 열차로';
    const dir=f.train.direction==='up'?-1:1,addR=(station,points,from,until)=>{(states()[station].scenarioMotions??=[]).push({id:j.id,uid:j.uid,number:j.number,points,from:from+states()[station].clock-s.clock,to:until+states()[station].clock-s.clock});};
    if(target===f.station)addR(f.station,[a,b],s.clock,s.clock+40);else{addR(f.station,[a,[a[0]+dir*60,a[1]]],s.clock,s.clock+20);addR(target,[[b[0]-dir*60,b[1]],b],s.clock+20,s.clock+40);}return;}

@@ -181,4 +181,21 @@ test('situations anchored on a route or a departing train happen right after it'
  ctl({type:'mode',value:'CCM'});ctl({type:'stop',id:'3B'});ctl({type:'stop',id:'3C'});r.command({type:'tick',seconds:40});assert.deepEqual(Object.keys(item().branch||{}),[]);
  assert.ok(ctl({type:'route',id:'3B-B655T'}).ok);r.command({type:'tick',seconds:5});assert.ok(item().branch['v-self-run-late']!=null);
 });
+test('동묘앞 23B 선로전환기 불량: G0602 leaves only after the hand-signal departure order, without a departure route',()=>{
+ const p=everything.find(x=>x.id==='P-em-02-point-23b'),r=startOne(p),S=()=>r.snapshot(),item=()=>S().fts.session.items[0];
+ const row=n=>{for(const [station,s] of Object.entries(S().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid};return null;};
+ const say=id=>assert.ok(r.command({type:'fts',op:'manual',key:'comm:'+id,checked:true}).ok,id),tick=n=>{for(let i=0;i<n;i+=5)r.command({type:'tick',seconds:5});};
+ say('n7');say('n13');tick(5);assert.ok(item().branch['v-derail-k602']!=null&&item().branch['v-point-23b']!=null);
+ // 동묘앞을 CCM으로 두고 3A를 정지시켜 둔다: 출발신호기 진로가 없다
+ r.command({type:'control',station:'dongmyo',action:{type:'mode',value:'CCM',source:'LS'}});r.command({type:'control',station:'dongmyo',action:{type:'stop',id:'3A',source:'LS'}});tick(40);
+ assert.ok(r.command({type:'numbers',action:{op:'rename',...row('K0602'),number:'G0602'}}).ok);tick(60);
+ assert.deepEqual([row('G0602').station,row('G0602').slot],['dongmyo','2T'],'번호를 고친 것만으로는 떠나지 않는다');
+ assert.equal(Object.keys(S().states.dongmyo.routes).some(k=>k.startsWith('3A-')),false);
+ say('v23b-hand');tick(45);assert.notEqual(row('G0602')?.slot,'2T','수신호 발차 지시 뒤 진로 없이 출발');
+ assert.equal(Object.keys(S().states.dongmyo.routes).some(k=>k.startsWith('3A-')),false,'출발신호기 진로는 서지 않았다');
+});
+test('the 열차탈선 scenario strings the four derailment situations of the response guide together',()=>{
+ const l=R.create().snapshot().ftsLibrary,sc=l.scenarios.find(s=>s.id==='SC-04-DERAIL');assert.deepEqual(sc.situations,['S-em-02-derail-k604','S-em-02-derail-k602','S-em-02-point-23b','S-em-03-derail']);
+ for(const id of sc.situations){const p=l.problems.find(p=>p.id===l.situations.find(s=>s.id===id).problems[0]);assert.match(p.name,/탈선|23B/);assert.equal(p.variant,'branch');}
+});
 module.exports={solve,problems};

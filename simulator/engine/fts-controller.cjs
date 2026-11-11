@@ -31,7 +31,7 @@ function create(host){
   case 'runTrain':{let f=null;for(const [station,s]of Object.entries(host.context().ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)f={station,slot,uid:r.uid};
    if(!f)throw Error(ph.number+' 열차번호가 LS에 없습니다');
    for(const l of ph.legs||[])error(host.apply({type:'scenario:move',auto:true,action:{op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.rescue?{rescue:true}:{})}}));
-   if(ph.exit)error(host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid}}));break;}
+   if(ph.exit)error(host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid,...(ph.handSignal?{handSignal:true}:{})}}));break;}
   case 'alarm':host.alarm(ph.text);break;
   case 'notice':session.notice=ph.text;announce('notice',ph.text,'안내 · '+ph.text);break;
   default:throw Error('지원하지 않는 현상');

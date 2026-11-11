@@ -31,6 +31,7 @@ const overlap={
   '1B-3T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 중 4A-B660T 설정 가능'}
  },
  yeongdeungpo:{
+  '1B-5T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-5T 중 4E-B942T 설정 가능 (계산 규칙의 54 반위는 틀림)'},
   '2A-4T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 2A-4T 중 3C-B619T2T 설정 가능'},
   '2B-4T':{none:true,points:{},note:'오버랩 없음 · 2A-4T와 같은 도착선',source:'2A-4T 실물 확인에서 유추 (같은 도착선)'},
   '1A-1T':{points:{},clearSignals:['4B'],note:'4B 출발신호기 해정 후 진행(오버랩 때문)',source:'실무5 영등포 1번 대피 대본 해설(1A 해정 후 4B 오버랩 해정)'}
@@ -44,7 +45,7 @@ const parallel={
  gunpo:[{routes:['1A-1T','4A-B680T'],source:SEEN},{routes:['1B-2T','4A-B680T'],source:SEEN}],
  geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1A-2T','4B-B644T'],source:SEEN},{routes:['2B-4T','1B-2T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
  yongsan:[{routes:['2A-7T','4B-B610T'],source:SEEN},{routes:['2A-5T','3D-B605T'],source:SEEN},{routes:['1B-4T','4D-B610T'],source:SEEN},{routes:['2B-2T','1B-1T'],source:SEEN},{routes:['2A-4T','3C-B605T'],source:SEEN}],
- yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN},{routes:['2A-4T','3C-B619T2T'],source:SEEN}],
+ yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN},{routes:['2A-4T','3C-B619T2T'],source:SEEN},{routes:['1B-5T','4E-B942T'],source:SEEN}],
  guro:[{routes:['2A-5T','3B-B949T'],source:SEEN}]};
 const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
 // ---------------------------------------------------------------- general rules, every station

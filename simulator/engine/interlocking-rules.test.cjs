@@ -43,7 +43,7 @@ test('real LS observations of 2026-11-11: 안양 1A-2T locks point 55 against 4A
  const r=pair('anyang','1A-2T','4A-B984T');assert.equal(r.ok,false);assert.equal(r.message,'안양(010100)역 RT_4A_B984T진로 22 요구중 SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]');
  assert.ok(pair('anyang','4C-B660T','4A-B984T').ok);
  for(const [st,rules] of Object.entries(IL.parallel))for(const {routes:[a,b]} of rules)assert.ok(pair(st,a,b).ok,`${st} ${a} 설정 중 ${b}`);
- assert.equal(Object.values(IL.parallel).flat().length,19);
+ assert.equal(Object.values(IL.parallel).flat().length,20);
  // 2차 확인: 안양 1번선·2번선(55), 3번선은 없음. 용산 하선 도착은 51B까지. 문구가 가리키는 전환기도 실물과 같다
  const sw=(st,a,b)=>pair(st,a,b).message.replace(/.*요구중 /,'');
  assert.match(sw('anyang','1B-2T','4A-B984T'),/^SW_55선로전환기/);assert.match(sw('anyang','1A-2T','4A-B660T'),/^SW_55선로전환기/);assert.match(sw('anyang','1A-1T','4B-B984T'),/^SW_55선로전환기/);

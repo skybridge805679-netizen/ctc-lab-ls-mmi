@@ -439,6 +439,8 @@ function seed({scripts=[],limits={}}={}){
  scen({id:'SC-02',name:'#2-철도관제시스템운용·운행선관리-(종합)01',situations:[sOral,...sEvac]});
  if(sEm.length)scen({id:'SC-04',name:'#4-비상시조치-(종합)01',situations:sEm});
  scen({id:'SC-03',name:'#3-열차운행선관리-지장작업(종합)01',situations:[sWork]});
+ // 열차탈선: 대본이 따로 없어 「상황별 대응 요령」의 탈선 상황(동묘앞 3 · 석수 1)을 한 시나리오로 묶는다
+ {const ids=['S-em-02-derail-k604','S-em-02-derail-k602','S-em-02-point-23b','S-em-03-derail'].filter(id=>S.some(x=>x.id===id));if(ids.length)scen({id:'SC-04-DERAIL',name:'#4-비상시조치-열차탈선(종합)01',situations:ids});}
  scen({id:'SC-OP',name:'#2-철도관제시스템운용-실기 10항목',situations:[sOp]});
  scen({id:'SC-ORAL',name:'#2-철도관제시스템운용-구술 전체',situations:[sOralAll]});
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)

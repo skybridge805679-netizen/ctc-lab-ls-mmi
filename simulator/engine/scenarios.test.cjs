@@ -4,7 +4,7 @@ const flows={
  'yongsan-5':[['mode','CCM'],['stop','2A'],['refused','2A-5T'],['pass','1B-3T'],['pass','4B-B610T'],['tick',90],['route','2A-5T'],['mode','AUTO'],['sched','yongsan','3C_B605T']],
  'yongsan-6':[['mode','CCM'],['stop','2A'],['refused','2A-6T'],['pass','1B-3T'],['pass','4B-B610T'],['tick',90],['route','2A-6T'],['mode','AUTO'],['sched','yongsan','3B_B605T']],
  'yeongdeungpo-4':[['mode','CCM'],['stop','2B'],['tick',90],['route','2B-4T'],['mode','AUTO'],['sched','yeongdeungpo','3B_B619T2T']],
- 'yeongdeungpo-5':[['mode','CCM'],['stop','1B'],['refused','1B-5T'],['stop','4E'],['tick',90],['route','1B-5T'],['mode','AUTO'],['sched','yeongdeungpo','4D_B942T']],
+ 'yeongdeungpo-5':[['mode','CCM'],['stop','1B'],['tick',90],['route','1B-5T'],['mode','AUTO'],['sched','yeongdeungpo','4D_B942T']],
  'yongsan-4':[['mode','CCM'],['stop','1B'],['tick',90],['route','1B-4T'],['mode','AUTO'],['sched','yongsan','4C_B610T']],
  'yeongdeungpo-1':[['mode','CCM'],['stop','1A'],['stop','4B'],['tick',90],['route','1A-1T'],['mode','AUTO'],['sched','yeongdeungpo','4A_B622T']],
  'geumcheon-1':[['mode','CCM'],['stop','1B'],['stop','1A'],['stop','4B'],['tick',90],['route','1B-1T'],['mode','AUTO'],['mode','CCM'],['route','4A-B644T'],['mode','AUTO']],
