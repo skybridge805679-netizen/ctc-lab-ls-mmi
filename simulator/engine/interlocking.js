@@ -19,7 +19,8 @@ const overlap={
   '1B-3T':{points:{'52':'N','51':'N'},order:['52','51'],parts:{'51':'51B'},note:'전방 52 · 51B 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 중 2A-5T 거부(SW-52), 2A-3T 거부(SW_51B)'},
   '1B-4T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-4T 중 2A-5T 거부, 2A-5T 중 1B-4T 거부(SW_51B)'},
   '1B-5T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩) · 4번선에서 유추',source:'1B-4T 실물 확인에서 유추 (같은 출구)'},
-  '1B-6T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩) · 4번선에서 유추',source:'1B-4T 실물 확인에서 유추 (같은 출구)'}
+  '1B-6T':{points:{'51':'N'},parts:{'51':'51B'},note:'전방 51B 선로전환기 정위 쇄정(오버랩) · 4번선에서 유추',source:'1B-4T 실물 확인에서 유추 (같은 출구)'},
+  '2A-5T':{none:true,points:{},note:'오버랩 없음',source:'사용자 실물 LS 확인 · 2026-11-11 · 2A-5T 중 3D-B605T 설정 가능 (계산 규칙의 28 반위는 틀림)'}
  },
  // 안양: 2번선 도착(1A-2T · 1B-2T 둘 다 확인)은 55 정위, 1번선 도착(1A-1T 확인, 1B-1T는 같은 도착선)은 55 반위. 3번선 도착(1B-3T)은 오버랩이 없다(4A-B660T 함께 설정).
  anyang:{
@@ -39,10 +40,10 @@ const overlap={
 // This is a regression observation for the generic shared-N rule, not a route-pair exception.
 const SEEN='사용자 실물 LS 확인 · 2026-11-11 · 앞 진로 설정 중 뒤 진로 설정 가능 (오버랩 아님)';
 const parallel={
- anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'},{routes:['1B-3T','4A-B660T'],source:SEEN}],
- gunpo:[{routes:['1A-1T','4A-B680T'],source:SEEN}],
- geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1A-2T','4B-B644T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
- yongsan:[{routes:['2A-7T','4B-B610T'],source:SEEN},{routes:['2B-2T','1B-1T'],source:SEEN},{routes:['2A-4T','3C-B605T'],source:SEEN}],
+ anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'},{routes:['1B-3T','4A-B660T'],source:SEEN},{routes:['2A-5T','3A-B981T'],source:SEEN},{routes:['2B-4T','3A-B655T'],source:SEEN}],
+ gunpo:[{routes:['1A-1T','4A-B680T'],source:SEEN},{routes:['1B-2T','4A-B680T'],source:SEEN}],
+ geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1A-2T','4B-B644T'],source:SEEN},{routes:['2B-4T','1B-2T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
+ yongsan:[{routes:['2A-7T','4B-B610T'],source:SEEN},{routes:['2A-5T','3D-B605T'],source:SEEN},{routes:['1B-4T','4D-B610T'],source:SEEN},{routes:['2B-2T','1B-1T'],source:SEEN},{routes:['2A-4T','3C-B605T'],source:SEEN}],
  yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN},{routes:['2A-4T','3C-B619T2T'],source:SEEN}],
  guro:[{routes:['2A-5T','3B-B949T'],source:SEEN}]};
 const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
