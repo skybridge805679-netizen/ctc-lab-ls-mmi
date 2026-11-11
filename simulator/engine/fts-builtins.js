@@ -36,7 +36,7 @@ function objectiveBook(){
    if(value==='AUTO')return add('auto-'+station,`${nm(station)}역 AUTO 복귀 (끝날 때 AUTO 유지)`,{type:'all',conditions:[{type:'event',eventType:'mode',station,value:'AUTO'},{type:'mode',station,value:'AUTO'}]},{final:true});
    return add(value.toLowerCase()+'-'+station,`${nm(station)}역 ${value} 전환`,{type:'event',eventType:'mode',station,value});
   },
-  cancel:(station,signal)=>add(`stop-${station}-${signal}`,`${nm(station)}역 ${signal} 신호 취소(정지 취급)`,{type:'signalCancelled',station,signal}),
+  cancel:(station,signal)=>add(`stop-${station}-${signal}`,`${nm(station)}역 ${signal} 신호 취소(정지 취급)`,{type:'signalCancelled',station,signal,orStopped:true}),
   released:(station,signal)=>add(`free-${station}-${signal}`,`${nm(station)}역 ${signal} 진로 해정 확인 (접근쇄정 시간 경과)`,{type:'signalStop',station,signal}),
   route:(station,route,label)=>add(`route-${station}-${route}`,`${nm(station)}역 ${route} ${label||'진로 설정'}`,{type:'route',station,route}),
   rename(from,to){const id=add('rename-'+to,`열차번호 ${from} → ${to} 수정`,after(from,{type:'all',conditions:[exists(to),{type:'trainGone',number:from}]}));lastFor.set(to,id);return id;},

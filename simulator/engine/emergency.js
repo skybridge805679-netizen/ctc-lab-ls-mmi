@@ -38,7 +38,8 @@ const SUB={'01': '단선지령식', '02': '회송·구원연결·단선지령식
 const SEOKSU_UP2='B967T',SEOKSU_UP1='B643T',GWANAK_UP2='B975T',GASAN_UP2='B953T',DOKSAN_UP2='B959T';
 const OVERLAY={
  '01':{station:'jonggak',stations:['jonggak','underground-seoul'],
-  cast:[['K1137','jonggak'],['K1008','underground-seoul'],['K1135','jonggak','B060T'],['K1006','jonggak','B055T'],['K1139','dongmyo','B034T'],['K1010','seoul','B909T']],
+  cast:[['K1137','jonggak'],['K1008','underground-seoul'],['K1135','jonggak','B060T'],['K1006','jonggak','B055T'],['K1139','dongmyo','B034T'],['K1010','seoul','B909T'],
+        ['K1133','seoul','1T'],['K1131','seoul','B908T'],['K1004','dongmyo','B033T'],['K1002','dongmyo','B027T']],   // 「각 역 3분 추가정차」 선행 열차: 사고 열차 앞쪽으로 한 역씩 (서울·남영 / 종로3가·종로5가)
   seeds:{jonggak:['4A','2A'],'underground-seoul':['3A','1A']},
   before:{
    13:[mode('jonggak','CCM'),stop('jonggak',['4A','2A']),mode('underground-seoul','CCM'),stop('underground-seoul',['3A','1A'])],
@@ -46,7 +47,7 @@ const OVERLAY={
    16:[move('K1137','underground-seoul',null,'K1137 열차번호 종각역 → 지하서울역 이동 (반대선 운행이라 수동 이동)')],
    21:[mode('jonggak','AUTO'),mode('underground-seoul','AUTO')]}},
  '02':{station:'dongmyo',stations:['dongmyo','jonggak'],
-  cast:[['K0602','dongmyo'],['K0606','dongmyo','B021T'],['K0607','dongmyo','B012T'],['K0608','jonggak','B055T'],['K0610','underground-seoul']],
+  cast:[['K0602','dongmyo'],['K0606','dongmyo','B021T'],['K0607','dongmyo','B012T'],['K0608','jonggak','B055T'],['K0610','underground-seoul'],['K0605','dongmyo','B020T']],   // K0605: 하선 선행 열차 (동대문)
   seeds:{dongmyo:['3A','1B','4A'],jonggak:['2A','1A','4A']},
   autos:{
    n1:[{op:'insert',number:'K0604',station:'dongmyo',dir:'up'}],                  // K0604 충돌 → 같은 열번창에 두 번호 (열차번호 중복 알람)
@@ -61,7 +62,8 @@ const OVERLAY={
    25:[rename('K0604','G0604','dongmyo','g0604')],
    26:[mode('dongmyo','AUTO'),mode('jonggak','AUTO')]}},
  '03':{station:'anyang',stations:['anyang','geumcheon'],
-  cast:[['K0450','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T']],
+  cast:[['K0450','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],
+        ['K0448','guro','B959T'],['K0446','guro','B953T'],['K0399','anyang','B978T']],   // 추가정차 선행 열차: 상2선 독산·가산, 하2선 관악
   seeds:{anyang:['3B','3C','2B'],geumcheon:['2A']},
   autos:{n1:[{op:'insert',number:'K0452',station:'geumcheon',slot:SEOKSU_UP2,dir:'up'}],      // K0452 추돌 → 석수역 열번창에 번호 중복
          g0450:[{op:'delete',number:'G0450'}]},
@@ -73,26 +75,27 @@ const OVERLAY={
    27:[rename('K0452','G0452','geumcheon')]}},
  '04':{station:'anyang',stations:['anyang','gunpo','geumjeong'],
   cast:[['K0809','geumjeong','2T'],   // 원문: 금정역 하2선 진입 중 사상사고 — 하2선(전동차선)은 2T
-        ['K0811','anyang','2T'],['A1003','anyang','3T'],['K0813','anyang','B978T'],['K1114','gunpo'],['A0346','gunpo','3T'],['K1116','gunpo','B1005T'],['K1118','uiwang','5T']],   // 일반열차 A1003·A0346은 1선(일반선), 원문 관계열차 A0346·K1118 포함
+        ['K0811','anyang','2T'],['A1003','anyang','3T'],['K0813','anyang','B978T'],['K1114','gunpo'],['A0346','gunpo','3T'],['K1116','gunpo','B1005T'],['K1118','uiwang','5T'],
+        ['K0807','gunpo','B1002T'],['K0805','gunpo','B1008T'],['K1110','anyang','B981T'],['K1112','anyang','B985T']],   // 원문: K0807 군포 발차 · K0805 당정 발차 · K1110 안양 발차 · K1112 명학 발차   // 일반열차 A1003·A0346은 1선(일반선), 원문 관계열차 A0346·K1118 포함
   seeds:{anyang:['4B','1B'],gunpo:['1A','1B']},   // 4C는 A1003이 AUTO로 스스로 받는다 (미리 세워 두면 4B-B660T 운행선 변경 진로와 경합)
   before:{
    16:[mode('anyang','CCM'),stop('anyang',['4B'],' (필요시 4C 출발·1B 장내도 정지)'),mode('gunpo','CCM'),stop('gunpo',['1A','1B'])],
    17:[route('anyang','4B-B660T','출발 진행'),mode('anyang','AUTO'),route('gunpo','1B-1T','장내 진행'),mode('gunpo','AUTO')],
    20:[rename('K0809','G0809','geumjeong')]}},
  '05':{station:'geumcheon',stations:['geumcheon','guro'],
-  cast:[['K1208','guro',GASAN_UP2],['K1210','guro',DOKSAN_UP2],['K1212','geumcheon'],['K1214','geumcheon',SEOKSU_UP2],['A0168','guro','2T']],   // 일반열차는 상1선(2T)에서 발차
+  cast:[['K1208','guro',GASAN_UP2],['K1210','guro',DOKSAN_UP2],['K1212','geumcheon'],['K1214','geumcheon',SEOKSU_UP2],['A0168','guro','2T'],['K1204','yeongdeungpo','B943T'],['K1206','yeongdeungpo','B945T']],   // 원문: K1204 영등포 발차 · K1206 신도림 발차   // 일반열차는 상1선(2T)에서 발차
   seeds:{geumcheon:['3B','3C','2B'],guro:['2A','2B','3A']},
   before:{
    14:[mode('geumcheon','CCM'),stop('geumcheon',['3B','3C','2B']),mode('guro','CCM'),stop('guro',['2A','2B','3A']),route('geumcheon','3B-B639T','출발 진행'),mode('geumcheon','AUTO'),route('guro','2B-5T','장내 진행'),mode('guro','AUTO')],
    16:[rename('K1210','G1210','guro')],
    17:[move('G1210','guro',GASAN_UP2,'G1210 열차번호를 K1208이 있는 가산디지털역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G1210','guro'),rename('K1208','G1208','guro')]}},
  '05-1':{station:'geumcheon',stations:['geumcheon','guro'],
-  cast:[['K1208','guro',GASAN_UP2],['K1210','geumcheon'],['K1212','geumcheon',SEOKSU_UP2],['K1214','anyang',GWANAK_UP2],['A0168','geumcheon','4T']],   // 원문: A0168 금천구청~독산 상1선 운행 중 (주의운전 지시)
+  cast:[['K1208','guro',GASAN_UP2],['K1210','geumcheon'],['K1212','geumcheon',SEOKSU_UP2],['K1214','anyang',GWANAK_UP2],['A0168','geumcheon','4T'],['K1204','yeongdeungpo','B943T'],['K1206','yeongdeungpo','B945T']],   // 원문: A0168 금천구청~독산 상1선 운행 중 (주의운전 지시)
   seeds:{geumcheon:['3B'],guro:['2A','3A']},
   before:{
    11:[mode('geumcheon','CCM'),stop('geumcheon',['3B']),mode('geumcheon','AUTO'),mode('guro','CCM'),stop('guro',['2A','3A']),mode('guro','AUTO')]}},
  '06':{station:'anyang',stations:['anyang','geumcheon'],
-  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T']],
+  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],['K0450','guro','B959T'],['K0399','anyang','B978T']],
   seeds:{anyang:['3B','3C','2B'],geumcheon:['2A','2B']},
   before:{
    20:[mode('anyang','CCM'),stop('anyang',['3B','3C','2B']),mode('geumcheon','CCM'),stop('geumcheon',['2A','2B']),route('geumcheon','2B-5T','장내 진행 (A1004 금천구청역 통과 확인 후)'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],
@@ -100,7 +103,7 @@ const OVERLAY={
    24:[move('G0454','geumcheon',SEOKSU_UP2,'G0454 열차번호를 K0452가 있는 석수역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G0454','geumcheon')],
    25:[rename('K0452','G0452','geumcheon')]}},
  '06-1':{station:'anyang',stations:['anyang','geumcheon'],
-  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T']],
+  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],['K0450','guro','B959T'],['K0399','anyang','B978T']],
   seeds:{anyang:['3B','3C','2B'],geumcheon:['2A','2B']},
   before:{
    20:[mode('anyang','CCM'),stop('anyang',['3B','3C','2B']),mode('geumcheon','CCM'),stop('geumcheon',['2A','2B']),route('geumcheon','2B-5T','장내 진행 (A1004 금천구청역 통과 확인 후)'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],
@@ -108,7 +111,7 @@ const OVERLAY={
    24:[move('G0454','geumcheon',SEOKSU_UP2,'G0454 열차번호를 K0452가 있는 석수역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G0454','geumcheon')],
    25:[rename('K0452','G0452','geumcheon')]}},
  '06-2':{station:'anyang',stations:['anyang','geumcheon'],
-  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T']],
+  cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],['K0450','guro','B959T'],['K0399','anyang','B978T']],
   seeds:{anyang:['3B'],geumcheon:['2A']},
   before:{
    19:[mode('anyang','CCM'),stop('anyang',['3B']),mode('geumcheon','CCM'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],
@@ -121,17 +124,17 @@ const trip=(number,legs)=>legs.map(([station,slot,handover=false])=>({op:'move',
 const north=number=>trip(number,[['anyang','B655T'],['geumcheon','B641T',true],['geumcheon','5T'],['geumcheon','B963T']]);
 const guroTrip=number=>trip(number,[['geumcheon','B639T'],['guro','B631T',true],['guro','5T']]);
 const MOTION={
- '01':{n11:exit('K1006'),n21:exit('K1137','K1135')},
- '02':{n25:exit('K0608')},
- '03':{n14:exit('A1001','K0401','A1002'),n23:north('K0456'),n27:exit('G0452')},
- '04':{n12:exit('A1003','A0346','K1114','K1116','K1118'),n19:trip('K0813',[['anyang','2T']]),   // n12 「각 열차 신호 확인 출발」(K1116·K1118 포함), n19 「K0813 안양역까지 운행」
+ '01':{n11:exit('K1006'),n21:exit('K1131','K1133','K1137','K1135','K1002','K1004')},
+ '02':{n12:exit('K0605'),n25:exit('K0608')},      // n12 「K0605열차 정상운행」
+ '03':{n14:exit('A1001','K0401','A1002'),n15:exit('K0399'),n23:north('K0456'),n27:exit('G0452'),n28:exit('K0446','K0448')},
+ '04':{n12:exit('K1110','K1112','A1003','A0346','K1114','K1116','K1118'),n19:trip('K0813',[['anyang','2T']]),n21:exit('K0805','K0807'),   // n12 「각 열차 신호 확인 출발」(K1116·K1118 포함), n19 「K0813 안양역까지 운행」
        n17:trip('K0811',[['anyang','B660T'],['gunpo','B678T',true],['gunpo','1T']]),n20:exit('G0809')},
- '05':{n1:exit('A0168'),n15:guroTrip('K1212'),n18:exit('G1208')},       // 원문 "A0168열차 : 구로역 발차" — 사고 때 이미 출발한다
- '05-1':{n3:exit('A0168'),n12:guroTrip('K1210')},
- '06':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),   // n2 「A1002열차 석수역 속히 통과」
-      n21:north('K0456'),n25:exit('G0452')},
- '06-1':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n21:north('K0456'),n25:exit('G0452')},
- '06-2':{n2:exit('A1002'),n14:exit('A1001','K0401','A1004'),n20:north('K0456'),n21:exit('G0452')}
+ '05':{n1:exit('A0168'),n15:guroTrip('K1212'),n18:exit('G1208'),n19:exit('K1204','K1206')},       // 원문 "A0168열차 : 구로역 발차" — 사고 때 이미 출발한다
+ '05-1':{n3:exit('A0168'),n12:guroTrip('K1210'),n16:exit('K1204','K1206')},
+ '06':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n14:exit('K0399'),   // n2 「A1002열차 석수역 속히 통과」
+      n21:north('K0456'),n25:exit('G0452'),n26:exit('K0450')},
+ '06-1':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n14:exit('K0399'),n21:north('K0456'),n25:exit('G0452'),n26:exit('K0450')},
+ '06-2':{n2:exit('A1002'),n14:exit('A1001','K0401','A1004'),n15:exit('K0399'),n20:north('K0456'),n21:exit('G0452'),n22:exit('K0450')}
 };
 for(const [key,tags]of Object.entries(MOTION))for(const [tag,actions]of Object.entries(tags)){
  const autos=OVERLAY[key].autos??={};autos[tag]=[...(autos[tag]||[]),...actions];

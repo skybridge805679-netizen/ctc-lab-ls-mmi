@@ -30,6 +30,8 @@ function solve(p0,{log=false,branches=[],first=[]}={}){
  const done=()=>item().obj||{};
  const ready=o=>{const d=done();if(refs(o.condition).some(id=>d[id]==null))return false;if(waits(o.condition).some(id=>!item().reactions?.[id]?.fired))return false;if(o.condition.type==='alarmAck'&&o.condition.afterObjective&&d[o.condition.afterObjective]==null)return false;
   if(o.final)return p.objectives.every(x=>x.final||d[x.id]!=null);
+  // 열차번호를 회송 번호로 바꾸면 그 열차가 떠나 본선을 이어 달린다: 관제사는 진로를 먼저 다 낸 뒤에 출발시킨다
+  if(o.id.startsWith('rename-')&&p.objectives.some(x=>gated(x.condition).type==='route'&&d[x.id]==null))return false;
   const k=gated(o.condition),st=k.station;
   if(k.type==='route')return p.objectives.filter(x=>x.condition.station===st&&['signalCancelled','signalStop'].includes(x.condition.type)).every(x=>d[x.id]!=null);
   if(o.condition.type==='signalStop')return p.objectives.filter(x=>x.condition.type==='signalCancelled'&&x.condition.station===st&&x.condition.signal===o.condition.signal).every(x=>d[x.id]!=null);
@@ -39,7 +41,7 @@ function solve(p0,{log=false,branches=[],first=[]}={}){
   if(o.condition.type==='alarmAck')return r.command({type:'alarm:ack',texts:['열차번호 중복 알람']}).ok;
   const c=gated(o.condition);
   // 열차가 스스로 지나가야 하는 목표(상황 반응의 열차 운행)는 진로를 내 주고 기다린다
-  if(o.condition.type==='all'&&o.condition.conditions[0].type==='reaction'&&c.type==='trainGone')return false;
+  if(o.condition.type==='all'&&o.condition.conditions[0].type==='reaction'&&['trainGone','not'].includes(c.type))return false;
   if(o.final){const st=leaf(c,'mode').station;return control(st,{type:'mode',value:'AUTO'}).ok;}
   if(c.type==='event')return control(c.station,{type:'mode',value:c.value}).ok;
   if(c.type==='signalCancelled')return ccm(c.station)&&control(c.station,{type:'stop',id:c.signal}).ok;
@@ -127,12 +129,15 @@ test('비상 04 starts with the straight routes; 통보 12 sends the adjacent tr
  assert.deepEqual(where('A1003'),['anyang:3T']);assert.deepEqual(where('K0809'),['geumjeong:2T']);
  // 통보 12 「각 열차 신호 확인 출발」: A1003·A0346·K1114·K1116·K1118이 떠난다
  assert.ok(r.command({type:'fts',op:'manual',key:'comm:n12',checked:true}).ok);for(let i=0;i<40;i++)r.command({type:'tick',seconds:5});
- for(const n of ['A1003','A0346','K1114','K1116','K1118'])assert.deepEqual(where(n),[],n+' 출발');
+ // 떠난 열차는 사라지지 않고 본선을 따라 다음 역으로 이어 달린다
+ const start={A1003:'anyang:3T',A0346:'gunpo:3T',K1114:'gunpo:4T',K1116:'gunpo:B1005T',K1118:'uiwang:5T'};
+ for(const [n,at0] of Object.entries(start))assert.notDeepEqual(where(n),[at0],n+' 출발');
+ assert.ok(where('A1003').length===0||!where('A1003')[0].startsWith('anyang:'),'A1003은 안양을 벗어나 군포 방면으로');
  // 후속 A1005 근접(상황2): 4B만 해정하고 1B·4C는 진행을 유지해야 A1005가 지나간다 — CCM에서는 자동 진로가 서지 않고, AUTO로 돌리면 1B-3T · 4C-B660T 자동 진로로 통과한다
  const anyang=a=>r.command({type:'control',station:'anyang',action:a});
  anyang({type:'mode',value:'CCM'});assert.ok(anyang({type:'stop',id:'4B'}).ok!==false);
  assert.ok(r.command({type:'fts',op:'manual',key:'branch:v-a1005'}).ok);r.command({type:'tick',seconds:2});
- const at=()=>where('A1005');
+ const at=()=>where('A1005').filter(x=>x.startsWith('anyang:'));
  assert.deepEqual(at(),['anyang:B658T']);
  r.command({type:'tick',seconds:120});assert.deepEqual(at(),['anyang:B658T'],'CCM에서는 자동 진로가 서지 않는다');
  anyang({type:'mode',value:'AUTO'});

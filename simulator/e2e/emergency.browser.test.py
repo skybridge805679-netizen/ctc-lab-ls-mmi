@@ -48,7 +48,9 @@ def run(page, url):
     assert row('K0607') == 'dongmyo/B012T/down' and row('K0608') == 'jonggak/B055T/up'
     page.wait_for_timeout(550)
     page.evaluate("SimMMI.run({type:'tick',seconds:20})")
-    assert row('G0602') is None
+    assert row('G0602') != 'dongmyo/2T/up'                                             # 회송열차는 승강장을 떠나 상선을 따라 이어 달린다 (사라지지 않는다)
+    page.evaluate("SimMMI.run({type:'tick',seconds:120})")
+    assert row('G0602') is None or not row('G0602').startswith('dongmyo/')             # 신설동을 지나 청량리 방면으로
     at('dongmyo', {'type': 'mode', 'value': 'CCM', 'source': 'MMI'})
     for sig in ('3A', '1B', '4A'):
         at('dongmyo', {'type': 'stop', 'id': sig, 'source': 'LS'})

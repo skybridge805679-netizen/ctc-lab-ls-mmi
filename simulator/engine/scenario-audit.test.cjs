@@ -1,5 +1,5 @@
 'use strict';
-// 시나리오 검수(docs/시나리오-검수-v0.39.45.md): 시작 배치와 시작 진로가 원문·배선에 맞는지 구조로 지킨다
+// 시나리오 검수(docs/시나리오-검수.md): 시작 배치와 시작 진로가 원문·배선에 맞는지 구조로 지킨다
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const E=require('./emergency.js'),B=require('./fts-builtins.js'),W=require('./wiring.js'),L=require('./line.js'),Core=require('./core.js'),S=require('./scenarios.js');
 const problems=B.emergency({});
@@ -21,9 +21,28 @@ test('emergency setup routes are the normal route of each signal: no crossover o
 });
 test('trains told to leave in the source scripts have a movement cue',()=>{
  const leaves=(id,tag)=>E.list.find(s=>s.id===id).autos[tag].filter(a=>a.op==='delete').map(a=>a.number);
- assert.deepEqual(leaves('em-04','n12'),['A1003','A0346','K1114','K1116','K1118']);
+ assert.deepEqual(leaves('em-04','n12'),['K1110','K1112','A1003','A0346','K1114','K1116','K1118']);
+ // 「각 역 추가정차」 선행 열차도 LS에 서 있다가, 정상운행 지시(없으면 마지막 정상 운행 통보)에 떠난다
+ const cast=id=>E.castFor(E.list.find(s=>s.id===id)).map(c=>c.number);
+ for(const [id,held] of Object.entries({'em-01':['K1133','K1131','K1004','K1002'],'em-02':['K0605'],'em-03':['K0448','K0446','K0399'],'em-04':['K0807','K0805','K1110','K1112'],'em-05':['K1204','K1206'],'em-05-1':['K1204','K1206'],'em-06':['K0450','K0399'],'em-06-1':['K0450','K0399'],'em-06-2':['K0450','K0399']})){
+  const sc=E.list.find(s=>s.id===id),gone=new Set(Object.values(sc.autos).flat().filter(a=>a.op==='delete').map(a=>a.number));
+  for(const n of held){assert.ok(cast(id).includes(n),id+' '+n+' 배치');assert.ok(gone.has(n),id+' '+n+' 출발');}}
+ assert.deepEqual(leaves('em-02','n12'),['K0607','K0605']);assert.deepEqual(leaves('em-03','n15'),['K0399']);
  for(const id of ['em-06','em-06-1','em-06-2'])assert.deepEqual(leaves(id,'n2'),['A1002']);
  assert.deepEqual(leaves('em-05-1','n3'),['A0168']);
  // 금천구청 1번 대피: 후속열차는 하1선에서 하2선 열번창으로 건너뛰지 않는다
  assert.deepEqual(S.list.find(s=>s.id==='geumcheon-1').beats.enter,[['follow1','3T'],['follow1',null,30]]);
+});
+test('a train told to leave runs on along its main line to the next stations instead of vanishing',()=>{
+ const M=require('./scenario-motion.js'),path=(a,b,c)=>M.onward(a,b,c).map(l=>l.station+':'+l.slot);
+ assert.deepEqual(path('anyang','3T','down').slice(0,4),['anyang:B660T','anyang:B666T','gunpo:B678T','gunpo:2T']);       // 하1선: 안양 → 명학 → 군포
+ assert.equal(path('anyang','3T','down').at(-1),'suwon:4T');
+ assert.deepEqual(path('gunpo','B1005T','up').slice(0,3),['gunpo:4T','gunpo:B999T','geumjeong:B997T']);                    // 당정(상2선) → 군포 → 금정
+ assert.equal(path('jonggak','B060T','down')[1],'underground-seoul:1T');                                                    // 시청 하선 → 지하서울, 서울에서 전동차선으로 직결
+ assert.ok(path('jonggak','B060T','down').includes('yongsan:1T'));
+ assert.deepEqual(path('geumcheon','B967T','up'),['geumcheon:5T']);                                                         // 본선이 갈리는 구로 앞에서 끝난다
+ // 출발 폐색 열번창이 없는 역은 출발 진로를 지난 뒤에 넘어간다
+ assert.equal(M.onward('geumcheon','3T','down')[0].exitCode,'B644T');
+ // 승강장을 떠나기 전에 다음 역 장내 앞까지 비어 있어야 한다
+ assert.deepEqual(M.onward('anyang','3T','down')[0].clear.map(x=>x.slot),['B660T','B666T','B678T']);
 });

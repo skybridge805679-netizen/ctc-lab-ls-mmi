@@ -39,7 +39,7 @@ const BRANCHES={
    objectives:[
     {id:'a1005-entry',label:'안양역 1B-3T 진행 확인 (A1005 · CCM이면 직접 설정)',condition:{type:'all',conditions:[{type:'reaction',id:'r-a1005'},{type:'route',station:'anyang',route:'1B-3T'}]},points:2},
     {id:'a1005-exit',label:'안양역 4C-B660T 진행 확인 (A1005 · CCM이면 직접 설정)',condition:{type:'all',conditions:[{type:'reaction',id:'r-a1005'},{type:'route',station:'anyang',route:'4C-B660T'}]},points:2},
-    {id:'a1005-passed',label:'A1005 안양역 통과 (4B 해정 → 1B-3T · 4C-B660T 자동 진로)',condition:{type:'all',conditions:[{type:'reaction',id:'r-a1005'},{type:'trainGone',number:'A1005'}]},points:2},
+    {id:'a1005-passed',label:'A1005 안양역 통과 (4B 해정 → 1B-3T · 4C-B660T 자동 진로)',condition:{type:'all',conditions:[{type:'reaction',id:'r-a1005'},{type:'not',condition:{type:'trainAt',number:'A1005',station:'anyang'}}]},points:2},   // 안양 화면을 벗어나면 통과 (그 뒤로는 본선을 이어 달린다)
     {id:'route-anyang-4B-B660T-after',label:'안양역 4B-B660T 출발 진행 (A1005 통과 후 K0811 하1선 운행선 변경)',condition:{type:'all',conditions:[{type:'objective',id:'a1005-passed'},{type:'route',station:'anyang',route:'4B-B660T'}]},points:2},
     {id:'route-gunpo-1B-1T-after',label:'군포역 1B-1T 장내 진행 (A1005 군포역 통과 후)',condition:{type:'all',conditions:[{type:'objective',id:'a1005-passed'},{type:'route',station:'gunpo',route:'1B-1T'}]},points:2}]},
   {id:'v-myeonghak-before',label:'상황3 · 사고열차 정차위치 변경 (명학 진입 전)',at:[30,35],head:'<상황3> 사고열차 정차위치 변경(명학 진입전)',

@@ -42,7 +42,9 @@ const CONDITIONS={
  graphTrain:{label:'그래프 열차 선택',fields:['train'],test:(c,x)=>x.ui?.graphTrain===c.train&&!!x.ui?.windows?.includes('graph'),text:c=>`열차그래프에서 ${c.train} 검색`},
  trainRun:{label:'열차 운행 도착 (진로·신호 또는 전령법으로 실제 운행)',fields:['number','station'],test:(c,x)=>(x.events||[]).some(e=>e.type==='trainRun'&&e.number===c.number&&e.station===c.station&&(!c.slot||e.slot===c.slot)),text:c=>`${c.number} 열차가 ${nm(c.station)}역${c.slot?' '+c.slot:''}까지 운행 (열번 수동 이동은 인정 안 함)`},
  event:{label:'조작 기록',fields:['eventType'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.type===c.eventType&&(!c.station||e.station===c.station)&&(c.id===undefined||String(e.id)===String(c.id))&&(c.value===undefined||e.value===c.value)),text:c=>`${c.station?nm(c.station)+'역 ':''}${c.eventType}${c.id!==undefined?' '+c.id:''}${c.value!==undefined?' '+c.value:''} 조작`},
- signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll'))),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
+ signalCancelled:{label:'신호 취소 조작',fields:['station','signal'],test:(c,x)=>(x.events||[]).some(e=>e.ok!==false&&e.station===c.station&&((e.type==='stop'&&String(e.id)===c.signal)||(e.type==='withdraw'&&String(e.id).startsWith(c.signal+'-'))||(e.type==='stopAll')))
+  // orStopped: 그 신호로 열차가 이미 지나가 정지로 돌아와 있으면 취소할 것이 없다 — 정지 확인으로 인정한다
+  ||!!c.orStopped&&CONDITIONS.signalStop.test(c,x),text:c=>`${nm(c.station)}역 ${c.signal} 신호 취소(해정 조작)`},
  failedOp:{label:'실패한 조작',fields:[],test:(c,x)=>(x.events||[]).filter(e=>e.ok===false&&(!c.station||e.station===c.station)&&(!c.eventType||e.type===c.eventType)).length>=(c.count||1),text:c=>`${c.station?nm(c.station)+'역 ':''}거부된 조작${c.count>1?` ${c.count}회`:''}`},
  objective:{label:'목표 달성',fields:['id'],test:(c,x)=>x.objectives?.[c.id]!=null,text:c=>`목표 ${c.id} 달성`},
  // MMI 알람 확인(체크 후 [확인]). contains: 알람 문구에 들어 있어야 할 말, afterObjective: 그 목표를 이룬 뒤의 확인만 인정
