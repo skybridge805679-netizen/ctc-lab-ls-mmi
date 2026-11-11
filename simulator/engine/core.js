@@ -99,8 +99,8 @@
    if(conflict)return log(false,s.routes[conflict].lock?conflict+' 접근쇄정 중 · 남은 '+remaining(s,s.routes[conflict])+'초 후에 설정하세요.':conflict+' 진로와 경합합니다. 먼저 정지·해정하세요.');
    const ov=overlapOf(a.id,s);
    if(ov?.clearSignals){const open=Object.keys(s.routes).find(id=>ov.clearSignals.includes(routes[id].signal));if(open)return log(false,'오버랩 구간의 '+routes[open].signal+' 신호를 먼저 해정하세요. ('+ov.note+')');}
-   // 실제 MMI 문구: 「… 요구중 SW-52선로전환 오방향 쇄정 상태[수동진로설정불가]」
-   const ob=overlapBlocker(s,a.id);if(ob)return log(false,'SW-'+ob.point+' 선로전환 오방향 쇄정 상태[수동진로설정불가] · 오버랩 쇄정 전환기가 '+ob.route+' 진로와 충돌합니다.');
+   // 실제 MMI 문구 그대로: 「안양(010100)역 RT_4A_B984T진로22 요구중 SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]」 (어느 진로 때문인지는 알려 주지 않는다)
+   const ob=overlapBlocker(s,a.id);if(ob)return log(false,ob.point?`${config.name}(${config.code})역 RT_${a.id.replace('-','_')}진로 22 요구중 SW_${ob.point}선로전환기 오방향 쇄정 상태[수동진로설정불가]`:'오버랩 쇄정 전환기가 '+ob.route+' 진로와 충돌합니다.');
    for(const [pid,pos] of Object.entries(ov?.points||{}))if(s.blockedPoints.includes(pid)&&s.points[pid]!==pos)return log(false,'오버랩 전환기 '+pid+'이 수동 쇄정되어 있습니다.');
    for(const [id,position]of Object.entries({...(r.pointPositions||{}),...(ov?.points||{})}))s.points[id]=position;
    s.routes[a.id]={status:'SET',control:a.control||'single',occupied:false};s.signals[r.signal]='GO';

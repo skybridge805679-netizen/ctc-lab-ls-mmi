@@ -15,13 +15,24 @@ const overlap={
  yongsan:{
   '1B-3T':{points:{'52':'N'},note:'전방 52 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1B-3T 설정 중 2A-5T 거부(SW-52 오방향 쇄정)'}
  },
+ // 사용자 실물 LS 확인 · 2026-11-11: 안양 1A-2T 설정 중 4A-B984T는 「SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]」로 거부된다.
+ // 1B-2T는 같은 도착선(2T)이라 같은 오버랩으로 두었다(직접 확인한 것은 1A-2T).
+ anyang:{
+  '1A-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩)',source:'사용자 실물 LS 확인 · 2026-11-11 · 1A-2T 설정 중 4A-B984T 거부(SW_55 오방향 쇄정)'},
+  '1B-2T':{points:{'55':'N'},note:'전방 55 선로전환기 정위 쇄정(오버랩) · 1A-2T와 같은 도착선',source:'1A-2T 실물 확인에서 유추 (같은 도착선 2T · 출발 4B)'}
+ },
  yeongdeungpo:{
   '1A-1T':{points:{},clearSignals:['4B'],note:'4B 출발신호기 해정 후 진행(오버랩 때문)',source:'실무5 영등포 1번 대피 대본 해설(1A 해정 후 4B 오버랩 해정)'}
  }
 };
 // Simultaneous routes confirmed by the user's observation of the real LS.
 // This is a regression observation for the generic shared-N rule, not a route-pair exception.
-const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}]};
+const SEEN='사용자 실물 LS 확인 · 2026-11-11 · 앞 진로 설정 중 뒤 진로 설정 가능 (오버랩 아님)';
+const parallel={anyang:[{routes:['4C-B660T','4A-B984T'],source:'사용자 실물 LS 확인 · 2026-10-23 · 4C-B660T 설정 중 4A-B984T 동시 설정 가능'}],
+ geumcheon:[{routes:['1A-2T','4C-B968T'],source:SEEN},{routes:['1B-3T','4B-B644T'],source:SEEN},{routes:['2A-5T','3A-B963T'],source:SEEN}],
+ yongsan:[{routes:['2A-7T','4B-B610T'],source:SEEN},{routes:['2B-2T','1B-1T'],source:SEEN},{routes:['2A-4T','3C-B605T'],source:SEEN}],
+ yeongdeungpo:[{routes:['1A-2T','2B-1T'],source:SEEN}],
+ guro:[{routes:['2A-5T','3B-B949T'],source:SEEN}]};
 const parallelFor=(station,a,b)=>parallel[station]?.find(rule=>rule.routes.includes(a)&&rule.routes.includes(b)&&a!==b)||null;
 // ---------------------------------------------------------------- general rules, every station
 // The course gives the definitions, not per-station tables (구술 8·9번):

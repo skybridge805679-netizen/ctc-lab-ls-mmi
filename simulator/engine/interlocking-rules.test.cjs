@@ -14,7 +14,7 @@ test('용산 6번 통과: exit route first, then 장내; the other order is refu
  assert.ok(C.dispatch(s,{type:'route',id:'3B-B605T'}).ok);assert.ok(C.dispatch(s,{type:'route',id:'2A-6T'}).ok);
  s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});
  assert.ok(C.dispatch(s,{type:'route',id:'2A-6T'}).ok);assert.equal(s.points['26'],'N');
- const r=C.dispatch(s,{type:'route',id:'3B-B605T'});assert.equal(r.ok,false);assert.match(r.message,/오버랩/);
+ const r=C.dispatch(s,{type:'route',id:'3B-B605T'});assert.equal(r.ok,false);assert.match(r.message,/SW_\d+선로전환기 오방향 쇄정 상태/);
  assert.equal(C.dispatch(s,{type:'point',id:'26',value:'R'}).ok,false);
 });
 test('approach section of every 장내 signal is the line circuit in rear of it',()=>{
@@ -34,7 +34,14 @@ test('용산: 2A-7T and 4B-B610T stand together; 1B-3T locks point 52 so the ref
  const C=Core.forStation('yongsan'),fresh=()=>{const s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});return s;},set=(s,id)=>C.dispatch(s,{type:'route',id});
  assert.deepEqual(C.routes['2A-7T'].pointPositions,{'51':'N','55':'N'});      // YT는 7T로 그대로 이어진다 — 51호 건넘선을 반위로 쓰지 않는다
  let s=fresh();assert.ok(set(s,'2A-7T').ok);assert.ok(set(s,'4B-B610T').ok);assert.ok(set(s,'1B-3T').ok);
- s=fresh();assert.ok(set(s,'1B-3T').ok);const r=set(s,'2A-5T');assert.equal(r.ok,false);assert.match(r.message,/SW-52 선로전환 오방향 쇄정 상태\[수동진로설정불가\]/);assert.match(r.message,/1B-3T/);
+ s=fresh();assert.ok(set(s,'1B-3T').ok);const r=set(s,'2A-5T');assert.equal(r.ok,false);assert.equal(r.message,'용산(010050)역 RT_2A_5T진로 22 요구중 SW_52선로전환기 오방향 쇄정 상태[수동진로설정불가]');
  assert.equal(set(s,'2A-6T').ok,false);
  s=fresh();assert.ok(set(s,'4B-B610T').ok);assert.equal(set(s,'2A-5T').ok,false);      // 원문: 상2선 2A-부본선과 하2선(1B-3T · 4B-B610T)의 상관관계
+});
+test('real LS observations of 2026-11-11: 안양 1A-2T locks point 55 against 4A-B984T; the seven pairs seen to stand together still do',()=>{
+ const pair=(st,a,b)=>{const C=Core.forStation(st),s=C.initial();C.dispatch(s,{type:'mode',value:'CCM'});assert.ok(C.dispatch(s,{type:'route',id:a}).ok,st+' '+a);return C.dispatch(s,{type:'route',id:b});};
+ const r=pair('anyang','1A-2T','4A-B984T');assert.equal(r.ok,false);assert.equal(r.message,'안양(010100)역 RT_4A_B984T진로 22 요구중 SW_55선로전환기 오방향 쇄정 상태[수동진로설정불가]');
+ assert.ok(pair('anyang','4C-B660T','4A-B984T').ok);
+ for(const [st,rules] of Object.entries(IL.parallel))for(const {routes:[a,b]} of rules)assert.ok(pair(st,a,b).ok,`${st} ${a} 설정 중 ${b}`);
+ assert.equal(Object.values(IL.parallel).flat().length,9);
 });

@@ -62,7 +62,7 @@ test('an existing overlap rejects opposing point settings regardless of route or
  for(const [protectedRoute,conflict]of [['2B-6T','3A-B963T'],['1B-1T','4B-B968T']])for(const order of [[protectedRoute,conflict],[conflict,protectedRoute]]){
   const [C,s]=ccm('geumcheon');assert(C.dispatch(s,{type:'route',id:order[0]}).ok);
   const before=JSON.stringify({routes:s.routes,points:s.points,signals:s.signals});
-  const result=C.dispatch(s,{type:'route',id:order[1]});assert.equal(result.ok,false,order.join(' -> '));assert.match(result.message,/오버랩/);
+  const result=C.dispatch(s,{type:'route',id:order[1]});assert.equal(result.ok,false,order.join(' -> '));assert.match(result.message,/SW_\d+선로전환기 오방향 쇄정 상태|오버랩/);
   assert.equal(JSON.stringify({routes:s.routes,points:s.points,signals:s.signals}),before);
  }
 });

@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),{audit}=require('./route-conflict-aud
 const report=audit();
 assert.equal(report.totals.stations,15);assert.equal(report.totals.routes,710);
 assert.equal(report.totals.pairs,22718);assert.equal(report.totals.orders,45436);
-assert.equal(report.totals.newlyAllowed,1813);assert.equal(report.totals.sharedNormalPairs,1814);
+assert.equal(report.totals.newlyAllowed,1812);assert.equal(report.totals.sharedNormalPairs,1814);
 assert.equal(report.totals.lifecycleOrders,3628);
 assert(report.stations.every(s=>s.newlyAllowed>0),'the generic rule covers all 15 stations');
 // rule-derived overlaps: 출발 먼저 → 장내 is allowed, the other order is refused (용산 6번 통과 대본)
