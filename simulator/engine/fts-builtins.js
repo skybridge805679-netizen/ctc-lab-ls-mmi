@@ -230,7 +230,8 @@ function evacuation({limits={}}={}){
   }
   const seeded=seedRoutes(sc.station,sc.seed.routes,sc.seed.approach);
   if(seeded.routes.length!==sc.seed.routes.length)throw new Error(`${sc.id}: 초기 진로를 설정할 수 없습니다`);
-  return {id:'P-'+sc.id,subject:'운행선 관리',name:`${sc.title}를 시행하시오`,limit:limits[sc.id]||600,score:100,voice:fill(sc.problem),
+  // late: 나중에 더한 문제 — 기존 시나리오 번호 · 스케줄 ID가 밀리지 않게 뒤에 번호를 받는다
+  return {id:'P-'+sc.id,...(sc.added?{late:true}:{}),subject:'운행선 관리',name:`${sc.title}를 시행하시오`,limit:limits[sc.id]||600,score:100,voice:fill(sc.problem),
    situation:[fill(sc.problem),...cast.map(c=>`${c.id} : ${{fault:'고장열차',other:c.label||'다른 선 열차'}[c.key]||c.label||'후속열차'} (${nm(sc.station)}역 ${c.slot})`)].join('\n'),
    actions:reference(order)+'\n\n'+sc.notes.join('\n'),source:sc.source,
    trigger:{useTime:false,at:0,conditions:[]},phenomena:[],checks:[],deductions:deductions(),

@@ -22,7 +22,7 @@ def run(page, url):
     page.locator('#pauseBtn').click()
     page.evaluate("SimMMI.open('scenario')")
     expect(page.locator('[data-mmi-window="scenario"] .mmi-title-text')).to_contain_text('실기 시나리오')
-    assert page.locator('#scSelect option').count() == 16
+    assert page.locator('#scSelect option').count() == 19      # 대피 8 (대본 5 + 변형 3) · 비상 9 · 스케줄 2
     def do(action):
         result = page.evaluate('a=>SimMMI.run(a)', action)
         page.clock.run_for(600)  # UI evaluation timers run; the paused virtual train clock advances only by explicit ticks.

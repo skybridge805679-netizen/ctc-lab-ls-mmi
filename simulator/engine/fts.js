@@ -416,7 +416,7 @@ function seed({scripts=[],limits={}}={}){
  // 부본선 대피 · 비상시 조치: 대본을 능동형 데이터 문제(초기상태 · 순서 없는 목표 · 통보 · 상황반응)로 바꾼 것 (engine/fts-builtins.js)
  const B=node?require('./fts-builtins.js'):root.SimFTSBuiltins,data=id=>{const p=P.find(x=>x.id===id);return p;};
  const active=B?B.all({limits}):[];for(const p of active)prob(p);
- const evac=active.filter(p=>p.subject==='운행선 관리').map(p=>p.id);
+ const evac=[...active.filter(p=>p.subject==='운행선 관리'&&!p.late),...active.filter(p=>p.subject==='운행선 관리'&&p.late)].map(p=>p.id);
  // 상황은 교육생에게 보이는 사실만: 해소 방법(해소역 · +2분 · 진로 변경)은 조치사항에 둔다 (조치사항 표시를 끄면 보이지 않음)
  const SITUATION={'sch-conflict':['임시열차 B0000 운행 요청이 들어와 시간표에 추가되었습니다. 경합을 확인하고 해소하시오.','온라인 열차그래프에서 경합 구간을 찾고, 경합지에서 가장 가까운 앞쪽 해소역(용산·영등포·금천구청·안양·군포·의왕)에서 B0000의 시각을 +2분 늦추고 도착·출발진로를 바꿔 해소합니다. 3차 경합이 생기지 않게 하고 최소 운전시격은 120초입니다.'],
   'sch-create':['지금 시간표에 새 열차를 만들어야 합니다. 열차를 생성하고 편집적용하시오.','열차스케줄 → 패턴을 불러와 열차를 생성 → 편집적용']};
@@ -447,7 +447,7 @@ function seed({scripts=[],limits={}}={}){
  const schedules=[];
  // A problem may replace the timetable explicitly; follow-up edits of C4201 keep the work done before them.
  const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict',...active.filter(p=>!p.variant).map(p=>p.id)]);
- for(const p of P)if(starters.has(p.id)){
+ for(const p of [...P.filter(x=>!x.late),...P.filter(x=>x.late)])if(starters.has(p.id)){
   const id=String(90001+schedules.length);p.setup={...p.setup,scheduleId:id};delete p.setup.clearTimetable;delete p.setup.baseTimetable;
   schedules.push({id,name:p.name+' · 교육 시간표',relative:true,generated:true,timing:'대본 열번·방향·초기 위치에 맞춘 교육용 생성 시각 (+10분, 열차 간격 3분)',timetable:B.timetableFor(p)});
  }
