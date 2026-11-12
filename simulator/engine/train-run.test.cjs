@@ -78,7 +78,11 @@ test('비상 03 in the inspector order: 통보 14 before stopping 3C counts 3C a
  const g=row(r,'G0454');assert.ok(r.command({type:'numbers',action:{op:'delete',...g}}).ok);rename(r,'K0452','G0452');
  ctl(r,'anyang',{type:'mode',value:'AUTO'});ctl(r,'geumcheon',{type:'mode',value:'AUTO'});c('n27');
  tick(r,400);
- assert.equal(row(r,'K0456'),null,'K0456은 B963T에 서지 않고 관제구간 밖으로');assert.equal(row(r,'G0450'),null,'G0450 회송');assert.equal(row(r,'G0452'),null,'G0452 회송');
+ // 원문 「상2선 사고열차의 선행하는 열차의 정상 운행 지시 금지 (사고 조치 중)」: 추가정차 중인 선행열차(K0448·K0446)가 독산·가산디지털에 서 있는 동안
+ // 뒤따르는 열차들은 사라지지 않고 그 뒤 폐색에 차례로 선다. 선행열차는 복구완료(n28) 통보로 떠난다 (이어 달리기는 scenario-motion.test.cjs).
+ assert.deepEqual(row(r,'K0448')&&[row(r,'K0448').station,row(r,'K0448').slot],['guro','B959T']);
+ assert.ok(row(r,'K0456'),'K0456은 선행열차 뒤 폐색에서 기다린다');assert.notEqual(row(r,'K0456').slot,'5T');
+ assert.deepEqual([row(r,'K0456').station,row(r,'K0456').slot],['geumcheon','B963T']);   // 독산의 K0448 뒤 폐색
 });
 test('[CA028_01] 오프라인ID 실시간변경 loads the selected schedule ID into today\'s timetable; tomorrow only sets the ID; reservations and the setting survive restore',()=>{
  const r=R.create(),s=()=>r.snapshot();assert.equal(s().timetable.trains.length,0,'빈 시작');

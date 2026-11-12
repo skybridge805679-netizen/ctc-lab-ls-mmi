@@ -40,9 +40,10 @@ test('a train told to leave runs on along its main line to the next stations ins
  assert.deepEqual(path('gunpo','B1005T','up').slice(0,3),['gunpo:4T','gunpo:B999T','geumjeong:B997T']);                    // 당정(상2선) → 군포 → 금정
  assert.equal(path('jonggak','B060T','down')[1],'underground-seoul:1T');                                                    // 시청 하선 → 지하서울, 서울에서 전동차선으로 직결
  assert.ok(path('jonggak','B060T','down').includes('yongsan:1T'));
- assert.deepEqual(path('geumcheon','B967T','up'),['geumcheon:5T']);                                                         // 본선이 갈리는 구로 앞에서 끝난다
+ assert.deepEqual(path('geumcheon','B967T','up'),['geumcheon:5T','geumcheon:B963T','guro:B959T','guro:B953T','guro:B953T']);     // 본선이 갈리는 구로는 장내 앞 열번창까지 가서 진로를 기다린다
+ assert.deepEqual(M.onward('geumcheon','B967T','up').at(-1).follow,['4T','5T']);
  // 출발 폐색 열번창이 없는 역은 출발 진로를 지난 뒤에 넘어간다
  assert.equal(M.onward('geumcheon','3T','down')[0].exitCode,'B644T');
  // 승강장을 떠나기 전에 다음 역 장내 앞까지 비어 있어야 한다
- assert.deepEqual(M.onward('anyang','3T','down')[0].clear.map(x=>x.slot),['B660T','B666T','B678T']);
+ assert.equal(M.onward('anyang','3T','down')[0].clear,undefined);   // 폐색 하나씩 따라간다 (장내 앞까지 전부 비기를 기다리지 않는다)
 });

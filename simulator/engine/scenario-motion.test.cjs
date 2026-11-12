@@ -66,3 +66,21 @@ console.log('PASS all five siding scripts: '+sidingJourneys+' fault/following/ot
  w.engine.request({op:'move',station:'yongsan',slot:'7T',uid:a,targetStation:'yongsan',targetSlot:'B605T'});w.tick(20);w.tick(20);assert(w.ls.stations.yongsan.windows['7T'].some(t=>t.uid===b));
 }
 console.log('PASS following train waits for route resources and occupied destination until the leader departs');
+{
+// 갈림 역(구로 상2선 4T·5T) 앞에서 사라지지 않는다: 금천구청 5T를 떠난 열차가 독산·가산디지털을 지나 구로 장내 앞 열번창에서 진로를 기다리고,
+// 관제사가 고른 선로(5T)로 들어간 뒤 다시 이어 달린다. 「정차」 지시를 받으면 그 역 승강장에 선다.
+const legs=M.onward('geumcheon','5T','up');assert.deepEqual(legs.map(l=>l.station+':'+l.slot),['geumcheon:B963T','guro:B959T','guro:B953T','guro:B953T']);assert.deepEqual(legs.at(-1).follow,['4T','5T']);
+const w=world(),uid=w.add('geumcheon','5T','K1206'),where=()=>{for(const [st,s] of Object.entries(w.ls.stations))for(const [slot,rows] of Object.entries(s.windows))if(rows.some(t=>t.uid===uid))return st+':'+slot;return null;};
+for(const st of ['geumcheon','guro','yeongdeungpo'])Core.forStation(st).dispatch(w.states[st],{type:'mode',value:'CCM'});
+assert(w.engine.request({op:'delete',station:'geumcheon',slot:'5T',uid}).ok);
+const dep=M.candidates('geumcheon','5T','B963T','up')[0];assert(Core.forStation('geumcheon').dispatch(w.states.geumcheon,{type:'route',id:dep}).ok);
+for(let i=0;i<30;i++)w.tick(10);
+assert.equal(where(),'guro:B953T','waits in front of the Guro home signal instead of vanishing');
+assert(w.engine.list().some(j=>!['done','cancelled'].includes(j.phase)&&/장내 진로 설정 대기/.test(j.reason)),JSON.stringify(w.engine.list().map(j=>j.phase+' '+j.reason)));
+assert(w.engine.stop(uid,'guro').ok);
+const home=M.candidates('guro','B953T','5T','up').find(id=>Core.forStation('guro').routes[id].destination==='5T');assert(home);assert(Core.forStation('guro').dispatch(w.states.guro,{type:'route',id:home}).ok,home);
+for(let i=0;i<12;i++)w.tick(10);
+assert.equal(where(),'guro:5T');assert(!w.engine.list().some(j=>!['done','cancelled'].includes(j.phase)),'held at Guro');
+assert(w.engine.request({op:'delete',station:'guro',slot:'5T',uid}).ok);assert(w.engine.list().some(j=>!['done','cancelled'].includes(j.phase)),'departure order runs it on again');
+}
+console.log('PASS run-on reaches the home signal of a multi-track station, follows the route the controller sets, stops on order and resumes');

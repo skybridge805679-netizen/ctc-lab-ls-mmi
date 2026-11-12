@@ -14,12 +14,12 @@ const L=()=>D.variants.lines;
 // 구원이 필요 없어지면 구원 관련 목표(번호 수정·구원연결 이동·중복 알람 확인·삭제)도 빠진다
 const RESCUE={'05':['rename-G1210','move-G1210','ack-G1210','delete-G1210','rename-G1208','n16','n17','n18'],'06':['rename-G0454','move-G0454','ack-G0454','delete-G0454','rename-G0452'],'06-1':['rename-G0454','move-G0454','ack-G0454','delete-G0454','rename-G0452']};
 const FIRE=key=>[
- {id:'v-change-after-control',label:'열차통제 종료 후 운행선 변경 지시',at:[209,212],head:'열차통제 종료 후 운행선 변경지시'},
- {id:'v-change-during-rescue',label:'구원준비 중 운행선 변경 지시 (기존 순서 변경)',at:[212,214],head:'구원준비 중 운행선 변경 지시'},
- {id:'v-self-run-first',label:'화재차량 완전부동취급 · 자력 운행 가능 (최초 #11 사고복구반 수보 시)',at:[214,240],head:'화재발생 차량 완전부동취급',drop:RESCUE[key],
-  comms:[['v-pan','MCB 차단·판타그래프 하강 · 연장급전 조치 통보',214,217],['v-self-first','사고복구반 수보 · K0452 출발 준비 · 인접선 운행 재개',217,226],['v-seoksu','석수역 · K0452 정상운행 안내방송',226,229],['v-guro','구로역 · K0452 차량교체 준비',229,233],['v-depart','K0452 출발 지시 (구로역까지)',233,240]]},
- {id:'v-self-run-late',label:'자력 운행 가능 (운행선 변경 후 수보 시)',at:[240,259],head:'시나리오 진행 중(운행선 변경 후) 수보 시',drop:RESCUE[key],
-  comms:[['v-self-late','사고복구반 수보 · K0452 출발 준비',240,247],['v-seoksu-late','석수역 · K0452 정상운행 · 열차지연 안내방송',247,251],['v-guro-late','구로역 · K0452 차량교체 준비',251,255],['v-depart-late','K0452 출발 지시 (구로역까지)',255,259]]}
+ {id:'v-change-after-control',label:'열차통제 종료 후 운행선 변경 지시',at:[205,208],head:'열차통제 종료 후 운행선 변경지시'},
+ {id:'v-change-during-rescue',label:'구원준비 중 운행선 변경 지시 (기존 순서 변경)',at:[208,210],head:'구원준비 중 운행선 변경 지시'},
+ {id:'v-self-run-first',label:'화재차량 완전부동취급 · 자력 운행 가능 (최초 #11 사고복구반 수보 시)',at:[210,236],head:'화재발생 차량 완전부동취급',drop:RESCUE[key],
+  comms:[['v-pan','MCB 차단·판타그래프 하강 · 연장급전 조치 통보',210,213],['v-self-first','사고복구반 수보 · K0452 출발 준비 · 인접선 운행 재개',213,222],['v-seoksu','석수역 · K0452 정상운행 안내방송',222,225],['v-guro','구로역 · K0452 차량교체 준비',225,229],['v-depart','K0452 출발 지시 (구로역까지)',229,236]]},
+ {id:'v-self-run-late',label:'자력 운행 가능 (운행선 변경 후 수보 시)',at:[236,255],head:'시나리오 진행 중(운행선 변경 후) 수보 시',drop:RESCUE[key],
+  comms:[['v-self-late','사고복구반 수보 · K0452 출발 준비',236,243],['v-seoksu-late','석수역 · K0452 정상운행 · 열차지연 안내방송',243,247],['v-guro-late','구로역 · K0452 차량교체 준비',247,251],['v-depart-late','K0452 출발 지시 (구로역까지)',251,255]]}
 ];
 const BRANCHES={
  // ■ 사상사고 (04 금정 하선)
@@ -57,45 +57,45 @@ const BRANCHES={
  // 동묘충돌 (02)
  '02':[
   {id:'v-adjacent',label:'인접선 지장여부 확인 불가',at:[102,105],head:'인접선 지장여부 확인 불가'},
-  {id:'v-k602-cannot',label:'K0602 회송 불가 → K1008 상선 단선지령식 우선',at:[105,111],head:'K602 회송 불가'},
-  {id:'v-g602-first',label:'G0602 회송 후 단선지령식 지시',at:[111,114],head:'G602 회송후 K1008 단선지령식 지시'},
-  {id:'v-g607-passed',label:'G0607 통과 후 또는 설정 없음 (#21 일부 변경)',at:[114,117],head:'G607 통과 후 또는 설정 없음',
+  // 2026-11-12 원문 개정: 상선 단선지령식 우선 열차가 K1008 → K608로 바뀌고, 「G602 회송 후 K1008 단선지령식 지시」 분기는 삭제됐다
+  {id:'v-k602-cannot',label:'K0602 회송 불가 → K0608 상선 단선지령식 우선',at:[105,111],head:'K602 회송 불가'},
+  {id:'v-g607-passed',label:'G0607 통과 후 또는 설정 없음 (#21 일부 변경)',at:[111,114],head:'G607 통과 후 또는 설정 없음',
    reactions:[{id:'r-g607-gone',label:'인접선 최초열차(K0607)가 이미 지나감',when:{type:'not',condition:{type:'trainGone',number:'K0607'}},do:[{type:'deleteTrain',number:'K0607'}]}]},
-  {id:'v-derail-k602',label:'충돌 시 열차탈선 · K0602 23B 선로전환기 탈선 (2차 확인 시)',at:[117,139],head:'충돌시 열차탈선',drop:['n8'],
-   comms:[['v8','8 · K0602·K0604 운행중지 · 동묘앞역 승객 대피',120,129],['v8-report','관제팀장·관제운영실 보고 · 탈선복구장비 출동',129,133],['v8-recover','사고복구반 탈선 복구 확인',133,139]]},
-  {id:'v-point-23b',label:'탈선 복구 확인 중 23B 선로전환기 불량',at:[139,150],head:'※ 탈선 복구 완료 확인 중 23B 선로전환기 불량 수보',
-   comms:[['v23b-key','23B 정위 키볼트 쇄정 지시 · 45km/h 서행',139,144],['v23b-hand','동묘앞역 상출발 수신호 현시 · G0602 발차 지시',144,150]],
+  {id:'v-derail-k602',label:'충돌 시 열차탈선 · K0602 23B 선로전환기 탈선 (2차 확인 시)',at:[114,138],head:'충돌시 열차탈선',drop:['n8'],
+   comms:[['v8','8 · K0602·K0604 운행중지 · 동묘앞역 승객 대피',117,126],['v8-report','관제팀장·관제운영실 보고 · 탈선복구장비 출동 · 인접선 단선지령식',126,130],['v8-recover','사고복구반 탈선 복구·자력운행 확인 · 이문차량기지 회송 준비',130,138]]},
+  {id:'v-point-23b',label:'탈선 복구 확인 중 23B 선로전환기 불량',at:[138,147],head:'※ 탈선 복구 완료 확인 중 23B 선로전환기 불량 수보',
+   comms:[['v23b-key','23B 정위 키볼트 쇄정 지시',138,142],['v23b-hand','동묘앞역 상출발 수신호 현시 · G0602 변경·45km/h 서행 회송 발차 지시',142,147]],
    // 원문 「관제승인 00호로 상출발 수신호 현시 … 확인하고 출발하세요」: G0602는 번호를 고쳤다고 떠나지 않고, 수신호 발차 지시를 받은 뒤 출발신호기 진로 없이 떠난다
    drop:['r-g0602'],
    reactions:[{id:'r-g0602-hand',label:'수신호 발차 지시 뒤 G0602 출발 (출발신호기 진로 없이)',when:{type:'all',conditions:[{type:'communication',id:'v23b-hand'},{type:'objective',id:'rename-G0602'},{type:'not',condition:{type:'trainGone',number:'G0602'}},{type:'not',condition:{type:'trainGone',number:'K0606'}}]},do:[{type:'runTrain',number:'G0602',legs:[],exit:true,handSignal:true},{type:'runTrain',number:'K0606',legs:[{station:'dongmyo',slot:'B017T'}]}]}]},
-  {id:'v-derail-k604',label:'충돌 시 열차탈선 · K0604 탈선 (최초 수보 시)',at:[151,205],head:'충돌시 열차탈선',drop:['n1','n5','n6','n11','n24'],
-   comms:[['v1','1 · K0604 운행중지 · 선로반대편 하차 / K0602 상황 확인',154,162],['v5','5 · 동묘앞역 초기대응 · 전차선 단전 여부',162,172],['v6','6 · 비상 전파 · 탈선복구장비 지원',172,177],['v11','11 · 대피 완료 확인 · 무선방호 해제',177,187],['v-recover21','탈선사고 복구 상황 확인 (#21-1)',187,196],['v24','24 · 구원연결 · 합병승인 · G0604 회송',196,205]]}],
+  {id:'v-derail-k604',label:'충돌 시 열차탈선 · K0604 탈선 (최초 수보 시)',at:[148,201],head:'충돌시 열차탈선',drop:['n1','n5','n6','n11','n24'],
+   comms:[['v1','1 · K0604 운행중지 · 선로반대편 하차 / K0602 상황 확인',151,158],['v5','5 · 동묘앞역 초기대응 · 전차선 단전 여부',158,168],['v6','6 · 비상 전파 · 탈선복구장비 지원',168,173],['v11','11 · 대피 완료 확인 · 무선방호 해제',173,183],['v-recover21','탈선사고 복구 상황 확인 (#21-1)',183,192],['v24','24 · 구원연결 · 합병승인 · G0604 회송',192,201]]}],
  // 석수화재 (06 구원연결 · 06-1 역간정차)
  '06':FIRE('06'),'06-1':FIRE('06-1'),
  // 석수충돌 (03)
  '03':[
-  {id:'v-adjacent',label:'인접선 지장 여부 확인 불가',at:[260,264],head:'인접선 지장 여부 확인 불가'},
-  {id:'v-k450-cannot',label:'K0450 회송 불가 → K0456 운행선 변경 우선',at:[264,269],head:'K450 회송 불가'},
-  {id:'v-g450-first',label:'G0450 발차 후 K0456 운행선 변경',at:[269,272],head:'G450 발차 후 K456 운행선 변경지시'},
-  {id:'v-brake-pipe',label:'충돌 시 제동관 파손',at:[272,280],head:'충돌 시 제동관 파손',
-   comms:[['v-brake-report','제동관 파손 수보 · 조치완료 통보 요청',272,275],['v-brake-check','사고복구반 제동기능 확인 후 구원 순차 시행',275,280]]},
-  {id:'v-derail',label:'K0450 또는 K0452 탈선 (동묘 탈선 참고)',at:[280,287],head:'탈선'}],
+  {id:'v-adjacent',label:'인접선 지장 여부 확인 불가',at:[256,260],head:'인접선 지장 여부 확인 불가'},
+  {id:'v-k450-cannot',label:'K0450 회송 불가 → K0456 운행선 변경 우선',at:[260,265],head:'K450 회송 불가'},
+  {id:'v-g450-first',label:'G0450 발차 후 K0456 운행선 변경',at:[265,268],head:'G450 발차 후 K456 운행선 변경지시'},
+  {id:'v-brake-pipe',label:'충돌 시 제동관 파손',at:[268,276],head:'충돌 시 제동관 파손',
+   comms:[['v-brake-report','제동관 파손 수보 · 조치완료 통보 요청',268,271],['v-brake-check','사고복구반 제동기능 확인 후 구원 순차 시행',271,276]]},
+  {id:'v-derail',label:'K0450 또는 K0452 탈선 (동묘 탈선 참고)',at:[276,283],head:'탈선'}],
  // 시청침수 (01)
  '01':[
-  {id:'v-swap-lines',label:'침수선로 상하선 변경',at:[288,290],head:'침수선로 상하선 변경'},
-  {id:'v-k1006-passed',label:'K1006 이미 통과 또는 설정 없음',at:[290,295],head:'K1006 이미 통과 또는 설정 없음',
+  {id:'v-swap-lines',label:'침수선로 상하선 변경',at:[284,286],head:'침수선로 상하선 변경'},
+  {id:'v-k1006-passed',label:'K1006 이미 통과 또는 설정 없음',at:[286,291],head:'K1006 이미 통과 또는 설정 없음',
    reactions:[{id:'r-k1006-gone',label:'K1006이 이미 지나감',when:{type:'not',condition:{type:'trainGone',number:'K1006'}},do:[{type:'deleteTrain',number:'K1006'}]}]},
   // 원문: 「K1008 지하서울 장내신호기외방 접근 중 … ※ 장내신호외방 정차 중 장내 해정시 접근쇄정 90초」
   // → K1008을 지하서울 2A 장내 외방(B067T, 접근구간)에 두고 2A-2T 진로를 세운다. 2A를 취소하면 접근쇄정 90초가 걸린다.
-  {id:'v-k1008-approach',label:'K1008 지하서울 장내신호기 외방 접근 중',at:[297,302],head:'K1008 지하서울 장내신호기외방 접근 중',
+  {id:'v-k1008-approach',label:'K1008 지하서울 장내신호기 외방 접근 중',at:[293,298],head:'K1008 지하서울 장내신호기외방 접근 중',
    reactions:[{id:'r-k1008-approach',label:'K1008 지하서울 2A 장내 외방 접근 · 2A 진행',when:{type:'not',condition:{type:'trainGone',number:'K1008'}},do:[{type:'moveTrain',number:'K1008',station:'underground-seoul',slot:'B067T'},{type:'route',station:'underground-seoul',route:'2A-2T'}]}],
    objectives:[{id:'stop-underground-seoul-2A',label:'지하서울역 2A 신호 취소 (접근쇄정 90초)',condition:{type:'all',conditions:[{type:'reaction',id:'r-k1008-approach'},{type:'signalCancelled',station:'underground-seoul',signal:'2A'}]},points:2}]},
   // 원문: 「K1008 원거리 접근 · 지하서울 3A, 2A 정지 · K1008 접근 확인 가능시 지하서울 정거장 밖 정차 지시」
   // → K1008을 접근구간 밖(서울역 B069T)에 두고 2A-2T 진로를 세운다. 접근구간 밖이라 취소해도 접근쇄정이 걸리지 않는다.
-  {id:'v-k1008-far',label:'K1008 원거리 접근',at:[302,305],head:'K1008 원거리 접근',
+  {id:'v-k1008-far',label:'K1008 원거리 접근',at:[298,301],head:'K1008 원거리 접근',
    reactions:[{id:'r-k1008-far',label:'K1008 원거리 접근 · 지하서울 2A 진행',when:{type:'not',condition:{type:'trainGone',number:'K1008'}},do:[{type:'moveTrain',number:'K1008',station:'seoul',slot:'B069T'},{type:'route',station:'underground-seoul',route:'2A-2T'}]}],
    objectives:[{id:'stop-underground-seoul-2A-far',label:'지하서울역 2A 신호 정지 (원거리 · 접근쇄정 없음)',condition:{type:'all',conditions:[{type:'reaction',id:'r-k1008-far'},{type:'signalCancelled',station:'underground-seoul',signal:'2A'}]},points:2}]},
-  {id:'v-track-circuit',label:'궤도회로 낙하',at:[305,308],head:'궤도회로낙하'}]
+  {id:'v-track-circuit',label:'궤도회로 낙하',at:[301,304],head:'궤도회로낙하'}]
 };
 // 관제사가 선제적으로 할 수 있는 요청 (원문 끝 ※): 점수 없는 선택 통보로 기록만 한다
 const PROACTIVE={'03':[309,311],'02':[311,313],'06':[313,315],'06-1':[313,315],'05':[315,317]};

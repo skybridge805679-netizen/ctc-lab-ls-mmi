@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'references' / 'extracted' / 'emergency'
-OUT = ROOT / 'simulator' / 'emergency-data.js'
+OUT = ROOT / 'simulator' / 'engine' / 'emergency-data.js'
 SKIP = re.compile(r'^(번\s*호|제\s*목|통\s*화|번호|\d{2}(-\d)?)$')       # table header cells and page markers (01-2 ...)
 TITLE_NO = re.compile(r'\(관\)|\(기\)|[※★→⇒~=]|^[-<]|이상|[.!?]$|\(.*역\)')       # a line that already belongs to the step body
 

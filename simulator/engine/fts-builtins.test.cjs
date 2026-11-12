@@ -149,7 +149,7 @@ test('비상 04 starts with the straight routes; 통보 12 sends the adjacent tr
 const startOne=p=>{const r=R.create();assert.ok(r.command({type:'fts',op:'library',library:libraryOf(p)}).ok,p.id);assert.ok(r.command({type:'fts',op:'start',scenario:'SC',professor:'001',student:'tester',autoRun:false}).ok);r.command({type:'tick',seconds:1});return r;};
 const leafOf=(c,type)=>!c?null:c.type===type?c:(c.conditions||[]).map(k=>leafOf(k,type)).find(Boolean)||leafOf(c.condition,type);
 test('every emergency script also comes as a supervisor-ordered problem and one problem per 상황별 대응 situation',()=>{
- const variants=everything.filter(p=>p.variant);assert.equal(everything.filter(p=>p.variant==='order').length,9);assert.equal(everything.filter(p=>p.variant==='branch').length,32);
+ const variants=everything.filter(p=>p.variant);assert.equal(everything.filter(p=>p.variant==='order').length,9);assert.equal(everything.filter(p=>p.variant==='branch').length,31);
  for(const p of variants){assert.deepEqual(F.validate(libraryOf(p)),[],p.id);assert.equal(new Set(everything.map(x=>x.id)).size,everything.length);}
  for(const base of problems.filter(p=>p.id.startsWith('P-em-')))for(const b of base.branches)assert.ok(everything.some(p=>p.variant==='branch'&&p.branches.at(-1).id===b.id&&p.id.startsWith(base.id+'-')),base.id+' '+b.id);
 });

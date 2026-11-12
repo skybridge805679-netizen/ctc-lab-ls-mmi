@@ -28,6 +28,8 @@ function create(host){
   case 'resetStation':host.resetStation(ph.station);break;
   case 'resetAll':host.resetAll();break;
   case 'clearTimetable':error(host.apply({type:'timetable',method:'import',args:[{serviceDate:c.model.serviceDate,trains:[]}]}));break;
+  case 'stopTrain':{let f=null;for(const [station,s]of Object.entries(host.context().ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)f={station,slot,uid:r.uid};
+   if(!f)throw Error(ph.number+' 열차번호가 LS에 없습니다');error(host.apply({type:'scenario:move',auto:true,action:{op:'stop',station:f.station,slot:f.slot,uid:f.uid,...(ph.station?{targetStation:ph.station}:{})}}));break;}
   case 'runTrain':{let f=null;for(const [station,s]of Object.entries(host.context().ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of rows)if(r.number===ph.number)f={station,slot,uid:r.uid};
    if(!f)throw Error(ph.number+' 열차번호가 LS에 없습니다');
    for(const l of ph.legs||[])error(host.apply({type:'scenario:move',auto:true,action:{op:'move',station:f.station,slot:f.slot,uid:f.uid,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.rescue?{rescue:true}:{})}}));

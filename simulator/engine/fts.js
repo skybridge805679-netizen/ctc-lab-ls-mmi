@@ -76,6 +76,7 @@ const PHENOMENA={
  cancel:{label:'구간 운휴',fields:['train','from','to']},
  moveTrain:{label:'열차번호 이동',fields:['number','station','slot']},
  runTrain:{label:'열차 운행 (진로를 기다려 이동)',fields:['number','legs']},
+ stopTrain:{label:'열차 정차 (지정한 역 승강장에 세움 · 역을 비우면 다음 역)',fields:['number','station']},
  resetStation:{label:'역 상태 초기화',fields:['station']},
  resetAll:{label:'LS 전체 초기화 (모든 역 진로·모드·열차번호)',fields:[]},
  clearTimetable:{label:'시간표 비우기 (대본 열차만 남김)',fields:[]},
@@ -128,6 +129,7 @@ function checkPhenomenon(k,where,errors){
  if(k.type==='delay'&&!finite(k.minutes,-120,120))errors.push(`${where}: 지연은 -120~120분`);
  if(k.type==='createTrain'&&!(k.start!==undefined?Number.isFinite(hms(k.start)):finite(k.startIn,-86400)))errors.push(`${where}: 출발시각(start) 또는 지금부터 초(startIn)를 확인하세요`);
  if(k.type==='createTrain'&&k.replace!==undefined&&typeof k.replace!=='boolean')errors.push(`${where}: replace는 true/false`);
+ if(k.type==='stopTrain'){if(!/^[A-Za-z]{0,2}[0-9]{1,6}$/.test(k.number||''))errors.push(`${where}: 열차번호를 확인하세요`);if(k.station)checkStation(k.station,where,errors);}
  if(k.type==='runTrain'){
   if(!/^[A-Za-z]{0,2}[0-9]{1,6}$/.test(k.number||''))errors.push(`${where}: 열차번호를 확인하세요`);
   const ws=node?require('./train-windows').data:root.SimTrainWindows.data;
