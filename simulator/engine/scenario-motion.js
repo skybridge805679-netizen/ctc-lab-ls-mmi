@@ -90,8 +90,10 @@ function create(host){
    j.follow??={rails:j.action.rails||[],background:j.action.background};
    const s=states()[f.station],C=cachedCore(f.station),rails=j.follow.rails;
    const all=rails.flatMap(r=>candidates(f.station,f.slot,r,f.train.direction).filter(id=>C.routes[id].destination===r));
-   const set=all.find(id=>s.routes[id]&&!s.routes[id].occupied&&!s.routes[id].lock),pick=set||(s.mode==='AUTO'?all[0]:null);
-   if(!pick){j.action={op:'follow',uid:j.uid,rails,background:j.follow.background};j.reason=all.length?'장내 진로 설정 대기 · '+rails.join('/'):'일치하는 장내 진로가 없습니다';return;}
+   // AUTO 역은 그 열차의 스케줄에 정해진 도착진로만 내준다. 스케줄에 없는 열차(번호를 바꾼 회송·구원열차 등)는 관제사가 진로를 세울 때까지 기다린다.
+   const planned=s.mode==='AUTO'?host.scheduled?.(f.train.number,f.station):null,auto=planned&&all.includes(planned)?planned:null;
+   const set=all.find(id=>s.routes[id]&&!s.routes[id].occupied&&!s.routes[id].lock),pick=set||auto;
+   if(!pick){j.action={op:'follow',uid:j.uid,rails,background:j.follow.background};j.reason=!all.length?'일치하는 장내 진로가 없습니다':s.mode==='AUTO'?'스케줄에 도착진로 없음 · 장내 진로 설정 대기':'장내 진로 설정 대기 · '+rails.join('/');return;}
    j.action={op:'move',uid:j.uid,targetStation:f.station,targetSlot:C.routes[pick].destination,runOn:true,background:j.follow.background,resume:true};j.to=j.action.targetSlot;
   }
   if(j.action.op==='move'&&j.action.targetStation===f.station&&j.action.targetSlot===f.slot){j.phase='done';return;}

@@ -550,8 +550,6 @@ function render(st,def,core,model,neighbours={}){
   if(model.clock<m.from||model.clock>m.to)continue;
   const pts=m.points.map(T),len=lenOf(pts),fraction=Math.max(0,Math.min(1,(model.clock-m.from)/(m.to-m.from))),head=Math.max(1,len*fraction),part=slicePath(pts,Math.max(0,head-90),head);
   if(part.length>1)routes+=`<path class="route-line occupied scenario-run" data-scenario-run="${esc(m.id)}" data-scenario-train="${esc(m.number)}" data-manual-handover="${!!m.manual}" stroke="${COLORS.occupied}" d="${dpath(part)}"/>`;
-  // 달리는 동안에도 열차번호가 선두 위에 따라간다 (전에는 빨간 점유만 움직이고 번호는 도착한 뒤에 떴다)
-  if(part.length>1&&m.number){const h=part.at(-1);routes+=`<g class="scenario-run-label" data-scenario-label="${esc(m.number)}" pointer-events="none"><rect x="${h[0]-27}" y="${h[1]-27}" width="54" height="15" rx="2" fill="#fff" stroke="#c81e1e"/><text x="${h[0]}" y="${h[1]-16}" text-anchor="middle" font-size="11" font-weight="700" fill="#111">${esc(m.number)}</text></g>`;}
  }
  // an approaching train (접근 열차) reddens the circuit just outside its signal
  for(const [sig,on] of Object.entries(model.approach||{})){
