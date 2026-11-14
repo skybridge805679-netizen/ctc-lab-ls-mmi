@@ -42,6 +42,7 @@ function onward(station,slot,direction){
     legs.push({station:cur,slot:entry,follow:[...T.rails]});return legs;}
    rail=T.rails[0];push({station:cur,slot:rail});}
  }
+ let startN=!rail&&L.numberOf(slot)!==null?L.numberOf(slot):null;      // 폐색 열번창에서 출발: 그 칸의 번호
  for(let hop=0;hop<16;hop++){
   let nx=L.next(cur,trunk,direction);
   if(!nx&&rail){const sib=Object.keys(S.trunks).find(x=>x!==trunk&&x.endsWith(trunk.at(-1))&&S.trunks[x].rails.includes(rail)&&L.next(cur,x,direction));if(sib){trunk=sib;T=S.trunks[trunk];nx=L.next(cur,trunk,direction);}}   // 1호선 직결: 지하 본선(M) ↔ 전동차선(E)
@@ -54,7 +55,10 @@ function onward(station,slot,direction){
   if(fromRail&&has(cur,exitCode))push({station:cur,slot:exitCode});
   const leaving=fromRail&&!has(cur,exitCode)?exitCode:null;let first=true;      // 출발 폐색 열번창이 없는 역은 출발 진로를 지난 뒤 바로 다음 열번창으로
   const hop1=l=>{push({...l,handover:true,...(first&&leaving?{exitCode:leaving}:{})});first=false;};
-  for(const v of L.viaStations(cur,nx.station,trunk))if(has(v.host,v.slot))hop1({station:v.host,slot:v.slot,stop:true});      // 중간역 (독산·가산디지털 등): 정차하는 역
+  // 역 사이 폐색에서 출발하면 이미 지나온 중간역 칸은 건너뛴다 (군포 B1008T의 하행 K0805가 뒤쪽 당정 B1006T로 되돌아가던 문제)
+  const behind=x=>startN!==null&&L.numberOf(x)!==null&&(down?L.numberOf(x)<=startN:L.numberOf(x)>=startN);
+  for(const v of L.viaStations(cur,nx.station,trunk))if(has(v.host,v.slot)&&!behind(v.slot))hop1({station:v.host,slot:v.slot,stop:true});
+  startN=null;      // 중간역 (독산·가산디지털 등): 정차하는 역
   hop1({station:nx.station,slot:entry});
   // 폐색 하나씩 따라간다: 바로 앞 열번창이 비면 들어가고, 선행열차가 있으면 그 뒤 폐색에서 기다린다 (자동폐색).
   // (전에는 다음 역 장내 앞까지 전부 비어야 승강장을 떠났다. 그러면 후속열차가 사고 열차 뒤로 다가오는 모습이 나오지 않는다)

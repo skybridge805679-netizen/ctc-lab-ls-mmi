@@ -48,3 +48,18 @@ test('C1: 반대선 운행 열차의 열번을 역 너머로 옮기면 지나간
  const k=row(r,'K0608');assert.ok(r.command({type:'numbers',action:{op:'move',...k,targetStation:'dongmyo',targetSlot:'B011T'}}).ok);
  assert.equal(r.snapshot().states.jonggak.routes['51-1T'],undefined);assert.equal(r.snapshot().states.dongmyo.routes['24-B015T'],undefined);
 });
+test('A6: 문제가 끝나도 상황 반응이 보낸 열차는 계속 달린다 (마지막 통보로 끝나는 회송열차 등)',()=>{
+ const r=start('P-em-03');say(r,'n6');tick(r,10);
+ assert.ok((r.snapshot().scenario.jobs||[]).some(j=>j.number==='K0446'&&!['done','cancelled'].includes(j.phase)),'추가정차 운행 작업');
+ assert.ok(r.command({type:'fts',op:'next'}).ok);assert.ok(r.snapshot().fts.session.finished,'문제·교육 종료');
+ assert.ok((r.snapshot().scenario.jobs||[]).some(j=>j.number==='K0446'&&!['done','cancelled'].includes(j.phase)),'끝난 뒤에도 운행 작업이 남는다');
+ tick(r,420);assert.notEqual(at(r,'K0446'),'guro:B953T','끝난 뒤에도 계속 달린다');
+});
+test('B2: 시간표 자동운전은 대본 열차와 그 열차가 바꾼 번호를 다시 만들지 않는다 (문제가 끝난 뒤에도)',()=>{
+ const r=start('P-em-03');rename(r,'K0450','G0450');
+ assert.ok(r.command({type:'fts',op:'next'}).ok);r.command({type:'auto',enabled:true});
+ for(const st of ['geumcheon','anyang','guro'])ctl(r,st,{type:'mode',value:'AUTO'});tick(r,900);
+ const count=n=>Object.values(r.snapshot().ls.stations).flatMap(s=>Object.values(s.windows).flat()).filter(t=>t.number===n).length;
+ assert.equal(count('K0450'),0,'시간표의 K0450이 다시 생기지 않는다');assert.ok(count('G0450')<=1);
+ for(const n of ['K0446','K0448','K0454','K0456'])assert.ok(count(n)<=1,n+' 중복 없음');
+});

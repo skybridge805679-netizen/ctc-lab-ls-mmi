@@ -41,6 +41,7 @@ function create(){
   clearAlarms:()=>emit('alarmClear',{}),
   pause:value=>{paused=value;},auto:on=>root.SimAutoUI.set(on),startAssessment:()=>assessment.start({subject:'integrated'},now()),beginTask:o=>assessment.begin(o,now()),endTask:(key,status)=>{if(key)assessment.finishTask(now(),status,key);},finishAssessment:()=>assessment.finish(now()),
   stopScript:()=>root.SimScenarioUI.stop(),
+  endScript:()=>root.SimScenarioUI.endScript(),
   resetStation:st=>{const c=root.SimCore.forStation(st),clock=states[st].clock;for(const k of Object.keys(states[st]))delete states[st][k];Object.assign(states[st],c.initial(),{clock});},
   // 새 문제는 깨끗한 LS에서: 모든 역의 진로·모드·점유와 열차번호, 운행 중이던 시나리오 열차를 지운다
   resetAll:()=>{root.SimScenarioUI.stop();const a=root.SimAutoUI.checkpoint();root.SimAutoUI.restore({...a,transit:[]});
@@ -76,7 +77,7 @@ function create(){
   if(type==='control'){
    refresh();const result=session.dispatch(action.station,action.action);fts.event({...action.action,station:action.station,ok:result.ok!==false});emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
   }
-  if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok){root.SimScenarioUI.manualNumberAction(a);passedShuntRoutes(a);}if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});fts.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok,source:action.fts?'FTS':a.source==='MMI'?'MMI':'LS'});refresh();return r;}
+  if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok){root.SimScenarioUI.manualNumberAction(a);passedShuntRoutes(a);if(a.op==='rename'){const was=(ls.stations[a.station]?.windows[a.slot]||[]).find(t=>t.uid===a.uid)?.was?.at(-1);if(was)fts.own(was,String(a.number).trim().toUpperCase());}}if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});fts.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok,source:action.fts?'FTS':a.source==='MMI'?'MMI':'LS'});refresh();return r;}
   if(type==='numbers:validate')return root.SimLSUI.validate(action.action);
   if(type==='numbers:reset'){ls.stations[action.station]={windows:{},boards:[]};refresh();return {ok:true};}
   if(type==='station:reset'){const clock=states[action.station].clock;Object.assign(states[action.station],session.core(action.station).initial(),{clock});return {ok:true};}

@@ -15,7 +15,7 @@ function create(host){
  function context(it,elapsed){const c=host.context(),p=problem(it);return {...c,events:events.filter(e=>e.seq>(it.eventSeq??0)&&e.source!=='FTS'),elapsed,ui,manual:session.manual[session.current]||{},script:p.script?host.scriptStatus(p.script):null};}
  function syncAssessment(it){const p=problem(it);host.beginTask({key:it.taskKey,title:p.name,subject:{'열차 운행 계획':'plan','철도관제시스템 운용':'operation','운행선 관리':'line','비상 시 조치':'emergency'}[p.subject],limitSeconds:p.limit});}
  function apply(ph){const action=(station,a)=>error(host.apply({type:'control',station,action:{...a,source:'FTS'}}));const c=host.context();switch(ph.type){
-  case 'insertTrain':error(host.apply({type:'numbers',action:{op:'insert',station:ph.station,slot:ph.slot,number:ph.number,direction:ph.direction}}));break;
+  case 'insertTrain':owned.add(ph.number);error(host.apply({type:'numbers',action:{op:'insert',station:ph.station,slot:ph.slot,number:ph.number,direction:ph.direction}}));break;
   case 'deleteTrain':for(const [station,s]of Object.entries(c.ls.stations))for(const [slot,rows]of Object.entries(s.windows))for(const r of [...rows])if(r.number===ph.number)error(host.apply({type:'numbers',action:{op:'delete',station,slot,uid:r.uid}}));break;
   case 'mode':if(c.states[ph.station].mode!==ph.value)action(ph.station,{type:'mode',value:ph.value});break;
   case 'route':{const before=c.states[ph.station].mode;if(before==='LOCAL')throw Error('LOCAL 역의 진로는 CCM 전환 후 설정하세요.');try{if(before!=='CCM')action(ph.station,{type:'mode',value:'CCM'});action(ph.station,{type:'route',id:ph.route});}finally{if(before!=='CCM')action(ph.station,{type:'mode',value:before});}break;}
@@ -38,16 +38,21 @@ function create(host){
   case 'notice':session.notice=ph.text;announce('notice',ph.text,'안내 · '+ph.text);break;
   default:throw Error('지원하지 않는 현상');
  }log('현상 발생 · '+F.PHENOMENA[ph.type].label);}
+ // 대본 열차: FTS가 배치·등장시킨 열차와 그 열차가 바꾼 번호(K0450 → G0450). 시간표 자동운전은 이 번호들을 만들거나 옮기지 않는다 —
+ // 문제가 끝난 뒤에도 그 시간표를 쓰는 동안은 그대로 (전에는 문제 진행 중에만 처음 배치한 번호를 막아, 끝나면 시간표의 K0450이 다시 생겼다)
+ const owned=new Set();
  function loadTimetable(t,relative=false){
+  owned.clear();
   const table=F.scheduleTable({timetable:t,relative},now(),host.context().model.serviceDate);
   error(host.apply({type:'timetable',method:'import',args:[table]}));
  }
  function loadSituation(it){if(session.loadedEntry===it.situationIndex)return;host.stopScript();const s=runLibrary.situations.find(s=>s.id===it.situation),sch=runLibrary.schedules?.find(x=>x.id===s.scheduleId),t=s.timetable||sch?.timetable;if(t)loadTimetable(t,!s.timetable&&sch?.relative);session.loadedEntry=it.situationIndex;session.situationStartedAt=now();session.situationDeadline=s.limit?now()+s.limit:null;session.notice='';log('상황 시작 · '+s.name);}
- function close(reason){if(!session||session.closed)return;const t=now();host.stopScript();for(let i=session.current;i<session.items.length;i++){const it=session.items[i];if(it.status==='진행'){it.endedAt=t;it.status='종료';host.endTask(it.taskKey,'stopped');}else if(it.status==='대기'){it.status='미실시';it.endedAt=t;}}
+ function close(reason){if(!session||session.closed)return;const t=now();host.endScript();for(let i=session.current;i<session.items.length;i++){const it=session.items[i];if(it.status==='진행'){it.endedAt=t;it.status='종료';host.endTask(it.taskKey,'stopped');}else if(it.status==='대기'){it.status='미실시';it.endedAt=t;}}
   session.finished=true;session.closed=true;session.endedAt=t;session.reason=reason;const sum=F.summary(runLibrary,session);history.unshift({id:session.id,at:new Date().toISOString(),professor:session.professor,student:session.student,scenario:session.scenarioName,reason,duration:t-session.startedAt,overtime:Math.max(0,t-session.startedAt-(session.totalLimit||3600)),...sum,attempts:clone(session.attempts||[])});history=history.slice(0,200);host.finishAssessment();host.pause(true);announce('finished',`교육 종료 · ${session.scenarioName} · ${sum.got}/${sum.full}점 (${reason})`);
  }
  function fail(it,e){it.error=String(e.message||e);host.pause(true);announce('error','교육 현상 적용 오류 · '+it.error+' · 상황 재로딩 또는 교육 종료로 처리하세요.');}
- function ended(it,status){host.endTask(it.taskKey,status==='완료'?'completed':'stopped');host.stopScript();announce('end',`문제 ${status} · ${problem(it).name} · ${it.score}점`);}
+ // 문제가 끝나도 상황 반응이 보낸 열차는 계속 달린다(회송열차 G0452 등): 대본 실행(script)만 멈춘다. 운행 작업은 다음 문제가 역을 초기화할 때 지워진다.
+ function ended(it,status){host.endTask(it.taskKey,status==='완료'?'completed':'stopped');host.endScript();announce('end',`문제 ${status} · ${problem(it).name} · ${it.score}점`);}
  function step(){if(!active(session))return;const it=current();if(!it){close('모든 문제 종료');return;}if(it.error)return;
   try{loadSituation(it);
    if(session.situationDeadline!==null&&now()>=session.situationDeadline){const entry=it.situationIndex;host.stopScript();while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null)x.startedAt=now();F.finish(session,x,'시간초과',now());ended(x,'시간초과');}if(session.finished)close('상황 제한시간 종료');return;}
@@ -90,7 +95,7 @@ function create(host){
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
  function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}
- return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,reservedNumbers:()=>active(session)?(problem(current())?.setup?.trains||[]).map(t=>t.number):[],snapshot:()=>({session,history,users,revision,notice,logs})};
+ return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,reservedNumbers:()=>[...new Set([...owned,...(active(session)?(problem(current())?.setup?.trains||[]).map(t=>t.number):[])])],own:(from,to)=>{if(owned.has(from))owned.add(to);},snapshot:()=>({session,history,users,revision,notice,logs})};
 }
 function validateCheckpoint(d,scripts){if(!d||!Number.isInteger(d.sequence)||d.sequence<0||!Number.isInteger(d.revision)||d.revision<0||F.validate(d.library,{scripts,drafts:true}).length||d.runLibrary&&F.validate(d.runLibrary,{scripts,drafts:true}).length||!Array.isArray(d.users)||d.users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'||!['교수','교육생'].includes(u.role))||!Array.isArray(d.history)||d.history.some(h=>!h||!Array.isArray(h.rows)||!Number.isFinite(h.got)||!Number.isFinite(h.full))||!Array.isArray(d.events)||!Number.isInteger(d.sequence)||!Number.isInteger(d.revision))throw Error('Invalid FTS checkpoint');if(d.session){const s=d.session;if(!d.runLibrary||!Array.isArray(s.items)||!Number.isInteger(s.current)||s.current<0||s.current>s.items.length||!Number.isFinite(s.startedAt)||!s.manual||s.items.some(it=>!d.runLibrary.problems.some(p=>p.id===it.problem)||!d.runLibrary.situations.some(x=>x.id===it.situation)||!Number.isInteger(it.situationIndex)||!Number.isFinite(it.score)||!Array.isArray(it.met)||!Array.isArray(it.deducted)||it.startedAt!==null&&!Number.isFinite(it.startedAt)||it.endedAt!==null&&!Number.isFinite(it.endedAt)||!['대기','진행','완료','시간초과','종료','미실시'].includes(it.status)))throw Error('Invalid FTS session');}}
 module.exports={create,validateCheckpoint};

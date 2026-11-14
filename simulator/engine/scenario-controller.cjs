@@ -84,7 +84,7 @@ function restore(data){
  run={...saved,sc,fired:new Set(saved.fired),autoApplied:new Set(saved.autoApplied)};lastUI={};motion.restore(data.motion);
 }
 function snapshot(){return {run,jobs:motion.list(),reserved:!run||isSch(run.sc)?[]:isEm(run.sc)?EM().numbersOf(run.sc):run.cast.map(c=>c.id)};}
-return {checkpoint,restore,reservedNumbers:()=>snapshot().reserved,start,intercept,manualNumberAction,position:actualPosition,snapshot,step:()=>{evaluate();},ui:value=>{lastUI=value;evaluate();},say(index,checked){if(run&&run.sc.steps[index]?.kind==='say'){run.done[index]=!!checked;evaluate();}},event(e){if(run){run.events.push(e);evaluate();}},stop(){motion.reset();run=null;},request:a=>motion.request(a,true),
+return {checkpoint,restore,reservedNumbers:()=>snapshot().reserved,start,intercept,manualNumberAction,position:actualPosition,snapshot,step:()=>{evaluate();},ui:value=>{lastUI=value;evaluate();},say(index,checked){if(run&&run.sc.steps[index]?.kind==='say'){run.done[index]=!!checked;evaluate();}},event(e){if(run){run.events.push(e);evaluate();}},stop(){motion.reset();run=null;},endScript(){if(run){motion.reset();run=null;}},request:a=>motion.request(a,true),
  // FTS 상황 반응의 열차 운행: 수동 인계가 아니라 진로·연동을 지키며 움직인다
  run:a=>motion.request(a,false)};
 }
