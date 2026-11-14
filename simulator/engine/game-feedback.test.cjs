@@ -28,9 +28,10 @@ test('A3: 여러 열차를 한꺼번에 보내는 반응은 한 대가 먼저 �
 });
 test('A4: 「각 역 n분 추가정차」 통보 뒤 선행열차는 역마다 n분 더 서며 가고, 정상운행 통보가 추가정차를 푼다',()=>{
  const r=start('P-em-03');assert.equal(at(r,'K0446'),'guro:B953T');
- say(r,'n6');tick(r,240);assert.equal(at(r,'K0446'),'guro:B953T','가산디지털에서 5분 추가정차');
+ // 대본 5분 → 시뮬레이션 50초 (시간 압축 · DWELL_SCALE)
+ say(r,'n6');tick(r,30);assert.equal(at(r,'K0446'),'guro:B953T','가산디지털에서 추가정차');
  assert.ok((r.snapshot().scenario.jobs||[]).some(j=>j.number==='K0446'&&/추가정차/.test(j.reason)));
- tick(r,120);assert.notEqual(at(r,'K0446'),'guro:B953T','5분 뒤 다음 역으로');
+ tick(r,60);assert.notEqual(at(r,'K0446'),'guro:B953T','50초 뒤 다음 역으로');
  say(r,'n28');tick(r,5);assert.ok(!(r.snapshot().scenario.jobs||[]).some(j=>j.number==='K0446'&&!['done','cancelled'].includes(j.phase)&&j.action.hold>0),'정상운행: 남은 추가정차 없음');
 });
 test('B1: 자동진로는 스케줄 있는 열차에 스케줄 진로만 낸다 · 번호를 바꾼 열차는 원래 스케줄을 쓴다 · 스케줄 없는 열차는 기다린다',()=>{

@@ -31,6 +31,9 @@ function candidates(station,from,to,direction){
 // 본선이 여러 선로로 갈리는 역(구로 상2선 4T·5T, 용산 등)은 장내신호기 앞 열번창까지 달려 거기서 장내 진로를 기다린다 (follow).
 // 진로가 서면 그 선로로 들어가 다시 이어 달린다. (전에는 그 역 앞 구간을 아예 만들지 않아 출발 직후 사라졌다)
 // 장내·출발은 진로로만 지나고(진로가 없으면 그 앞에서 기다린다), 폐색 사이는 인계 이동이다.
+// 시뮬레이션 시간은 압축돼 있다: 폐색 한 칸 20초(실제 역간 2~3분), 구원연결 40초, 비상 대본 하나 9~12분.
+// 대본의 「각 역 n분 추가정차」도 같은 비율로 줄인다: 대본 1분 = 시뮬레이션 10초 (5분 → 50초, 3분 → 30초).
+const DWELL_SCALE=1/6;
 function onward(station,slot,direction){
  const legs=[],down=direction==='down',has=(id,x)=>(TW?.data?.[id]||[]).some(w=>w.slot===x),stations=L?.line?.stations||{};
  const push=l=>{const last=legs.at(-1)||{station,slot};if(last.station===l.station&&last.slot===l.slot)return;legs.push(l);};
@@ -87,9 +90,9 @@ function create(host){
   if(action.op==='delete'&&!manual&&!action.runOn){
     // 「각 역 n분 추가정차」: 그 열차는 역마다 n분 더 선다(dwell 초). 이미 이어 달리는 중이면 새로 경로를 만들지 않고 정차 시간만 바꾼다 —
     // 나중의 「정상운행 하세요」(dwell 없음)가 추가정차를 푼다.
-    if(action.dwell!==undefined||!action.keepHold)dwellOf.set(action.uid,action.dwell||0);
+    if(action.dwell!==undefined||!action.keepHold)dwellOf.set(action.uid,Math.round((action.dwell||0)*DWELL_SCALE));      // dwell: 대본의 추가정차(초) → 시뮬레이션 시간
     const chain=jobs.filter(j=>j.uid===action.uid&&j.action.runOn&&!['done','cancelled'].includes(j.phase));
-    if(chain.length&&!action.keepHold){const d=dwellOf.get(action.uid)||0;for(const j of chain)if(j.action.stopHold){j.action.hold=d;if(!d)j.notBefore=null;else if(j.notBefore!=null)j.notBefore=Math.min(j.notBefore,now(j)+d);}step();return {ok:true,pending:true,message:f.train.number+(d?` 각 역 ${Math.round(d/60)}분 추가정차`:' 정상운행')};}
+    if(chain.length&&!action.keepHold){const d=dwellOf.get(action.uid)||0;for(const j of chain)if(j.action.stopHold){j.action.hold=d;if(!d)j.notBefore=null;else if(j.notBefore!=null)j.notBefore=Math.min(j.notBefore,now(j)+d);}step();return {ok:true,pending:true,message:f.train.number+(d?` 각 역 추가정차 (시뮬레이션 ${d}초)`:' 정상운행')};}
   }
   const existing=jobs.find(j=>j.uid===action.uid&&!['done','cancelled'].includes(j.phase)&&j.action.op===action.op&&j.action.targetStation===action.targetStation&&j.action.targetSlot===action.targetSlot);
   if(existing){if(manual){existing.manual=true;step();}return {ok:true,pending:true,message:manual?'수동 이동 확인 · 진행 대기':'이미 이동 대기 중입니다.'};}
@@ -205,7 +208,7 @@ function create(host){
    if(j.phase==='waiting'){
     if(jobs.some(p=>p!==j&&p.uid===j.uid&&p.id!==j.id&&jobs.indexOf(p)<jobs.indexOf(j)&&!['done','cancelled'].includes(p.phase)))continue;
     // 정차 지시: 지정한 역(없으면 처음 닿는 역)의 승강장에 닿으면 남은 이어 달리기를 버리고 선다
-    if(j.action.hold>0){j.notBefore??=now(j)+j.action.hold;if(now(j)<j.notBefore){const r='추가정차 · '+Math.ceil((j.notBefore-now(j))/60)+'분 남음';changed||=j.reason!==r;j.reason=r;continue;}}
+    if(j.action.hold>0){j.notBefore??=now(j)+j.action.hold;if(now(j)<j.notBefore){const r='추가정차 · '+Math.ceil(j.notBefore-now(j))+'초 남음';changed||=j.reason!==r;j.reason=r;continue;}}
     const h=holds.get(j.uid);if(h&&!j.manual&&W.data[f.station]?.rails.some(r=>r[0]===f.slot)&&(!h.station||h.station===f.station)){for(const p of jobs)if(p.uid===j.uid&&!['done','cancelled'].includes(p.phase)){release(p);p.phase='cancelled';p.reason='정차 지시 · '+(N.catalog[f.station]?.name||f.station);}holds.set(j.uid,{...h,held:f.station});changed=true;continue;}
     const phase=j.phase,reason=j.reason;begin(j,f);changed||=phase!==j.phase||reason!==j.reason;
    }else if(f.station!==j.station||f.slot!==j.from||(j.route&&states()[j.station]?.routes[j.route]?.train?.scenario!==j.id)){
@@ -230,5 +233,5 @@ function create(host){
  return {request,step,reset,cancel,stop,holds:()=>[...holds].map(([uid,h])=>({uid,...h})),checkpoint:()=>({serial,jobs:structuredClone(jobs),holds:[...holds],dwell:[...dwellOf]}),restore:data=>{serial=data.serial;jobs=structuredClone(data.jobs);holds.clear();for(const [k,v] of data.holds||[])holds.set(k,v);dwellOf.clear();for(const [k,v] of data.dwell||[])dwellOf.set(k,v);},list:()=>jobs.map(j=>({...j,action:{...j.action}})),busy:()=>jobs.some(j=>!j.background&&!['done','cancelled'].includes(j.phase))};
 }
 const inTransit=(state,uid)=>Object.values(state?.routes||{}).some(r=>r.occupied&&r.train?.scenario&&r.train.uid===uid)||(state?.scenarioMotions||[]).some(m=>m.uid===uid);
-const api={create,candidates,point,inTransit,onward};if(node)module.exports=api;else root.SimScenarioMotion=api;
+const api={create,candidates,point,inTransit,onward,DWELL_SCALE};if(node)module.exports=api;else root.SimScenarioMotion=api;
 })(typeof window!=='undefined'?window:globalThis);
