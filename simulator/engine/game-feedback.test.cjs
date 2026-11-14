@@ -63,3 +63,13 @@ test('B2: 시간표 자동운전은 대본 열차와 그 열차가 바꾼 번호
  assert.equal(count('K0450'),0,'시간표의 K0450이 다시 생기지 않는다');assert.ok(count('G0450')<=1);
  for(const n of ['K0446','K0448','K0454','K0456'])assert.ok(count(n)<=1,n+' 중복 없음');
 });
+test('A7: 문제가 시간초과로 끝나도 추가정차 열차는 계속 간다 (비상 06 · 제한 540초)',()=>{
+ const r=start('P-em-06');for(const k of ['n1','n2','n3','n4','n5','n6'])say(r,k);
+ for(let t=0;t<720;t+=30)r.command({type:'tick',seconds:30});
+ assert.equal(r.snapshot().fts.session.items[0].status,'시간초과');
+ assert.ok((r.snapshot().scenario.jobs||[]).some(j=>j.number==='K0450'&&!['done','cancelled'].includes(j.phase)),'시간초과 뒤에도 운행 작업이 남는다');
+ for(let t=0;t<600;t+=30)r.command({type:'tick',seconds:30});assert.ok(at(r,'K0450')&&!['guro:B959T','guro:B953T'].includes(at(r,'K0450')),'가산디지털 추가정차 뒤 구로 너머로 · '+at(r,'K0450'));
+});
+test('A8: 진입 열번창이 다른 줄에 그려진 역(노량진 상2선 B931T)에서도 장내 진로를 찾는다',()=>{
+ const M=require('./scenario-motion.js');assert.deepEqual(M.candidates('noryangjin','B931T','2T','up'),['2B-2T']);
+});

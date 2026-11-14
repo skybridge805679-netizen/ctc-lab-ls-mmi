@@ -11,7 +11,7 @@ function point(station,slot){
 function candidates(station,from,to,direction){
  const def=W.data[station],C=cachedCore(station),a=point(station,from),b=point(station,to);if(!a||!b)return [];
  const platform=def.rails.some(r=>r[0]===from),targetPlatform=def.rails.some(r=>r[0]===to),dir=direction==='up'?-1:1;
- return Object.entries(C.routes).flatMap(([id,r])=>{
+ const found=Object.entries(C.routes).flatMap(([id,r])=>{
   const sig=def.signals.find(s=>s[0]===r.signal);if(!sig||sig[4]!==dir)return [];
   const ry=LS.railY(def,sig[1],sig[2]);
   if(platform?sig[1]!==from:Math.abs(a[1]-ry)>8||(sig[2]-a[0])*dir<-10)return [];
@@ -20,6 +20,11 @@ function candidates(station,from,to,direction){
   if(targetPlatform?r.destination!==to:!/^B/.test(r.destination)||Math.abs(end[1]-b[1])>8)return [];
   return [{id,score:(r.destination===to?0:100000)+Math.abs(sig[2]-a[0])+Math.abs(end[0]-b[0])}];
  }).sort((a,b)=>a.score-b.score).map(x=>x.id);
+ if(found.length||platform||!targetPlatform)return found;
+ // 진입 열번창이 화면상 다른 줄에 그려진 역(노량진 상2선 B931T — 대방 쪽): 그 칸이 이 역의 진입 칸이면 그 본선 장내신호기의 진로로 찾는다
+ const trunk=L.trunkOf(from),entry=trunk&&L.entrySlot(station,trunk,direction,(TW.data[station]||[]).map(w=>w.slot));
+ const sig=entry===from&&L.arrivalSignal(station,trunk,direction);
+ return sig?Object.keys(C.routes).filter(id=>C.routes[id].signal===sig&&C.routes[id].destination===to):[];
 }
 // 출발 지시를 받은 열차는 역을 벗어나 사라지지 않고 같은 본선을 따라 다음 역들로 이어 달린다 (베타 피드백).
 // 경로: 출발 폐색 → 중간역 열번창 → 다음 연동역 진입 열번창 → 그 역 본선 승강장 → … 관제구간 끝.

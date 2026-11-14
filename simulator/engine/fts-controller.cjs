@@ -55,7 +55,8 @@ function create(host){
  function ended(it,status){host.endTask(it.taskKey,status==='완료'?'completed':'stopped');host.endScript();announce('end',`문제 ${status} · ${problem(it).name} · ${it.score}점`);}
  function step(){if(!active(session))return;const it=current();if(!it){close('모든 문제 종료');return;}if(it.error)return;
   try{loadSituation(it);
-   if(session.situationDeadline!==null&&now()>=session.situationDeadline){const entry=it.situationIndex;host.stopScript();while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null)x.startedAt=now();F.finish(session,x,'시간초과',now());ended(x,'시간초과');}if(session.finished)close('상황 제한시간 종료');return;}
+   if(session.situationDeadline!==null&&now()>=session.situationDeadline){const entry=it.situationIndex;host.endScript();      // 시간초과도 완료와 같다: 대본 실행만 멈추고 상황 반응이 보낸 열차는 계속 달린다 (A7)
+while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null)x.startedAt=now();F.finish(session,x,'시간초과',now());ended(x,'시간초과');}if(session.finished)close('상황 제한시간 종료');return;}
    for(let pass=0;pass<4&&active(session);pass++){
     const out=F.advance(runLibrary,session,(x,e)=>context(x,e),now());if(!out.length)break;let again=false;
     for(const o of out){
