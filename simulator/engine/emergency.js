@@ -136,6 +136,11 @@ const MOTION={
  '06-1':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n14:exit('K0399'),n21:north('K0456'),n25:exit('G0452'),n26:exit('K0450')},
  '06-2':{n2:exit('A1002'),n14:exit('A1001','K0401','A1004'),n15:exit('K0399'),n20:north('K0456'),n21:exit('G0452'),n22:exit('K0450')}
 };
+// 「(관) K0448열차, K0446열차 각 역 5분 추가정차」: 통보를 확인하면 그 열차들은 지금 선 역에서부터 역마다 n분 더 서며 운행한다 (dwell 초).
+// 나중의 「정상운행 하세요」·복구완료 통보(위 MOTION의 exit)가 추가정차를 푼다. 대상 열차·분은 원문 그 줄에서 읽는다.
+for(const [key,o] of Object.entries(OVERLAY)){const sc=D.scenarios[key];if(!sc)continue;
+ for(const step of sc.steps)for(const line of step.body||[]){const m=/^\s*\(관\)\s*((?:[A-Z]\d{4}(?:열차)?[,\s.]*)+)각\s*역\s*(\d+)\s*분씩?\s*추가\s*정차/.exec(line);if(!m)continue;
+  const tag='n'+step.no,numbers=m[1].match(/[A-Z]\d{4}/g);(MOTION[key]??={})[tag]=[...(MOTION[key][tag]||[]),...numbers.map(number=>({op:'delete',number,dwell:Number(m[2])*60}))];}}
 for(const [key,tags]of Object.entries(MOTION))for(const [tag,actions]of Object.entries(tags)){
  const autos=OVERLAY[key].autos??={};autos[tag]=[...(autos[tag]||[]),...actions];
 }

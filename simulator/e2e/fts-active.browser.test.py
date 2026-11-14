@@ -32,7 +32,7 @@ try:
   page.click('[data-ptab="react"]');page.select_option('#pfType','runTrain');page.dispatch_event('#pfType','change');page.fill('#pf-number','K0602');page.fill('#pf-legs','dongmyo:없는창');page.click('#pfAdd');expect(page.locator('.mmi-alert')).to_contain_text('없는 열번창');page.click('#mmiAlertOk')
   page.click('#pSave');page.click('#mmiConfirmYes');page.click('#mmiAlertOk')
   made=page.evaluate("(()=>{const p=SimFTSUI.library().problems.find(x=>x.name==='응용 · 동묘앞역 충돌 + 구로역 CCM');return p&&{id:p.id,obj:p.objectives.length,comm:p.communications.length,react:p.reactions.length,reset:p.setup.reset,pre:p.objectives.at(-1).condition.conditions[0].id,errors:SimFTS.validate(SimFTSUI.library(),{drafts:true,scripts:SimScheduleScenarios.list.map(s=>s.id)})}})()")
-  assert made and made['obj']==21 and made['comm']==29 and made['react']==7 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
+  assert made and made['obj']==21 and made['comm']==29 and made['react']==8 and 'guro' in made['reset'] and made['pre']=='rename-G0602' and made['errors']==[],made
   # 교육: 비상시 조치 종합 → 첫 문제(em-01)는 초기 상태가 LS에 놓이고, 통보를 아무 순서로나 확인할 수 있다
   fts.locator('[data-fts-page=setup]').first.click();page.click('#suPick');page.locator('#pkScen tr[data-key="SC-04"]').click();page.click('#pkOk');page.uncheck('#suAuto');page.click('#suStart')
   fts.locator('[data-fts-page=monitor]').first.click()

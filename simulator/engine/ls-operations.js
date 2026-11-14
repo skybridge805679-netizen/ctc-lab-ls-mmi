@@ -20,7 +20,8 @@ function create(catalog){
     if(a.direction&&!['up','down'].includes(a.direction))return fail('상하행을 확인하세요.');
     const duplicate=Object.values(model.stations).some(s=>Object.values(s.windows).some(ts=>ts.some(t=>t.uid!==a.uid&&t.number===number)));
     if(a.op==='insert')(st.windows[a.slot]??=[]).push({uid:'T'+(++model.serial),number,direction:a.direction||'up'});
-    else Object.assign(entry,{number,direction:a.direction||entry.direction});
+    // 번호 수정(K0450 → G0450 회송 등)은 같은 열차다: 이전 번호를 남겨 자동진로가 그 열차의 원래 스케줄을 계속 쓸 수 있게 한다
+    else Object.assign(entry,{number,direction:a.direction||entry.direction},number!==entry.number?{was:[...(entry.was||[]),entry.number].slice(-4)}:{});
     return ok(number+' 열차번호 '+(a.op==='insert'?'추가':'수정')+(duplicate?' · 열차번호 중복 표시 확인':''));
    }
    if(a.op==='delete'){list.splice(index,1);return ok(entry.number+' 열차번호 삭제');}

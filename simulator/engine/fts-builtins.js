@@ -50,7 +50,6 @@ function objectiveBook(){
  return api;
 }
 const lastFor=(book,number)=>book.last(number);
-const routeOf=c=>c?.type==='route'?c:c?.type==='all'?c.conditions.map(routeOf).find(Boolean):null;
 
 // 대본 진로 seed와 같은 방식으로 신호기마다 첫 진로를 고르고, 실제로 설정되는 진로만 남긴다
 function seedRoutes(station,signals,approach=[],occupied=new Set()){
@@ -126,12 +125,13 @@ function emergency({limits={}}={}){
 function emergencyBase(sc,limits){
  const E=EM();
  {
-  const book=objectiveBook(),comms=[],reactions=[],order=[],tagTo={};
+  const book=objectiveBook(),comms=[],reactions=[],order=[],tagTo={},tagAt={};
   // 대본 seed 가운데 연동 조건으로 설정되지 않는 진로의 신호기는 처음부터 정지 상태라 취소할 신호가 없다
   const castAt=st=>new Set(E.castFor(sc).filter(c=>c.station===st).map(c=>c.slot));
   const setupRoutes=Object.entries(sc.seeds).flatMap(([st,sigs])=>seedRoutes(st,sigs,[],castAt(st)).routes);
   const proceeding=new Set(setupRoutes.map(r=>r.station+'|'+(Core().forStation(r.station).routes[r.route]?.signal)));
-  for(let st of sc.steps){
+  for(let [index,st] of sc.steps.entries()){
+   if(st.tag)tagAt[st.tag]=index;
    if(st.kind==='say'){const id='n'+st.no;comms.push({id,label:short(clean(`${st.no}. ${st.heading}`),60),text:clean(st.lines.join('\n')),points:COMM_POINTS});tagTo[st.tag]={type:'communication',id};order.push(`[통보] ${st.no}. ${st.heading}`);continue;}
    const a=st.act;let id;
    if(a.type==='mode')id=book.mode(a.station,a.value);
@@ -162,19 +162,26 @@ function emergencyBase(sc,limits){
    for(const a of actions){
     if(a.op==='insert'){dos.push({type:'insertTrain',station:a.station,slot:a.slot||E.platform(a.station,a.dir),number:a.number,direction:a.dir});continue;}
     const r=runs.get(a.number)||{type:'runTrain',number:a.number,legs:[]};runs.set(a.number,r);
-    if(a.op==='move')r.legs.push({station:a.station,slot:a.slot,...(a.handover?{handover:true}:{})});else r.exit=true;
+    if(a.op==='move')r.legs.push({station:a.station,slot:a.slot,...(a.handover?{handover:true}:{})});else{r.exit=true;if(a.dwell)r.dwell=a.dwell;}
    }
    // 마지막 구간이 역간 폐색(승강장이 아닌 열번창)에서 끝나고 그 뒤로 다룰 목표가 없는 열차는 관제구간 밖으로 계속 간다
    // (안 그러면 폐색에 서서 뒤 열차를 막는다 — 비상 03 K0456이 B963T에 서서 G0450·G0452가 못 나가던 문제)
    const Wd=(node?require('./wiring.js'):root.SimWiring).data,named=new Set(JSON.stringify(book.list.map(o=>o.condition)).match(/[A-Z]\d{4}/g)||[]);
    for(const r of runs.values()){const last=r.legs.at(-1);if(!r.exit&&last&&!Wd[last.station]?.rails.some(x=>x[0]===last.slot)&&!named.has(r.number))r.exit=true;}
    dos.push(...runs.values());
-   const trigger=opening.has(tag)?null:tagTo[tag];if(!opening.has(tag)&&!trigger)continue;
-   // 진로를 기다려 달리는 열차(운행선 변경 등)는 관제사가 그 구간 진로를 내면 바로 출발 준비를 한다 — 통보 확인만 기다리지 않는다
-   const routeGoals=trigger?.type==='communication'?book.list.filter(o=>{const c=routeOf(o.condition);if(!c)return false;const r=Core().forStation(c.station).routes[c.route];return [...runs.values()].some(x=>(x.legs||[]).some(l=>l.station===c.station&&r?.destination===l.slot));}).map(o=>({type:'objective',id:o.id})):[];
-   const start=trigger&&routeGoals.length?{type:'any',conditions:[trigger,...routeGoals]}:trigger;
-   const guards=[...runs.keys()].map(exists),when=[...(start?[start]:[]),...guards];
-   reactions.push({id:'r-'+tag,label:trigger?`${trigger.type==='communication'?'통보':'목표'} ${trigger.id}${routeGoals.length?' 또는 '+routeGoals.map(g=>g.id).join('·'):''} 이후 열차 변화`:'사고 발생 시점의 열차 변화',...(when.length?{when:when.length===1?when[0]:{type:'all',conditions:when}}:{}),do:dos});
+   let trigger=opening.has(tag)?null:tagTo[tag];if(!opening.has(tag)&&!trigger)continue;
+   // 회송열차는 열번을 고쳤다고 떠나지 않는다: 바로 앞뒤 통보 가운데 그 번호로 「출발」을 지시하는 통보(… 회송 운행합니다. 신호 확인 출발)가 있으면 그것도 기다린다
+   if(trigger?.type==='objective'&&/^rename-/.test(trigger.id)){const to=trigger.id.slice(7),i=tagAt[tag];
+    const say=[sc.steps[i+1],sc.steps[i-1]].find(x=>x?.kind==='say'&&x.text.includes(to)&&/출발/.test(x.text));
+    if(say)trigger={type:'all',conditions:[trigger,{type:'communication',id:'n'+say.no}]};}
+   // 출발의 계기는 기관사에게 하는 지시(통보)다. 진로는 출발의 필요조건일 뿐: 통보 뒤 열차는 진로가 설 때까지 그 앞에서 기다린다.
+   // (v0.37.0~v0.39.60은 「통보 또는 그 경로의 진로 설정」이어서, 운행선 변경 진로만 열어도 「신호 확인 출발」 지시 전에 떠났다)
+   const start=trigger;
+   // 여러 열차를 한꺼번에 보내는 반응(운행 재개 등)은 한 대라도 남아 있으면 일어나고, 이미 없는 열차는 건너뛴다
+   // (전에는 「모두 남아 있을 때」라 한 대가 먼저 지나가거나 지워지면 나머지도 영영 떠나지 않았다)
+   if(runs.size>1)for(const r of runs.values())r.ifPresent=true;
+   const guards=runs.size>1?[{type:'any',conditions:[...runs.keys()].map(exists)}]:[...runs.keys()].map(exists),when=[...(start?[start]:[]),...guards];
+   reactions.push({id:'r-'+tag,label:trigger?(trigger.type==='all'?`목표 ${trigger.conditions[0].id} · 통보 ${trigger.conditions[1].id} 이후 열차 변화`:`${trigger.type==='communication'?'통보':'목표'} ${trigger.id} 이후 열차 변화`):'사고 발생 시점의 열차 변화',...(when.length?{when:when.length===1?when[0]:{type:'all',conditions:when}}:{}),do:dos});
   }
   // 정지시켜야 할 신호 앞의 열차가 상황 반응(운행 재개 등)으로 이미 그 신호를 지나가 버리면, 그 신호 취소 목표는 이룰 기회가 지난 것이다:
   // 0점으로 닫혀 완료를 막지 않는다 (예: 비상 03 — 통보 14 뒤 A1002가 안양 2B로 출발하면 2B 취소는 놓침)
@@ -270,9 +277,12 @@ function initialTrack(problem,c,family){
  return undefined;
 }
 function timetableFor(problem){
- const Tt=T(),network=N(),model={trains:[]},cast=problem.setup?.trains||[];
+ // 처음 배치한 열차와 함께, 상황 반응·상황 변경으로 나타나는 열차(충돌한 K0452, 안양을 지나는 A1005 등)도 운행 중인 정기 열차라 스케줄이 있다 — 자동진로는 스케줄 있는 열차에만 진로를 낸다
+ const appear=[...(problem.reactions||[]),...(problem.branches||[]).flatMap(b=>b.reactions||[])].flatMap(r=>r.do||[]).filter(d=>d.type==='insertTrain').map(d=>({station:d.station,slot:d.slot,number:d.number,direction:d.direction}));
+ const Tt=T(),network=N(),model={trains:[]},cast=[...(problem.setup?.trains||[]),...appear];
  const specs=cast.map((c,i)=>{const family=castLine(c);return {id:c.number,direction:c.direction,station:c.station,slot:initialTrack(problem,c,family),family,arrival:600+i*180};});
  if(problem.id==='P-TG-01')specs.push({id:'K1135',direction:'down',station:'yongsan',arrival:600});
+ if(problem.id==='P-WORK-1')specs.push({id:'K0401',direction:'down',station:'geumcheon',slot:'2T',arrival:600});      // 지장작업 5단계의 최초열차
  if(problem.id==='P-sch-conflict')specs.push({id:'K1131',direction:'down',station:network.stations[0].id,arrival:600});
  const seen=new Set();
  for(const c of specs){

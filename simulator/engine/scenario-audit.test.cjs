@@ -20,7 +20,8 @@ test('emergency setup routes are the normal route of each signal: no crossover o
  assert.ok(of('P-em-02').includes('jonggak:2A-2T'));
 });
 test('trains told to leave in the source scripts have a movement cue',()=>{
- const leaves=(id,tag)=>E.list.find(s=>s.id===id).autos[tag].filter(a=>a.op==='delete').map(a=>a.number);
+ const leaves=(id,tag)=>E.list.find(s=>s.id===id).autos[tag].filter(a=>a.op==='delete'&&!a.dwell).map(a=>a.number);
+ const extra=(id,tag)=>E.list.find(s=>s.id===id).autos[tag].filter(a=>a.op==='delete'&&a.dwell).map(a=>a.number+'+'+a.dwell);
  assert.deepEqual(leaves('em-04','n12'),['K1110','K1112','A1003','A0346','K1114','K1116','K1118']);
  // 「각 역 추가정차」 선행 열차도 LS에 서 있다가, 정상운행 지시(없으면 마지막 정상 운행 통보)에 떠난다
  const cast=id=>E.castFor(E.list.find(s=>s.id===id)).map(c=>c.number);
@@ -30,6 +31,8 @@ test('trains told to leave in the source scripts have a movement cue',()=>{
  assert.deepEqual(leaves('em-02','n12'),['K0607','K0605']);assert.deepEqual(leaves('em-03','n15'),['K0399']);
  for(const id of ['em-06','em-06-1','em-06-2'])assert.deepEqual(leaves(id,'n2'),['A1002']);
  assert.deepEqual(leaves('em-05-1','n3'),['A0168']);
+ // 「각 역 n분 추가정차」 통보: 그 열차들은 그때부터 역마다 n분 더 서며 운행한다 (원문 그 줄의 열차·분)
+ assert.deepEqual(extra('em-03','n6'),['K0448+300','K0446+300','K0399+300']);assert.deepEqual(extra('em-05','n3'),['K1206+180','K1204+180']);assert.deepEqual(extra('em-04','n5'),['K0807+180','K0805+180','K1112+180','K1110+180']);
  // 금천구청 1번 대피: 후속열차는 하1선에서 하2선 열번창으로 건너뛰지 않는다
  assert.deepEqual(S.list.find(s=>s.id==='geumcheon-1').beats.enter,[['follow1','3T'],['follow1',null,30]]);
 });

@@ -175,7 +175,8 @@ test('situations anchored on a route or a departing train happen right after it'
  let p=everything.find(x=>x.id==='P-em-03-g450-first'),r=startOne(p),item=()=>r.snapshot().fts.session.items[0];
  const row=n=>{for(const [station,s] of Object.entries(r.snapshot().ls.stations))for(const [slot,rows] of Object.entries(s.windows))for(const x of rows)if(x.number===n)return {station,slot,uid:x.uid};return null;};
  r.command({type:'tick',seconds:30});assert.deepEqual(Object.keys(item().branch||{}),[]);
- assert.ok(r.command({type:'numbers',action:{op:'rename',...row('K0450'),number:'G0450'}}).ok);r.command({type:'tick',seconds:10});assert.ok(item().branch['v-g450-first']!=null);
+ assert.ok(r.command({type:'numbers',action:{op:'rename',...row('K0450'),number:'G0450'}}).ok);r.command({type:'tick',seconds:10});assert.deepEqual(Object.keys(item().branch||{}),[],'열번만 고쳐서는 떠나지 않는다');
+ assert.ok(r.command({type:'fts',op:'manual',key:'comm:n17',checked:true}).ok);r.command({type:'tick',seconds:10});assert.ok(item().branch['v-g450-first']!=null,'회송 출발 통보(n17) 뒤 G0450 발차');
  // 06: 운행선 변경 진로(안양 3B-B655T)를 낸 뒤 「자력 운행 가능 수보」
  p=everything.find(x=>x.id==='P-em-06-self-run-late');r=startOne(p);const ctl=a=>r.command({type:'control',station:'anyang',action:{...a,source:'LS'}});
  ctl({type:'mode',value:'CCM'});ctl({type:'stop',id:'3B'});ctl({type:'stop',id:'3C'});r.command({type:'tick',seconds:40});assert.deepEqual(Object.keys(item().branch||{}),[]);

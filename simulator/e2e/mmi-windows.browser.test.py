@@ -59,7 +59,7 @@ def run(page, url):
     page.locator('#idmOffline').click(); expect(page.locator('.mmi-confirm, .mmi-alert').last).to_contain_text('온라인상(오늘/내일)에 올라가 있는 DATA를 수정')
     page.locator('#mmiConfirmYes').click(); expect(page.locator('.mmi-alert')).to_contain_text('90011'); ok()
     expect(page.locator('#idmSetId')).to_have_value('90011')
-    assert page.evaluate("SimRemote.snapshot.timetable.trains.map(t=>t.id).sort().join()")=='A1001,A1002,K0399,K0401,K0446,K0448,K0450,K0454,K0456'   # 앞 열차(추가정차 대상)까지 든다
+    assert page.evaluate("SimRemote.snapshot.timetable.trains.map(t=>t.id).sort().join()")=='A1001,A1002,K0399,K0401,K0446,K0448,K0450,K0452,K0454,K0456'   # 앞 열차(추가정차 대상)까지 든다
     # 예약적용: 다른 날짜에 ID 예약
     page.locator('#idmList tr[data-sid="90004"]').click()
     free = page.locator('#idmCal button:not(.set)[data-date]').nth(20)

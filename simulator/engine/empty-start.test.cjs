@@ -7,7 +7,7 @@ test('fresh startup has no timetable, running scenario, active training or train
  act(r,{type:'auto',enabled:true});act(r,{type:'tick',seconds:1200});assert.deepEqual(r.snapshot().timetable.trains,[]);assert(Object.values(r.snapshot().ls.stations).every(s=>Object.values(s.windows).every(rows=>!rows.length)));
 });
 test('every FTS starting problem explicitly loads its own valid schedule from an empty runtime',()=>{
- const presets=R.create().snapshot().ftsLibrary.problems.filter(p=>p.setup?.scheduleId);assert.equal(presets.length,62);assert.equal(new Set(presets.map(p=>p.setup.scheduleId)).size,22,"감독관 지시형·상황별 문제는 기본 문제의 시간표를 함께 쓴다");
+ const presets=R.create().snapshot().ftsLibrary.problems.filter(p=>p.setup?.scheduleId);assert.equal(presets.length,63);assert.equal(new Set(presets.map(p=>p.setup.scheduleId)).size,23,"감독관 지시형·상황별 문제는 기본 문제의 시간표를 함께 쓴다");
  for(const source of presets){const r=R.create();single(r,source.id);const s=r.snapshot(),item=s.fts.session.items[0];assert.equal(item.error,undefined,source.id);const expected=s.ftsLibrary.schedules.find(t=>t.id===source.setup.scheduleId).timetable;const ids=s.timetable.trains.map(t=>t.id).sort();
   if(source.id==='P-sch-conflict'){assert.deepEqual(ids,['B0000','K1131']);assert(T.conflicts(s.timetable).some(c=>c.trains.includes('B0000')));}
   else assert.deepEqual(ids,expected.trains.map(t=>t.id).sort(),source.id);

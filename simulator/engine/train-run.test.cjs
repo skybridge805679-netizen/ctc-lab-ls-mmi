@@ -21,7 +21,8 @@ test('K0456 changes line only along the routes the controller gives, then the re
  assert.deepEqual(Object.keys(r.snapshot().states.anyang.routes).sort(),['3B-B981T','3C-B655T']);
  ctl(r,'anyang',{type:'mode',value:'CCM'});ctl(r,'anyang',{type:'stop',id:'3B'});ctl(r,'anyang',{type:'stop',id:'3C'});ctl(r,'geumcheon',{type:'mode',value:'CCM'});ctl(r,'geumcheon',{type:'stop',id:'2A'});
  tick(r,95);assert.equal(row(r,'K0456').slot,'5T');
- assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);
+ assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);assert.equal(row(r,'K0456').slot,'5T','진로만으로는 떠나지 않는다: 기관사 지시(통보 n23)가 출발 계기');
+ assert.ok(r.command({type:'fts',op:'manual',key:'comm:n23',checked:true}).ok);tick(r,60);
  assert.equal(row(r,'K0456').station,'geumcheon');assert.equal(row(r,'K0456').slot,'B641T','2B-5T 진로 없이는 금천구청 4T 방면에서 기다린다');
  assert.ok(ctl(r,'geumcheon',{type:'route',id:'2B-5T'}).ok);tick(r,30);assert.equal(row(r,'K0456').slot,'5T');
  // 구원: 번호 수정만으로는 움직이지 않는다
@@ -58,7 +59,7 @@ test('a 관제시스템 운용 problem that asks to move a train number (checks:
 test('a schedule problem after an emergency problem that emptied the timetable restores the base timetable before the script builds the conflict',()=>{
  const r=R.create(),lib=r.snapshot().ftsLibrary;lib.situations.push({id:'S-A',name:'a',problems:['P-em-03']},{id:'S-B',name:'b',problems:['P-sch-conflict']});lib.scenarios.push({id:'SC-AB',name:'ab',situations:['S-A','S-B']});
  assert.ok(r.command({type:'fts',op:'library',library:lib}).ok);assert.ok(r.command({type:'fts',op:'start',scenario:'SC-AB',professor:'001',student:'tester',autoRun:false}).ok);r.command({type:'tick',seconds:1});
- assert.ok(r.snapshot().timetable.trains.length<10,'비상 문제는 대본 열차만');
+ assert.ok(r.snapshot().timetable.trains.length<=10,'비상 문제는 대본 열차만 (상황 반응으로 나타나는 K0452 포함)');
  assert.ok(r.command({type:'fts',op:'next'}).ok);r.command({type:'fts',op:'ui',ui:{windows:[]}});r.command({type:'tick',seconds:1});
  const it=r.snapshot().fts.session.items[1];assert.equal(it.error,undefined,it.error);assert.equal(it.status,'진행');
  assert.ok(r.snapshot().timetable.trains.some(t=>t.id==='B0000'),'경합 임시열차 B0000');
@@ -72,8 +73,8 @@ test('비상 03 in the inspector order: 통보 14 before stopping 3C counts 3C a
  assert.deepEqual([row(r,'A1002').station,row(r,'A1002').slot],['geumcheon','B641T']);
  ctl(r,'geumcheon',{type:'mode',value:'AUTO'});tick(r,120);assert.notEqual(row(r,'A1002')?.station,'geumcheon','AUTO로 돌리면 A1002가 2B-4T 자동 진로로 금천구청을 통과한다');
  ctl(r,'geumcheon',{type:'mode',value:'CCM'});
- assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);tick(r,60);assert.ok(ctl(r,'geumcheon',{type:'route',id:'2B-5T'}).ok);
- rename(r,'K0450','G0450');rename(r,'K0454','G0454');c('n24');tick(r,60);
+ assert.ok(ctl(r,'anyang',{type:'route',id:'3B-B655T'}).ok);c('n23');tick(r,60);assert.ok(ctl(r,'geumcheon',{type:'route',id:'2B-5T'}).ok);
+ rename(r,'K0450','G0450');c('n17');rename(r,'K0454','G0454');c('n24');tick(r,60);
  assert.ok(r.command({type:'alarm:ack',texts:['열차번호 중복']}).ok);
  const g=row(r,'G0454');assert.ok(r.command({type:'numbers',action:{op:'delete',...g}}).ok);rename(r,'K0452','G0452');
  ctl(r,'anyang',{type:'mode',value:'AUTO'});ctl(r,'geumcheon',{type:'mode',value:'AUTO'});c('n27');
@@ -88,9 +89,9 @@ test('[CA028_01] 오프라인ID 실시간변경 loads the selected schedule ID i
  const r=R.create(),s=()=>r.snapshot();assert.equal(s().timetable.trains.length,0,'빈 시작');
  assert.ok(s().scheduleIds.list.some(x=>x.id==='90011'));
  assert.equal(r.command({type:'scheduleId',op:'realtime',id:'없음',day:'today'}).ok,false);
- const x=r.command({type:'scheduleId',op:'realtime',id:'90011',day:'today'});assert.ok(x.ok,x.message);assert.equal(x.trains,9);
- assert.deepEqual(s().timetable.trains.map(t=>t.id).sort(),['A1001','A1002','K0399','K0401','K0446','K0448','K0450','K0454','K0456']);assert.equal(s().scheduleIds.today.id,'90011');
- assert.ok(r.command({type:'scheduleId',op:'realtime',id:'90004',day:'tomorrow'}).ok);assert.equal(s().timetable.trains.length,9,'내일 설정은 오늘 운행을 바꾸지 않음');
+ const x=r.command({type:'scheduleId',op:'realtime',id:'90011',day:'today'});assert.ok(x.ok,x.message);assert.equal(x.trains,10);
+ assert.deepEqual(s().timetable.trains.map(t=>t.id).sort(),['A1001','A1002','K0399','K0401','K0446','K0448','K0450','K0452','K0454','K0456']);assert.equal(s().scheduleIds.today.id,'90011');
+ assert.ok(r.command({type:'scheduleId',op:'realtime',id:'90004',day:'tomorrow'}).ok);assert.equal(s().timetable.trains.length,10,'내일 설정은 오늘 운행을 바꾸지 않음');
  assert.ok(r.command({type:'scheduleId',op:'reserve',id:'90004',days:['20261110']}).ok);
  const c=R.create();c.restore(r.checkpoint());assert.equal(c.snapshot().scheduleIds.today.id,'90011');assert.equal(c.snapshot().scheduleIds.tomorrow.id,'90004');assert.equal(c.snapshot().scheduleIds.reserved['20261110'].id,'90004');
 });

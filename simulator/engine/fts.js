@@ -75,7 +75,7 @@ const PHENOMENA={
  delay:{label:'열차 지연',fields:['train','station','minutes']},
  cancel:{label:'구간 운휴',fields:['train','from','to']},
  moveTrain:{label:'열차번호 이동',fields:['number','station','slot']},
- runTrain:{label:'열차 운행 (진로를 기다려 이동)',fields:['number','legs']},
+ runTrain:{label:'열차 운행 (진로를 기다려 이동 · dwell: 역마다 추가정차 초)',fields:['number','legs']},
  stopTrain:{label:'열차 정차 (지정한 역 승강장에 세움 · 역을 비우면 다음 역)',fields:['number','station']},
  resetStation:{label:'역 상태 초기화',fields:['station']},
  resetAll:{label:'LS 전체 초기화 (모든 역 진로·모드·열차번호)',fields:[]},
@@ -136,6 +136,8 @@ function checkPhenomenon(k,where,errors){
   if(!Array.isArray(k.legs)||k.legs.length>20)errors.push(`${where}: legs는 20개 이하 배열`);
   else k.legs.forEach((l,j)=>{if(!object(l)){errors.push(`${where} 구간 ${j+1}: 객체여야 합니다`);return;}checkStation(l.station,`${where} 구간 ${j+1}`,errors);if(!(ws[l.station]||[]).some(w=>w.slot===l.slot))errors.push(`${where} 구간 ${j+1}: 없는 열번창 ${l.slot}`);});
   if(k.exit!==undefined&&typeof k.exit!=='boolean')errors.push(`${where}: exit는 true/false`);
+  if(k.ifPresent!==undefined&&typeof k.ifPresent!=='boolean')errors.push(`${where}: ifPresent는 true/false`);
+  if(k.dwell!==undefined&&!finite(k.dwell,0,1800))errors.push(`${where}: 추가정차(dwell)는 0~1800초`);
   if(!k.exit&&!k.legs?.length)errors.push(`${where}: 이동 구간(legs)이나 퇴장(exit)이 필요합니다`);
  }
 }
@@ -380,7 +382,8 @@ function seed({scripts=[],limits={}}={}){
     say('c2','② 전차선 단전 · 장비운행 필요 여부 구분','전차선 단전이 필요한 작업이고, 장비 운행이 필요한 작업입니다.'),
     say('c3','③ 열차운행계획과 경합 확인 · 운행조정 결정 통보','(관) 금천구청역, 안양역. 관제 이상!\n(관) 금일 01시 00분부터 04시 00분까지 금천구청~안양역간 하2선 선로일시사용중지 작업 있습니다. 전차선 단전 동반, 장비 투입 작업입니다. 작업시간대 하2선 열차는 하1선으로 운행조정합니다. 관제 이상!\n   (역) 수신 이상!'),
     say('c5','⑤ 작업책임자 통해 영향 사항 확인 · 중요사항 인수인계','(관) 작업책임자 통해 장비 운행순서와 특이사항 확인 후 통보 바랍니다. 관제 이상!\n(교대 시) 금천구청~안양역간 01시 00분 지장작업, L/S 표지판 · T/G 노트 설정 완료, 단전 예정 01시 00분입니다.')],
-   {setup:{clearTimetable:true,resetAll:true,reset:[...WK],modes:WK.map(station=>({station,value:'AUTO'}))}}),
+   // 교육 시간표: 최초열차 K0401은 정기 열차라 스케줄이 있다(자동진로는 스케줄 있는 열차에만 진로를 낸다). late: 기존 스케줄 ID가 밀리지 않게 맨 뒤 번호
+   {late:true,setup:{clearTimetable:true,resetAll:true,reset:[...WK],modes:WK.map(station=>({station,value:'AUTO'}))}}),
   work(2,'전차선 단전 및 지장작업 시행을 승인하시오',WORK+'\n시행시간이 임박했다. 작업구간에 열차가 없다.','작업구간 열차 없음 확인 → 단전 준비 확인 → 전기운용자 단전 요청 · 단전 통보(직 · 성명 기록) → 주의사항 통보 · 승인번호 부여 → 양 끝 역 LOCAL 이관 확인 · 감시',[
     ...WK.map(station=>done('local-'+station,`${nm(station)}역 LOCAL 이관 (현장이 제어권을 받았는지 확인)`,{type:'mode',station,value:'LOCAL'})),
     done('power','L/S 표지판 [전차선단전] 설정',{type:'any',conditions:WK.map(station=>({type:'event',eventType:'lsOperation',station,op:'boardAdd',kind:'전차선단전'}))})],[
@@ -450,7 +453,7 @@ function seed({scripts=[],limits={}}={}){
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
  const schedules=[];
  // A problem may replace the timetable explicitly; follow-up edits of C4201 keep the work done before them.
- const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict',...active.filter(p=>!p.variant).map(p=>p.id)]);
+ const starters=new Set(['P-C4201-01','P-TG-01','P-ORAL-MODE','P-sch-create','P-sch-conflict','P-WORK-1',...active.filter(p=>!p.variant).map(p=>p.id)]);
  for(const p of [...P.filter(x=>!x.late),...P.filter(x=>x.late)])if(starters.has(p.id)){
   const id=String(90001+schedules.length);p.setup={...p.setup,scheduleId:id};delete p.setup.clearTimetable;delete p.setup.baseTimetable;
   schedules.push({id,name:p.name+' · 교육 시간표',relative:true,generated:true,timing:'대본 열번·방향·초기 위치에 맞춘 교육용 생성 시각 (+10분, 열차 간격 3분)',timetable:B.timetableFor(p)});

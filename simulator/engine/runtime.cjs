@@ -5,6 +5,17 @@ function create(){
  const assessment=require('./assessment').create(),now=()=>states[session.selected].clock;
  let scheduleIds={today:null,tomorrow:null,reserved:{}};
  const ops=Operations.create(Object.fromEntries(Object.entries(Windows.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),ls=ops.initial();
+  // 단선지령식 반대선 운행처럼 대본이 「반대선 운행이라 수동 이동」하는 열차는 LS가 번호를 따라가지 못할 뿐 실제로는 지나간다:
+  // 역을 넘어 열번을 옮기면, 그 사이 역들에 같은 방향으로 세워 둔 입환진로(종각 51-1T, 동묘앞 24-B015T 등)는 열차가 지나가 해정된 것으로 본다.
+  function passedShuntRoutes(a){
+   if(a.op!=='move'||!a.targetStation||a.targetStation===a.station)return;
+   const N=root.SimNetwork,from=N.catalog[a.station]?.order,to=N.catalog[a.targetStation]?.order,row=(ls.stations[a.targetStation]?.windows[a.targetSlot]||[]).find(t=>t.uid===a.uid);if(from==null||to==null||!row)return;
+   const dir=row.direction==='down'?1:-1,lo=Math.min(from,to),hi=Math.max(from,to);
+   for(const st of N.stations){if(!st.controlled||st.order<lo||st.order>hi)continue;const s=states[st.id],C=root.SimCore.forStation(st.id);if(!s)continue;
+    for(const [id,x] of Object.entries(s.routes)){const sig=C.signals[C.routes[id]?.signal];if(x.occupied||sig?.kind!=='입환'||sig.dir!==dir)continue;
+     const o=C.dispatch(s,{type:'occupy',id,number:row.number,seconds:1,source:'LS'});const c=o.ok?C.dispatch(s,{type:'clear',id,source:'LS'}):o;
+     s.logs.unshift({time:s.clock,source:'LS',action:'pass',result:c.ok?'완료':'보류',message:row.number+' 반대선 통과 · '+id+(c.ok?' 진로 해정':' · '+c.message)});}}
+  }
  let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;let ftsLibrarySource=null,ftsRunSource=null,ftsLibraryCache=null,ftsRunCache=null;const published=new Map();const events=[];
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
  const root={SimCore:{...Core,forStation:session.core},SimNetwork:Network,SimTimetable:Timetable,SimTrainWindows:Windows,SimTrackNetwork:require('./track-network'),SimLine:require('./line'),SimAuto:require('./autocontrol'),SimScenarios:require('./scenarios'),SimEmergency:require('./emergency'),SimScheduleScenarios:require('./schedule-scenarios'),SimScenarioMotion:require('./scenario-motion')};
@@ -65,7 +76,7 @@ function create(){
   if(type==='control'){
    refresh();const result=session.dispatch(action.station,action.action);fts.event({...action.action,station:action.station,ok:result.ok!==false});emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
   }
-  if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok)root.SimScenarioUI.manualNumberAction(a);if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});fts.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok,source:action.fts?'FTS':a.source==='MMI'?'MMI':'LS'});refresh();return r;}
+  if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok){root.SimScenarioUI.manualNumberAction(a);passedShuntRoutes(a);}if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});fts.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok,source:action.fts?'FTS':a.source==='MMI'?'MMI':'LS'});refresh();return r;}
   if(type==='numbers:validate')return root.SimLSUI.validate(action.action);
   if(type==='numbers:reset'){ls.stations[action.station]={windows:{},boards:[]};refresh();return {ok:true};}
   if(type==='station:reset'){const clock=states[action.station].clock;Object.assign(states[action.station],session.core(action.station).initial(),{clock});return {ok:true};}
