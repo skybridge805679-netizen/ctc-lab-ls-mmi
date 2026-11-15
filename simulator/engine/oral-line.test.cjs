@@ -1,0 +1,26 @@
+'use strict';
+// 열차운행선 관리 구술 (사용자가 준 「운행선관리 요약」 2026-09-18): 데이터 · FTS 문제 · 공부용 문서가 같은 내용인지
+const {test}=require('node:test'),assert=require('node:assert/strict'),O=require('./oral-line.js'),F=require('./fts.js'),fs=require('fs'),path=require('path'),cp=require('child_process');
+test('요약의 62문항이 빠짐없이 들어 있고 출제 표시가 정해진 값만 쓴다',()=>{
+ assert.equal(O.items.length,62);assert.equal(new Set(O.items.map(i=>i.id)).size,62);
+ for(const i of O.items){assert.ok(i.q&&i.a.length,i.id);assert.ok(O.CHAPTERS.includes(i.ch),i.id);for(const t of i.tags)assert.ok(['기출','신출','예상','1차','2차','3차'].includes(t),i.id+' '+t);}
+ assert.equal(O.items.filter(i=>i.tags.includes('예상')).length,6,'점선 상자 6문항');
+ assert.deepEqual(O.items.filter(i=>i.tags.includes('신출')).map(i=>i.id),['ZONE-HARM']);
+ assert.equal(O.items.filter(i=>['1차','2차','3차'].every(t=>i.tags.includes(t))).length,15,'26년 세 회차 모두 나온 문항');
+ const pre=O.items.find(i=>i.id==='PRE-EDU');assert.equal(pre.page,'45');assert.equal(pre.a.length,7);
+ assert.match(O.items.find(i=>i.id==='MULTI-EQUIP').a[0],/200m/);assert.match(O.items.find(i=>i.id==='COORD-TIME').a[0],/3시간 전까지/);
+});
+test('FTS: 문항마다 구술 문제 하나 · 전체 / 26년 출제 / 예상·신출 시나리오',()=>{
+ const L=F.seed(),ps=L.problems.filter(p=>p.id.startsWith('P-LORAL-'));assert.equal(ps.length,62);
+ for(const p of ps){assert.equal(p.subject,'운행선 관리');assert.equal(p.checks.length,1);assert.equal(p.checks[0].condition.type,'manual');assert.ok(p.actions.length>10,p.id);assert.ok(p.limit>=60&&p.limit<=240);}
+ const n=id=>L.situations.find(s=>s.id===L.scenarios.find(c=>c.id===id).situations[0]).problems.length;
+ assert.equal(n('SC-LORAL'),62);assert.equal(n('SC-LORAL-ASKED'),32);assert.equal(n('SC-LORAL-NEW'),7);
+ assert.deepEqual(F.validate(L),[]);
+ assert.match(ps.find(p=>p.id==='P-LORAL-ZONE-HARM').situation,/신출 · 26년 1차·3차 · 교재 14쪽/);
+ assert.match(ps.find(p=>p.id==='P-LORAL-EQUIP-BLOCK').actions,/※ 교재 37~38쪽 원문/);
+});
+test('공부용 문서(docs/운행선관리-구술.md)가 데이터와 같다',()=>{
+ const file=path.join(__dirname,'..','..','docs','운행선관리-구술.md'),before=fs.readFileSync(file,'utf8');
+ cp.execFileSync(process.execPath,[path.join(__dirname,'..','..','tools','build-oral-line-doc.cjs')]);
+ assert.equal(fs.readFileSync(file,'utf8'),before,'tools/build-oral-line-doc.cjs를 다시 돌려 문서를 갱신하세요');
+});

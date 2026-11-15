@@ -428,6 +428,17 @@ function seed({scripts=[],limits={}}={}){
  const plan=['sch-create','sch-conflict'].filter(s=>scripts.includes(s)).map(s=>{const id=scriptProblem(s,'열차 운행 계획',`${titles[s]} 문제를 시행하시오`),x=P.find(x=>x.id===id);x.situation=SITUATION[s][0];x.actions=SITUATION[s][1]+'\n\n'+(x.actions||'');x.setup={};return id;});
 
  const emergency=active.filter(p=>p.subject==='비상 시 조치'&&!p.variant).map(p=>p.id),emergencyVariants=active.filter(p=>p.variant).map(p=>p.id);
+ // 열차운행선 관리 구술 (engine/oral-line.js — 사용자가 준 「운행선관리 요약」 2026-09-18): 질문 · 교재 쪽수 · 출제 표시(기출·신출·26년 회차·예상).
+ // 답은 조치사항(모범답안)에 있고 교수가 답변을 확인한다. 시간은 답의 줄 수에 맞춘다(60초 + 줄당 12초, 4분까지).
+ const OL=node?require('./oral-line.js'):root.SimOralLine;
+ const clip=(t,n)=>t.length>n?t.slice(0,n-1)+'…':t;
+ const lineMark=i=>[...i.tags.filter(t=>t==='기출'||t==='신출'||t==='예상'),...(i.tags.some(t=>/차$/.test(t))?['26년 '+i.tags.filter(t=>/차$/.test(t)).join('·')]:[])].join(' · ');
+ const lineOral=i=>prob({id:'P-LORAL-'+i.id,subject:'운행선 관리',name:i.q,limit:Math.min(240,60+12*i.a.length),
+  situation:[lineMark(i)&&'출제: '+lineMark(i),i.page&&'교재 '+i.page+'쪽'+(i.pageFound?'(교재에서 찾음)':'')].filter(Boolean).join(' · '),
+  actions:[...i.a,...(i.note?['※ '+i.note]:[])].join('\n'),
+  checks:[{label:'구술 답변',condition:{type:'manual',label:clip(i.q.replace(/\s*\(.*\)\s*$/,'').replace(/(에 대하여|에 대해서?)\s*(설명|구술|말)하시오.*$|\s*(설명|구술|말)하시오.*$|\?$/,'').trim(),40)+' — 구술'}}]});
+ const lineOrals=(OL?.items||[]).map(lineOral);
+ const asked=i=>i.tags.some(t=>/차$/.test(t)),fresh=i=>i.tags.includes('예상')||i.tags.includes('신출');
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
  const s4=sit({id:'S-04',name:'시나리오 상황#4',scheduleId:'01178',limit:3600,problems:[c1,c2,c3,c4,c5]});
  const sTg=sit({id:'S-TG',name:'#1-열차운행계획-009(구술)',scheduleId:'01105',limit:600,problems:[g1]});
@@ -435,6 +446,11 @@ function seed({scripts=[],limits={}}={}){
  const sOral=sit({id:'S-ORAL',name:'#2-철도관제시스템운용실무(구술)',section:'지하청량리-영등포',scheduleId:'01105',limit:300,problems:[o1,o2,o3]});
  const sOp=sit({id:'S-OP',name:'#2-철도관제시스템운용-실기 10항목',section:'군포-수원',limit:2400,problems:ops});
  const sOralAll=sit({id:'S-ORAL-ALL',name:'#2-철도관제시스템운용-구술 전체',limit:3000,problems:[o1,o2,o3,...orals]});
+ const lineSum=list=>list.reduce((t,id)=>t+P.find(p=>p.id===id).limit,0);
+ const lineIds=pred=>(OL?.items||[]).filter(pred).map(i=>'P-LORAL-'+i.id);
+ const sLineAll=lineOrals.length?sit({id:'S-LORAL-ALL',name:'#3-열차운행선관리-구술 전체',limit:lineSum(lineOrals),problems:lineOrals}):null;
+ const sLineAsked=lineOrals.length?sit({id:'S-LORAL-ASKED',name:'#3-열차운행선관리-구술 (26년 출제)',limit:lineSum(lineIds(asked)),problems:lineIds(asked)}):null;
+ const sLineNew=lineOrals.length?sit({id:'S-LORAL-NEW',name:'#3-열차운행선관리-구술 (예상·신출)',limit:lineSum(lineIds(fresh)),problems:lineIds(fresh)}):null;
  const sWork=sit({id:'S-WORK',name:'#3-열차운행선관리-지장작업 5단계',section:'구로-수원',limit:3000,problems:works});
  const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
  const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
@@ -448,6 +464,7 @@ function seed({scripts=[],limits={}}={}){
  {const ids=['S-em-02-derail-k604','S-em-02-derail-k602','S-em-02-point-23b','S-em-03-derail'].filter(id=>S.some(x=>x.id===id));if(ids.length)scen({id:'SC-04-DERAIL',name:'#4-비상시조치-열차탈선(종합)01',situations:ids});}
  scen({id:'SC-OP',name:'#2-철도관제시스템운용-실기 10항목',situations:[sOp]});
  scen({id:'SC-ORAL',name:'#2-철도관제시스템운용-구술 전체',situations:[sOralAll]});
+ if(sLineAll){scen({id:'SC-LORAL',name:'#3-열차운행선관리-구술 전체',situations:[sLineAll]});scen({id:'SC-LORAL-ASKED',name:'#3-열차운행선관리-구술 (26년 출제)',situations:[sLineAsked]});scen({id:'SC-LORAL-NEW',name:'#3-열차운행선관리-구술 (예상·신출)',situations:[sLineNew]});}
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
  for(const id of [...sEvac,...sEm,...sEmV]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다
