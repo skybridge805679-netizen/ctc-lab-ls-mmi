@@ -3,6 +3,8 @@
 const fs=require('fs'),path=require('path'),O=require('../simulator/engine/oral-line.js');
 const mark=i=>[...i.tags.filter(t=>['기출','신출','예상'].includes(t)),...(i.tags.some(t=>/차$/.test(t))?['26년 '+i.tags.filter(t=>/차$/.test(t)).join('·')]:[])].join(' · ');
 const asked=i=>i.tags.some(t=>/차$/.test(t)),count=i=>i.tags.filter(t=>/차$/.test(t)).length;
+// 개조식 본답 + [참고] + 교재 원문(접어 둠)
+const body=i=>i.key.map((x,n)=>`${n+1}) ${x}`).join('  \n')+'\n\n'+(i.ref.length?`**[참고]**\n\n`+i.ref.map(x=>`- ${x}`).join('\n')+'\n\n':'')+`<details><summary>교재 원문</summary>\n\n`+i.a.map(x=>`> ${x.trim()}`).join('  \n')+'\n\n</details>\n\n';
 let md=`# 열차운행선 관리 — 구술 대비\n\n`;
 md+=`근거: ${O.source}. 쪽수는 관제자격증명 표준교재 「도시철도·철도 열차운행선 관리」 기준(요약에 적힌 값).\n`;
 md+=`FTS에서는 \`#3-열차운행선관리-구술 전체\`(${O.items.length}문항), \`(26년 출제)\`(${O.items.filter(asked).length}문항), \`(예상·신출)\`(${O.items.filter(i=>i.tags.includes('예상')||i.tags.includes('신출')).length}문항)으로 풀 수 있다.\n\n`;
@@ -12,7 +14,7 @@ md+=`## 먼저 볼 것 — 26년 세 회차 모두 나온 문항\n\n`+O.items.fi
 md+=`## 예상 문항 (점선 상자)\n\n`+O.items.filter(i=>i.tags.includes('예상')).map(i=>`- ${i.q} (교재 ${i.page||'—'}쪽)`).join('\n')+'\n\n';
 for(const ch of O.CHAPTERS){const list=O.items.filter(i=>i.ch===ch);if(!list.length)continue;
  md+=`## ${ch}\n\n`;
- for(const i of list){md+=`### ${i.q}\n\n`;const m=mark(i);md+=`${m?`**${m}**`:'출제 표시 없음'} · 교재 ${i.page||'—'}쪽${i.pageFound?' (요약에 없어 교재에서 찾은 쪽)':''}\n\n`;md+=i.a.map(x=>/^\s/.test(x)?`  ${x.trim()}`:x).map(x=>`> ${x}`).join('  \n')+'\n\n';if(i.note)md+=`※ ${i.note}\n\n`;}}
+ for(const i of list){md+=`### ${i.q}\n\n`;const m=mark(i);md+=`${m?`**${m}**`:'출제 표시 없음'} · 교재 ${i.page||'—'}쪽${i.pageFound?' (요약에 없어 교재에서 찾은 쪽)':''}\n\n`;md+=body(i);if(i.note)md+=`※ ${i.note}\n\n`;}}
 fs.writeFileSync(path.join(__dirname,'..','docs','운행선관리-구술.md'),md);
 console.log('docs/운행선관리-구술.md',O.items.length,'문항');
 // 교재 문항 (기출 외) — 최근 신유형 대비: 교재 원문 전체를 조문·절 단위로
@@ -22,6 +24,6 @@ bk+=`쪽수는 교재 본문 쪽이다(문항이 여러 쪽에 걸치면 시작~
 bk+=`## 목차\n\n`+O.CHAPTERS.map(ch=>[ch,O.book.filter(i=>i.ch===ch).length]).filter(([,n])=>n).map(([ch,n])=>`- ${ch} — ${n}문항`).join('\n')+'\n\n';
 for(const ch of O.CHAPTERS){const list=O.book.filter(i=>i.ch===ch);if(!list.length)continue;
  bk+=`## ${ch}\n\n`;
- for(const i of list){bk+=`### ${i.q}\n\n교재 ${i.page}쪽\n\n`+i.a.map(x=>`> ${x}`).join('  \n')+'\n\n';if(i.note)bk+=`※ ${i.note}\n\n`;}}
+ for(const i of list){bk+=`### ${i.q}\n\n교재 ${i.page}쪽\n\n`+body(i);if(i.note)bk+=`※ ${i.note}\n\n`;}}
 fs.writeFileSync(path.join(__dirname,'..','docs','운행선관리-교재구술.md'),bk);
 console.log('docs/운행선관리-교재구술.md',O.book.length,'문항');

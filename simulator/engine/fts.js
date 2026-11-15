@@ -433,9 +433,11 @@ function seed({scripts=[],limits={}}={}){
  const OL=node?require('./oral-line.js'):root.SimOralLine;
  const clip=(t,n)=>t.length>n?t.slice(0,n-1)+'…':t;
  const lineMark=i=>[...i.tags.filter(t=>t==='기출'||t==='신출'||t==='예상'),...(i.tags.some(t=>/차$/.test(t))?['26년 '+i.tags.filter(t=>/차$/.test(t)).join('·')]:[])].join(' · ');
- const lineOral=i=>prob({id:'P-LORAL-'+i.id,subject:'운행선 관리',name:i.q,limit:Math.min(240,60+12*i.a.length),
+ // 모범답안 = 개조식 본답(외울 뼈대) + [참고](꼬리질문) + 교재 원문. 시간은 본답 줄 수에 맞춘다
+ const lineAnswer=i=>i.key?[...i.key.map((x,n)=>(n+1)+') '+x),...(i.ref?.length?['[참고]',...i.ref.map(x=>'- '+x)]:[]),'[교재 원문]',...i.a]:i.a;
+ const lineOral=i=>prob({id:'P-LORAL-'+i.id,subject:'운행선 관리',name:i.q,limit:Math.min(240,60+15*(i.key||i.a).length),
   situation:[i.tags.includes('교재')?'교재 문항(기출 외)':lineMark(i)&&'출제: '+lineMark(i),i.page&&'교재 '+i.page+'쪽'+(i.pageFound?'(교재에서 찾음)':'')].filter(Boolean).join(' · '),
-  actions:[...i.a,...(i.note?['※ '+i.note]:[])].join('\n'),
+  actions:[...lineAnswer(i),...(i.note?['※ '+i.note]:[])].join('\n'),
   checks:[{label:'구술 답변',condition:{type:'manual',label:clip(i.q.replace(/\s*\(.*\)\s*$/,'').replace(/(에 대하여|에 대해서?)\s*(설명|구술|말)하시오.*$|\s*(설명|구술|말)하시오.*$|\?$/,'').trim(),40)+' — 구술'}}]});
  // 교재 문항(OL.book): 기출 외에 교재 원문 전체를 조문·절 단위로 문항화한 것 — 장별 상황과 「기출+교재」 전체 시나리오로 푼다
  const lineAll=[...(OL?.items||[]),...(OL?.book||[])];
