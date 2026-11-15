@@ -434,10 +434,12 @@ function seed({scripts=[],limits={}}={}){
  const clip=(t,n)=>t.length>n?t.slice(0,n-1)+'…':t;
  const lineMark=i=>[...i.tags.filter(t=>t==='기출'||t==='신출'||t==='예상'),...(i.tags.some(t=>/차$/.test(t))?['26년 '+i.tags.filter(t=>/차$/.test(t)).join('·')]:[])].join(' · ');
  const lineOral=i=>prob({id:'P-LORAL-'+i.id,subject:'운행선 관리',name:i.q,limit:Math.min(240,60+12*i.a.length),
-  situation:[lineMark(i)&&'출제: '+lineMark(i),i.page&&'교재 '+i.page+'쪽'+(i.pageFound?'(교재에서 찾음)':'')].filter(Boolean).join(' · '),
+  situation:[i.tags.includes('교재')?'교재 문항(기출 외)':lineMark(i)&&'출제: '+lineMark(i),i.page&&'교재 '+i.page+'쪽'+(i.pageFound?'(교재에서 찾음)':'')].filter(Boolean).join(' · '),
   actions:[...i.a,...(i.note?['※ '+i.note]:[])].join('\n'),
   checks:[{label:'구술 답변',condition:{type:'manual',label:clip(i.q.replace(/\s*\(.*\)\s*$/,'').replace(/(에 대하여|에 대해서?)\s*(설명|구술|말)하시오.*$|\s*(설명|구술|말)하시오.*$|\?$/,'').trim(),40)+' — 구술'}}]});
- const lineOrals=(OL?.items||[]).map(lineOral);
+ // 교재 문항(OL.book): 기출 외에 교재 원문 전체를 조문·절 단위로 문항화한 것 — 장별 상황과 「기출+교재」 전체 시나리오로 푼다
+ const lineAll=[...(OL?.items||[]),...(OL?.book||[])];
+ const lineOrals=(OL?.items||[]).map(lineOral),bookOrals=(OL?.book||[]).map(lineOral);
  const asked=i=>i.tags.some(t=>/차$/.test(t)),fresh=i=>i.tags.includes('예상')||i.tags.includes('신출');
  const sit=(o)=>{S.push({section:'지하청량리-수원',scheduleId:'',limit:0,timetable:null,...o});return o.id;};
  const s4=sit({id:'S-04',name:'시나리오 상황#4',scheduleId:'01178',limit:3600,problems:[c1,c2,c3,c4,c5]});
@@ -448,9 +450,13 @@ function seed({scripts=[],limits={}}={}){
  const sOralAll=sit({id:'S-ORAL-ALL',name:'#2-철도관제시스템운용-구술 전체',limit:3000,problems:[o1,o2,o3,...orals]});
  const lineSum=list=>list.reduce((t,id)=>t+P.find(p=>p.id===id).limit,0);
  const lineIds=pred=>(OL?.items||[]).filter(pred).map(i=>'P-LORAL-'+i.id);
- const sLineAll=lineOrals.length?sit({id:'S-LORAL-ALL',name:'#3-열차운행선관리-구술 전체',limit:lineSum(lineOrals),problems:lineOrals}):null;
+ const sLineAll=lineOrals.length?sit({id:'S-LORAL-ALL',name:'#3-열차운행선관리-구술 기출 전체',limit:lineSum(lineOrals),problems:lineOrals}):null;
  const sLineAsked=lineOrals.length?sit({id:'S-LORAL-ASKED',name:'#3-열차운행선관리-구술 (26년 출제)',limit:lineSum(lineIds(asked)),problems:lineIds(asked)}):null;
  const sLineNew=lineOrals.length?sit({id:'S-LORAL-NEW',name:'#3-열차운행선관리-구술 (예상·신출)',limit:lineSum(lineIds(fresh)),problems:lineIds(fresh)}):null;
+ const bookCh=(OL?.CHAPTERS||[]).map((ch,k)=>{const ids=(OL?.book||[]).filter(i=>i.ch===ch).map(i=>'P-LORAL-'+i.id);return ids.length?sit({id:'S-LORAL-BOOK-'+(k+1),name:'#3-열차운행선관리-구술 교재 · '+ch,limit:lineSum(ids),problems:ids}):null;}).filter(Boolean);
+ const pageOf=i=>parseInt(i.page,10)||999,chOf=i=>(OL?.CHAPTERS||[]).indexOf(i.ch);
+ const totalIds=lineAll.map((i,k)=>({i,k})).sort((a,b)=>chOf(a.i)-chOf(b.i)||pageOf(a.i)-pageOf(b.i)||a.k-b.k).map(({i})=>'P-LORAL-'+i.id);
+ const sLineTotal=bookOrals.length?sit({id:'S-LORAL-TOTAL',name:'#3-열차운행선관리-구술 기출+교재 전체 (장·쪽 순서)',limit:lineSum(totalIds),problems:totalIds}):null;
  const sWork=sit({id:'S-WORK',name:'#3-열차운행선관리-지장작업 5단계',section:'구로-수원',limit:3000,problems:works});
  const sEvac=evac.map((p,i)=>sit({id:'S-EVAC-'+(i+1),name:'#2-운행선관리-'+data(p).name.replace(/를 시행하시오$/,''),limit:data(p).limit,problems:[p]}));
  const sEm=emergency.map(p=>sit({id:'S-'+p.slice(2),name:'#4-비상시조치-'+p.slice(5),limit:data(p).limit,problems:[p]}));
@@ -464,7 +470,8 @@ function seed({scripts=[],limits={}}={}){
  {const ids=['S-em-02-derail-k604','S-em-02-derail-k602','S-em-02-point-23b','S-em-03-derail'].filter(id=>S.some(x=>x.id===id));if(ids.length)scen({id:'SC-04-DERAIL',name:'#4-비상시조치-열차탈선(종합)01',situations:ids});}
  scen({id:'SC-OP',name:'#2-철도관제시스템운용-실기 10항목',situations:[sOp]});
  scen({id:'SC-ORAL',name:'#2-철도관제시스템운용-구술 전체',situations:[sOralAll]});
- if(sLineAll){scen({id:'SC-LORAL',name:'#3-열차운행선관리-구술 전체',situations:[sLineAll]});scen({id:'SC-LORAL-ASKED',name:'#3-열차운행선관리-구술 (26년 출제)',situations:[sLineAsked]});scen({id:'SC-LORAL-NEW',name:'#3-열차운행선관리-구술 (예상·신출)',situations:[sLineNew]});}
+ if(sLineAll){scen({id:'SC-LORAL',name:'#3-열차운행선관리-구술 기출 전체',situations:[sLineAll]});scen({id:'SC-LORAL-ASKED',name:'#3-열차운행선관리-구술 (26년 출제)',situations:[sLineAsked]});scen({id:'SC-LORAL-NEW',name:'#3-열차운행선관리-구술 (예상·신출)',situations:[sLineNew]});}
+ if(bookCh.length){scen({id:'SC-LORAL-BOOK',name:'#3-열차운행선관리-구술 교재 (기출 외 · 장별)',situations:bookCh});scen({id:'SC-LORAL-TOTAL',name:'#3-열차운행선관리-구술 기출+교재 전체',situations:[sLineTotal]});}
  // 문제 하나씩 골라 풀기: 종합 시나리오는 순서대로 이어지므로, 상황마다 단독 시나리오도 둔다 (베타 피드백 — 특정 시나리오만 반복 연습)
  for(const id of [...sEvac,...sEm,...sEmV]){const x=S.find(v=>v.id===id),pr=data(x.problems[0]);scen({id:'SC-'+id.slice(2),name:pr.subject==='비상 시 조치'?'#4-비상시조치-'+pr.name.replace(/^비상시 조치\s*/,''):x.name,situations:[id]});}
  // 내장 표지는 내용의 지문: 앱의 내장 문제가 바뀌면 저장된 라이브러리의 옛 내장 문제가 자동으로 갱신된다

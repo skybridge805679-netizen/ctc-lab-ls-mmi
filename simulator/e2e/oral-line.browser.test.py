@@ -19,7 +19,7 @@ def run(page, url):
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.add_init_script('window.open=()=>null'); page.goto(url, wait_until='networkidle'); page.click('#ftsWinBtn'); fts = page.locator('#ftsPanel')
     fts.locator('[data-fts-page=setup]').first.click(); page.click('#suPick')
-    for key in ['SC-LORAL', 'SC-LORAL-ASKED', 'SC-LORAL-NEW']:
+    for key in ['SC-LORAL', 'SC-LORAL-ASKED', 'SC-LORAL-NEW', 'SC-LORAL-BOOK', 'SC-LORAL-TOTAL']:
         expect(page.locator(f'#pkScen tr[data-key="{key}"]')).to_have_count(1)
     page.locator('#pkScen tr[data-key="SC-LORAL-NEW"]').click(); page.click('#pkOk'); page.uncheck('#suAuto'); page.uncheck('#suActions'); page.click('#suStart')   # 시험처럼: 조치사항(모범답안) 숨김
     # 교육생 문제 화면: 질문은 보이고 모범답안은 보이지 않는다
@@ -44,5 +44,5 @@ with sync_playwright() as p:
     browser = p.chromium.launch(executable_path='/usr/bin/chromium', headless=True, args=['--no-sandbox'])
     page = browser.new_page(viewport={'width': 1440, 'height': 1000})
     run(page, f'http://127.0.0.1:{server.server_port}/')
-    print('PASS 운행선관리 구술: 시나리오 3종, 문제 화면은 질문만, 모니터링은 출제 표시·모범답안·구술 확인')
+    print('PASS 운행선관리 구술: 시나리오 5종(기출·교재), 문제 화면은 질문만, 모니터링은 출제 표시·모범답안·구술 확인')
     browser.close(); server.shutdown()
