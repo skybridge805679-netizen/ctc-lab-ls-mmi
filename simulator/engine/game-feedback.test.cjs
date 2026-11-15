@@ -42,12 +42,30 @@ test('B1: 자동진로는 스케줄 있는 열차에 스케줄 진로만 낸다 
  const g=row(r,'K0606');assert.ok(r.command({type:'numbers',action:{op:'rename',...g,number:'G0606'}}).ok);
  assert.deepEqual(r.snapshot().ls.stations[g.station].windows[g.slot].find(t=>t.uid===g.uid).was,['K0606'],'이전 번호가 남는다');
 });
-test('C1: 반대선 운행 열차의 열번을 역 너머로 옮기면 지나간 입환진로가 해정된다',()=>{
+test('C1: 반대선 운행 열차의 열번을 역 너머로 옮기면 지나간 입환진로는 그 역을 AUTO로 전환할 때 해정된다',()=>{
  const r=start('P-em-02');for(const st of ['jonggak','dongmyo']){ctl(r,st,{type:'mode',value:'CCM'});}
  ctl(r,'dongmyo',{type:'stop',id:'3A'});ctl(r,'dongmyo',{type:'stop',id:'1B'});ctl(r,'dongmyo',{type:'stop',id:'4A'});ctl(r,'jonggak',{type:'stop',id:'2A'});ctl(r,'jonggak',{type:'stop',id:'1A'});ctl(r,'jonggak',{type:'stop',id:'4A'});tick(r,95);
  assert.ok(ctl(r,'jonggak',{type:'route',id:'51-1T'}).ok);assert.ok(ctl(r,'dongmyo',{type:'route',id:'24-B015T'}).ok);
  const k=row(r,'K0608');assert.ok(r.command({type:'numbers',action:{op:'move',...k,targetStation:'dongmyo',targetSlot:'B011T'}}).ok);
- assert.equal(r.snapshot().states.jonggak.routes['51-1T'],undefined);assert.equal(r.snapshot().states.dongmyo.routes['24-B015T'],undefined);
+ assert.ok(r.snapshot().states.jonggak.routes['51-1T']?.passed,'옮긴 직후에는 입환진로가 그대로 (열차가 지나가는 진로로 표시)');assert.ok(r.snapshot().states.dongmyo.routes['24-B015T']?.passed);
+ tick(r,80);ctl(r,'jonggak',{type:'mode',value:'AUTO'});assert.equal(r.snapshot().states.jonggak.routes['51-1T'],undefined,'종각 AUTO 전환 → 51-1T 해정');assert.ok(r.snapshot().states.dongmyo.routes['24-B015T'],'동묘앞은 아직 CCM');
+ ctl(r,'dongmyo',{type:'mode',value:'AUTO'});assert.equal(r.snapshot().states.dongmyo.routes['24-B015T'],undefined,'동묘앞 AUTO 전환 → 24-B015T 해정');
+});
+test('C1-2: 수동 열번 이동 — 열번은 바로 옮겨지고, 붉은 점유가 그 칸까지 열차 속도로 따라간 뒤 열차가 이어 달린다 (시청 침수 · K1137 단선지령식)',()=>{
+ const r=start('P-em-01');for(const st of ['jonggak','underground-seoul'])ctl(r,st,{type:'mode',value:'CCM'});
+ for(const id of ['1A','2A','4A'])ctl(r,'jonggak',{type:'stop',id});for(const id of ['1A','2A','3A'])ctl(r,'underground-seoul',{type:'stop',id});tick(r,95);
+ const k=row(r,'K1137');assert.ok(k,'K1137 표시');assert.equal(k.station,'jonggak');
+ for(const [st,id] of [['jonggak','53-B045T'],['underground-seoul','21-1T']]){const o=ctl(r,st,{type:'route',id});assert.ok(o.ok,st+' '+id+' '+o.message);}
+ assert.ok(r.command({type:'numbers',action:{op:'move',...k,targetStation:'underground-seoul',targetSlot:'1T'}}).ok);
+ assert.equal(at(r,'K1137'),'underground-seoul:1T','열번은 즉시 목표 열번창으로');
+ const runs=st=>(r.snapshot().states[st].scenarioMotions||[]).filter(m=>m.number==='K1137');
+ assert.ok(runs('jonggak').length&&runs('underground-seoul').length,'출발역·도착역에 붉은 점유 이동이 그려진다');
+ const job=r.snapshot().scenario.jobs.find(j=>j.number==='K1137'&&j.phase==='transit');assert.ok(job,'수동 이동 진행 작업');assert.ok(job.until-job.fromTime>=40,'구간마다 20초 (종각 → 시청 → 지하서울)');
+ tick(r,20);assert.equal(at(r,'K1137'),'underground-seoul:1T','도착 전에는 그 칸에서 아직 떠나지 않는다');
+ tick(r,40);const next=r.snapshot().scenario.jobs.filter(j=>j.number==='K1137'&&j.phase==='waiting');assert.ok(next.length,'도착 뒤 이어 달리기 시작 (CCM이면 출발진로 대기)');assert.match(next[0].reason,/진로/);
+ assert.ok(r.snapshot().states['underground-seoul'].routes['21-1T'],'AUTO 전환 전에는 입환진로 유지');
+ ctl(r,'underground-seoul',{type:'mode',value:'AUTO'});assert.equal(r.snapshot().states['underground-seoul'].routes['21-1T'],undefined,'지하서울 AUTO 전환 → 21-1T 해정');
+ tick(r,120);assert.notEqual(at(r,'K1137'),'underground-seoul:1T','AUTO 역에서 스케줄 진로로 이어 달린다');
 });
 test('A6: 문제가 끝나도 상황 반응이 보낸 열차는 계속 달린다 (마지막 통보로 끝나는 회송열차 등)',()=>{
  const r=start('P-em-03');say(r,'n6');tick(r,10);

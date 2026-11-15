@@ -211,6 +211,9 @@ function create(host){
     if(j.action.hold>0){j.notBefore??=now(j)+j.action.hold;if(now(j)<j.notBefore){const r='추가정차 · '+Math.ceil(j.notBefore-now(j))+'초 남음';changed||=j.reason!==r;j.reason=r;continue;}}
     const h=holds.get(j.uid);if(h&&!j.manual&&W.data[f.station]?.rails.some(r=>r[0]===f.slot)&&(!h.station||h.station===f.station)){for(const p of jobs)if(p.uid===j.uid&&!['done','cancelled'].includes(p.phase)){release(p);p.phase='cancelled';p.reason='정차 지시 · '+(N.catalog[f.station]?.name||f.station);}holds.set(j.uid,{...h,held:f.station});changed=true;continue;}
     const phase=j.phase,reason=j.reason;begin(j,f);changed||=phase!==j.phase||reason!==j.reason;
+   }else if(j.phase==='transit'){
+    if(f.station!==j.station||f.slot!==j.from){release(j);j.phase='cancelled';j.reason='열차 위치 변경으로 취소';changed=true;}
+    else if(now(j)>=j.until){release(j);j.phase='done';j.reason='도착 · 이어 달리기';changed=true;resume.push(j.uid);}
    }else if(f.station!==j.station||f.slot!==j.from||(j.route&&states()[j.station]?.routes[j.route]?.train?.scenario!==j.id)){
     release(j);j.phase='cancelled';j.reason='열차 위치·모의점유 변경으로 취소';changed=true;
    }else if(now(j)>=j.until){
@@ -228,10 +231,53 @@ function create(host){
  // 「○○역 정차」: 달리는 열차를 그 역 승강장에 세운다. 이미 승강장에 서 있으면 떠나지 않게 남은 이동을 지운다. 다시 보내려면 출발(delete) 요청.
  const holds=new Map(),dwellOf=new Map();
  function stop(uid,station){const f=locate(uid);if(!f)return {ok:false,message:'정차시킬 열차번호가 없습니다.'};if(station&&!W.data[station])return {ok:false,message:'정차역을 확인하세요.'};holds.set(uid,{station:station||null});step();return {ok:true,message:f.train.number+' '+(station?(N.catalog[station]?.name||station)+'역 ':'다음 역 ')+'정차 지시'};}
+ // 수동 열번 이동(단선지령식 반대선 운행 등): 열번은 이미 목표 열번창에 옮겨졌다(LS가 반대선 열차를 따라가지 못해 관제사가 손으로 옮김).
+ // 실제 열차는 그 칸까지 열차 속도(구간마다 20초)로 달려간다 — 붉은 점유가 세워 둔 입환진로·반대선을 따라 목표 칸까지 흘러가고,
+ // 닿으면 그 자리에서 다음 역으로 이어 달린다. 지나간 입환진로는 그 역을 AUTO로 전환할 때 해정한다(runtime).
+ const PER=20;
+ function extent(def){const xs=def.rails.flatMap(r=>r[1].map(p=>p[0])).concat(def.signals.map(g=>g[2]));return [Math.min(...xs),Math.max(...xs)];}
+ const sigPt=(def,id)=>{const g=def.signals.find(x=>x[0]===id);return g?[g[2],LS.railY(def,g[1],g[2])]:null;};      // 열번창과 같은 좌표계(배선 자료)의 신호기 위치
+ function transitPath(A,from,B,to){
+  const oA=N.catalog[A]?.order,oB=N.catalog[B]?.order;if(oA==null||oB==null)return [];
+  const pa=point(A,from),pb=point(B,to);if(!pa||!pb)return [];
+  if(A===B)return [];      // 같은 역 안의 열번 이동은 표시 정정 (역 안의 운행은 진로로 움직인다)
+  const sx=oB>oA?1:-1,segs=[];
+  // 출발역: 그 칸 앞에서 나가는 쪽으로 세워 둔 진로(입환진로 등)가 있으면 그 진로를 따라 나간다
+  const dA=W.data[A],CA=cachedCore(A),sA=states()[A];let trunk=L.trunkOf(from);
+  const out=Object.keys(sA?.routes||{}).filter(id=>{const r=CA.routes[id],g=dA.signals.find(x=>x[0]===r?.signal);if(!r||CA.signals[r.signal]?.dir!==sx||!g||sA.routes[id].occupied)return false;return g[1]===from||(Math.abs(LS.railY(dA,g[1],g[2])-pa[1])<8&&(g[2]-pa[0])*sx>=-10);})
+   .sort((a,b)=>Math.abs(dA.signals.find(x=>x[0]===CA.routes[a].signal)[2]-pa[0])-Math.abs(dA.signals.find(x=>x[0]===CA.routes[b].signal)[2]-pa[0]))[0];
+  const [a0,a1]=extent(dA),edgeA=sx>0?a1:a0;
+  // 관제사가 그 방향으로 진로를 세워 주지 않았으면 열차는 떠나지 않는다: 그때의 열번 이동은 표시 정정일 뿐이다 (구원열차 열번을 미리 옮기는 경우 등)
+  if(!out)return [];
+  {const r=CA.routes[out],g=sigPt(dA,r.signal),pd=point(A,r.destination)||pa;trunk=L.trunkOf(r.destination)||trunk;segs.push({station:A,points:[pa,...(g?[g]:[]),pd,[edgeA,pd[1]]],transit:true});}
+  // 사이 역: 그 선로(반대선)를 따라 화면을 가로지른다. LS 화면이 없는 역(시청 등)도 시간은 한 구간 걸린다
+  for(const st of N.stations.filter(x=>x.order>Math.min(oA,oB)&&x.order<Math.max(oA,oB)).sort((x,y)=>(x.order-y.order)*sx)){
+   const d=W.data[st.id],rail=L.line?.stations?.[st.id]?.trunks?.[trunk]?.rails?.[0],p=d&&rail&&point(st.id,rail);
+   if(!p){segs.push({station:null});continue;}const [x0,x1]=extent(d);segs.push({station:st.id,points:sx>0?[[x0,p[1]],[x1,p[1]]]:[[x1,p[1]],[x0,p[1]]],transit:true});
+  }
+  // 도착역: 그 칸으로 들어오는 쪽으로 세워 둔 진로가 있으면 그 진로를 따라 들어온다
+  const dB=W.data[B],CB=cachedCore(B),sB=states()[B],[b0,b1]=extent(dB),edgeB=sx>0?b0:b1;
+  const inn=Object.keys(sB?.routes||{}).find(id=>{const r=CB.routes[id];return r&&r.destination===to&&CB.signals[r.signal]?.dir===sx&&!sB.routes[id].occupied;});
+  const g=inn&&sigPt(dB,CB.routes[inn].signal);
+  segs.push({station:B,points:g?[[edgeB,g[1]],g,pb]:[[edgeB,pb[1]],pb],transit:true});
+  return segs;
+ }
+ function transit(op){
+  const f=locate(op.uid);if(!f)return {ok:false,message:'이동한 열차번호가 없습니다.'};
+  const A=op.station,B=op.targetStation||op.station,segs=transitPath(A,op.slot,B,op.targetSlot);
+  if(!segs.length)return {ok:false,message:'세워 둔 진로가 없어 열번 표시만 옮깁니다.'};
+  for(const j of jobs)if(j.uid===op.uid&&!['done','cancelled'].includes(j.phase)){release(j);j.phase='cancelled';j.reason='수동 열번 이동';}
+  const base=states()[A]?.clock??0,off=st=>(states()[st]?.clock??base)-base,j={id:'SCM'+(++serial),uid:op.uid,number:f.train.number,background:false,station:B,fromStation:A,from:op.targetSlot,to:op.targetSlot,
+   action:{op:'transit',targetStation:B,targetSlot:op.targetSlot},manual:true,phase:'transit',fromTime:base+off(B),until:base+off(B)+PER*Math.max(1,segs.length),reason:'수동 열번 이동 · 열차가 '+(N.catalog[B]?.name||B)+'역 '+op.targetSlot+'(으)로 진행 중'};
+  segs.forEach((g,i)=>{if(g.station&&states()[g.station])(states()[g.station].scenarioMotions??=[]).push({id:j.id,uid:j.uid,number:j.number,points:g.points,from:base+off(g.station)+i*PER,to:base+off(g.station)+(i+1)*PER,manual:true,transit:true});});
+  jobs.push(j);return {ok:true,pending:true,message:j.reason};
+ }
  function cancel(uid){for(const j of jobs)if(j.uid===uid&&!['done','cancelled'].includes(j.phase)){release(j);j.phase='cancelled';j.reason='수동 열차번호 조작';}}
  function reset(){for(const j of jobs)release(j);jobs=[];holds.clear();dwellOf.clear();}
- return {request,step,reset,cancel,stop,holds:()=>[...holds].map(([uid,h])=>({uid,...h})),checkpoint:()=>({serial,jobs:structuredClone(jobs),holds:[...holds],dwell:[...dwellOf]}),restore:data=>{serial=data.serial;jobs=structuredClone(data.jobs);holds.clear();for(const [k,v] of data.holds||[])holds.set(k,v);dwellOf.clear();for(const [k,v] of data.dwell||[])dwellOf.set(k,v);},list:()=>jobs.map(j=>({...j,action:{...j.action}})),busy:()=>jobs.some(j=>!j.background&&!['done','cancelled'].includes(j.phase))};
+ return {request,step,reset,cancel,transit,stop,holds:()=>[...holds].map(([uid,h])=>({uid,...h})),checkpoint:()=>({serial,jobs:structuredClone(jobs),holds:[...holds],dwell:[...dwellOf]}),restore:data=>{serial=data.serial;jobs=structuredClone(data.jobs);holds.clear();for(const [k,v] of data.holds||[])holds.set(k,v);dwellOf.clear();for(const [k,v] of data.dwell||[])dwellOf.set(k,v);},list:()=>jobs.map(j=>({...j,action:{...j.action}})),busy:()=>jobs.some(j=>!j.background&&!['done','cancelled'].includes(j.phase))};
 }
+// 수동 열번 이동(transit)은 열번이 이미 목표 칸에 보인다: 번호 표시는 숨기지 않고 붉은 점유만 따라간다
+const numberHidden=(state,uid)=>Object.values(state?.routes||{}).some(r=>r.occupied&&r.train?.scenario&&r.train.uid===uid)||(state?.scenarioMotions||[]).some(m=>m.uid===uid&&!m.transit);
 const inTransit=(state,uid)=>Object.values(state?.routes||{}).some(r=>r.occupied&&r.train?.scenario&&r.train.uid===uid)||(state?.scenarioMotions||[]).some(m=>m.uid===uid);
-const api={create,candidates,point,inTransit,onward,DWELL_SCALE};if(node)module.exports=api;else root.SimScenarioMotion=api;
+const api={create,candidates,point,inTransit,numberHidden,onward,DWELL_SCALE};if(node)module.exports=api;else root.SimScenarioMotion=api;
 })(typeof window!=='undefined'?window:globalThis);

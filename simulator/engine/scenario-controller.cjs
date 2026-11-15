@@ -48,7 +48,13 @@ function evaluate(){
  if(run.done.every(Boolean)&&!motion.busy()&&!run.queue.length&&!run.passed){run.passed=true;const t=host.assessment?.().task,late=t?.key===run.assessmentKey&&t.overtime>0;mmi().log('event',(late?'실기 시나리오 절차 완료 · 시간초과 · ':'실기 시나리오 합격 · ')+run.sc.title);}
 }
 function intercept(){return null;}
-function manualNumberAction(a){if(['move','swap','delete'].includes(a.op)){motion.cancel(a.uid);if(a.targetUid)motion.cancel(a.targetUid);}}
+// 열번 이동: 시나리오·FTS가 움직이는 열차이고 출발역에 그 방향 진로(단선지령식 입환진로 등)가 서 있으면 실제 열차가 그 칸까지 달려간 뒤 이어 달린다(motion.transit).
+// 그 밖의 열번 이동은 표시 정정일 뿐이다.
+function manualNumberAction(a){
+ if(a.op==='move'){const row=(lsm().stations[a.targetStation||a.station]?.windows[a.targetSlot]||[]).find(t=>t.uid===a.uid);
+  const controlled=row&&(motion.list().some(j=>j.uid===a.uid)||snapshot().reserved.includes(row.number)||(host.reservedNumbers?.()||[]).includes(row.number));
+  if(controlled&&motion.transit(a).ok)return;}      // 출발역에 그 방향 진로가 서 있을 때만 실제 운행 (아니면 표시 정정)
+ if(['move','swap','delete'].includes(a.op)){motion.cancel(a.uid);if(a.targetUid)motion.cancel(a.targetUid);}}
 
 function actualPosition(train){
  const f=findRow(train.id);if(!f)return null;

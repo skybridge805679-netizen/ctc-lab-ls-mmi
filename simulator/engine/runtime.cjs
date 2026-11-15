@@ -6,15 +6,20 @@ function create(){
  let scheduleIds={today:null,tomorrow:null,reserved:{}};
  const ops=Operations.create(Object.fromEntries(Object.entries(Windows.data).map(([id,ws])=>[id,ws.map(w=>w.slot)]))),ls=ops.initial();
   // 단선지령식 반대선 운행처럼 대본이 「반대선 운행이라 수동 이동」하는 열차는 LS가 번호를 따라가지 못할 뿐 실제로는 지나간다:
-  // 역을 넘어 열번을 옮기면, 그 사이 역들에 같은 방향으로 세워 둔 입환진로(종각 51-1T, 동묘앞 24-B015T 등)는 열차가 지나가 해정된 것으로 본다.
+  // 역을 넘어 열번을 옮기면, 출발역~도착역 사이에 같은 방향으로 세워 둔 입환진로(종각 53-B045T, 지하서울 21-1T 등)는 그 열차가 지나가는 진로로 표시해 두고,
+  // 그 역을 AUTO로 전환할 때 해정한다 (대본: 「K1137열차 지하서울역 도착 후 … 종각역 Auto 전환. 지하서울역 Auto 전환」).
   function passedShuntRoutes(a){
    if(a.op!=='move'||!a.targetStation||a.targetStation===a.station)return;
    const N=root.SimNetwork,from=N.catalog[a.station]?.order,to=N.catalog[a.targetStation]?.order,row=(ls.stations[a.targetStation]?.windows[a.targetSlot]||[]).find(t=>t.uid===a.uid);if(from==null||to==null||!row)return;
-   const dir=row.direction==='down'?1:-1,lo=Math.min(from,to),hi=Math.max(from,to);
+   const dir=to>from?1:-1,lo=Math.min(from,to),hi=Math.max(from,to);
    for(const st of N.stations){if(!st.controlled||st.order<lo||st.order>hi)continue;const s=states[st.id],C=root.SimCore.forStation(st.id);if(!s)continue;
     for(const [id,x] of Object.entries(s.routes)){const sig=C.signals[C.routes[id]?.signal];if(x.occupied||sig?.kind!=='입환'||sig.dir!==dir)continue;
-     const o=C.dispatch(s,{type:'occupy',id,number:row.number,seconds:1,source:'LS'});const c=o.ok?C.dispatch(s,{type:'clear',id,source:'LS'}):o;
-     s.logs.unshift({time:s.clock,source:'LS',action:'pass',result:c.ok?'완료':'보류',message:row.number+' 반대선 통과 · '+id+(c.ok?' 진로 해정':' · '+c.message)});}}
+     x.passed=row.number;s.logs.unshift({time:s.clock,source:'LS',action:'pass',result:'완료',message:row.number+' 반대선 운행 · '+id+' 입환진로 (AUTO 전환 시 해정)'});}}
+  }
+  function releasePassed(station){
+   const s=states[station],C=root.SimCore.forStation(station);if(!s)return;
+   for(const [id,x] of Object.entries(s.routes)){if(!x.passed||x.occupied)continue;const sig=C.routes[id]?.signal;delete s.routes[id];if(sig)s.signals[sig]='STOP';
+    s.logs.unshift({time:s.clock,source:'SYSTEM',action:'release',result:'완료',message:id+' 입환진로 해정 · AUTO 전환 ('+x.passed+' 통과)'});}
   }
  let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;let ftsLibrarySource=null,ftsRunSource=null,ftsLibraryCache=null,ftsRunCache=null;const published=new Map();const events=[];
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
@@ -75,7 +80,7 @@ function create(){
   if(type==='tick'){tick(action.seconds);return {ok:true};}
   if(type==='select'){session.select(action.station);return {ok:true};}
   if(type==='control'){
-   refresh();const result=session.dispatch(action.station,action.action);fts.event({...action.action,station:action.station,ok:result.ok!==false});emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
+   refresh();const result=session.dispatch(action.station,action.action);if(result.ok!==false&&action.action?.type==='mode'&&states[action.station]?.mode==='AUTO')releasePassed(action.station);fts.event({...action.action,station:action.station,ok:result.ok!==false});emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
   }
   if(type==='numbers'){const a=action.action,r=ops.dispatch(ls,a),s=states[a.station];if(r.ok){root.SimScenarioUI.manualNumberAction(a);passedShuntRoutes(a);if(a.op==='rename'){const was=(ls.stations[a.station]?.windows[a.slot]||[]).find(t=>t.uid===a.uid)?.was?.at(-1);if(was)fts.own(was,String(a.number).trim().toUpperCase());}}if(s){s.logs.unshift({time:s.clock,source:'LS',action:a.op,result:r.ok?'완료':'보류',message:r.message});if(r.ok)s.events.push({type:'lsOperation',operation:a,time:s.clock,source:'LS'});}root.SimScenarioUI.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok});fts.event({type:'lsOperation',operation:a,station:a.station,ok:r.ok,source:action.fts?'FTS':a.source==='MMI'?'MMI':'LS'});refresh();return r;}
   if(type==='numbers:validate')return root.SimLSUI.validate(action.action);
