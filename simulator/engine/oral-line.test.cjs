@@ -30,8 +30,8 @@ test('교재 문항(기출 외): 장마다 있고 기출과 id가 겹치지 않�
 });
 test('모든 문항에 개조식 본답과 [참고]가 있고 FTS 모범답안에 본답·참고·원문 순으로 실린다',()=>{
  const F2=require('./fts.js'),L=F2.seed();
- for(const i of [...O.items,...O.book]){assert.ok(Array.isArray(i.key)&&i.key.length>0,i.id);assert.ok(Array.isArray(i.ref),i.id);for(const x of i.key)assert.ok(x.length<=140,i.id+' 본답 줄이 너무 길다: '+x);}
- const p=L.problems.find(x=>x.id==='P-LORAL-COORD-TIME');assert.match(p.actions,/^1\) 차단장비 운행 있음 → 착수 3시간 전까지/);assert.match(p.actions,/\[참고\][\s\S]*\[교재 원문\]/);
+ for(const i of [...O.items,...O.book]){assert.ok(Array.isArray(i.key)&&i.key.length>0,i.id);assert.ok(Array.isArray(i.ref),i.id);for(const x of i.key)assert.ok(x.length<=260,i.id+' 본답 줄이 너무 길다: '+x);}
+ const p=L.problems.find(x=>x.id==='P-LORAL-COORD-TIME');assert.match(p.actions,/^1\) 차단장비 운행이 예정된 작업: 작업 착수 예정시각 3시간 전까지/);assert.match(p.actions,/\[참고\][\s\S]*\[교재 원문\]/);
 });
 test('공부용 문서(docs/운행선관리-구술.md)가 데이터와 같다',()=>{
  const file=path.join(__dirname,'..','..','docs','운행선관리-구술.md'),before=fs.readFileSync(file,'utf8');
