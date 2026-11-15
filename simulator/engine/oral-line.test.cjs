@@ -20,12 +20,12 @@ test('FTS: 문항마다 구술 문제 하나 · 전체 / 26년 출제 / 예상·
  assert.match(ps.find(p=>p.id==='P-LORAL-EQUIP-BLOCK').actions,/※ 교재 37~38쪽 원문/);
 });
 test('교재 문항(기출 외): 장마다 있고 기출과 id가 겹치지 않으며 FTS 장별·전체 시나리오로 풀린다',()=>{
- assert.equal(O.book.length,109);const ids=new Set(O.items.map(i=>i.id));
- for(const i of O.book){assert.ok(!ids.has(i.id),i.id);ids.add(i.id);assert.deepEqual(i.tags,['교재']);assert.ok(O.CHAPTERS.includes(i.ch),i.id);assert.match(i.page,/^\d+(~\d+)?$/,i.id);assert.ok(i.q&&i.a.length,i.id);}
+ assert.equal(O.book.length,171);const ids=new Set(O.items.map(i=>i.id));
+ for(const i of O.book){assert.ok(!ids.has(i.id),i.id);ids.add(i.id);assert.deepEqual(i.tags,['교재']);assert.ok(O.CHAPTERS.includes(i.ch),i.id);assert.match(i.page,/^\d+(~\d+)?$/,i.id);assert.doesNotMatch(i.q,/제\d+조/,i.id);assert.ok(i.q&&i.a.length,i.id);}
  for(const ch of O.CHAPTERS)assert.ok(O.book.some(i=>i.ch===ch),ch);
  const L=F.seed(),sc=id=>L.scenarios.find(c=>c.id===id),cnt=id=>sc(id).situations.reduce((t,s)=>t+L.situations.find(x=>x.id===s).problems.length,0);
- assert.equal(sc('SC-LORAL-BOOK').situations.length,O.CHAPTERS.length);assert.equal(cnt('SC-LORAL-BOOK'),109);assert.equal(cnt('SC-LORAL-TOTAL'),171);
- const p=L.problems.find(x=>x.id==='P-LORAL-B-ORDER-ISSUE');assert.equal(p.situation,'교재 문항(기출 외) · 교재 58쪽');assert.match(p.actions,/작업시작일 1일 전 17시까지/);
+ assert.equal(sc('SC-LORAL-BOOK').situations.length,O.CHAPTERS.length);assert.equal(cnt('SC-LORAL-BOOK'),171);assert.equal(cnt('SC-LORAL-TOTAL'),233);
+ const p=L.problems.find(x=>x.id==='P-LORAL-B-ORDER-ISSUE-A');assert.equal(p.situation,'교재 문항(기출 외) · 교재 58쪽');assert.match(p.actions,/작업시작일 1일 전 17시까지/);
  assert.ok(fs.readFileSync(path.join(__dirname,'..','..','docs','운행선관리-교재구술.md'),'utf8').includes('### '+O.book[0].q));
 });
 test('공부용 문서(docs/운행선관리-구술.md)가 데이터와 같다',()=>{
