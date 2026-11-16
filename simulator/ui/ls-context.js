@@ -1,11 +1,14 @@
 (function(root){
 'use strict';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let host,ops,model,menu,dialog,pending=null,lastFocus=null,drag=null,menuOpenedAt=0,overviewTimer=null,overviewIds=[];
+let host,ops,model,menu,dialog,lastFocus=null,drag=null,menuOpenedAt=0,overviewTimer=null,overviewIds=[];
 const ctx=()=>host.context(),norm=s=>s.replaceAll(' · ','');
 const rows=(station,slot)=>ops.entries(model,station,slot);
 function closeMenu(){if(menu){const old=menu;menu=null;old.remove();}if(lastFocus?.isConnected)lastFocus.focus?.({preventScroll:true});}
-function cancelPending(){pending=null;$('lsStage').classList.remove('select-train-target');}
+// 목표 열번창 고르는 중인 상태는 엔진이 들고 있다: LS 창 여러 개(LS +) 중 어느 창에서 칸을 눌러도 이어진다
+const getPending=()=>root.SimRemote?.snapshot?.lsPending||null;
+function setPending(p){try{root.SimRemote.command({type:'lsPending',pending:p});}catch{}$('lsStage').classList.toggle('select-train-target',!!p);}
+function cancelPending(){if(getPending())setPending(null);else $('lsStage').classList.remove('select-train-target');}
 function apply(a){host.run({type:'lsOperation',operation:a,source:'LS'});}
 function confirm(title,body,a){closeMenu();host.openAction(title,body,()=>({type:'lsOperation',operation:typeof a==='function'?a():a,source:'LS'}));}
 function editTrain(slot,uid){
@@ -15,9 +18,9 @@ function editTrain(slot,uid){
  $('lsTrainDirection').value=t?.direction||'up';$('lsTrainNumber').focus();$('lsTrainNumber').select();
  $('lsTrainNumber').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('dialogConfirm').click();}};
 }
-function chooseTarget(op,slot,uid){closeMenu();pending={op,station:ctx().station,slot,uid};$('lsStage').classList.add('select-train-target');host.toast((op==='move'?'이동할':'교환할')+' 열번창을 클릭하세요. 다른 역 선택 가능 · Esc 취소');}
+function chooseTarget(op,slot,uid){closeMenu();setPending({op,station:ctx().station,slot,uid});host.toast((op==='move'?'이동할':'교환할')+' 열번창을 클릭하세요. 다른 역 선택 가능 · Esc 취소');}
 function target(slot){
- if(!pending)return;const from=pending,station=ctx().station,ts=rows(station,slot);
+ const from=getPending();if(!from)return;const station=ctx().station,ts=rows(station,slot);
  if(from.op==='swap'&&!ts.length){host.toast('교환할 열차번호가 있는 창을 선택하세요.',true);return;}
  const source=rows(from.station,from.slot).find(t=>t.uid===from.uid);if(!source){cancelPending();return;}
  confirm('열차번호 '+(from.op==='move'?'이동':'교환'),`<p>${esc(root.SimNetwork.catalog[from.station].name)} ${esc(from.slot)} ${esc(source.number)} → ${esc(root.SimNetwork.catalog[station].name)} ${esc(slot)}</p>`+(from.op==='swap'?`<label class="field-label" for="lsSwapNumber">교환할 열차번호</label><select id="lsSwapNumber">${ts.map(t=>`<option value="${t.uid}">${esc(t.number)}</option>`).join('')}</select>`:''),()=>({...from,targetStation:station,targetSlot:slot,targetUid:from.op==='swap'?$('lsSwapNumber').value:undefined}));cancelPending();
@@ -110,14 +113,14 @@ function decorate(svg=$('trackSvg'),station=ctx().station,readonly=false){
   const w=b.w||180,h=b.h||58,slow=b.kind==='서행표시',label=slow?b.text+' km/h':b.text,title=18,size=Math.max(12,Math.min(18,Math.round((h-title)*.45)));
   // 선로상태 표시: 회색 제목줄 + 붉은 본문, 서행표시: 노란 본문 + 붉은 글자. 모두 반투명이라 아래 진로가 비친다.
   markup+=`<g class="ls-info-board ${slow?'slow':'state'} ${b.fixed?'fixed':''}" data-ls-board="${b.id}" transform="translate(${b.x} ${b.y})"><rect class="bd-body" width="${w}" height="${h}"/><rect class="bd-title" width="${w}" height="${title}"/><text x="6" y="13" class="board-kind">${esc(b.kind)}${b.fixed?' · 고정':''}</text><text class="bd-text" x="${w/2}" y="${title+(h-title)/2+size*.35}" text-anchor="middle" style="font-size:${size}px" ${label.length*size*.62>w-12?`textLength="${w-14}" lengthAdjust="spacingAndGlyphs"`:''}>${esc(label)}</text><g data-board-close="${b.id}" role="button" tabindex="0" aria-label="표지판 삭제"><rect class="bd-x" x="${w-20}" width="20" height="${title}"/><text x="${w-10}" y="13" text-anchor="middle">×</text></g>${b.fixed?'':`<path data-board-resize="${b.id}" class="bd-grip" d="M${w-14} ${h}L${w} ${h-14}V${h}Z"/>`}</g>`;}
- layer.innerHTML=readonly?markup.replace(/ role="button" tabindex="0"/g,''):markup;svg.append(layer);if(!readonly)$('lsStage').classList.toggle('select-train-target',!!pending);
+ layer.innerHTML=readonly?markup.replace(/ role="button" tabindex="0"/g,''):markup;svg.append(layer);if(!readonly)$('lsStage').classList.toggle('select-train-target',!!getPending());
 }
 function init(h){
  host=h;const catalog={};for(const st of root.SimNetwork.stations.filter(s=>s.controlled))catalog[st.id]=root.SimTrainWindows.data[st.id].map(w=>w.slot);ops=root.SimLSOperations.create(catalog);model=root.SimRemote.snapshot.ls;   // 열번창 상태는 엔진의 것 (ops는 읽기 도우미)
  dialog=document.createElement('dialog');dialog.id='lsOverview';dialog.className='ls-overview';document.body.append(dialog);root.addEventListener('resize',()=>{if(dialog.open)refreshOverview();});
  $('lsDisplay').oncontextmenu=e=>{e.preventDefault();if(drag)return;if(ctx().monitor){const slot=e.target.closest('[data-train-slot]');openMenu(slot?numberMenu(slot.dataset.trainSlot):[{label:'화면인쇄',id:'print',action:()=>{closeMenu();root.print();}},{label:'전체 LS 보기',id:'overview-all',action:()=>overview(root.SimNetwork.stations.filter(s=>s.controlled).map(s=>s.id))}],e.clientX,e.clientY,e.target);return;}const board=e.target.closest('[data-ls-board]'),slot=e.target.closest('[data-train-slot]'),circuit=e.target.closest('[data-track-circuit],[data-circuit-label]');const id=slot?.dataset.trainSlot||norm(circuit?.dataset.trackCircuit||circuit?.dataset.circuitLabel||'');let point={x:30,y:30};if($('trackSvg').contains(e.target))point=svgPoint(e);openMenu(board?boardMenu(board.dataset.lsBoard):slot&&catalog[ctx().station].includes(id)?numberMenu(id):backgroundMenu(point),e.clientX,e.clientY,e.target);};
- $('lsDisplay').addEventListener('click',e=>{const close=e.target.closest('[data-board-close]');if(close&&!ctx().monitor){e.stopPropagation();deleteBoard(close.dataset.boardClose);return;}const slot=e.target.closest('[data-train-slot]');if(slot&&pending){e.stopPropagation();target(slot.dataset.trainSlot);}},true);
- $('lsDisplay').addEventListener('keydown',e=>{const slot=e.target.closest('[data-train-slot]');if(slot&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(pending)target(slot.dataset.trainSlot);else editTrain(slot.dataset.trainSlot,rows(ctx().station,slot.dataset.trainSlot)[0]?.uid);}},true);
+ $('lsDisplay').addEventListener('click',e=>{const close=e.target.closest('[data-board-close]');if(close&&!ctx().monitor){e.stopPropagation();deleteBoard(close.dataset.boardClose);return;}const slot=e.target.closest('[data-train-slot]');if(slot&&getPending()){e.stopPropagation();target(slot.dataset.trainSlot);}},true);
+ $('lsDisplay').addEventListener('keydown',e=>{const slot=e.target.closest('[data-train-slot]');if(slot&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();if(getPending())target(slot.dataset.trainSlot);else editTrain(slot.dataset.trainSlot,rows(ctx().station,slot.dataset.trainSlot)[0]?.uid);}},true);
  $('lsDisplay').addEventListener('dblclick',e=>{const slot=e.target.closest('[data-train-slot]'),board=e.target.closest('[data-ls-board]');if(slot){e.preventDefault();editTrain(slot.dataset.trainSlot,rows(ctx().station,slot.dataset.trainSlot)[0]?.uid);}else if(board&&!ctx().monitor){const b=model.stations[ctx().station].boards.find(b=>b.id===board.dataset.lsBoard);editBoard(b.kind,{},b.id);}});
  $('lsDisplay').addEventListener('pointerdown',e=>{if(ctx().monitor)return;const b=e.target.closest('[data-ls-board]');if(e.button!==0||!b||e.target.closest('[data-board-close]'))return;const data=model.stations[ctx().station].boards.find(x=>x.id===b.dataset.lsBoard);if(data.fixed)return;const p=svgPoint(e,false),grip=!!e.target.closest('[data-board-resize]');drag={id:data.id,station:ctx().station,dx:p.x-data.x,dy:p.y-data.y,x:data.x,y:data.y,w:data.w||180,h:data.h||58,sw:data.w||180,sh:data.h||58,px:p.x,py:p.y,resize:grip,node:b};b.setPointerCapture(e.pointerId);e.preventDefault();});
  $('lsDisplay').addEventListener('pointermove',e=>{if(!drag)return;const p=svgPoint(e,false),v=$('trackSvg').viewBox.baseVal;if(drag.resize){drag.w=Math.max(60,Math.min(1200,drag.sw+p.x-drag.px));drag.h=Math.max(30,Math.min(400,drag.sh+p.y-drag.py));drag.node.querySelector('.bd-body').setAttribute('width',drag.w);drag.node.querySelector('.bd-body').setAttribute('height',drag.h);drag.node.querySelector('.bd-title').setAttribute('width',drag.w);return;}drag.x=Math.max(8,Math.min(v.width-188,p.x-drag.dx));drag.y=Math.max(8,Math.min(v.height-68,p.y-drag.dy));drag.node.setAttribute('transform',`translate(${drag.x} ${drag.y})`);});

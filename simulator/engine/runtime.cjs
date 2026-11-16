@@ -21,7 +21,7 @@ function create(){
    for(const [id,x] of Object.entries(s.routes)){if(!x.passed||x.occupied)continue;const sig=C.routes[id]?.signal;delete s.routes[id];if(sig)s.signals[sig]='STOP';
     s.logs.unshift({time:s.clock,source:'SYSTEM',action:'release',result:'완료',message:id+' 입환진로 해정 · AUTO 전환 ('+x.passed+' 통과)'});}
   }
- let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;let ftsLibrarySource=null,ftsRunSource=null,ftsLibraryCache=null,ftsRunCache=null;const published=new Map();const events=[];
+ let lsPending=null;let seq=0,paused=false,speed=1,replay=false,revision=0,cache=null,tableCache=null,tableDirty=true;let ftsLibrarySource=null,ftsRunSource=null,ftsLibraryCache=null,ftsRunCache=null;const published=new Map();const events=[];
  const emit=(kind,data)=>{events.push({seq:++seq,kind,...data});if(events.length>1000)events.shift();};
  const root={SimCore:{...Core,forStation:session.core},SimNetwork:Network,SimTimetable:Timetable,SimTrainWindows:Windows,SimTrackNetwork:require('./track-network'),SimLine:require('./line'),SimAuto:require('./autocontrol'),SimScenarios:require('./scenarios'),SimEmergency:require('./emergency'),SimScheduleScenarios:require('./schedule-scenarios'),SimScenarioMotion:require('./scenario-motion')};
  root.SimLine.journeys.clear();root.SimLine.state.enforce=true;root.SimLine.state.single.clear();
@@ -79,6 +79,8 @@ function create(){
   if(type==='clock'){if(action.paused!==undefined)paused=!!action.paused;if(action.speed!==undefined){if(!Number.isFinite(action.speed)||action.speed<0||action.speed>120)throw new Error('Invalid clock speed');speed=action.speed;}return {ok:true};}
   if(type==='tick'){tick(action.seconds);return {ok:true};}
   if(type==='select'){session.select(action.station);return {ok:true};}
+  // LS 열번 이동·교환의 「목표 열번창 고르는 중」 상태: LS 창이 여럿(LS +)이어도 한 창에서 고르고 다른 창에서 칸을 누를 수 있게 엔진이 들고 있다
+  if(type==='lsPending'){const p=action.pending;if(p!==null&&!(p&&['move','swap'].includes(p.op)&&typeof p.station==='string'&&typeof p.slot==='string'&&typeof p.uid==='string'))return {ok:false,message:'열번 선택 상태를 확인하세요.'};lsPending=p?{op:p.op,station:p.station,slot:p.slot,uid:p.uid}:null;return {ok:true};}
   if(type==='control'){
    refresh();const result=session.dispatch(action.station,action.action);if(result.ok!==false&&action.action?.type==='mode'&&states[action.station]?.mode==='AUTO')releasePassed(action.station);fts.event({...action.action,station:action.station,ok:result.ok!==false});emit('control',{station:action.station,action:action.action,result});root.SimScenarioUI.event({...action.action,station:action.station,ok:result.ok!==false});refresh();return result;
   }
@@ -125,7 +127,7 @@ function create(){
   // 시나리오 열차(시간표 밖 예약 번호)의 실제 위치도 엔진이 낸다 — 화면은 계산하지 않는다
   for(const id of root.SimScenarioUI.reservedNumbers?.()||[])if(!(id in positions))positions[id]=root.SimScenarioUI.position({id});
   if(ftsLibrarySource!==fts.library()){ftsLibrarySource=fts.library();ftsLibraryCache=structuredClone(ftsLibrarySource);}if(ftsRunSource!==fts.runLibrary()){ftsRunSource=fts.runLibrary();ftsRunCache=structuredClone(ftsRunSource);}
-  const value={fts:fts.snapshot(),editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},assessment:assessment.snapshot(now()),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],scheduleIds:{...scheduleIds,list:scheduleIdList().map(s=>({id:s.id,name:s.name,trains:s.timetable?.trains?.length||0}))},events};
+  const value={lsPending,fts:fts.snapshot(),editHistory:Timetable.history(model),seq,pid:process.pid,selected:session.selected,states,ls,clock:{paused,speed,replay},assessment:assessment.snapshot(now()),line:{enforce:root.SimLine.state.enforce,single:[...root.SimLine.state.single]},equipment:{faults:root.SimEquipment.faultList(),sent:root.SimEquipment.sentTimes()},auto:{enabled:root.SimAutoUI.enabled(),reflect:root.SimAutoUI.reflecting(),transits:root.SimAutoUI.transits(),troubles:root.SimAutoUI.troubles(),actuals:root.SimAutoUI.actuals(),positions},scenario:root.SimScenarioUI.snapshot(),drill:root.SimDrill.snapshot(),journeys:[...root.SimLine.journeys],scheduleIds:{...scheduleIds,list:scheduleIdList().map(s=>({id:s.id,name:s.name,trains:s.timetable?.trains?.length||0}))},events};
   if(tableDirty||!tableCache){tableCache=JSON.parse(JSON.stringify(model));tableDirty=false;}
   cache=JSON.parse(JSON.stringify(value,(_key,v)=>typeof v==='function'?undefined:v instanceof Set?[...v]:v));cache.timetable=tableCache;cache.ftsLibrary=ftsLibraryCache;cache.ftsRunLibrary=ftsRunCache;
   for(const [key,v]of Object.entries(cache)){if(key==='events')continue;const previous=published.get(key);if(previous?.value===v)continue;const hash=JSON.stringify(v);if(previous?.hash!==hash)published.set(key,{at:revision,hash,value:v});}

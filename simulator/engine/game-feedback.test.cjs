@@ -92,3 +92,10 @@ test('A7: 문제가 시간초과로 끝나도 추가정차 열차는 계속 간�
 test('A8: 진입 열번창이 다른 줄에 그려진 역(노량진 상2선 B931T)에서도 장내 진로를 찾는다',()=>{
  const M=require('./scenario-motion.js');assert.deepEqual(M.candidates('noryangjin','B931T','2T','up'),['2B-2T']);
 });
+test('LS + 여러 창: 열번 이동 선택 상태를 엔진이 들고 있어 다른 LS 창에서 목표 칸을 고를 수 있다',()=>{
+ const r=R.create();assert.equal(r.snapshot().lsPending,null);
+ const p={op:'move',station:'jonggak',slot:'1T',uid:'T1'};assert.ok(r.command({type:'lsPending',pending:p}).ok);
+ assert.deepEqual(r.snapshot().lsPending,p,'다른 창도 같은 스냅숏에서 선택 상태를 본다');
+ assert.equal(r.command({type:'lsPending',pending:{op:'drop'}}).ok,false);
+ assert.ok(r.command({type:'lsPending',pending:null}).ok);assert.equal(r.snapshot().lsPending,null);
+});

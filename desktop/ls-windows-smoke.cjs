@@ -36,6 +36,16 @@ const profile=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-ls-windows-'));let a
  await expect.poll(()=>primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1022T?.[0]?.number)).toBe('K254');
  await corridor.locator('[data-train-slot="B1022T"]').click({button:'right'});const move=corridor.locator('[data-context-action="train-move"]');await move.hover();await move.locator('..').locator('.ls-submenu button').first().click();await corridor.locator('[data-train-slot="B1032T"]').click();await corridor.click('#dialogConfirm');await corridor.waitForFunction(()=>SimLSUI.getModel().stations.uiwang.windows.B1032T?.[0]?.number==='K254');
  await expect.poll(()=>primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1032T?.[0]?.number)).toBe('K254');assert.equal(await primary.evaluate(()=>SimRemote.snapshot.ls.stations.uiwang.windows.B1022T?.length||0),0);await corridor.close();
+ // LS + 여러 창: 한 창에서 「열차번호 이동」을 고르고 다른 창에서 목표 열번창을 누른다 (선택 상태는 엔진이 들고 있다)
+ {const a=await additional('uiwang-suwon'),b=await additional('gunpo');await a.waitForFunction(()=>document.querySelector('#lsStage').dataset.preset==='uiwang-suwon');await b.waitForFunction(()=>document.querySelector('#lsStage').dataset.preset==='gunpo');
+  await a.locator('[data-train-slot="B1032T"]').click({button:'right'});const mv=a.locator('[data-context-action="train-move"]');await mv.hover();await mv.locator('..').locator('.ls-submenu button').first().click();
+  await expect.poll(()=>b.evaluate(()=>(SimRemote.poll(),document.querySelector('#lsStage').classList.contains('select-train-target')))).toBe(true);
+  const target=await b.evaluate(()=>[...document.querySelectorAll('[data-train-slot]')].map(g=>g.dataset.trainSlot).find(s=>!(SimLSUI.getModel().stations.gunpo.windows[s]||[]).length));
+  await b.locator(`[data-train-slot="${target}"]`).click();await b.click('#dialogConfirm');
+  await expect.poll(()=>primary.evaluate(t=>SimRemote.snapshot.ls.stations.gunpo.windows[t]?.[0]?.number,target)).toBe('K254');
+  assert.equal(await primary.evaluate(()=>SimRemote.snapshot.lsPending),null,'이동 뒤 선택 상태는 모든 창에서 풀린다');
+  await expect.poll(()=>a.evaluate(()=>(SimRemote.poll(),document.querySelector('#lsStage').classList.contains('select-train-target')))).toBe(false);
+  await a.close();await b.close();}
  for(const [host,view,slot]of [['anyang','anyang-geumjeong','B988T'],['gunpo','gunpo-uiwang','B1006T']]){
   const page=await additional(view);await page.waitForFunction(v=>document.querySelector('#lsStage').dataset.preset===v,view);
   assert.equal(await page.evaluate(()=>SimRemote.snapshot.pid),pid);assert.equal(await page.locator('#lsStage [data-mode],#lsStage [data-point-control],#lsStage [data-stop-all]').count(),0);
