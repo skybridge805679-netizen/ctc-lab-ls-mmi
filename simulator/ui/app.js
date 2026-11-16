@@ -37,7 +37,7 @@ function drawBoard(){
 }
 // 열번창에 열차번호가 서 있는 궤도회로 = 열차 점유 (FTS는 이 구간을 붉게 표시)
 // a train is still running over a route: the red occupied part moves with the clock, so redraw every tick
-function trainOccupied(id){const st=window.SimLSUI?.getModel?.().stations?.[id],set=new Set(Object.keys(stationStates[id]?.circuitOccupied||{}));if(st)for(const [slot,rows] of Object.entries(st.windows))if(rows.some(t=>!window.SimScenarioMotion?.inTransit(stationStates[id],t.uid)&&!window.SimLine?.journeys.has(t.number)))set.add(slot);return set;}
+function trainOccupied(id){const st=window.SimLSUI?.getModel?.().stations?.[id],set=new Set(Object.keys(stationStates[id]?.circuitOccupied||{}));if(st)for(const [slot,rows] of Object.entries(st.windows))if(rows.some(t=>!window.SimScenarioMotion?.inTransit(stationStates[id],t.uid)&&!window.SimLine?.journeys.has(t.number)))set.add(window.SimLine?.circuitOf?.(id,slot)||slot);return set;}
 function drawTracks(){
  const monitor=!!window.SimLSPresets.get(selectedView).monitor,stage=$('lsStage'),aspect=stage.clientWidth/Math.max(160,stage.clientHeight-(stage.querySelector('.ls-head')?.offsetHeight||56)-14);
  const st=N.catalog[selectedStation],at=lsViews.findIndex(v=>v.id===selectedView),view=window.SimLS.render(st,window.SimWiring.data[selectedStation],C,state,{aspect,preset:selectedView,left:lsViews[at-1],right:lsViews[at+1],occupied:trainOccupied(selectedStation)});

@@ -13,7 +13,8 @@ test('signal stop with a train standing on the platform or in the rear block win
  const r=start('P-em-03');
  assert.deepEqual(IL.approachWindows('anyang','3B'),['5T','B983T']);assert.deepEqual(IL.approachWindows('geumcheon','2A'),['B965T','B967T']);
  ctl(r,'anyang',{type:'mode',value:'CCM'});assert.match(ctl(r,'anyang',{type:'stop',id:'3B'}).message,/접근쇄정 30초/);
- ctl(r,'geumcheon',{type:'mode',value:'CCM'});assert.match(ctl(r,'geumcheon',{type:'stop',id:'2A'}).message,/접근쇄정 90초/);
+ // 석수역 상2선 열번창(B967T)의 K0450·K0452는 석수 정지위치 B969T를 밟는다 — 금천구청 2A 접근구간(B965T·B967T) 밖이라 접근쇄정 없음 (사용자 확인)
+ ctl(r,'geumcheon',{type:'mode',value:'CCM'});assert.doesNotMatch(ctl(r,'geumcheon',{type:'stop',id:'2A'}).message,/접근쇄정/);
 });
 test('K0456 changes line only along the routes the controller gives, then the rescue train runs to the collision on the rescue order',()=>{
  const r=start('P-em-03');

@@ -12,7 +12,11 @@ const SHOTS=process.env.REMOTE_SHOTS;
   const phone=await browser.newContext({...devices['iPhone 13']});const m=await phone.newPage();const errors=[];m.on('pageerror',e=>errors.push(String(e)));
   await m.goto(base);await m.fill('#pin',info.pin);await m.click('button[type=submit]');await m.waitForSelector('#problem');
   await m.waitForFunction(()=>document.querySelector('#scenario').textContent.includes('진행 중인 교육'));
-  r.command({type:'fts',op:'start',scenario:'SC-G',professor:'001',student:'tester',autoRun:false});r.command({type:'tick',seconds:15});
+  // 리모컨에서 교육 시작: 시나리오 찾기 → 고르기 → 교육생 → 시작
+  await m.waitForSelector('#rcFilter');if(SHOTS)await m.screenshot({path:SHOTS+'/remote-phone-start.png'});
+  await m.fill('#rcFilter','시청');await m.locator('[data-scenario="SC-G"]').click();await m.selectOption('#rcStud','tester');
+  await m.click('#rcStart');await m.click('#yes');await m.waitForFunction(()=>document.querySelector('#scenario').textContent.includes('시청 침수'));
+  assert.equal(r.snapshot().fts.session.student,'tester','폰에서 시작한 교육이 엔진에 반영');r.command({type:'clock',paused:true});r.command({type:'tick',seconds:15});
   await m.waitForFunction(()=>document.querySelector('#scenario').textContent.includes('시청 침수'));
   const next=m.locator('.item.next .tap');await next.waitFor();
   if(SHOTS)await m.screenshot({path:SHOTS+'/remote-phone.png',fullPage:false});

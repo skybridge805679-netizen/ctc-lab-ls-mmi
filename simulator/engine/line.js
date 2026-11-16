@@ -54,9 +54,14 @@ const Track=isNode?require('./track-network'):root.SimTrackNetwork;
 const graph=Track.build(line.sections);
 const journeys=new Map();
 function setJourney(number,code){if(code&&graph.circuits[Track.codeOf(code)])journeys.set(number,Track.codeOf(code));else journeys.delete(number);}
+// 열번창 이름과 열차가 실제로 밟는 회로가 다른 곳 (원본 LS 배치 · 사용자 확인):
+//  금천구청 화면의 석수역 상2선 열번창은 이름이 B967T이지만, 거기 선 열차는 석수역 정지위치 B969T를 밟는다.
+//  (B967T로 보면 금천구청 2A 장내신호기 접근구간이 점유된 것이 되어, 2A 진로를 취소할 때 접근쇄정이 걸린다 — 비상시조치 03 석수 충돌)
+const WINDOW_CIRCUIT={geumcheon:{B967T:'B969T'}};
+const circuitOf=(station,slot)=>WINDOW_CIRCUIT[station]?.[slot]||slot;
 function circuitOccupancy(ls,states={},slotsOf=slotsOfDefault){
  const occupied={};const put=(code,who)=>{code=Track.codeOf(code);if(code&&graph.circuits[code]){const rows=occupied[code]??=[];if(!rows.includes(who))rows.push(who);}};
- for(const [st,s]of Object.entries(ls?.stations||{}))for(const slot of slotsOf(st))for(const row of s.windows?.[slot]||[])if(!journeys.has(row.number))put(slot,row.number);
+ for(const [st,s]of Object.entries(ls?.stations||{}))for(const slot of slotsOf(st))for(const row of s.windows?.[slot]||[])if(!journeys.has(row.number))put(circuitOf(st,slot),row.number);
  for(const [who,code]of journeys)put(code,who);
  for(const [st,s]of Object.entries(states))for(const [res,route]of Object.entries(s.occupied||{}))put(graph.resourceToCode[res],s.routes?.[route]?.train?.number||st+' '+route);
  return occupied;
@@ -190,6 +195,6 @@ function refresh(states,ls,slotsOf){
  for(const [id,s] of Object.entries(states)){if(blocked[id])s.exitBlocked=blocked[id];else delete s.exitBlocked;}
  return blocked;
 }
-const api={mainLineOf,lineNameOf,graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,autoSingle,isSingle,wrongDirection,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
+const api={circuitOf,mainLineOf,lineNameOf,graph,journeys,setJourney,circuitOccupancy,INTERMEDIATE,viaStations,state,autoSingle,isSingle,wrongDirection,sectionNumbers,blockedExits,refresh,line,NAMES,trunkOf,numberOf,arrivalSignal,next,entrySlot,handoff,build};
 if(isNode)module.exports=api;else root.SimLine=api;
 })(typeof window!=='undefined'?window:globalThis);

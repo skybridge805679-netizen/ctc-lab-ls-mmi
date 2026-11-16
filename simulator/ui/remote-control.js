@@ -14,24 +14,39 @@ function ask(text){return new Promise(res=>{const d=$('confirm');$('confirmText'
 async function act(action,done){if(busy)return;busy=true;try{const r=await call(action);if(r&&r.ok===false)toast(r.message||'처리하지 못했습니다.');else if(done)toast(done);}catch(e){toast(e.message);}finally{busy=false;}}
 function render(){
  const v=view||{active:false},running=v.active&&!v.finished;
- $('scenario').textContent=v.scenario||'진행 중인 교육 없음';$('people').textContent=v.professor?`교수: ${v.professor} · 교육생: ${v.student}`:'교수 PC에서 교육을 시작하면 여기에 표시됩니다';
+ $('scenario').textContent=v.scenario||'진행 중인 교육 없음';$('people').textContent=v.professor?`교수: ${v.professor} · 교육생: ${v.student}`:'아래에서 시나리오를 골라 시작하세요';
  $('problem').textContent=v.problem?.name||'진행 중인 교육이 없습니다';$('progress').textContent=v.total?`문제 ${v.index+1} / ${v.total}`:'';
  $('status').textContent=v.finished?'교육 종료':v.problem?.status||'';$('status').hidden=!$('status').textContent;
  $('error').hidden=!v.problem?.error;$('error').textContent=v.problem?.error||'';
  for(const id of ['reload','next','stop'])$(id).disabled=!running;
  tickClock();
  const sig=JSON.stringify([v.index,v.finished,v.problem?.status,v.comms,v.branches,v.manual,v.result,[...opened]]);if(sig===signature)return;signature=sig;
- if(!v.problem){$('lists').innerHTML='<p class="empty">교수 PC의 FTS에서 교육을 시작하면<br>통보 확인 버튼이 여기에 나타납니다.</p>';return;}
+ if(!v.problem){$('lists').innerHTML=startForm(v.setup);return;}
  const next=(v.comms||[]).find(c=>c.at==null&&!c.optional)||(v.comms||[]).find(c=>c.at==null);
  let html='';
  if(v.result)html+=`<div class="result">결과 ${v.result.got}/${v.result.full}점 (${v.result.percent}%)</div>`;
  if(v.comms?.length){const left=v.comms.filter(c=>c.at==null&&!c.optional).length;html+=`<h2>통보 확인 · 남은 ${left}개</h2><ul class="list">`+v.comms.map(c=>`<li class="item ${c.at!=null?'done':''} ${c===next&&running?'next':''}"><button type="button" class="tap" data-key="${esc(c.key)}" ${c.at!=null||!running?'disabled':''}><b>${esc(c.label)}</b><small>${c.at!=null?'확인 '+clock(c.at):c===next?'다음 통보 · 교육생이 말하면 누르세요':'확인 대기'}</small></button>${c.text?`<button type="button" class="more" data-open="${esc(c.key)}" aria-expanded="${opened.has(c.key)}">${opened.has(c.key)?'접기':'대본'}</button>`:''}</li>${opened.has(c.key)?`<li class="text">${esc(c.text)}</li>`:''}`).join('')+'</ul>';}
  if(v.manual?.length)html+=`<h2>구술 확인</h2><div class="chips">`+v.manual.map(m=>`<button type="button" class="chip ${m.on?'on':''}" data-key="${esc(m.key)}" ${!running?'disabled':''}>${m.on?'✔ ':''}${esc(m.label)}</button>`).join('')+'</div>';
  if(v.branches?.length)html+=`<h2>상황 변경 (감독관 주입)</h2><ul class="list">`+v.branches.map(b=>`<li class="item branch ${b.at!=null?'done':''}"><button type="button" class="tap" data-branch="${esc(b.key)}" data-label="${esc(b.label)}" ${b.at!=null||!running||v.problem.status!=='진행'?'disabled':''}><b>${esc(b.label)}</b><small>${b.at!=null?'주입 '+clock(b.at):'누르면 상황을 바꿉니다'}</small></button></li>`).join('')+'</ul>';
+ if(v.finished&&v.setup)html+=startForm(v.setup,'새 교육 시작');
  $('lists').innerHTML=html||'<p class="empty">이 문제에는 교수가 누를 항목이 없습니다.</p>';
 }
+// 교육 시작: 시나리오 · 교수 · 교육생을 골라 리모컨에서 바로 시작 (교수 PC의 FTS 교육설정과 같은 명령)
+let pick={scenario:'',filter:''};
+function startForm(setup,title='교육 시작'){
+ if(!setup)return '<p class="empty">교수 PC에 연결 중입니다…</p>';
+ const sel=(id,list,label)=>`<label class="field"><span>${label}</span><select id="${id}">${list.map(u=>`<option value="${esc(u.id)}">${esc(u.name||u.id)}${u.name&&u.name!==u.id?' ('+esc(u.id)+')':''}</option>`).join('')}</select></label>`;
+ const shown=setup.scenarios.filter(s=>!pick.filter||s.name.includes(pick.filter));
+ return `<h2>${title}</h2><div class="start">${sel('rcProf',setup.professors,'교수')}${sel('rcStud',setup.students,'교육생')}
+<label class="field"><span>시나리오 찾기</span><input id="rcFilter" type="search" placeholder="예: 비상시조치, 구술" value="${esc(pick.filter)}"></label></div>
+<ul class="list">${shown.map(s=>`<li class="item ${pick.scenario===s.id?'next':''}"><button type="button" class="tap" data-scenario="${esc(s.id)}"><b>${esc(s.name)}</b><small>문제 ${s.count}개</small></button></li>`).join('')||'<li class="empty">맞는 시나리오가 없습니다.</li>'}</ul>
+<div class="start"><button type="button" id="rcStart" class="go" ${pick.scenario?'':'disabled'}>${pick.scenario?'선택한 시나리오로 교육 시작':'시나리오를 고르세요'}</button></div>`;
+}
 function tickClock(){const v=view;if(!v?.problem){$('remaining').textContent='--:--';return;}const live=v.active&&!v.finished&&v.problem.status==='진행',r=Math.max(0,v.remaining-(live?(Date.now()-lastAt)/1000:0));$('remaining').textContent=clock(r);document.querySelector('.clock').classList.toggle('low',live&&r<=60);}
+$('lists').addEventListener('input',e=>{if(e.target.id==='rcFilter'){pick.filter=e.target.value.trim();const keep=[$('rcProf')?.value,$('rcStud')?.value];signature='';render();const f=$('rcFilter');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);}if(keep[0]&&$('rcProf'))$('rcProf').value=keep[0];if(keep[1]&&$('rcStud'))$('rcStud').value=keep[1];}});
 $('lists').addEventListener('click',async e=>{
+ const sc=e.target.closest('[data-scenario]');if(sc){const keep=[$('rcProf')?.value,$('rcStud')?.value];pick.scenario=sc.dataset.scenario;signature='';render();if(keep[0]&&$('rcProf'))$('rcProf').value=keep[0];if(keep[1]&&$('rcStud'))$('rcStud').value=keep[1];return;}
+ if(e.target.id==='rcStart'&&pick.scenario){const name=view?.setup?.scenarios.find(s=>s.id===pick.scenario)?.name||'';if(await ask(`「${name}」 교육을 시작할까요?`)){const professor=$('rcProf').value,student=$('rcStud').value;await act({type:'fts',op:'start',scenario:pick.scenario,professor,student},'교육 시작');pick.scenario='';}return;}
  const open=e.target.closest('[data-open]');if(open){const k=open.dataset.open;opened.has(k)?opened.delete(k):opened.add(k);render();return;}
  const b=e.target.closest('[data-branch]');if(b&&!b.disabled){if(await ask(`상황 변경 「${b.dataset.label}」을(를) 주입할까요? 되돌릴 수 없습니다.`))act({type:'fts',op:'manual',key:b.dataset.branch},'상황 변경 주입');return;}
  const t=e.target.closest('[data-key]');if(t&&!t.disabled){navigator.vibrate?.(20);act({type:'fts',op:'manual',key:t.dataset.key});}

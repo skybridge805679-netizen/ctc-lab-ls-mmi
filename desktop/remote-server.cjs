@@ -6,9 +6,12 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.cjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const MOBILE=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i;
-const REMOTE_OPS=new Set(['manual','next','reload','stop']);
-// 모바일 리모컨이 보낼 수 있는 명령: 리모컨 요약 조회와 FTS 진행 명령뿐 (진로·신호·열번·시간표 등은 받지 않는다)
-function remoteAllowed(action){return action?.type==='remote:view'||(action?.type==='fts'&&REMOTE_OPS.has(action.op)&&(action.op!=='manual'||typeof action.key==='string'));}
+const REMOTE_OPS=new Set(['start','manual','next','reload','stop']);
+// 모바일 리모컨이 보낼 수 있는 명령: 리모컨 요약 조회와 FTS 진행 명령(교육 시작 포함)뿐 (진로·신호·열번·시간표·문제 편집 등은 받지 않는다)
+function remoteAllowed(action){if(action?.type==='remote:view')return true;if(action?.type!=='fts'||!REMOTE_OPS.has(action.op))return false;
+ if(action.op==='manual')return typeof action.key==='string';if(action.op==='start')return ['scenario','professor','student'].every(k=>typeof action[k]==='string');return true;}
+// 리모컨 명령은 허용한 필드만 엔진에 넘긴다 (교육 시작에 문제 라이브러리 등을 끼워 보내지 못하게)
+function remoteAction(a){if(a.type==='remote:view')return {type:'remote:view'};if(a.op==='manual')return {type:'fts',op:'manual',key:a.key};if(a.op==='start')return {type:'fts',op:'start',scenario:a.scenario,professor:a.professor,student:a.student};return {type:'fts',op:a.op};}
 // PC 브라우저: 앱 화면과 같지만 세션 파일·프로그램 초기화는 이 PC 앱에서만
 function pcAllowed(action){return typeof action?.type==='string'&&!action.type.startsWith('session:');}
 function addresses(){return Object.values(os.networkInterfaces()).flat().filter(a=>a&&a.family==='IPv4'&&!a.internal).map(a=>a.address);}
@@ -49,7 +52,7 @@ function create({root,request,onChange=()=>{}}){
    const action=body.action;
    if(c.role==='remote'){
     if(!remoteAllowed(action))return json(res,403,{error:'리모컨에서는 할 수 없는 조작입니다.'});
-    const r=await engine(action,0,-1);if(r.error)return json(res,200,{error:r.error});
+    const r=await engine(remoteAction(action),0,-1);if(r.error)return json(res,200,{error:r.error});
     const view=action.type==='remote:view'?r:await engine({type:'remote:view'},0,-1);
     return json(res,200,{result:r.result,view:view.result});
    }
@@ -80,4 +83,4 @@ function create({root,request,onChange=()=>{}}){
  function kick(id){for(const [t,c]of clients)if(c.id===id)clients.delete(t);changed();}
  return {start,stop,info,kick};
 }
-module.exports={create,remoteAllowed,pcAllowed,MOBILE};
+module.exports={create,remoteAllowed,remoteAction,pcAllowed,MOBILE};

@@ -26,3 +26,6 @@ h2{font-size:13px;color:var(--muted);margin:18px 16px 8px;font-weight:600}
 dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);width:min(92vw,380px);padding:20px}dialog::backdrop{background:#0008}
 dialog p{margin:0 0 16px;line-height:1.6}.row{display:flex;gap:8px}.row button{flex:1;min-height:48px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}.row .primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 #toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--head);color:var(--head-ink);padding:10px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}#toast.show{opacity:1}
+.start{display:grid;gap:10px;padding:0 12px 10px}.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.field select,.field input{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:48px;width:100%}
+.go{margin-top:6px;min-height:54px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px}.go:disabled{opacity:.45}

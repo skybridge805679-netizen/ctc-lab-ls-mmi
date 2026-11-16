@@ -96,9 +96,12 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
  // 원격 리모컨(모바일)용 요약: 엔진 전체 스냅숏 대신 지금 문제·시간·교수가 누를 항목만 내려 준다
  function remoteView(){
-  if(!session)return {active:false};
+  // 교육 전(또는 끝난 뒤): 리모컨에서 시나리오를 골라 교육을 시작할 수 있게 목록을 같이 준다
+  const setup={scenarios:library.scenarios.map(s=>({id:s.id,name:s.name,count:library.situations.filter(x=>s.situations.includes(x.id)).reduce((n,x)=>n+x.problems.length,0)})),
+   professors:users.filter(u=>u.role==='교수').map(u=>({id:u.id,name:u.name})),students:users.filter(u=>u.role==='교육생').map(u=>({id:u.id,name:u.name||u.id}))};
+  if(!session)return {active:false,setup};
   const it=session.items[Math.min(session.current,session.items.length-1)],p=it&&problem(it),idx=session.items.indexOf(it);
-  if(!it||!p)return {active:false};
+  if(!it||!p)return {active:false,setup};
   const v=F.view(p,it),elapsed=it.startedAt!=null?(it.endedAt??now())-it.startedAt:0,manual=[],seen=new Set();
   const visit=c=>{if(c?.type==='manual'){const key=c.key||c.label;if(!seen.has(key)){seen.add(key);manual.push({key,label:c.label,on:!!session.manual[idx]?.[key]});}}(c?.conditions||[]).forEach(visit);if(c?.condition)visit(c.condition);};
   [...(p.checks||[]),...(p.deductions||[])].forEach(k=>visit(k.condition));
@@ -106,7 +109,7 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
    problem:{name:p.name,subject:p.subject,limit:p.limit||0,status:it.status,error:it.error||null},elapsed,remaining:Math.max(0,(p.limit||0)-elapsed),
    comms:(v?.communications||[]).map(c=>({key:'comm:'+c.id,label:c.label,text:c.text||'',at:it.comm?.[c.id]??null,optional:!!c.optional})),
    branches:(p.branches||[]).map(b=>({key:'branch:'+b.id,label:b.label,at:it.branch?.[b.id]??null})),manual,
-   result:session.finished?F.summary(runLibrary,session):null};
+   result:session.finished?F.summary(runLibrary,session):null,...(session.finished?{setup}:{})};
  }
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
  function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}

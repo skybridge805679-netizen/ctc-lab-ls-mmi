@@ -21,9 +21,12 @@ test('PIN 로그인과 기기별 권한: 모바일은 리모컨만, PC는 앱 �
   assert.match(await (await fetch(base+'/',{headers:{'User-Agent':MOBILE,Cookie:m.cookie}})).text(),/ORPHEIA 리모컨/,'모바일은 리모컨 화면');
   assert.equal((await fetch(base+'/ui/fts.js',{headers:{'User-Agent':MOBILE,Cookie:m.cookie}})).status,403,'모바일은 앱 화면 파일을 열 수 없다');
   assert.equal((await api(base,m.cookie,MOBILE,{type:'control',station:'jonggak',action:{type:'mode',value:'CCM',source:'LS'}})).status,403,'모바일은 LS/MMI 조작 금지');
-  assert.equal((await api(base,m.cookie,MOBILE,{type:'fts',op:'start',scenario:'SC-G',professor:'001',student:'tester'})).status,403,'모바일은 교육 시작·설정 금지');
+  assert.equal((await api(base,m.cookie,MOBILE,{type:'fts',op:'library',library:{}})).status,403,'모바일은 문제·시나리오 편집 금지');
   let v=(await (await api(base,m.cookie,MOBILE,{type:'remote:view'})).json()).view;assert.equal(v.active,false);
-  r.command({type:'fts',op:'start',scenario:'SC-G',professor:'001',student:'tester',autoRun:false});r.command({type:'tick',seconds:2});
+  assert.ok(v.setup.scenarios.some(s=>s.id==='SC-G'&&s.count===1),'교육 전에는 시나리오 목록');assert.ok(v.setup.professors.length&&v.setup.students.some(s=>s.id==='tester'));
+  // 리모컨에서 교육 시작: 허용한 필드만 엔진에 간다 (끼워 보낸 library는 버린다)
+  const started=await (await api(base,m.cookie,MOBILE,{type:'fts',op:'start',scenario:'SC-G',professor:v.setup.professors[0].id,student:'tester',library:{problems:[]}})).json();
+  assert.equal(started.result.ok,true,JSON.stringify(started));assert.ok(r.snapshot().ftsLibrary.problems.length>10,'라이브러리는 그대로');r.command({type:'tick',seconds:2});
   v=(await (await api(base,m.cookie,MOBILE,{type:'remote:view'})).json()).view;assert.equal(v.active,true);assert.equal(v.scenario,'원격 시험');assert.ok(v.comms.length>5);
   const j=await (await api(base,m.cookie,MOBILE,{type:'fts',op:'manual',key:v.comms[0].key})).json();assert.notEqual(j.result?.ok,false,JSON.stringify(j));assert.notEqual(j.view.comms[0].at,null,'통보 확인이 엔진에 반영되고 요약이 함께 온다');
   assert.ok(srv.info().clients.some(c=>c.role==='remote'));
@@ -49,6 +52,7 @@ test('PIN을 5번 틀리면 1분 잠금, 끊기(kick) 하면 그 기기는 다�
 });
 test('리모컨 명령 허용 목록',()=>{
  assert.ok(S.remoteAllowed({type:'remote:view'}));assert.ok(S.remoteAllowed({type:'fts',op:'manual',key:'comm:n1'}));assert.ok(S.remoteAllowed({type:'fts',op:'next'}));
+ assert.ok(S.remoteAllowed({type:'fts',op:'start',scenario:'a',professor:'b',student:'c'}));assert.deepEqual(S.remoteAction({type:'fts',op:'start',scenario:'a',professor:'b',student:'c',library:{},autoRun:false}),{type:'fts',op:'start',scenario:'a',professor:'b',student:'c'});
  for(const a of [{type:'poll'},{type:'fts',op:'start'},{type:'fts',op:'library'},{type:'numbers'},{type:'control'},{type:'fts',op:'manual'}])assert.equal(S.remoteAllowed(a),false,JSON.stringify(a));
  assert.equal(S.pcAllowed({type:'session:open'}),false);assert.ok(S.pcAllowed({type:'control'}));
 });

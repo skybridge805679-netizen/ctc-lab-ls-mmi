@@ -56,7 +56,7 @@ function boardMenu(id){const station=ctx().station,b=model.stations[station].boa
 function deleteBoard(id){confirm('표지판 삭제','표지판을 삭제하시겠습니까?',{op:'boardDelete',station:ctx().station,id});}
 function scan(scope){cancelPending();closeMenu();host.openAction('베이스스캔',`<p>설정과 열차번호를 유지하고 상태를 재수신합니다.</p><select id="lsScope"><option value="current">현재역 베이스스캔</option><option value="all">전체역 베이스스캔</option></select>`,()=>({type:'scan',scope:$('lsScope').value,source:'LS'}));$('lsScope').value=scope;}
 function refreshOverview(){
- const occupied=Object.fromEntries(overviewIds.map(id=>[id,new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[id],t.uid))).map(([slot])=>slot))]));
+ const occupied=Object.fromEntries(overviewIds.map(id=>[id,new Set(Object.entries(model.stations[id].windows).filter(([,rows])=>rows.some(t=>!root.SimScenarioMotion?.inTransit(ctx().stationStates[id],t.uid))).map(([slot])=>root.SimLine?.circuitOf?.(id,slot)||slot))]));
  const focused=document.activeElement?.closest('[data-overview-station]')?.dataset.overviewStation;
  const canvas=dialog.querySelector('.ls-overview-canvas'),view=root.SimLSOverview.build(overviewIds,ctx().stationStates,occupied,{aspect:canvas.clientWidth/canvas.clientHeight});canvas.innerHTML=view.svg;overviewView(view);dialog.querySelector('h2').textContent='L/S Overview · '+(root.SimLSOverview.REGIONS.find(r=>r.id===view.region)?.name||'전체 관제구간');
  for(const svg of dialog.querySelectorAll('[data-overview-detail]'))decorate(svg,svg.dataset.overviewDetail,true);

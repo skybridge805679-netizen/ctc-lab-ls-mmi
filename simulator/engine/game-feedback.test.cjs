@@ -92,6 +92,12 @@ test('A7: 문제가 시간초과로 끝나도 추가정차 열차는 계속 간�
 test('A8: 진입 열번창이 다른 줄에 그려진 역(노량진 상2선 B931T)에서도 장내 진로를 찾는다',()=>{
  const M=require('./scenario-motion.js');assert.deepEqual(M.candidates('noryangjin','B931T','2T','up'),['2B-2T']);
 });
+test('석수역 상2선 열번창(B967T)의 열차는 석수 정지위치 B969T를 밟는다: 금천구청 2A 진로를 취소해도 접근쇄정이 걸리지 않는다 (비상시조치 03)',()=>{
+ const r=start('P-em-03');const g=()=>r.snapshot().states.geumcheon;
+ assert.deepEqual(Object.keys(g().circuitOccupied||{}),['B969T'],'K0450·K0452는 B969T 점유');assert.ok(g().routes['2A-5T']);
+ assert.ok(ctl(r,'geumcheon',{type:'mode',value:'CCM'}).ok);const o=ctl(r,'geumcheon',{type:'stop',id:'2A'});assert.ok(o.ok,o.message);
+ assert.equal(g().routes['2A-5T'],undefined,'접근쇄정 없이 바로 해정');assert.doesNotMatch(o.message,/접근쇄정/);
+});
 test('LS + 여러 창: 열번 이동 선택 상태를 엔진이 들고 있어 다른 LS 창에서 목표 칸을 고를 수 있다',()=>{
  const r=R.create();assert.equal(r.snapshot().lsPending,null);
  const p={op:'move',station:'jonggak',slot:'1T',uid:'T1'};assert.ok(r.command({type:'lsPending',pending:p}).ok);
