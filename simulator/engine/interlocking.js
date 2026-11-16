@@ -75,8 +75,11 @@ function approachSection(station,signal){
 }
 // LS 열번창 in rear of the signal on its own line, nearest first (the platform track itself for a departure signal):
 // a train shown there is approaching even when its circuit is outside the interlocked edges (폐색 구간 · 승강장 선로)
+// 대본 원문이 접근 구간을 밝힌 신호기: 구로 2A = 가산디지털 상선 승강장만 (비상05 「가산디지털역 상선 승강장에 열차 정차해 있으면 구로역 장내신호기 접근쇄정」,
+//  비상05-1 「K1208열차 [독산~가산디지털]역 운행(정차) 중에는 접근쇄정 안 걸림」)
+const WINDOW_OVERRIDE={'guro|2A':['B953T']};
 function approachWindows(station,signal){
- const key=station+'|'+signal;if(cache.windows.has(key))return cache.windows.get(key);let out=[];
+ const key=station+'|'+signal;if(cache.windows.has(key))return cache.windows.get(key);if(WINDOW_OVERRIDE[key])return WINDOW_OVERRIDE[key];let out=[];
  try{const N=lib('network'),meta=N.catalog[station]?.signals[signal],row=signalRow(station,signal),def=lib('wiring').data[station],M=lib('scenario-motion'),G=lib('track-geometry');
   if(meta&&row&&approach.seconds[meta.kind]&&M&&G){const y=G.railY(def,row[1],row[2]),dir=meta.dir;
    out=(lib('train-windows').data[station]||[]).map(w=>({slot:w.slot,p:M.point(station,w.slot)})).filter(o=>o.p&&Math.abs(o.p[1]-y)<10&&(o.p[0]-row[2])*dir<0&&Math.abs(o.p[0]-row[2])<700)

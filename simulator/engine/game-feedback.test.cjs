@@ -37,7 +37,7 @@ test('A4: 「각 역 n분 추가정차」 통보 뒤 선행열차는 역마다 n
 test('B1: 자동진로는 스케줄 있는 열차에 스케줄 진로만 낸다 · 번호를 바꾼 열차는 원래 스케줄을 쓴다 · 스케줄 없는 열차는 기다린다',()=>{
  const r=start('P-em-02'),ins=r.command({type:'numbers',action:{op:'insert',station:'dongmyo',slot:'B021T',number:'Z9999',direction:'up'}});assert.ok(ins.ok);
  const z=row(r,'Z9999');r.command({type:'scenario:move',auto:true,action:{op:'delete',...z}});tick(r,60);
- assert.equal(at(r,'Z9999'),'dongmyo:B021T','스케줄 없는 열차는 AUTO 역에서 진로를 받지 못한다');
+ assert.equal(at(r,'Z9999'),'dongmyo:B017T','스케줄 없는 열차는 장내 앞 열번창까지 폐색을 따라온 뒤 AUTO 역에서 진로를 받지 못한다');
  assert.ok((r.snapshot().scenario.jobs||[]).some(j=>j.number==='Z9999'&&/스케줄/.test(j.reason)));
  const g=row(r,'K0606');assert.ok(r.command({type:'numbers',action:{op:'rename',...g,number:'G0606'}}).ok);
  assert.deepEqual(r.snapshot().ls.stations[g.station].windows[g.slot].find(t=>t.uid===g.uid).was,['K0606'],'이전 번호가 남는다');

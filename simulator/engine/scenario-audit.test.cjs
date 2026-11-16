@@ -40,10 +40,12 @@ test('a train told to leave runs on along its main line to the next stations ins
  const M=require('./scenario-motion.js'),path=(a,b,c)=>M.onward(a,b,c).map(l=>l.station+':'+l.slot);
  assert.deepEqual(path('anyang','3T','down').slice(0,4),['anyang:B660T','anyang:B666T','gunpo:B678T','gunpo:2T']);       // 하1선: 안양 → 명학 → 군포
  assert.equal(path('anyang','3T','down').at(-1),'suwon:4T');
- assert.deepEqual(path('gunpo','B1005T','up').slice(0,3),['gunpo:4T','gunpo:B999T','geumjeong:B997T']);                    // 당정(상2선) → 군포 → 금정
- assert.equal(path('jonggak','B060T','down')[1],'underground-seoul:1T');                                                    // 시청 하선 → 지하서울, 서울에서 전동차선으로 직결
+ assert.deepEqual(path('gunpo','B1005T','up').slice(0,4),['gunpo:B1001T','gunpo:4T','gunpo:B999T','geumjeong:B997T']);                    // 당정(상2선) → 군포 → 금정
+ assert.equal(path('jonggak','B060T','down')[1],'underground-seoul:1T');
+ assert.deepEqual(path('seoul','B909T','up').slice(0,2),['seoul:B903T','seoul:2T']);   // 몇 칸 밖 폐색 열번창: 장내 앞 칸까지 따라온 뒤 진로로 (서울 상선 · 비상01 K1010)
+ assert.equal(path('seoul','B069T','up')[0],'underground-seoul:B067T');                    // 서울 지하 본선 쪽 칸은 이 역에서 나가는 쪽                                                    // 시청 하선 → 지하서울, 서울에서 전동차선으로 직결
  assert.ok(path('jonggak','B060T','down').includes('yongsan:1T'));
- assert.deepEqual(path('geumcheon','B967T','up'),['geumcheon:5T','geumcheon:B963T','guro:B959T','guro:B953T','guro:B953T']);     // 본선이 갈리는 구로는 장내 앞 열번창까지 가서 진로를 기다린다
+ assert.deepEqual(path('geumcheon','B967T','up'),['geumcheon:B965T','geumcheon:5T','geumcheon:B963T','guro:B959T','guro:B953T','guro:B953T']);     // 본선이 갈리는 구로는 장내 앞 열번창까지 가서 진로를 기다린다
  assert.deepEqual(M.onward('geumcheon','B967T','up').at(-1).follow,['4T','5T']);
  // 출발 폐색 열번창이 없는 역은 출발 진로를 지난 뒤에 넘어간다
  assert.equal(M.onward('geumcheon','3T','down')[0].exitCode,'B644T');

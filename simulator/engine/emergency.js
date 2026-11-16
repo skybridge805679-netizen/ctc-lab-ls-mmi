@@ -90,7 +90,8 @@ const OVERLAY={
    16:[rename('K1210','G1210','guro')],
    17:[move('G1210','guro',GASAN_UP2,'G1210 열차번호를 K1208이 있는 가산디지털역 열번창으로 이동 (구원연결 → 열차번호 중복 알람 확인)'),del('G1210','guro'),rename('K1208','G1208','guro')]}},
  '05-1':{station:'geumcheon',stations:['geumcheon','guro'],
-  cast:[['K1208','guro',GASAN_UP2],['K1210','geumcheon'],['K1212','geumcheon',SEOKSU_UP2],['K1214','anyang',GWANAK_UP2],['A0168','geumcheon','4T'],['K1204','yeongdeungpo','B943T'],['K1206','yeongdeungpo','B945T']],   // 원문: A0168 금천구청~독산 상1선 운행 중 (주의운전 지시)
+  cast:[['K1208','guro','B957T'],['K1210','geumcheon'],['K1212','geumcheon',SEOKSU_UP2],   // 원문 「K1208열차 : 가산디지털역 (진입 중)」 · 「[독산~가산디지털] 운행(정차) 중에는 접근쇄정 안 걸림」
+  ['K1214','anyang',GWANAK_UP2],['A0168','geumcheon','4T'],['K1204','yeongdeungpo','B943T'],['K1206','yeongdeungpo','B945T']],   // 원문: A0168 금천구청~독산 상1선 운행 중 (주의운전 지시)
   seeds:{geumcheon:['3B'],guro:['2A','3A']},
   before:{
    11:[mode('geumcheon','CCM'),stop('geumcheon',['3B']),mode('geumcheon','AUTO'),mode('guro','CCM'),stop('guro',['2A','3A']),mode('guro','AUTO')]}},
@@ -121,16 +122,20 @@ const OVERLAY={
 // Only named departure/resumption instructions create motion; broadcasts and stop instructions do not.
 const exit=(...numbers)=>numbers.map(number=>({op:'delete',number}));
 const trip=(number,legs)=>legs.map(([station,slot,handover=false])=>({op:'move',number,station,slot,handover}));
-const north=number=>trip(number,[['anyang','B655T'],['geumcheon','B641T',true],['geumcheon','5T'],['geumcheon','B963T']]);
-const guroTrip=number=>trip(number,[['geumcheon','B639T'],['guro','B631T',true],['guro','5T']]);
+// 운행선 변경은 그 구간만 다른 선로로 달리는 것이다: 변경 구간을 지나면 그 자리에서 본선을 따라 계속 운행한다
+// (전에는 마지막 칸에서 멈춰 서서 뒤따르는 회송·구원 열차의 도착 선로를 막았다 — 비상04 K0811 군포 1T, 비상05 K1212 구로 5T)
+const lineChange=(number,legs)=>[...trip(number,legs),{op:'delete',number}];
+const north=number=>lineChange(number,[['anyang','B655T'],['geumcheon','B641T',true],['geumcheon','5T'],['geumcheon','B963T']]);
+const guroTrip=number=>lineChange(number,[['geumcheon','B639T'],['guro','B631T',true],['guro','5T']]);
+// 복구완료(마지막) 통보: 사고 때 「정차」시켜 둔 열차도 모두 정상 운행으로 돌려보낸다 (전에는 그 자리에 계속 서 있었다)
 const MOTION={
- '01':{n11:exit('K1006'),n21:exit('K1131','K1133','K1137','K1135','K1002','K1004')},
- '02':{n12:exit('K0605'),n25:exit('K0608')},      // n12 「K0605열차 정상운행」
+ '01':{n11:exit('K1006'),n21:exit('K1131','K1133','K1137','K1135','K1002','K1004'),n22:exit('K1139','K1008','K1010')},
+ '02':{n12:exit('K0605'),n25:exit('K0608'),n27:exit('K0610')},      // n12 「K0605열차 정상운행」
  '03':{n14:exit('A1001','K0401','A1002'),n15:exit('K0399'),n23:north('K0456'),n27:exit('G0452'),n28:exit('K0446','K0448')},
- '04':{n12:exit('K1110','K1112','A1003','A0346','K1114','K1116','K1118'),n19:trip('K0813',[['anyang','2T']]),n21:exit('K0805','K0807'),   // n12 「각 열차 신호 확인 출발」(K1116·K1118 포함), n19 「K0813 안양역까지 운행」
-       n17:trip('K0811',[['anyang','B660T'],['gunpo','B678T',true],['gunpo','1T']]),n20:exit('G0809')},
- '05':{n1:exit('A0168'),n15:guroTrip('K1212'),n18:exit('G1208'),n19:exit('K1204','K1206')},       // 원문 "A0168열차 : 구로역 발차" — 사고 때 이미 출발한다
- '05-1':{n3:exit('A0168'),n12:guroTrip('K1210'),n16:exit('K1204','K1206')},
+ '04':{n12:exit('K1110','K1112','A1003','A0346','K1114','K1116','K1118'),n19:trip('K0813',[['anyang','2T']]),n21:exit('K0805','K0807','K0813'),   // n12 「각 열차 신호 확인 출발」(K1116·K1118 포함), n19 「K0813 안양역까지 운행」
+       n17:lineChange('K0811',[['anyang','B660T'],['gunpo','B678T',true],['gunpo','1T']]),n20:exit('G0809')},
+ '05':{n1:exit('A0168'),n15:guroTrip('K1212'),n18:exit('G1208'),n19:exit('K1204','K1206','K1214')},       // 원문 "A0168열차 : 구로역 발차" — 사고 때 이미 출발한다
+ '05-1':{n3:exit('A0168'),n12:[...guroTrip('K1210'),...trip('K1212',[['geumcheon','5T']])],n15:exit('K1208'),n16:exit('K1204','K1206','K1212','K1214')},
  '06':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n14:exit('K0399'),   // n2 「A1002열차 석수역 속히 통과」
       n21:north('K0456'),n25:exit('G0452'),n26:exit('K0450')},
  '06-1':{n2:exit('A1002'),n13:exit('A1001','K0401','A1004'),n14:exit('K0399'),n21:north('K0456'),n25:exit('G0452'),n26:exit('K0450')},

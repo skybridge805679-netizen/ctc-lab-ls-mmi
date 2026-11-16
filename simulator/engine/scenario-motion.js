@@ -18,7 +18,9 @@ function candidates(station,from,to,direction){
   if(!platform&&def.signals.some(other=>other[0]!==sig[0]&&/^\d+[AB]$/.test(other[0])&&other[4]===dir&&Math.abs(LS.railY(def,other[1],other[2])-a[1])<8&&(other[2]-a[0])*dir>=0&&(other[2]-sig[2])*dir<-.1))return [];
   const end=point(station,r.destination);if(!end)return [];
   if(targetPlatform?r.destination!==to:!/^B/.test(r.destination)||Math.abs(end[1]-b[1])>8)return [];
-  return [{id,score:(r.destination===to?0:100000)+Math.abs(sig[2]-a[0])+Math.abs(end[0]-b[0])}];
+  // 입환진로는 열차 운행의 기본 진로가 아니다: 같은 칸으로 가는 장내·출발 진로가 있으면 그쪽을 먼저 고른다
+  // (관제사가 직접 세운 입환진로는 begin()에서 「서 있는 진로」로 먼저 잡힌다 — 종각 51-2T / 2A-2T, 영등포 22-6T / 1B-6T)
+  return [{id,score:(r.destination===to?0:100000)+(C.signals[r.signal]?.kind==='입환'?1000000:0)+Math.abs(sig[2]-a[0])+Math.abs(end[0]-b[0])}];
  }).sort((a,b)=>a.score-b.score).map(x=>x.id);
  if(found.length||platform||!targetPlatform)return found;
  // 진입 열번창이 화면상 다른 줄에 그려진 역(노량진 상2선 B931T — 대방 쪽): 그 칸이 이 역의 진입 칸이면 그 본선 장내신호기의 진로로 찾는다
@@ -42,12 +44,14 @@ function onward(station,slot,direction){
  if(!trunk||trunk.endsWith('D')!==down)return legs;
  let T=S?.trunks[trunk],rail=T?.rails.includes(slot)?slot:null;
  if(!rail){               // 폐색 열번창: 이 역으로 들어오는 쪽이면 승강장으로, 나가는 쪽이면 다음 역으로
-  if(!T)return legs;const n=L.numberOf(slot),approach=down?n<=L.numberOf(T.left):n>=L.numberOf(T.right);
+  if(!T)return legs;const n=L.numberOf(slot),approach=down?T.left!=null&&n<=L.numberOf(T.left):T.right!=null&&n>=L.numberOf(T.right);   // 그 쪽 끝이 없는 본선(서울 지하 MU 등)은 이 역에서 나가는 쪽
   if(approach){if(T.rails.length!==1){
     // 갈림 역: 장내 바로 앞 열번창까지는 폐색을 따라가고(앞 칸의 선행열차를 건너뛰지 않는다) 거기서 진로를 기다린다
     const entry=L.entrySlot(cur,trunk,direction,(TW.data[cur]||[]).map(w=>w.slot))||slot;
     if(entry!==slot)push({station:cur,slot:entry,stop:true});
     legs.push({station:cur,slot:entry,follow:[...T.rails]});return legs;}
+   // 한 선로 역도 장내 바로 앞 열번창이 아니면(서울 상선 B909T 등 몇 칸 밖) 먼저 그 칸까지 폐색을 따라온다 — 전에는 곧장 승강장으로 가려다 「일치하는 진로 없음」으로 멈췄다
+   const entry=L.entrySlot(cur,trunk,direction,(TW.data[cur]||[]).map(w=>w.slot));if(entry&&entry!==slot){const p0=point(cur,slot),p1=point(cur,entry),between=p0&&p1?(TW.data[cur]||[]).map(w=>({slot:w.slot,p:point(cur,w.slot)})).filter(o=>o.p&&o.slot!==slot&&Math.abs(o.p[1]-p0[1])<6&&(o.p[0]-p0[0])*(p1[0]-p0[0])>0&&Math.abs(o.p[0]-p0[0])<=Math.abs(p1[0]-p0[0])+1).map(o=>({station:cur,slot:o.slot})):[{station:cur,slot:entry}];push({station:cur,slot:entry,clear:between});}   // 사이 칸에 선행열차가 있으면 기다린다
    rail=T.rails[0];push({station:cur,slot:rail});}
  }
  let startN=!rail&&L.numberOf(slot)!==null?L.numberOf(slot):null;      // 폐색 열번창에서 출발: 그 칸의 번호
@@ -117,7 +121,10 @@ function create(host){
    const s=states()[f.station],C=cachedCore(f.station),rails=j.follow.rails;
    const all=rails.flatMap(r=>candidates(f.station,f.slot,r,f.train.direction).filter(id=>C.routes[id].destination===r));
    // AUTO 역은 그 열차의 스케줄에 정해진 도착진로만 내준다. 스케줄에 없는 열차(번호를 바꾼 회송·구원열차 등)는 관제사가 진로를 세울 때까지 기다린다.
-   const planned=s.mode==='AUTO'?host.scheduled?.(f.train.number,f.station,'arrival',f.train.was):null,auto=planned===undefined?all[0]:planned&&all.includes(planned)?planned:null;
+   const planned=s.mode==='AUTO'?host.scheduled?.(f.train.number,f.station,'arrival',f.train.was):null;
+   // 스케줄 도착진로가 갈림 선로 목록 밖의 선로로 가더라도(용산 일반선 상행 2A-7T 등), 이 칸에서 출발하는 장내 진로면 그 진로를 낸다
+   if(planned&&!all.includes(planned)&&C.routes[planned]&&candidates(f.station,f.slot,C.routes[planned].destination,f.train.direction).includes(planned))all.push(planned);
+   const auto=planned===undefined?all[0]:planned&&all.includes(planned)?planned:null;
    const set=all.find(id=>s.routes[id]&&!s.routes[id].occupied&&!s.routes[id].lock),pick=set||auto;
    if(!pick){j.action={op:'follow',uid:j.uid,rails,background:j.follow.background};j.reason=!all.length?'일치하는 장내 진로가 없습니다':s.mode==='AUTO'?'스케줄에 도착진로 없음 · 장내 진로 설정 대기':'장내 진로 설정 대기 · '+rails.join('/');return;}
    j.action={op:'move',uid:j.uid,targetStation:f.station,targetSlot:C.routes[pick].destination,runOn:true,background:j.follow.background,resume:true};j.to=j.action.targetSlot;
