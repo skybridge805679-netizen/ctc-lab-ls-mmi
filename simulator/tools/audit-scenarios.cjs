@@ -34,7 +34,7 @@ function audit(sc,{autoRun=false,problemId='P-'+sc.id}={}){
   // 대본의 「~열차 ○○ 통과 확인 후 진로 취급」: 진로를 세우기 전에 그 역을 지나가는 중인 열차가 지나갈 때까지 기다린다 (최대 3분)
   // 원문 그 단계에 「X열차 (역) 통과 확인 후」가 있으면, X가 그 역을 지나갈 때까지(또는 관제구간을 벗어날 때까지) 기다린다 (최대 5분)
   // 대본 조작은 「n번 통보 앞」에 놓인다(emergency.js before[n]): 앞뒤 통보 단계의 원문을 함께 본다
-  {const idx=sc.steps.indexOf(s),norm=t=>String(t||'').replace(/\s+/g,''),near=[lastSay,sc.steps.slice(idx).find(x=>x.kind==='say'&&x.no)].filter(Boolean).map(x=>norm(x.heading)),body=(D.scenarios[sc.key]?.steps||[]).filter(x=>near.includes(norm(x.title))).flatMap(x=>x.body),need=[...new Set(body.filter(l=>/통과 (확인|후)/.test(l)&&!/통과\s*(되기\s*)?전/.test(l)).flatMap(l=>l.match(/[KAG]\d{4}/g)||[]))];
+  {const idx=sc.steps.indexOf(s),norm=t=>String(t||'').replace(/\s+/g,''),near=[lastSay,sc.steps.slice(idx).find(x=>x.kind==='say'&&x.no)].filter(Boolean).map(x=>norm(x.heading)),body=[...(D.scenarios[sc.key]?.steps||[]).filter(x=>near.includes(norm(x.title))).flatMap(x=>x.body),s.text],need=[...new Set(body.filter(l=>/통과 (확인|후)/.test(l)&&!/통과\s*(되기\s*)?전/.test(l)).flatMap(l=>l.match(/[KAG]\d{4}/g)||[]))];
    for(const n of need)for(let w=0;w<300;w+=10){const p=rows()[n];if(!p)break;const dir=(snap().ls.stations[p.station].windows[p.slot].find(x=>x.number===n)?.direction==='down')?1:-1;if((N.catalog[p.station].order-N.catalog[a.station].order)*dir>0)break;tick(10);}
   }
   if(a.type==='route'){for(let w=0;w<180;w+=10){const busy=(snap().scenario?.jobs||[]).some(j=>!['done','cancelled'].includes(j.phase)&&j.phase!=='waiting'&&(j.station===a.station||j.action?.targetStation===a.station))||Object.values(snap().states[a.station].routes||{}).some(x=>x.status==='APPROACH_LOCK');if(!busy)break;tick(10);}}   // 접근쇄정이 풀릴 때까지도 기다린다 (교육생처럼 — 거부 3회 감점을 피함)

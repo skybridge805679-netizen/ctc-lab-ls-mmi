@@ -20,9 +20,11 @@ const deleted=n=>ctx=>!rowOf(ctx,n);
 const movedTo=(n,station,slot)=>ctx=>{const r=rowOf(ctx,n);return !!r&&r.station===station&&(!slot||r.slot===slot);};
 
 // ---- step builders
-const mode=(st,v)=>({act:{type:'mode',station:st,value:v},text:`${nm(st)}역 ${v} 전환`,check:modeAt(st,v),hint:v==='CCM'?'MMI 현장설비제어 → 역제어모드 설정, 또는 LS 상단 CCM':'역제어모드 AUTO (CCM에서만 전환 가능)'});
+const mode=(st,v,extra='')=>({act:{type:'mode',station:st,value:v},text:`${nm(st)}역 ${v} 전환${extra}`,check:modeAt(st,v),hint:v==='CCM'?'MMI 현장설비제어 → 역제어모드 설정, 또는 LS 상단 CCM':'역제어모드 AUTO (CCM에서만 전환 가능)'});
 const stop=(st,sigs,extra='')=>({act:{type:'stop',station:st,ids:sigs},text:`${nm(st)}역 ${sigs.join('·')} 정지${extra}`,check:stopAt(st,sigs),hint:'LS에서 신호기를 눌러 정지 확인창 [예] (접근 열차가 있으면 접근쇄정 후 해정)'});
 const route=(st,id,label='진행')=>({act:{type:'route',station:st,id},text:`${nm(st)}역 ${id} ${label}`,check:routeAt(st,id),hint:'CCM → 신호기 → 진로 선택'});
+// 원문 보충: 원문에 빠졌지만 같은 상황의 다른 원문(비상05 등)대로 취급해야 시나리오가 이어지는 조작. supplement에 근거를 적는다 (원문 대조 시험은 이 근거를 대신 확인)
+const added=(op,why)=>({...op,supplement:why});
 const rename=(from,to,st,tag)=>({tag,act:{type:'rename',station:st,from,to},text:`${nm(st)}역 열차번호 ${from} → ${to} 수정 (지적확인환호)`,check:renamed(from,to),hint:'LS 열번창 우클릭 → 열차번호 수정'});
 const move=(n,st,slot,label)=>({act:{type:'move',number:n,station:st,slot},text:label||`열차번호 ${n} → ${nm(st)}역${slot?' '+slot:''} 열번창으로 이동`,check:movedTo(n,st,slot),hint:'LS 열번창 우클릭 → 열차번호 이동 (반대선 운행은 자동 이동되지 않아 수동 이동)'});
 const del=(n,st)=>({act:{type:'delete',station:st,number:n},text:`${nm(st)}역 열차번호 ${n} 삭제 (지적확인환호)`,check:deleted(n),hint:'LS 열번창 우클릭 → 열차번호 삭제'});
@@ -94,7 +96,9 @@ const OVERLAY={
   ['K1214','anyang',GWANAK_UP2],['A0168','geumcheon','4T'],['K1204','yeongdeungpo','B943T'],['K1206','yeongdeungpo','B945T']],   // 원문: A0168 금천구청~독산 상1선 운행 중 (주의운전 지시)
   seeds:{geumcheon:['3B'],guro:['2A','3A']},
   before:{
-   11:[mode('geumcheon','CCM'),stop('geumcheon',['3B']),mode('geumcheon','AUTO'),mode('guro','CCM'),stop('guro',['2A','3A']),mode('guro','AUTO')]}},
+   // K1210 상1선 운행선 변경(원문 12번 「신호 확인 출발」)에는 비상05와 같은 진로가 있어야 한다 — 자동진로는 스케줄 진로만 내므로 없으면 K1210이 5T에서 못 떠난다
+   11:[mode('geumcheon','CCM'),stop('geumcheon',['3B']),added(route('geumcheon','3B-B639T','출발 진행 (K1210 상1선 운행선 변경)'),'비상05 「3B-B639T 출발 진행」'),mode('geumcheon','AUTO'),
+       mode('guro','CCM'),stop('guro',['2A','3A']),added(route('guro','2B-5T','장내 진행 (K1210 상1선 도착)'),'비상05 「2B-5T 장내 진행」'),mode('guro','AUTO')]}},
  '06':{station:'anyang',stations:['anyang','geumcheon'],
   cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],['K0450','guro','B959T'],['K0399','anyang','B978T']],
   seeds:{anyang:['3B','3C','2B'],geumcheon:['2A','2B']},
@@ -115,7 +119,7 @@ const OVERLAY={
   cast:[['K0452','geumcheon',SEOKSU_UP2],['K0454','anyang',GWANAK_UP2],['K0456','anyang'],['A1002','geumcheon',SEOKSU_UP1],['A1004','anyang','4T'],['K0401','geumcheon'],['A1001','geumcheon','3T'],['K0450','guro','B959T'],['K0399','anyang','B978T']],
   seeds:{anyang:['3B'],geumcheon:['2A']},
   before:{
-   19:[mode('anyang','CCM'),stop('anyang',['3B']),mode('geumcheon','CCM'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],
+   19:[mode('anyang','CCM'),stop('anyang',['3B']),mode('geumcheon','CCM',' (A1004 금천구청역 통과 확인 후 — CCM에서는 자동진로가 서지 않음)'),stop('geumcheon',['2A']),route('geumcheon','2B-5T','장내 진행 (A1004 금천구청역 통과 확인 후)'),mode('geumcheon','AUTO'),route('anyang','3B-B655T','출발 진행'),mode('anyang','AUTO')],   // 통과 확인 안내: 06·06-1 원문과 같음 (06-2 원문에는 빠짐)
    21:[rename('K0452','G0452','geumcheon')]}}
 };
 // Explicit movement cues reviewed against the numbered spoken instructions in emergency-data.js.

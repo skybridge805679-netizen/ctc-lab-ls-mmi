@@ -46,6 +46,7 @@ for(const sc of E.list){
  for(const [k,ops] of Object.entries(E.OVERLAY[sc.key].before)){
   const hay=(text(+k-1)+' '+text(+k)).replace(/\s+/g,' ');
   for(const op of ops){const a=op.act,need=[];
+   if(op.supplement){assert.ok(/^비상\d/.test(op.supplement),`${sc.id}: 원문 보충 "${op.text}"에 근거(다른 원문)가 없습니다`);continue;}   // 원문 보충: 근거로 적은 다른 원문을 대신 확인
    if(a.type==='rename'){need.push(a.from,a.to);}
    else if(a.type==='move'||a.type==='delete')need.push(a.number);
    else if(a.type==='mode'){need.push(a.value==='CCM'?/CCM/i:/AUTO|Auto/);}
