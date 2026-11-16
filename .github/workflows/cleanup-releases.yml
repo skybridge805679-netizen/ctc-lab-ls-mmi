@@ -1,5 +1,5 @@
 name: Clean up old releases
-# 수동 실행: 최신 릴리즈 N개만 남기고 나머지 릴리즈와 그 태그를 지운다 (남긴 릴리즈 밖의 v* 태그도 함께 정리)
+# 수동 실행: 최신 릴리즈 N개만 남기고 나머지 릴리즈와 그 태그를 지운다 (남긴 릴리즈 밖의 v* 태그도 함께 정리) · 지정한 브랜치 삭제
 on:
   workflow_dispatch:
     inputs:
@@ -7,6 +7,10 @@ on:
         description: '남길 최신 릴리즈 수'
         required: true
         default: '5'
+      branches:
+        description: '함께 지울 브랜치 (공백으로 구분, main 제외)'
+        required: false
+        default: ''
 permissions:
   contents: write
 jobs:
@@ -20,6 +24,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           KEEP: ${{ inputs.keep }}
+          BRANCHES: ${{ inputs.branches }}
         run: |
           set -euo pipefail
           case "$KEEP" in ''|*[!0-9]*) echo "keep must be a number"; exit 1;; esac
@@ -33,4 +38,7 @@ jobs:
           git fetch --tags --force -q
           git tag -l 'v*' | while read -r tag; do
             if ! grep -qx "$tag" keep.txt; then echo "태그 삭제: $tag"; git push -q origin ":refs/tags/$tag" || true; fi
+          done
+          for b in $BRANCHES; do
+            case "$b" in main|claude/*) echo "건너뜀: $b";; *) echo "브랜치 삭제: $b"; git push -q origin --delete "$b" || true;; esac
           done
