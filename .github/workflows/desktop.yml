@@ -6,6 +6,9 @@ on:
       - 'desktop/**'
       - 'simulator/**'
       - 'package*.json'
+      - 'tools/build-oral-line-doc.cjs'
+      - 'docs/운행선관리-구술.md'
+      - 'docs/운행선관리-교재구술.md'
       - '.github/workflows/desktop.yml'
   workflow_dispatch:
 permissions:

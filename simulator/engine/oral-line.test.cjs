@@ -33,9 +33,27 @@ test('모든 문항에 개조식 본답과 [참고]가 있고 FTS 모범답안�
  for(const i of [...O.items,...O.book]){assert.ok(Array.isArray(i.key)&&i.key.length>0,i.id);assert.ok(Array.isArray(i.ref),i.id);for(const x of i.key)assert.ok(x.length<=260,i.id+' 본답 줄이 너무 길다: '+x);}
  const p=L.problems.find(x=>x.id==='P-LORAL-COORD-TIME');assert.match(p.actions,/^1\) 차단장비 운행이 예정된 작업: 작업 착수 예정시각 3시간 전까지/);assert.match(p.actions,/\[참고\][\s\S]*\[교재 원문\]/);
 });
-test('공부용 문서(docs/운행선관리-구술.md)가 데이터와 같다',()=>{
- const file=path.join(__dirname,'..','..','docs','운행선관리-구술.md'),before=fs.readFileSync(file,'utf8');
- cp.execFileSync(process.execPath,[path.join(__dirname,'..','..','tools','build-oral-line-doc.cjs')]);
- assert.equal(fs.readFileSync(file,'utf8'),before,'tools/build-oral-line-doc.cjs를 다시 돌려 문서를 갱신하세요');
- const bookFile=path.join(__dirname,'..','..','docs','운행선관리-교재구술.md');assert.ok(fs.existsSync(bookFile));
+test('공부용 문서 두 개가 데이터와 같고 검사는 파일을 바꾸지 않는다',()=>{
+ const builder=path.join(__dirname,'..','..','tools','build-oral-line-doc.cjs');
+ const docs=path.join(__dirname,'..','..','docs'),names=['운행선관리-구술.md','운행선관리-교재구술.md'];
+ const before=names.map(n=>fs.readFileSync(path.join(docs,n)));
+ cp.execFileSync(process.execPath,[builder,'--check']);
+ names.forEach((n,i)=>assert.deepEqual(fs.readFileSync(path.join(docs,n)),before[i]));
+});
+test('문서 검사는 LF와 CRLF를 허용하지만 실제 본문 변경은 거부한다',()=>{
+ const temp=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'oral-doc-'));
+ const builder=path.join(__dirname,'..','..','tools','build-oral-line-doc.cjs');
+ const names=['운행선관리-구술.md','운행선관리-교재구술.md'];
+ try{
+  cp.execFileSync(process.execPath,[builder,'--output-dir',temp]);
+  for(const eol of ['\n','\r\n']){
+   for(const name of names){const file=path.join(temp,name);fs.writeFileSync(file,fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n').replace(/\n/g,eol));}
+   cp.execFileSync(process.execPath,[builder,'--check','--output-dir',temp]);
+  }
+  for(const name of names){
+   const file=path.join(temp,name),original=fs.readFileSync(file);fs.appendFileSync(file,'실제 본문 변경');
+   assert.throws(()=>cp.execFileSync(process.execPath,[builder,'--check','--output-dir',temp],{stdio:'pipe'}));
+   assert.ok(fs.readFileSync(file,'utf8').endsWith('실제 본문 변경'));fs.writeFileSync(file,original);
+  }
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });

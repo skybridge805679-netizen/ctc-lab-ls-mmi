@@ -1,6 +1,15 @@
 'use strict';
 // docs/운행선관리-구술.md 를 simulator/engine/oral-line.js 에서 만든다 (FTS 문제와 같은 데이터)
 const fs=require('fs'),path=require('path'),O=require('../simulator/engine/oral-line.js');
+const args=process.argv.slice(2),check=args.includes('--check'),outIndex=args.indexOf('--output-dir');
+if(outIndex>=0&&!args[outIndex+1])throw Error('--output-dir 경로가 필요합니다.');
+const output=outIndex>=0?path.resolve(args[outIndex+1]):path.join(__dirname,'..','docs');
+function emit(name,text){
+ const file=path.join(output,name);
+ if(check){
+  if(fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n')!==text)throw Error(name+': tools/build-oral-line-doc.cjs를 다시 돌려 문서를 갱신하세요');
+ }else fs.writeFileSync(file,text);
+}
 const mark=i=>[...i.tags.filter(t=>['기출','신출','예상'].includes(t)),...(i.tags.some(t=>/차$/.test(t))?['26년 '+i.tags.filter(t=>/차$/.test(t)).join('·')]:[])].join(' · ');
 const asked=i=>i.tags.some(t=>/차$/.test(t)),count=i=>i.tags.filter(t=>/차$/.test(t)).length;
 // 개조식 본답 + [참고] + 교재 원문(접어 둠)
@@ -15,7 +24,7 @@ md+=`## 예상 문항 (점선 상자)\n\n`+O.items.filter(i=>i.tags.includes('�
 for(const ch of O.CHAPTERS){const list=O.items.filter(i=>i.ch===ch);if(!list.length)continue;
  md+=`## ${ch}\n\n`;
  for(const i of list){md+=`### ${i.q}\n\n`;const m=mark(i);md+=`${m?`**${m}**`:'출제 표시 없음'} · 교재 ${i.page||'—'}쪽${i.pageFound?' (요약에 없어 교재에서 찾은 쪽)':''}\n\n`;md+=body(i);if(i.note)md+=`※ ${i.note}\n\n`;}}
-fs.writeFileSync(path.join(__dirname,'..','docs','운행선관리-구술.md'),md);
+emit('운행선관리-구술.md',md);
 console.log('docs/운행선관리-구술.md',O.items.length,'문항');
 // 교재 문항 (기출 외) — 최근 신유형 대비: 교재 원문 전체를 조문·절 단위로
 let bk=`# 열차운행선 관리 — 교재 구술 문항 (기출 외)\n\n`;
@@ -25,5 +34,5 @@ bk+=`## 목차\n\n`+O.CHAPTERS.map(ch=>[ch,O.book.filter(i=>i.ch===ch).length]).
 for(const ch of O.CHAPTERS){const list=O.book.filter(i=>i.ch===ch);if(!list.length)continue;
  bk+=`## ${ch}\n\n`;
  for(const i of list){bk+=`### ${i.q}\n\n교재 ${i.page}쪽\n\n`+body(i);if(i.note)bk+=`※ ${i.note}\n\n`;}}
-fs.writeFileSync(path.join(__dirname,'..','docs','운행선관리-교재구술.md'),bk);
+emit('운행선관리-교재구술.md',bk);
 console.log('docs/운행선관리-교재구술.md',O.book.length,'문항');
