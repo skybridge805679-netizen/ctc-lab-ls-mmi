@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ORPHEIA 원격 접속</title>
+<style>
+:root{--bg:#f0f5f3;--card:#fff;--ink:#173d42;--muted:#6b8287;--accent:#1f7a6c;--line:#d6e2df;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1c1e;--card:#172a2d;--ink:#e3efec;--muted:#93aaa6;--accent:#4fc3a8;--line:#2a4246;--bad:#ff8a80}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;padding:16px}
+form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px;width:100%;max-width:360px;text-align:center}
+h1{font-size:20px;margin:0 0 6px}p{color:var(--muted);font-size:13px;margin:0 0 20px;line-height:1.6}
+input{width:100%;font-size:32px;letter-spacing:12px;text-align:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink)}
+button{margin-top:16px;width:100%;padding:14px;font-size:16px;font-weight:700;border:0;border-radius:10px;background:var(--accent);color:#fff}
+#msg{color:var(--bad);min-height:20px;margin-top:12px;font-size:13px}
+</style></head><body>
+<form id="f"><h1>ORPHEIA 원격 접속</h1><p>교수 PC의 FTS 화면에 표시된<br>4자리 PIN을 입력하세요.</p>
+<input id="pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="one-time-code" required autofocus aria-label="PIN">
+<button type="submit">접속</button><div id="msg" role="alert"></div></form>
+<script>
+document.getElementById('f').onsubmit=async e=>{e.preventDefault();const msg=document.getElementById('msg');msg.textContent='';
+ try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:document.getElementById('pin').value})});const j=await r.json();
+  if(j.ok)location.replace('/');else msg.textContent=j.message||'접속하지 못했습니다.';}catch{msg.textContent='교수 PC에 연결할 수 없습니다.';}};
+</script></body></html>

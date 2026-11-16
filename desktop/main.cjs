@@ -11,7 +11,7 @@ const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
 let resetting=false;
-let ls=null,mmi=null,graph=null,fts=null,problem=null,stateFile,layout={},quitting=false,engine=null,tray=null;
+let ls=null,mmi=null,graph=null,fts=null,problem=null,stateFile,layout={},quitting=false,engine=null,tray=null,remote=null;
 if(process.argv.includes('--orpheia-smoke-test')&&process.env.ORPHEIA_TEST_USER_DATA)app.setPath('userData',process.env.ORPHEIA_TEST_USER_DATA);
 const single=app.requestSingleInstanceLock();
 if(!single)app.quit();
@@ -33,10 +33,19 @@ else{
    if(resetting){event.returnValue={error:'프로그램 전체 초기화 중입니다.'};return;}
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
+  // 원격 조작 서버 (같은 네트워크의 PC·스마트폰 브라우저): 기본 꺼짐. FTS [원격 조작]에서 켜고 끈다.
+  remote=require('./remote-server.cjs').create({root:path.join(__dirname,'../simulator'),request:(action,since,reply,version)=>{if(resetting){reply({error:'프로그램 전체 초기화 중입니다.'});return;}engine.request(action,since,reply,version);}});
+  const remoteInfo=()=>{const i=remote.info();return {...i,qr:i.urls[0]?require('./qr.cjs').svg(i.urls[0],{scale:5}):''};};
+  ipcMain.handle('orpheia:remote',async(event,{op,id}={})=>{
+   if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)throw Error('Untrusted remote client');
+   if(op==='start')await remote.start();else if(op==='stop')remote.stop();else if(op==='kick')remote.kick(String(id||''));
+   return remoteInfo();
+  });
   ipcMain.handle('orpheia:reset',async event=>{
    if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)throw Error('Untrusted reset client');
    if(resetting)return {ok:false,message:'이미 초기화 중입니다.'};resetting=true;
    try{
+    remote?.stop();
     const response=await new Promise(resolve=>engine.request({type:'session:reset'},0,resolve));
     if(response.error)throw Error(response.error);
     // Windows share UI in the LS renderer: close all old projections before clearing their storage.
@@ -56,7 +65,7 @@ else{
   if(process.platform!=='darwin'){tray=new Tray(path.join(__dirname,'resources/icon.png'));tray.setToolTip('ORPHEIA · 관제 엔진 실행 중');tray.setContextMenu(Menu.buildFromTemplate([{label:'LS 창 열기',click:()=>{ls?.show();ls?.focus();}},{label:'MMI 창 열기',click:()=>script('SimWorkspace.detach()')},{type:'separator'},{label:'프로그램 종료',click:()=>app.quit()}]));tray.on('double-click',()=>{ls?.show();ls?.focus();});}
 
  }).catch(error=>{dialog.showErrorBox('관제 엔진 시작 오류',error.message);app.quit();});
- app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;const finish=()=>{engine?.stop();tray?.destroy();app.quit();};if(engine)engine.request({type:'session:persist'},0,response=>{if(response.error)dialog.showErrorBox('실습 저장 실패',response.error);finish();});else finish();});
+ app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;const finish=()=>{remote?.stop();engine?.stop();tray?.destroy();app.quit();};if(engine)engine.request({type:'session:persist'},0,response=>{if(response.error)dialog.showErrorBox('실습 저장 실패',response.error);finish();});else finish();});
  app.on('window-all-closed',()=>app.quit());
  app.on('activate',()=>{if(!ls)createLS();else ls.show();});
 }

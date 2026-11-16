@@ -75,3 +75,7 @@ body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter
 .fts-branches pre{white-space:pre-wrap;font:12px/1.5 inherit;margin:6px 0 0;max-height:220px;overflow:auto}
 .fts-remaining{margin:4px 0 8px;padding:6px 8px;border-radius:6px;background:#fff7e3;border:1px solid #ecd59a;color:#6a4b0c;font-weight:600}
 .fts-remaining small{font-weight:400;color:#7d6a3e}
+/* 원격 조작 */
+.fts-remote-pin{display:flex;align-items:baseline;gap:12px;margin:14px 0}.fts-remote-pin b{font:700 40px/1 ui-monospace,Menlo,monospace;letter-spacing:10px}.fts-remote-pin small{color:var(--muted,#6b8287)}
+.fts-remote-urls{margin:4px 0 0;padding-left:18px}.fts-remote-urls code{font-size:15px;user-select:all}
+.fts-remote-qr{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 14px}.fts-remote-qr svg{width:200px;height:200px;border-radius:8px}.fts-remote-qr small{color:var(--muted,#6b8287)}

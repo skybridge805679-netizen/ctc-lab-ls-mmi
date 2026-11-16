@@ -38,5 +38,14 @@ async function launch(){const packed=process.env.ORPHEIA_PACKAGED_EXECUTABLE,exe
  }
  await fts.locator('[data-manual="베이스스캔 구술"]').click();await ls.waitForFunction(()=>SimRemote.snapshot.fts.session.finished);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.history[0].got),300);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.clock.paused),true);await expect(fts.locator('.fts-result')).toContainText('300/300');assert.deepEqual(errors,[]);
  await app.close();app=null;ls=await launch();assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.session.id),id);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.fts.history[0].got),300);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.clock.paused),true);assert.equal(await ls.evaluate(()=>SimRemote.snapshot.ftsLibrary.scenarios[0].name),'독립 엔진 FTS 실습');
- console.log('PASS authoritative FTS: renderer stall/reload survival, live LS control during problem display, instructor grading and durable restart/history');
+ // 원격 조작: FTS [원격 조작]에서 켜면 PIN·주소·QR이 뜨고, 같은 네트워크의 모바일 브라우저가 리모컨으로 붙는다. 끄면 접속이 끊긴다
+ {const f=await openFts();await f.locator('[data-fts-page="remote"]').click();await f.locator('#rmToggle').click();await f.waitForSelector('.fts-remote-pin b');await f.waitForSelector('.fts-remote-qr svg');
+  const pin=(await f.locator('.fts-remote-pin b').textContent()).trim(),url=(await f.locator('.fts-remote-urls code').first().textContent().catch(()=>'')).trim(),st={pin,port:Number((/:(\d+)\//.exec(url)||[])[1])};assert.match(st.pin,/^\d{4}$/);assert.ok(st.port>0,'접속 주소 '+url);
+  const base=`http://127.0.0.1:${st.port}`,UA='Mozilla/5.0 (Linux; Android 15) Mobile';
+  const login=await fetch(base+'/api/login',{method:'POST',headers:{'Content-Type':'application/json','User-Agent':UA},body:JSON.stringify({pin:st.pin})});assert.equal(login.status,200);const cookie=(login.headers.get('set-cookie')||'').split(';')[0];
+  const view=await (await fetch(base+'/api/request',{method:'POST',headers:{'Content-Type':'application/json','User-Agent':UA,Cookie:cookie},body:JSON.stringify({action:{type:'remote:view'}})})).json();assert.ok(view.view&&typeof view.view.active==='boolean',JSON.stringify(view));
+  await expect(f.locator('#rmClients tbody tr')).toHaveCount(1);await expect(f.locator('#rmClients')).toContainText('리모컨(모바일)');
+  await f.locator('#rmToggle').click();await f.waitForSelector('.fts-remote-pin',{state:'detached'});
+  assert.equal(await fetch(base+'/api/request',{method:'POST',headers:{'Content-Type':'application/json',Cookie:cookie},body:'{}'}).then(()=>'open',()=>'closed'),'closed','끄면 서버가 닫힌다');}
+ console.log('PASS authoritative FTS: renderer stall/reload survival, live LS control during problem display, instructor grading and durable restart/history · LAN remote (PIN, mobile remote, off closes)');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(app)await app.close();fs.rmSync(profile,{recursive:true,force:true});});

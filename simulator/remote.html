@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#173d42"><title>ORPHEIA 리모컨</title>
+<link rel="stylesheet" href="ui/remote-control.css"></head><body>
+<header class="top"><div class="who"><b id="scenario">연결 중…</b><small id="people"></small></div><div class="clock"><span id="remaining">--:--</span><small>남은 시간</small></div></header>
+<section class="problem"><div class="meta"><span id="progress"></span><span id="status" class="badge"></span></div><h1 id="problem">진행 중인 교육이 없습니다</h1><p id="error" class="error" hidden></p></section>
+<main id="lists"></main>
+<footer class="bar"><button id="reload" type="button">상황 재로딩</button><button id="next" type="button">문제 종료</button><button id="stop" type="button" class="danger">교육 종료</button></footer>
+<dialog id="confirm"><p id="confirmText"></p><div class="row"><button type="button" id="no">취소</button><button type="button" id="yes" class="primary">확인</button></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="ui/remote-control.js"></script></body></html>

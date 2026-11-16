@@ -31,14 +31,14 @@ function syncRemote(){const value=root.SimRemote.snapshot.fts;if(!value)return;i
 const SECTIONS=['지하청량리-수원','지하청량리-영등포','지하청량리-지하서울','노량진-금천구청','용산-수원','영등포-수원'];
 
 // ---------------------------------------------------------------- shell
-const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리']];
+const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리'],['remote','원격 조작']];
 function shell(){
  return `<div class="fts"><div class="fts-head"><img class="fts-banner" src="assets/orpheia/banner.png" alt="" aria-hidden="true" width="2172" height="724"><div class="fts-brand"><img src="assets/orpheia/emblem.png" alt="" width="38" height="38"><div><small>ORPHEIA · TRAINING CONTROL</small><b>FTS 제어통제 시스템</b></div></div><span class="fts-lamps"><i class="fts-engine" title="${root.OrpheiaEngine.native===false?'관제 엔진 (브라우저 시험 연결)':'독립 관제 엔진 연결'}">ENGINE</i>${['CTC','EMC','SIC','DB'].map(x=>`<i class="simulated" title="${x} 모의 · 외부 장치 통신 미연결">${x} · 모의</i>`).join('')}</span></div>
 <div class="fts-main"><nav class="fts-nav">${MENU.map(([id,label,sub])=>`<button type="button" data-fts-page="${sub?sub[0][0]:id}" data-fts-group="${id}">▸ ${label}</button>${sub?`<div class="fts-sub">${sub.map(([s,l])=>`<button type="button" data-fts-page="${s}">— ${l}</button>`).join('')}</div>`:''}`).join('')}</nav>
 <section class="fts-workspace"><div class="fts-workspace-head"><div><small>INSTRUCTOR WORKSPACE</small><h2 id="ftsPageTitle">교육설정</h2></div><span id="ftsSessionStatus">교육 전 준비</span></div><div class="fts-body" id="ftsBody"></div></section></div></div>`;
 }
 function go(p){
- page=p;monitorSignature='';problemSignature='';if($('ftsPageTitle'))$('ftsPageTitle').textContent={setup:'교육설정',system:'시스템관리',users:'사용자관리',problems:'문제 관리',situations:'상황 관리',scenarios:'시나리오 관리',monitor:'모니터링관리',history:'교육이력관리'}[p];for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
+ page=p;monitorSignature='';problemSignature='';if($('ftsPageTitle'))$('ftsPageTitle').textContent={setup:'교육설정',system:'시스템관리',users:'사용자관리',problems:'문제 관리',situations:'상황 관리',scenarios:'시나리오 관리',monitor:'모니터링관리',history:'교육이력관리',remote:'원격 조작'}[p];for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
  $('ftsBody').innerHTML=PAGES[p].html();PAGES[p].bind?.();
 }
 
@@ -475,6 +475,28 @@ function changes(p,item){return (p?.branches||[]).filter(b=>item.branch?.[b.id]!
 function speak(text){try{if(!text||!root.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';root.speechSynthesis.cancel();root.speechSynthesis.speak(u);}catch{}}
 
 // ---------------------------------------------------------------- 교육이력관리
+// 원격 조작: 같은 네트워크의 스마트폰(리모컨)·PC 브라우저(앱 화면)로 접속 — 데스크톱 앱 안의 원격 조작 서버를 켜고 끈다
+PAGES.remote={
+ html:()=>'<div id="ftsRemote" class="fts-remote"></div>',
+ bind(){
+  const box=$('ftsRemote'),api=root.OrpheiaEngine?.remote;
+  if(!api){box.innerHTML=`<p class="fts-empty">${root.OrpheiaRemoteClient?'원격으로 접속한 화면에서는 원격 조작 서버를 켜고 끌 수 없습니다. 교수 PC의 앱에서 관리하세요.':'원격 조작은 데스크톱 앱(교수 PC)에서 켤 수 있습니다.'}</p>`;return;}
+  const draw=i=>{if(!box.isConnected)return;
+   box.innerHTML=`<div class="fts-split"><div class="fts-left"><div class="fts-bar">원격 조작 서버</div>
+<p class="fts-hint">같은 네트워크(같은 와이파이·사내망)의 기기에서 브라우저로 접속합니다. <b>스마트폰·태블릿</b>은 리모컨 화면만 열리고 교육 진행(통보·구술 확인, 상황 변경, 문제 종료·재로딩·교육 종료)만 할 수 있습니다. <b>PC 브라우저</b>는 이 앱과 같은 화면(LS·MMI·FTS·그래프·문제 화면)을 엽니다.</p>
+<div class="fts-row-btns"><button type="button" class="sched-btn ${i.on?'danger':'primary'}" id="rmToggle">${i.on?'원격 조작 끄기':'원격 조작 켜기'}</button></div>
+${i.on?`<div class="fts-remote-pin"><small>접속 PIN</small><b>${esc(i.pin)}</b></div><div class="fts-cap">접속 주소</div><ul class="fts-remote-urls">${i.urls.map(u=>`<li><code>${esc(u)}</code></li>`).join('')||'<li>네트워크 주소를 찾지 못했습니다. 와이파이·랜 연결을 확인하세요.</li>'}</ul>`:'<p class="fts-empty">꺼져 있습니다. 켜면 접속 주소·QR 코드·PIN이 표시됩니다. 앱을 끄면 함께 꺼집니다.</p>'}
+</div><div class="fts-right"><div class="fts-bar">QR 코드 · 접속 기기</div>
+${i.on&&i.qr?`<div class="fts-remote-qr">${i.qr}<small>스마트폰 카메라로 찍은 뒤 PIN을 입력하세요</small></div>`:''}
+${table('rmClients',['구분','주소','기기','마지막 응답',''],(i.clients||[]).map(c=>({id:c.id,cells:[c.role==='remote'?'리모컨(모바일)':'PC 브라우저',esc(c.address),esc(c.agent.replace(/\).*$/,')')),new Date(c.last).toLocaleTimeString('ko-KR'),`<button type="button" class="sched-btn danger" data-kick="${esc(c.id)}">끊기</button>`]})),{empty:'접속한 기기가 없습니다.'})}
+<p class="fts-hint">PIN을 5번 틀리면 1분간 접속을 막습니다. 원격 PC에서도 세션 파일 저장·열기와 프로그램 전체 초기화는 할 수 없습니다.</p></div></div>`;
+   $('rmToggle').onclick=async()=>{try{draw(await api(i.on?'stop':'start'));}catch(e){alert('원격 조작 서버를 켜지 못했습니다: '+e.message);}};
+   for(const b of box.querySelectorAll('[data-kick]'))b.onclick=async()=>draw(await api('kick',b.dataset.kick));
+  };
+  api('status').then(draw);
+  clearInterval(PAGES.remote.timer);PAGES.remote.timer=setInterval(()=>{if(!box.isConnected){clearInterval(PAGES.remote.timer);return;}api('status').then(i=>{const sig=JSON.stringify([i.on,i.pin,i.urls,(i.clients||[]).map(c=>[c.id,Math.floor(c.last/5000)])]);if(sig!==PAGES.remote.sig){PAGES.remote.sig=sig;draw(i);}});},2000);
+ }
+};
 PAGES.history={
  html:()=>`<div class="fts-cap">교육 이력</div>${table('hTable',['일시','교수','교육생','시나리오','점수','사유'],history.map(h=>({id:h.id,cells:[esc(Number.isFinite(Date.parse(h.at))?new Date(h.at).toLocaleString('sv-SE',{timeZone:'Asia/Seoul'}):h.at),esc(h.professor),esc(h.student),esc(h.scenario),`${h.got}/${h.full} (${h.percent}%)`,esc(h.reason)]})))}<div id="hDetail"></div>
 <div class="fts-row-btns"><button type="button" class="sched-btn" id="hExport">교육 이력 내보내기</button><button type="button" class="sched-btn danger" id="hClear">이력 모두 지우기</button></div>`,

@@ -94,9 +94,23 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   const v=F.view(problem(it),it),expected=number&&[...(v?.objectives||[]),...(v?.checks||[])].some(o=>leaf(o.condition,number));
   if(expected)log(`열번 수동 이동 · ${number} → ${target} ${op.targetSlot||''} (문제가 요구한 열번 이동 — 단선지령식 반대선 운행, 열번 이동 문제 등)`,'I');
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
+ // 원격 리모컨(모바일)용 요약: 엔진 전체 스냅숏 대신 지금 문제·시간·교수가 누를 항목만 내려 준다
+ function remoteView(){
+  if(!session)return {active:false};
+  const it=session.items[Math.min(session.current,session.items.length-1)],p=it&&problem(it),idx=session.items.indexOf(it);
+  if(!it||!p)return {active:false};
+  const v=F.view(p,it),elapsed=it.startedAt!=null?(it.endedAt??now())-it.startedAt:0,manual=[],seen=new Set();
+  const visit=c=>{if(c?.type==='manual'){const key=c.key||c.label;if(!seen.has(key)){seen.add(key);manual.push({key,label:c.label,on:!!session.manual[idx]?.[key]});}}(c?.conditions||[]).forEach(visit);if(c?.condition)visit(c.condition);};
+  [...(p.checks||[]),...(p.deductions||[])].forEach(k=>visit(k.condition));
+  return {active:!session.finished,finished:!!session.finished,scenario:session.scenarioName,professor:session.professor,student:session.student,index:session.current,total:session.items.length,
+   problem:{name:p.name,subject:p.subject,limit:p.limit||0,status:it.status,error:it.error||null},elapsed,remaining:Math.max(0,(p.limit||0)-elapsed),
+   comms:(v?.communications||[]).map(c=>({key:'comm:'+c.id,label:c.label,text:c.text||'',at:it.comm?.[c.id]??null,optional:!!c.optional})),
+   branches:(p.branches||[]).map(b=>({key:'branch:'+b.id,label:b.label,at:it.branch?.[b.id]??null})),manual,
+   result:session.finished?F.summary(runLibrary,session):null};
+ }
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
  function restore(data){if(!data){session=null;runLibrary=null;events=[];ui={};notice=null;return;}validateCheckpoint(data,host.scripts);({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured}=clone(data));const up=F.upgrade(library,host.defaults()),stale=up!==library;library=up;logs=Array.isArray(data.logs)?clone(data.logs.slice(0,500)):[];if(stale)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');}
- return {command,step,event,checkpoint,restore,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,reservedNumbers:()=>[...new Set([...owned,...(active(session)?(problem(current())?.setup?.trains||[]).map(t=>t.number):[])])],own:(from,to)=>{if(owned.has(from))owned.add(to);},snapshot:()=>({session,history,users,revision,notice,logs})};
+ return {command,step,event,checkpoint,restore,remoteView,isActive:()=>active(session),ownsScript:()=>!!(active(session)&&current()&&problem(current()).script),library:()=>library,runLibrary:()=>runLibrary,reservedNumbers:()=>[...new Set([...owned,...(active(session)?(problem(current())?.setup?.trains||[]).map(t=>t.number):[])])],own:(from,to)=>{if(owned.has(from))owned.add(to);},snapshot:()=>({session,history,users,revision,notice,logs})};
 }
 function validateCheckpoint(d,scripts){if(!d||!Number.isInteger(d.sequence)||d.sequence<0||!Number.isInteger(d.revision)||d.revision<0||F.validate(d.library,{scripts,drafts:true}).length||d.runLibrary&&F.validate(d.runLibrary,{scripts,drafts:true}).length||!Array.isArray(d.users)||d.users.some(u=>!u||typeof u.id!=='string'||typeof u.name!=='string'||!['교수','교육생'].includes(u.role))||!Array.isArray(d.history)||d.history.some(h=>!h||!Array.isArray(h.rows)||!Number.isFinite(h.got)||!Number.isFinite(h.full))||!Array.isArray(d.events)||!Number.isInteger(d.sequence)||!Number.isInteger(d.revision))throw Error('Invalid FTS checkpoint');if(d.session){const s=d.session;if(!d.runLibrary||!Array.isArray(s.items)||!Number.isInteger(s.current)||s.current<0||s.current>s.items.length||!Number.isFinite(s.startedAt)||!s.manual||s.items.some(it=>!d.runLibrary.problems.some(p=>p.id===it.problem)||!d.runLibrary.situations.some(x=>x.id===it.situation)||!Number.isInteger(it.situationIndex)||!Number.isFinite(it.score)||!Array.isArray(it.met)||!Array.isArray(it.deducted)||it.startedAt!==null&&!Number.isFinite(it.startedAt)||it.endedAt!==null&&!Number.isFinite(it.endedAt)||!['대기','진행','완료','시간초과','종료','미실시'].includes(it.status)))throw Error('Invalid FTS session');}}
 module.exports={create,validateCheckpoint};
