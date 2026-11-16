@@ -1,7 +1,7 @@
 name: Desktop installers
 on:
   push:
-    branches: [main, codex/ls-trim-overview]
+    branches: [main]
     paths:
       - 'desktop/**'
       - 'simulator/**'

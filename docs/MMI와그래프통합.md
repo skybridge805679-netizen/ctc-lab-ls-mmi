@@ -1,10 +1,10 @@
 # v0.17.0 통합 안내
 
-현행 동작과 한계는 [v0.17.0 통합](v0.17.0-통합.md)을 따른다. 아래는 이전 버전 기록이다.
+현행 동작과 한계는 v0.17.0 통합을 따른다. 아래는 이전 버전 기록이다.
 
 # v0.16.0 통합 안내
 
-현행 동작과 한계는 [v0.16.0 통합](v0.16.0-통합.md)을 따른다. 아래 내용은 이전 버전 기록이다.
+현행 동작과 한계는 v0.16.0 통합을 따른다. 아래 내용은 이전 버전 기록이다.
 
 # MMI·그래프 통합 — v0.14.0
 
@@ -49,10 +49,6 @@ Claude `claude/practical-dirac-68tgp6`의 `ed81a24`까지 병합했다. ORPHEIA 
 - `python3 simulator/network.browser.test.py`
 - 기존 `simulator/*.test.cjs`, LS·배선·과제 브라우저 검사
 
-![MMI 통합 작업 영역](preview-v0.14.0-mmi.png)
 
-![온라인 열차그래프](preview-v0.14.0-graph.png)
 
-![스케줄 편집기](preview-v0.14.0-schedule.png)
 
-![LS와 연결된 열차번호제어](preview-v0.14.0-train-number.png)

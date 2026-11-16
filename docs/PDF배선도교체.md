@@ -21,6 +21,4 @@ PDF는 텍스트 레이어가 없는 이미지 기반 4쪽이며, 각 쪽에 576
 
 검증 명령: `node simulator/network.test.cjs`, `python3 simulator/map.browser.test.py`. 기존 상태·과제·다이아/스케줄 시험도 실행했다. 화면 예시:
 
-![PDF 지하서울 제어 화면](preview-v0.5.1-station.png)
 
-![PDF 전체노선 조회](preview-v0.5.1-overview.png)

@@ -1,0 +1,36 @@
+name: Clean up old releases
+# 수동 실행: 최신 릴리즈 N개만 남기고 나머지 릴리즈와 그 태그를 지운다 (남긴 릴리즈 밖의 v* 태그도 함께 정리)
+on:
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: '남길 최신 릴리즈 수'
+        required: true
+        default: '5'
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Delete old releases and tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP: ${{ inputs.keep }}
+        run: |
+          set -euo pipefail
+          case "$KEEP" in ''|*[!0-9]*) echo "keep must be a number"; exit 1;; esac
+          [ "$KEEP" -ge 1 ] || { echo "keep must be at least 1"; exit 1; }
+          gh release list --limit 1000 --json tagName,publishedAt --jq 'sort_by(.publishedAt) | reverse | .[].tagName' > releases.txt
+          head -n "$KEEP" releases.txt > keep.txt
+          echo "남기는 릴리즈:"; cat keep.txt
+          tail -n +"$((KEEP+1))" releases.txt | while read -r tag; do
+            echo "릴리즈 삭제: $tag"; gh release delete "$tag" --yes --cleanup-tag
+          done
+          git fetch --tags --force -q
+          git tag -l 'v*' | while read -r tag; do
+            if ! grep -qx "$tag" keep.txt; then echo "태그 삭제: $tag"; git push -q origin ":refs/tags/$tag" || true; fi
+          done
