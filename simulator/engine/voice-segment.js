@@ -53,6 +53,11 @@ function tidy(text,dur){
  if(/^(감사합니다|[.…\s]+)$/.test(t))return '';
  return t;
 }
-const api={create,budget,tidy,FRAME_S};
+// 받아쓰기를 일찍 끝냈는지: Whisper는 한 마디 안에서 첫 문장이 끝나면 뒤를 버리고 끝내는 일이 있다 (「…받아야 한다.」 뒤의 문장이 통째로 빠짐).
+// 그 사람의 말 빠르기(지금까지 받아쓴 1초당 글자 수)에 비해 글자가 절반 남짓도 안 되면 다시 받아쓴다 (앞 문맥 없이).
+const chars=t=>(String(t||'').match(/[가-힣A-Za-z0-9]/g)||[]).length;
+function speed(prev,text,dur){if(dur<2)return prev;const r=chars(text)/dur;if(!(r>1))return prev;return prev?prev*0.7+r*0.3:r;}      // 1초당 글자 수 (지수 평균)
+const short=(text,dur,rate)=>dur>=3&&rate>0&&chars(text)<rate*dur*0.7;
+const api={create,budget,tidy,chars,speed,short,FRAME_S};
 if(typeof module!=='undefined')module.exports=api;else root.SimVoiceSegment=api;
 })(typeof window!=='undefined'?window:globalThis);

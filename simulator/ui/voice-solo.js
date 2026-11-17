@@ -6,7 +6,7 @@
 //  · 상대 대사를 읽는 동안은 듣지 않는다 (자기 소리를 다시 받아쓰지 않게).
 // 상대를 고르는 화면이나 「말하기」 버튼은 없다. 화면에는 들은 말과 알아들은 단계만 보인다.
 const STT_URL=new URL('ui/voice-stt-worker.js',root.location?.href||'').href;
-const S={consumer:null,prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,seg:{},jobs:new Map(),heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
+const S={consumer:null,prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,seg:{},jobs:new Map(),rate:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
 // Whisper가 무음·잡음에서 자주 지어내는 말 (방송 끝인사 등) — 무전으로 넘기지 않는다
 const HALLUCINATION=/^(감사합니다\.?|시청해 ?주셔서 감사합니다\.?|구독과 좋아요.*|MBC 뉴스.*|\.+|…+)$/;
 
@@ -17,7 +17,7 @@ function worker(){
   if(m.type==='progress')S.progress=m;
   else if(m.type==='ready'){S.model=(m.model?'Whisper '+m.model+' · ':'')+(m.device==='webgpu'?'그래픽카드 가속':'CPU '+m.threads+'코어');S.progress=null;}
   else if(m.type==='text'){S.busy=Math.max(0,S.busy-1);const job=S.jobs.get(m.id)||{};S.jobs.delete(m.id);
-   const text=root.SimVoiceSegment?root.SimVoiceSegment.tidy(m.text,job.dur||0):m.text;      // 지어낸 글(되풀이·방송 끝인사·소리에 비해 너무 많은 글자) 거르기
+   const text=root.SimVoiceSegment?root.SimVoiceSegment.tidy(m.text,job.dur||0):m.text;if(!job.partial&&root.SimVoiceSegment)S.rate=root.SimVoiceSegment.speed(S.rate,text,job.dur||0);      // 지어낸 글(되풀이·방송 끝인사·소리에 비해 너무 많은 글자) 거르기
    if(job.partial){if(m.id===S.partialId)try{S.consumer?.onPartial?.(text);}catch(e){console.error(e);}}else heard(text,m.ms);}
   else if(m.type==='error'){S.busy=Math.max(0,S.busy-1);S.jobs.delete(m.id);S.error='음성인식 오류: '+m.message;}
   render();};
@@ -60,7 +60,8 @@ function transcribe(chunks,rate,opt={}){
  const n=chunks.reduce((a,c)=>a+c.length,0),audio=new Float32Array(n);let o=0;for(const c of chunks){audio.set(c,o);o+=c.length;}
  let pcm=audio;if(rate!==16000){const r=rate/16000,out=new Float32Array(Math.floor(n/r));for(let i=0;i<out.length;i++)out[i]=audio[Math.floor(i*r)];pcm=out;}
  const w=worker();if(!w)return;S.busy++;const id=++S.seq;if(opt.partial)S.partialId=id;S.jobs.set(id,{dur:opt.dur||pcm.length/16000,partial:!!opt.partial});
- w.postMessage({type:'transcribe',id,audio:pcm,prompt:(S.consumer?.hint?.()??S.state?.v?.hint)||'',partial:!!opt.partial},[pcm.buffer]);render();
+ const dur=pcm.length/16000,minChars=!opt.partial&&dur>=3&&S.rate?Math.ceil(S.rate*dur*0.7):0;      // 일찍 끝낸 받아쓰기 다시 (engine/voice-segment.js short)
+ w.postMessage({type:'transcribe',id,audio:pcm,prompt:(S.consumer?.hint?.()??S.state?.v?.hint)||'',partial:!!opt.partial,minChars},[pcm.buffer]);render();
 }
 // 휴대폰은 말하는 동안(앞뒤 여유 포함) 소리를 0.5초씩 이어 보낸다 → PC 마이크와 같은 규칙으로 여기서 자른다
 function phoneAudio(u8){

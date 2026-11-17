@@ -32,12 +32,16 @@ async function transcribe(audio,prompt){
  const seq=out[0].tolist?out[0].tolist():Array.from(out[0].data??out[0]);
  return tok.decode(seq.slice(pre.length).map(Number),{skip_special_tokens:true}).trim();
 }
+const count=t=>(String(t||'').match(/[가-힣A-Za-z0-9]/g)||[]).length;
 self.onmessage=async e=>{
  const m=e.data;
  if(m.type==='load'){load().catch(()=>{});return;}
  if(m.type==='transcribe'){
   try{await load();const t0=performance.now();
-   self.postMessage({type:'text',id:m.id,text:await transcribe(m.audio,m.prompt),ms:Math.round(performance.now()-t0)});}
+   let text=await transcribe(m.audio,m.prompt);
+   // 말한 길이에 비해 글자가 너무 적으면(첫 문장에서 받아쓰기를 끝냄) 앞 문맥 없이 한 번 더 받아써 긴 쪽을 쓴다
+   if(m.minChars&&count(text)<m.minChars){const again=await transcribe(m.audio,'');if(count(again)>count(text)&&count(again)<=m.audio.length/16000*11)text=again;}
+   self.postMessage({type:'text',id:m.id,text,ms:Math.round(performance.now()-t0)});}
   catch(err){self.postMessage({type:'error',id:m.id,message:String(err?.message||err)});}
  }
 };
