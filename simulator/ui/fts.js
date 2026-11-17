@@ -486,6 +486,8 @@ PAGES.oral={
   const opt=(val,label)=>`<option value="${esc(val)}" ${s.scope===val?'selected':''}>${esc(label)}</option>`;
   return `<div class="fts-split"><div class="fts-left"><div class="fts-bar">구술 릴레이 설정</div>
 <p class="fts-help">문제가 하나씩 뜨면 소리 내어 답하세요. 말한 핵심 항목이 하나씩 체크되고, 다 말하면 바로 다음 문제로 넘어갑니다. 「패스」라고 말하면 넘어갑니다.<br>마이크·음성인식은 음성 1인 모드와 같습니다 (PC 마이크 또는 휴대폰 리모컨의 「🎙 휴대폰 마이크」).</p>
+<div class="fts-row-btns wrap" role="radiogroup" aria-label="연습 방식">${[['speak','🎙 말하기','소리 내어 답하면 항목이 체크'],['card','🃏 카드','정답을 보고 스스로 평가'],['type','⌨ 타이핑','입력하면 항목이 체크']].map(([m,l,d])=>`<label class="fts-mode ${s.mode===m?'on':''}"><input type="radio" name="orMode" value="${m}" ${s.mode===m?'checked':''}> <b>${l}</b> <small>${d}</small></label>`).join('')}</div>
+<p class="fts-help">세 방식은 같은 간격 반복 기록을 씁니다 — 말하기에서 틀린 문제는 카드·타이핑에서 곧 다시 나오고, 카드에서 「모르겠음」 한 문제는 말하기에서 먼저 나옵니다.</p>
 <div class="fts-grid2"><label>출제 범위<select id="orScope">${opt('all','전범위 ('+R.pool('all').length+'문항)')}${opt('exam','기출 ('+R.pool('exam').length+'문항)')}${chs.map(c=>opt('ch:'+c,c+' ('+R.pool('ch:'+c).length+'문항)')).join('')}</select></label>
 <label>제한 시간(초)<input id="orLimit" type="number" min="10" max="600" step="10" value="${esc(s.limit)}"></label>
 <label>다음 문제까지(초)<input id="orGap" type="number" min="1" max="60" value="${esc(s.gap)}"></label></div>
@@ -493,13 +495,14 @@ PAGES.oral={
 <label><input type="checkbox" id="orRead" ${s.read?'checked':''}> 문제를 소리 내어 읽어 주기</label>
 <div class="fts-row-btns"><button type="button" class="sched-btn primary" id="orStart">구술 연습 시작</button></div></div>
 <div class="fts-right"><div class="fts-bar">학습 현황 (이 컴퓨터)</div>
-<div class="fts-grid2 fts-clock-cards"><label>본 문항<input readonly value="${v.seen} / ${v.total}"></label><label>다시 볼 때가 된 문항<input readonly value="${v.due}"></label><label>익힌 문항 (7일 이상 간격)<input readonly value="${v.mastered}"></label></div>
+<div class="fts-grid2 fts-clock-cards"><label>본 문항<input readonly value="${v.seen} / ${v.total}"></label><label>다시 볼 때가 된 문항<input readonly value="${v.due}"></label><label>푼 기록 (말하기·카드·타이핑)<input readonly value="${v.byMode.speak} · ${v.byMode.card} · ${v.byMode.type}"></label><label>익힌 문항 (7일 이상 간격)<input readonly value="${v.mastered}"></label></div>
 <div class="fts-cap">약한 문항</div><ul class="fts-checks">${v.weak.map(w=>`<li class="bad">${w.score}점${w.lapses?' · 틀린 횟수 '+w.lapses:''} · ${esc(w.q)}</li>`).join('')||'<li>아직 기록이 없습니다.</li>'}</ul>
 <div class="fts-row-btns"><button type="button" class="sched-btn" id="orReset">학습 기록 지우기</button></div></div></div>`;
  },
  bind(){
   const O=root.SimOralRelayUI;if(!O)return;
-  const opts=()=>({scope:$('orScope').value,limit:Math.max(10,Math.min(600,Number($('orLimit').value)||120)),gap:Math.max(1,Math.min(60,Number($('orGap').value)||5)),srs:$('orSrs').checked,read:$('orRead').checked});
+  const opts=()=>({mode:ftsDoc().querySelector('input[name=orMode]:checked')?.value||'speak',scope:$('orScope').value,limit:Math.max(10,Math.min(600,Number($('orLimit').value)||120)),gap:Math.max(1,Math.min(60,Number($('orGap').value)||5)),srs:$('orSrs').checked,read:$('orRead').checked});
+  for(const r of ftsDoc().querySelectorAll('input[name=orMode]'))r.onchange=()=>ftsDoc().querySelectorAll('.fts-mode').forEach(l=>l.classList.toggle('on',l.contains(ftsDoc().querySelector('input[name=orMode]:checked'))));
   $('orStart').onclick=()=>O.start(opts());
   $('orReset').onclick=()=>confirmBox('구술 연습 기록(간격 반복 일정·점수)을 모두 지울까요?',()=>{O.reset();go('oral');});
  }

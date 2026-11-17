@@ -26,3 +26,12 @@ body.oral-detached{margin:0;background:#eef6f5;font-family:inherit;color:#163a3a
 .oral-answer mark.miss{background:#ffe8e6;color:#c0262d;font-weight:700;padding:0 2px;border-radius:3px}
 .oral h2 small{font-weight:400;color:#7a4a4a;font-size:12px}
 .oral-foot>*{margin:0!important}.oral-foot button{flex:0 0 auto}
+/* 카드 · 타이핑 */
+.oral-hint{color:#4a6d6d;margin:4px 0}
+.oral-type textarea{width:100%;box-sizing:border-box;font-size:16px;line-height:1.5;padding:10px;border:1px solid #6aa6a6;border-radius:8px;resize:vertical;font-family:inherit}
+.oral-foot kbd{font-size:11px;border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-left:4px;opacity:.7}
+.oral-foot button.primary{background:#1d4d4d;color:#fff}.oral-foot button.g0{border-color:#c0262d;color:#c0262d}.oral-foot button.g1{border-color:#b7791f;color:#8a5a12}.oral-foot button.g2{border-color:#187a3a;color:#187a3a}
+.oral-keys ol.oral-check,.oral-keys ol.oral-answer{display:block;list-style:decimal;padding-left:22px}.oral-keys ol.oral-check li,.oral-keys ol.oral-answer li{padding:2px 0;background:none}
+.oral .oral-foot{justify-content:flex-start!important}
+.oral .oral-foot{font-size:14px;color:#1d4d4d;padding:12px 0 0;border-top:1px solid #cfe2e2}
+.oral .oral-head{margin-bottom:0}

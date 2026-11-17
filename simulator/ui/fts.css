@@ -93,3 +93,5 @@ body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter
 .fts-voice-prep ul{margin:6px 0;padding-left:18px}.fts-voice-prep li{margin:3px 0}.fts-voice-prep q{margin-right:8px}
 .fts-meter{display:inline-block;width:120px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}
 .fts-meter i{display:block;height:100%;background:#2b9a5a;transition:width .1s}
+.fts-mode{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #9cc;border-radius:8px;background:#fff;cursor:pointer}
+.fts-mode.on{border-color:#1d4d4d;background:#e3f2f0}.fts-mode small{color:#567}
