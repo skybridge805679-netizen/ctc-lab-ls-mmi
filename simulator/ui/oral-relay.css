@@ -35,3 +35,4 @@ body.oral-detached{margin:0;background:#eef6f5;font-family:inherit;color:#163a3a
 .oral .oral-foot{justify-content:flex-start!important}
 .oral .oral-foot{font-size:14px;color:#1d4d4d;padding:12px 0 0;border-top:1px solid #cfe2e2}
 .oral .oral-head{margin-bottom:0}
+.oral-heard li.live{color:#4a6d6d;font-style:italic}.oral-heard li.live small{color:#2b8a4a;font-style:normal}

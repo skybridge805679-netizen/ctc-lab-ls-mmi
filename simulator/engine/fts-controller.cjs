@@ -85,6 +85,7 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   case 'stop':close('교수 종료');return {ok:true};
   case 'reload':{if(!active(session))return {ok:false,message:'진행 중인 교육이 없습니다.'};const it=current(),entry=it.situationIndex,indices=session.items.map((x,i)=>x.situationIndex===entry?i:-1).filter(i=>i>=0);session.attempts.push({entry,at:now(),items:clone(indices.map(i=>session.items[i]))});for(const i of indices){const x=session.items[i];Object.assign(x,{status:'대기',startedAt:null,endedAt:null,met:[],deducted:[],score:0});delete x.error;delete x.fired;delete session.manual[i];}session.current=indices[0];session.readyAt=now();session.loadedEntry=null;session.attempt++;host.pause(false);announce('reload','상황 재로딩 · 이전 시도 기록 보존');step();return {ok:true};}
   case 'clearHistory':history=[];return {ok:true};
+  case 'oral':{oral=a.on?{on:true,question:String(a.question||'').slice(0,300),got:Number(a.got)||0,total:Number(a.total)||0,heard:String(a.heard||'').slice(0,200)}:null;return {ok:true};}      // LS의 구술 연습 상태 → 휴대폰 리모컨이 마이크를 켤 수 있게
   case 'voice':{const it=current();if(!active(session)||!session.voice||!it||it.error||it.status!=='진행')return {ok:false,message:'음성 모드로 진행 중인 문제가 없습니다.'};const r=voiceHear(it,String(a.text||'').slice(0,500));step();return r;}
   default:return {ok:false,message:'알 수 없는 FTS 명령'};
  }}
@@ -155,7 +156,9 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   return {ok:true,next:voiceNext(st,P,1)[0]?.text||'',matched:hits.map(h=>({id:h.step.id,comm:h.step.comm,text:h.step.text})),heard:V.normalize(text)};
  }
  // 원격 리모컨(모바일)용 요약: 엔진 전체 스냅숏 대신 지금 문제·시간·교수가 누를 항목만 내려 준다
- function remoteView(){
+ let oral=null;
+ function remoteView(){const v=remoteBase();if(oral)v.oral=oral;return v;}
+ function remoteBase(){
   // 교육 전(또는 끝난 뒤): 리모컨에서 시나리오를 골라 교육을 시작할 수 있게 목록을 같이 준다
   const setup={scenarios:library.scenarios.map(s=>({id:s.id,name:s.name,count:library.situations.filter(x=>s.situations.includes(x.id)).reduce((n,x)=>n+x.problems.length,0)})),
    professors:users.filter(u=>u.role==='교수').map(u=>({id:u.id,name:u.name})),students:users.filter(u=>u.role==='교육생').map(u=>({id:u.id,name:u.name||u.id}))};

@@ -43,9 +43,9 @@ function startForm(setup,title='교육 시작'){
 <div class="start"><button type="button" id="rcStart" class="go" ${pick.scenario?'':'disabled'}>${pick.scenario?'선택한 시나리오로 교육 시작':'시나리오를 고르세요'}</button></div>`;
 }
 // 음성 1인 모드: 휴대폰을 마이크로 쓴다. 「🎙 휴대폰 마이크 켜기」를 한 번 누르면 마이크 사용 동의를 받고,
-// 그 뒤로는 계속 듣다가 말이 끝날 때마다(무음 0.9초) 그 한 마디의 소리를 교수 PC로 보낸다. PC 앱이 받아써(Whisper) 판정한다.
+// 그 뒤로는 계속 듣다가 말하는 동안의 소리를 교수 PC로 이어 보낸다. PC 앱이 받아써(Whisper) 판정한다.
 // 휴대폰 브라우저는 보안 주소(https)에서만 마이크를 준다 — http로 들어왔으면 https 주소로 안내한다.
-const M={on:false,stream:null,ctx:null,node:null,level:0,sent:0,busy:false,error:'',wake:null,https:0};
+const M={on:false,stream:null,ctx:null,node:null,level:0,sent:0,busy:false,error:'',wake:null,https:0,queue:[]};
 async function micOn(){
  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){M.error='insecure';voiceRefresh();return;}
  try{M.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});}
@@ -53,39 +53,46 @@ async function micOn(){
  M.error='';M.on=true;try{M.wake=await navigator.wakeLock?.request('screen');}catch{}
  M.ctx=new (window.AudioContext||window.webkitAudioContext)();await M.ctx.resume?.();
  const src=M.ctx.createMediaStreamSource(M.stream);M.node=M.ctx.createScriptProcessor(4096,1,1);
- const rate=M.ctx.sampleRate,frame=4096/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
+ // 말하는 동안(시작 0.5초 전부터, 마지막 소리 뒤 1.5초까지)의 소리를 16kHz·16비트로 바꿔 0.5초씩 이어 보낸다.
+ // 어디서 한 마디를 끊을지는 PC가 정한다 (PC 마이크와 같은 규칙 · engine/voice-segment.js) — 쉬지 않고 길게 말해도 숨 고르기에서 나뉜다.
+ const rate=M.ctx.sampleRate,frame=4096/rate,pre=[],PRE=Math.ceil(0.5/frame);let floor=0.005,hang=0;
  M.node.onaudioprocess=e=>{
   const x=new Float32Array(e.inputBuffer.getChannelData(0));let sum=0;for(const v of x)sum+=v*v;const rms=Math.sqrt(sum/x.length),thr=Math.max(0.012,floor*3.5);M.level=rms/thr;
-  if(!talk){floor=floor*0.95+rms*0.05;pre.push(x);if(pre.length>PRE)pre.shift();if(rms>thr){talk={chunks:[...pre,x],voiced:1};quiet=0;pre.length=0;}return;}
-  talk.chunks.push(x);if(rms>thr){talk.voiced++;quiet=0;}else quiet+=frame;
-  if(quiet>=0.9||talk.chunks.length*frame>=25){const t=talk;talk=null;if(t.voiced*frame>=0.35)upload(t.chunks,rate);}
+  const pcm=to16k(x,rate);
+  if(rms>thr){if(hang<=0){M.queue.push(...pre);pre.length=0;}hang=1.5;}else if(hang<=0){floor=floor*0.95+rms*0.05;}
+  if(hang>0){M.queue.push(pcm);hang-=frame;pump();}else{pre.push(pcm);if(pre.length>PRE)pre.shift();}
  };
  src.connect(M.node);M.node.connect(M.ctx.destination);voiceRefresh();
 }
-function micOff(){M.on=false;try{M.node?.disconnect();M.ctx?.close();}catch{}for(const t of M.stream?.getTracks()||[])t.stop();M.stream=M.ctx=M.node=null;try{M.wake?.release();}catch{}M.wake=null;voiceRefresh();}
-// 16kHz · 16비트로 줄여 보낸다 (한 마디 25초까지 약 0.8MB)
-async function upload(chunks,rate){
- const n=chunks.reduce((a,c)=>a+c.length,0),r=rate/16000,out=new Int16Array(Math.floor(n/r));let all=new Float32Array(n),o=0;for(const c of chunks){all.set(c,o);o+=c.length;}
- for(let i=0;i<out.length;i++){const v=Math.max(-1,Math.min(1,all[Math.floor(i*r)]));out[i]=v<0?v*0x8000:v*0x7fff;}
+function micOff(){M.on=false;M.queue=[];try{M.node?.disconnect();M.ctx?.close();}catch{}for(const t of M.stream?.getTracks()||[])t.stop();M.stream=M.ctx=M.node=null;try{M.wake?.release();}catch{}M.wake=null;voiceRefresh();}
+const to16k=(x,rate)=>{const r=rate/16000,out=new Int16Array(Math.floor(x.length/r));for(let i=0;i<out.length;i++){const v=Math.max(-1,Math.min(1,x[Math.floor(i*r)]));out[i]=v<0?v*0x8000:v*0x7fff;}return out;};
+// 보낼 소리를 모아 0.5초 이상이면 보낸다. 한 번에 하나씩 순서대로 (네트워크가 밀리면 최근 20초만 남긴다)
+async function pump(){
+ if(M.busy)return;let n=M.queue.reduce((a,c)=>a+c.length,0);if(n<8000)return;
+ while(n>320000){n-=M.queue.shift().length;}
+ const out=new Int16Array(n);let o=0;for(const c of M.queue){out.set(c,o);o+=c.length;}M.queue=[];
  let bin='';const u8=new Uint8Array(out.buffer);for(let i=0;i<u8.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));
- M.busy=true;voiceRefresh();
- try{const res=await fetch('/api/audio',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pcm:btoa(bin)})});const j=await res.json();if(j.error)toast(j.error);else M.sent++;}catch(e){toast('보내지 못했습니다: '+e.message);}
- finally{M.busy=false;voiceRefresh();}
+ M.busy=true;
+ try{const res=await fetch('/api/audio',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pcm:btoa(bin)})});const j=await res.json();if(j.error){if(Date.now()-(M.toastAt||0)>5000){M.toastAt=Date.now();toast(j.error);}}else M.sent++;}catch(e){if(Date.now()-(M.toastAt||0)>5000){M.toastAt=Date.now();toast('보내지 못했습니다: '+e.message);}}
+ finally{M.busy=false;if(M.on)pump();}
 }
 let voiceView=null;
 function voicePanel(v,running,net){
  voiceView={v,running,net};if(net?.https)M.https=net.https;
  let box=$('rcVoice');
- if(!v.voice||!v.problem){if(box)box.remove();if(M.on&&!v.voice)micOff();return;}
- if(!box){box=document.createElement('section');box.id='rcVoice';box.className='voice';
-  box.innerHTML=`<h2>📻 무전 (음성 1인 모드)</h2><div id="rcMic"></div><ul class="list" id="rcVoiceLog"></ul>
-<details class="typed"><summary>마이크 대신 키보드로 보내기</summary><form id="rcVoiceForm"><textarea id="rcVoiceText" rows="2" placeholder="예: K1210열차 금천구청역 정차" enterkeyhint="send"></textarea><button type="submit" class="go">보내기</button></form></details>`;
+ // 음성 1인 모드 문제가 진행 중이거나, 교수 PC에서 구술 연습(말하기)을 하는 중이면 휴대폰을 마이크로 쓴다
+ const kind=v.oral?'oral':v.voice&&v.problem?'voice':'';
+ if(!kind){if(box)box.remove();if(M.on&&!v.voice)micOff();return;}
+ if(box&&box.dataset.kind!==kind){box.remove();box=null;}
+ if(!box){box=document.createElement('section');box.id='rcVoice';box.className='voice';box.dataset.kind=kind;
+  box.innerHTML=`<h2>${kind==='oral'?'🎙 구술 연습 (휴대폰 마이크)':'📻 무전 (음성 1인 모드)'}</h2><div id="rcMic"></div><ul class="list" id="rcVoiceLog"></ul>
+${kind==='oral'?'':`<details class="typed"><summary>마이크 대신 키보드로 보내기</summary><form id="rcVoiceForm"><textarea id="rcVoiceText" rows="2" placeholder="예: K1210열차 금천구청역 정차" enterkeyhint="send"></textarea><button type="submit" class="go">보내기</button></form></details>`}`;
   $('lists').before(box);
-  const t=$('rcVoiceText'),send=async()=>{const text=t.value.trim();if(!text)return;t.value='';await act({type:'fts',op:'voice',text});};
-  $('rcVoiceForm').onsubmit=e=>{e.preventDefault();send();};t.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  const t=$('rcVoiceText');if(t){const send=async()=>{const text=t.value.trim();if(!text)return;t.value='';await act({type:'fts',op:'voice',text});};
+  $('rcVoiceForm').onsubmit=e=>{e.preventDefault();send();};t.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});}
   box.addEventListener('click',e=>{if(e.target.id==='rcMicOn')micOn();if(e.target.id==='rcMicOff')micOff();});}
  voiceRefresh();
- const log=(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 들은 무전이 없습니다.</li>';
+ const log=kind==='oral'?`<li class="item"><div class="tap"><b>${esc(v.oral.question||'다음 문제를 기다리는 중')}</b><small>${v.oral.total?`항목 ${v.oral.got} / ${v.oral.total}`:''}${v.oral.heard?' · 들은 말: '+esc(v.oral.heard):''}</small></div></li>`:(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 들은 무전이 없습니다.</li>';
  if($('rcVoiceLog').innerHTML!==log)$('rcVoiceLog').innerHTML=log;
 }
 function voiceRefresh(){

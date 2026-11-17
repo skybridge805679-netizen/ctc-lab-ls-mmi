@@ -1,12 +1,12 @@
 (function(root){
 'use strict';
 // 음성 1인 모드 (FTS 교육설정 「음성 1인 모드」): 교수 없이 교육생이 말과 LS 조작만으로 실습한다.
-//  · 마이크를 계속 듣다가 말이 끝나면(무음 0.9초) 그 한 마디를 받아써(Whisper, ui/voice-stt-worker.js) 엔진에 넘긴다 (fts op:'voice').
+//  · 마이크를 계속 듣다가 말이 끝나면(무음 0.9초, engine/voice-segment.js) 그 한 마디를 받아써(Whisper, ui/voice-stt-worker.js) 엔진에 넘긴다 (fts op:'voice').
 //  · 엔진이 대본의 한 단계로 알아들으면 그 말에 나온 열차만 반응하고, 상대(기관사·역·관제팀장) 대사를 돌려준다 → 여기서 음성으로 읽는다.
 //  · 상대 대사를 읽는 동안은 듣지 않는다 (자기 소리를 다시 받아쓰지 않게).
 // 상대를 고르는 화면이나 「말하기」 버튼은 없다. 화면에는 들은 말과 알아들은 단계만 보인다.
 const STT_URL=new URL('ui/voice-stt-worker.js',root.location?.href||'').href;
-const S={consumer:null,prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
+const S={consumer:null,prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,seg:{},jobs:new Map(),heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
 // Whisper가 무음·잡음에서 자주 지어내는 말 (방송 끝인사 등) — 무전으로 넘기지 않는다
 const HALLUCINATION=/^(감사합니다\.?|시청해 ?주셔서 감사합니다\.?|구독과 좋아요.*|MBC 뉴스.*|\.+|…+)$/;
 
@@ -16,8 +16,10 @@ function worker(){
  S.worker.onmessage=e=>{const m=e.data;
   if(m.type==='progress')S.progress=m;
   else if(m.type==='ready'){S.model=(m.model?'Whisper '+m.model+' · ':'')+(m.device==='webgpu'?'그래픽카드 가속':'CPU '+m.threads+'코어');S.progress=null;}
-  else if(m.type==='text'){S.busy=Math.max(0,S.busy-1);heard(m.text,m.ms);}
-  else if(m.type==='error'){S.busy=Math.max(0,S.busy-1);S.error='음성인식 오류: '+m.message;}
+  else if(m.type==='text'){S.busy=Math.max(0,S.busy-1);const job=S.jobs.get(m.id)||{};S.jobs.delete(m.id);
+   const text=root.SimVoiceSegment?root.SimVoiceSegment.tidy(m.text,job.dur||0):m.text;      // 지어낸 글(되풀이·방송 끝인사·소리에 비해 너무 많은 글자) 거르기
+   if(job.partial){if(m.id===S.partialId)try{S.consumer?.onPartial?.(text);}catch(e){console.error(e);}}else heard(text,m.ms);}
+  else if(m.type==='error'){S.busy=Math.max(0,S.busy-1);S.jobs.delete(m.id);S.error='음성인식 오류: '+m.message;}
   render();};
  S.worker.postMessage({type:'load'});return S.worker;
 }
@@ -29,7 +31,17 @@ function heard(text,ms){
  const r=S.send?S.send(text):{ok:false,message:'엔진 연결 없음'};
  S.heard.unshift({at:Date.now(),text,ms,ok:r?.ok!==false&&(!!r?.matched?.length||!!r?.ack),ack:!!r?.ack,matched:r?.matched||[],next:r?.next||'',message:r?.ok===false?r.message:''});S.heard.length=Math.min(S.heard.length,12);
 }
-// ── 마이크와 말 끊기(VAD): 소리 크기로 말의 시작과 끝을 찾는다
+// ── 마이크와 말 끊기(VAD): engine/voice-segment.js. PC 마이크와 휴대폰 마이크는 각자 따로 자른다.
+// 음성 1인 모드는 무음 0.9초에서 한 마디(무전 한 마디). 구술 연습처럼 길게 이어 말하는 화면은 consumer.segment로 숨 고르기 자르기(6~12초)를 켠다.
+const SEG_FTS={end:0.9,soft:Infinity,hard:25};
+const muted=()=>S.speaking||Date.now()<S.mutedUntil||!(S.on||S.prep||S.consumer);
+function seg(src,rate){const o={...SEG_FTS,...(S.consumer?.segment||{})};
+ if(!S.seg[src]||S.seg[src].rate!==rate){S.seg[src]=root.SimVoiceSegment.create({...o,rate,onSegment:(a,info)=>transcribe([a],info.rate,{dur:a.length/info.rate})});S.seg[src].rate=rate;}
+ else S.seg[src].set(o);return S.seg[src];}
+// 중간 받아쓰기(consumer.live): 아직 끝나지 않은 말을 2.5초마다 받아써 미리 체크한다 (받아쓰기가 놀고 있을 때만 — 밀리지 않게). 확정은 마디가 끝날 때.
+function live(){const c=S.consumer;if(!c?.live||S.busy)return;const g=Object.values(S.seg).find(x=>x?.talking);if(!g)return;
+ const a=g.current();if(!a||a.length/g.rate<2.5||Date.now()-(S.liveAt||0)<2500)return;S.liveAt=Date.now();transcribe([a],g.rate,{dur:a.length/g.rate,partial:true});}
+function flush(){for(const g of Object.values(S.seg))g?.flush();}
 async function listen(){
  if(S.stream)return;
  const mac=/Mac/.test(navigator.platform||navigator.userAgent),GUIDE=mac?'macOS 시스템 설정 → 개인정보 보호 및 보안 → 마이크에서 「ORPHEIA CTC LAB」을 켠 뒤 [마이크 다시 연결]':'Windows 설정 → 개인 정보 → 마이크 → 「데스크톱 앱이 마이크에 액세스하도록 허용」을 켠 뒤 [마이크 다시 연결]';
@@ -40,31 +52,24 @@ async function listen(){
  }catch(e){S.error='마이크를 쓸 수 없습니다: '+(e.name==='NotAllowedError'?'마이크 사용이 막혀 있습니다 — '+GUIDE:e.name==='NotFoundError'?'연결된 마이크가 없습니다 (휴대폰 리모컨의 「📻 무전」을 쓰세요)':(e.message||e.name));render();return;}
  S.ctx=new AudioContext({sampleRate:16000});S.ctx.resume?.();S.src=S.ctx.createMediaStreamSource(S.stream);
  S.node=S.ctx.createScriptProcessor(2048,1,1);
- const rate=S.ctx.sampleRate,frame=2048/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
- S.node.onaudioprocess=e=>{
-  const x=new Float32Array(e.inputBuffer.getChannelData(0));let sum=0;for(const v of x)sum+=v*v;const rms=Math.sqrt(sum/x.length);
-  if(S.speaking||Date.now()<S.mutedUntil||!(S.on||S.prep||S.consumer)){talk=null;pre.length=0;S.level=0;return;}
-  const thr=Math.max(0.012,floor*3.5);
-  if(!talk){floor=floor*0.95+rms*0.05;pre.push(x);if(pre.length>PRE)pre.shift();if(rms>thr){talk={chunks:[...pre,x],voiced:1};quiet=0;pre.length=0;}S.level=rms/thr;return;}
-  talk.chunks.push(x);if(rms>thr){talk.voiced++;quiet=0;}else quiet+=frame;S.level=rms/thr;
-  const len=talk.chunks.length*frame;
-  if(quiet>=0.9||len>=25){const t=talk;talk=null;if(t.voiced*frame>=0.35)transcribe(t.chunks,rate);}
- };
+ S.node.onaudioprocess=e=>{const x=new Float32Array(e.inputBuffer.getChannelData(0));
+  if(muted()){S.seg.pc?.reset();S.level=0;return;}seg('pc',S.ctx.sampleRate).feed(x);S.level=S.seg.pc.level;live();};
  S.src.connect(S.node);S.node.connect(S.ctx.destination);render();
 }
-function transcribe(chunks,rate){
+function transcribe(chunks,rate,opt={}){
  const n=chunks.reduce((a,c)=>a+c.length,0),audio=new Float32Array(n);let o=0;for(const c of chunks){audio.set(c,o);o+=c.length;}
  let pcm=audio;if(rate!==16000){const r=rate/16000,out=new Float32Array(Math.floor(n/r));for(let i=0;i<out.length;i++)out[i]=audio[Math.floor(i*r)];pcm=out;}
- const w=worker();if(!w)return;S.busy++;w.postMessage({type:'transcribe',id:++S.seq,audio:pcm,prompt:(S.consumer?.hint?.()??S.state?.v?.hint)||''},[pcm.buffer]);render();
+ const w=worker();if(!w)return;S.busy++;const id=++S.seq;if(opt.partial)S.partialId=id;S.jobs.set(id,{dur:opt.dur||pcm.length/16000,partial:!!opt.partial});
+ w.postMessage({type:'transcribe',id,audio:pcm,prompt:(S.consumer?.hint?.()??S.state?.v?.hint)||'',partial:!!opt.partial},[pcm.buffer]);render();
 }
-// 휴대폰 마이크(원격 리모컨)에서 온 한 마디: 16kHz · 16비트. PC 마이크로 들은 것과 똑같이 받아쓴다 (상대 대사를 읽는 동안 온 소리는 버린다)
+// 휴대폰은 말하는 동안(앞뒤 여유 포함) 소리를 0.5초씩 이어 보낸다 → PC 마이크와 같은 규칙으로 여기서 자른다
 function phoneAudio(u8){
- if(!(S.on||S.prep||S.consumer)||S.speaking||Date.now()<S.mutedUntil)return;
+ if(muted()){S.seg.phone?.reset();return;}
  const i16=new Int16Array(u8.buffer,u8.byteOffset,Math.floor(u8.byteLength/2)),f=new Float32Array(i16.length);for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
- S.phoneAt=Date.now();transcribe([f],16000);
+ S.phoneAt=Date.now();const g=seg('phone',16000);g.feed(f);if(!S.stream)S.level=g.level;live();
 }
 try{root.OrpheiaEngine?.onRemoteAudio?.(phoneAudio);}catch{}
-function stopListening(){try{S.node?.disconnect();S.src?.disconnect();S.ctx?.close();}catch{}for(const t of S.stream?.getTracks()||[])t.stop();S.stream=S.ctx=S.node=S.src=null;}
+function stopListening(){for(const g of Object.values(S.seg))g?.reset();try{S.node?.disconnect();S.src?.disconnect();S.ctx?.close();}catch{}for(const t of S.stream?.getTracks()||[])t.stop();S.stream=S.ctx=S.node=S.src=null;}
 // ── 상대 대사 읽기: Supertonic 2 (ui/voice-tts-worker.js, 배역마다 다른 목소리). 모델 준비 전이나 실패하면 기본 TTS로 읽는다.
 const TTS_URL=new URL('ui/voice-tts-worker.js',root.location?.href||'').href;
 const V=()=>root.SimVoice;      // engine/voice.js: 목소리 고르기 · 읽기 쉬운 글 · 미리 만든 음성 파일 이름 (파일 생성 도구와 같은 규칙)
@@ -142,5 +147,5 @@ function announce(text){if(root.SimExtraLS||!text)return;T.queue.push({who:'chie
 // 다른 화면(구술 연습)이 마이크·받아쓰기를 빌려 쓴다: onText(받아쓴 한 마디), hint()(Whisper 문맥 힌트)
 function attach(c){S.consumer=c;S.error='';worker();listen();}
 function detach(c){if(!c||S.consumer===c){S.consumer=null;if(!S.on&&!S.prep)stopListening();}}
-root.SimVoiceSolo={attach,detach,announce,sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice(),progress:S.progress,level:S.level||0,stream:!!S.stream,phone:Date.now()-(S.phoneAt||0)<120000})};
+root.SimVoiceSolo={attach,detach,flush,announce,sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({talking:Object.values(S.seg).some(g=>g?.talking),on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice(),progress:S.progress,level:S.level||0,stream:!!S.stream,phone:Date.now()-(S.phoneAt||0)<120000})};
 })(typeof window!=='undefined'?window:globalThis);

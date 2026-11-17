@@ -15,7 +15,7 @@ test('구술 릴레이 항목 판정: 모범 답안을 말하면 모든 문항�
  assert.equal(R.endOf('30초 이상입니다. 이상입니다.'),'30초 이상입니다.');
  // 문제 은행 어느 답안 줄도 끝말로 오인하지 않는다
  for(const x of R.all())for(const l of [...x.a,...x.key])assert.equal(R.endOf(l),null,x.id+': '+l);
- assert.ok(R.hint(R.all()[0]).endsWith('이상입니다. 패스.'));
+ assert.ok(R.hint(R.all()[0]).endsWith('이상입니다. 패스.'));assert.ok(R.hint(R.all()[0],'앞에서 말한 글').endsWith('앞에서 말한 글'));
 });
 test('결과 화면: 모범 답안에서 말하지 못한 항목의 말만 강조한다 (문제 글에 있는 말은 제외)',()=>{
  const x=R.all().find(x=>x.id==='B-TEST-RECORD-A'),miss=R.highlight(x,[1,2])[0].filter(p=>p.miss).map(p=>p.text.trim());

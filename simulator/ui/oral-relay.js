@@ -35,25 +35,36 @@ function start(opts){
  if(s.mode==='speak')VS()?.attach(consumer);      // 마이크는 말하기 모드에서만
  bindKeys();next();
 }
-const consumer={onText:text=>heard(text),hint:()=>run?.q?R().hint(run.q.item):''};
+// 마이크 빌려 쓰기: 길게 이어 말하므로 숨 고르기에서 자르고(6~12초), 말하는 동안에도 중간 받아쓰기로 미리 체크한다.
+// 힌트에는 그 문제의 핵심 단어와 직전까지 받아쓴 글의 끝을 넣는다 (잘린 마디 앞뒤가 이어진다)
+// 휴대폰 리모컨에 알린다: 구술 연습(말하기) 중이면 리모컨에 휴대폰 마이크 버튼과 지금 문제가 뜬다
+function tell(on){if(run?.s.mode!=='speak'&&on)return;const q=run?.q;try{root.SimRemote?.command?.({type:'fts',op:'oral',on:!!on,question:q?.item.q||'',got:q?.done.length||0,total:q?.item.key.length||0,heard:q?.heard.at(-1)?.text||''});}catch{}}
+const consumer={onText:text=>heard(text),onPartial:text=>partial(text),live:true,segment:{soft:6,gap:0.2,hard:12},hint:()=>run?.q?R().hint(run.q.item,run.q.transcript):''};
 function next(){
  if(!run)return;clearTimeout(run.wait);const stats=load(KEY.stats,{});
  const item=R().pick(run.items,stats,{recent:run.recent,srs:run.s.srs});
  run.recent=[...run.recent,item.id].slice(-Math.min(5,Math.max(0,run.items.length-1)));
  run.q={item,transcript:'',heard:[],done:[],t0:Date.now(),limit:Math.max(10,Number(run.s.limit)||120)};run.phase='ask';
- render();if(run.s.read&&run.s.mode==='speak')VS()?.announce(item.q);
+ render();tell(true);if(run.s.read&&run.s.mode==='speak')VS()?.announce(item.q);
  clearInterval(run.timer);if(run.s.mode!=='card')run.timer=setInterval(tick,250);      // 카드는 시간 제한 없음
  if(run.s.mode==='type')setTimeout(()=>$('oralType')?.focus(),0);
 }
+// 중간 받아쓰기: 아직 끝나지 않은 마디의 글로 미리 체크한다 (체크는 되돌리지 않는다). 마디가 끝나 확정된 글이 오면 버린다
+function partial(text){if(!run||!['ask','grace'].includes(run.phase)||!text)return;const q=run.q;q.partial=text;
+ const newly=R().check(q.item,q.transcript+' '+text,q.done);if(!newly.length){render();return;}q.done.push(...newly);q.live=(q.live||0)+newly.length;
+ render();if(q.done.length===q.item.key.length)finish('all');}
+// 시간이 끝났을 때 하던 말: 마저 받아쓴 뒤(최대 5초) 채점한다 — 마지막에 몰아 말한 항목이 버려지지 않게
+function timeUp(){const q=run.q;if(run.s.mode!=='speak'){finish('time');return;}run.phase='grace';q.graceAt=Date.now();VS()?.flush();render();
+ const wait=()=>{if(!run||run.phase!=='grace'||run.q!==q)return;const st=VS()?.state()||{};if((!st.busy&&!st.talking)||Date.now()-q.graceAt>5000){run.phase='ask';finish('time');return;}setTimeout(wait,200);};setTimeout(wait,300);}
 function tick(){if(!run||run.phase!=='ask')return;const left=run.q.limit-(Date.now()-run.q.t0)/1000;const t=$('oralTime');if(t){t.textContent=clock(left);t.classList.toggle('low',left<=20);}
  const lv=$('oralLevel');if(lv){const st=VS()?.state()||{};lv.style.width=Math.round(Math.max(0,Math.min(1,(st.level||0)/3))*100)+'%';const m=$('oralMic');if(m)m.textContent=micText(st);}
- if(left<=0)finish('time');}
+ if(left<=0)timeUp();}
 function heard(text){
- if(!run||run.phase!=='ask'||!text)return;const q=run.q;
- if(R().isSkip(text)){q.heard.push({text,skip:true});finish('skip');return;}
+ if(!run||!['ask','grace'].includes(run.phase)||!text)return;const q=run.q;q.partial='';
+ if(R().isSkip(text)&&run.phase==='ask'){q.heard.push({text,skip:true});finish('skip');return;}
  const head=R().endOf(text),said=head??text;      // 「이상입니다」: 함께 말한 앞부분까지 채점한 뒤 끝낸다
- let newly=[];if(said.trim()){q.transcript+=' '+said;newly=R().check(q.item,q.transcript,q.done);q.done.push(...newly);}q.heard.push({text,hit:newly.length,end:head!=null});
- if(q.done.length===q.item.key.length){finish('all');return;}if(head!=null){finish('end');return;}render();
+ let newly=[];if(said.trim()){q.transcript+=' '+said;newly=R().check(q.item,q.transcript,q.done);q.done.push(...newly);}q.heard.push({text,hit:newly.length+(q.live||0),end:head!=null});q.live=0;tell(true);
+ if(run.phase==='grace'){render();return;}if(q.done.length===q.item.key.length){finish('all');return;}if(head!=null){finish('end');return;}render();
 }
 // self: 카드에서 스스로 매긴 점수 비율 (모르겠음 0 · 헷갈림 0.7 · 알았음 1)
 function finish(reason,self){
@@ -66,7 +77,7 @@ function finish(reason,self){
  run.phase='result';run.last=r;run.left=Number(run.s.gap)||5;render();
  const count=()=>{if(!run||run.phase!=='result')return;if(run.paused){run.wait=setTimeout(count,500);return;}if(run.left<=0){next();return;}const c=$('oralNext');if(c)c.textContent=`${run.left}초 뒤 다음 문제`;run.left--;run.wait=setTimeout(count,1000);};count();
 }
-function stop(closed){if(!run)return;clearInterval(run.timer);unbindKeys();clearTimeout(run.wait);VS()?.detach(consumer);const was=run;run=null;
+function stop(closed){if(!run)return;tell(false);clearInterval(run.timer);unbindKeys();clearTimeout(run.wait);VS()?.detach(consumer);const was=run;run=null;
  if(!closed&&doc){if(win&&!win.closed){summary(was);}else{const o=doc.getElementById('oralOverlay');if(o)o.hidden=true;}}}
 const clock=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 const micText=st=>st.error&&!st.phone?'⚠ '+st.error:st.progress&&st.progress.total?`음성인식 모델 내려받는 중 ${Math.round(st.progress.loaded/1e6)} / ${Math.round(st.progress.total/1e6)}MB`:!st.model?'음성인식 준비 중…':st.busy?'⏳ 받아쓰는 중…':st.speaking?'🔊 문제 읽는 중':st.phone?'🎙 듣는 중 (휴대폰 마이크)':'🎙 듣는 중 — 말하세요';
@@ -87,11 +98,11 @@ function render(){
 <section class="oral-type"><textarea id="oralType" rows="5" placeholder="답을 입력하세요. 맞힌 항목은 위에 바로 체크됩니다. (Ctrl+Enter 제출)">${esc(q.typed||'')}</textarea></section>
 <footer class="oral-foot"><button type="button" id="oralSubmit" class="primary">제출 <kbd>Ctrl+Enter</kbd></button><button type="button" id="oralSkip">모르겠음</button><button type="button" id="oralStop">연습 끝내기</button></footer>`;
   const t=$('oralType');t.oninput=()=>{q.typed=t.value;q.done=R().check(it,t.value,[]);const sl=$('oralSlots');if(sl)sl.innerHTML=slotsOf(q);const c=$('oralCount');if(c)c.textContent=q.done.length+' / '+it.key.length;if(q.done.length===it.key.length)finish('all');};
- }else if(run.phase==='ask'){
+ }else if(run.phase==='ask'||run.phase==='grace'){
   const slots=it.key.map((k,i)=>q.done.includes(i)?`<li class="ok">✔ ${esc(k)}</li>`:`<li class="todo">○ 항목 ${i+1}</li>`).join('');
   box.innerHTML=`${head}<section class="oral-q">${meta}<h1>${esc(it.q)}</h1></section>
 <section class="oral-keys"><h2>말해야 할 항목 ${q.done.length} / ${it.key.length}</h2><ol>${slots}</ol></section>
-<section class="oral-heard"><h2><span id="oralMic">${esc(micText(VS()?.state()||{}))}</span> <span class="oral-meter"><i id="oralLevel"></i></span></h2><ul>${q.heard.slice(-4).reverse().map(h=>`<li class="${h.hit?'hit':''}"><q>${esc(h.text)}</q>${h.hit?` <small>+${h.hit}항목</small>`:''}</li>`).join('')||'<li class="empty">항목을 하나씩 말하세요. 다 말했으면 「이상입니다」, 모르면 「패스」.</li>'}</ul></section>
+<section class="oral-heard"><h2><span id="oralMic">${esc(micText(VS()?.state()||{}))}</span> <span class="oral-meter"><i id="oralLevel"></i></span></h2><ul>${run.phase==='grace'?'<li class="live">⏱ 시간 종료 — 하던 말을 마저 받아쓰는 중…</li>':''}${q.partial?`<li class="live"><q>${esc(q.partial)}</q> <small>듣는 중${q.live?` · +${q.live}항목`:''}</small></li>`:''}${q.heard.slice(-4).reverse().map(h=>`<li class="${h.hit?'hit':''}"><q>${esc(h.text)}</q>${h.hit?` <small>+${h.hit}항목</small>`:''}</li>`).join('')||'<li class="empty">항목을 하나씩 말하세요. 다 말했으면 「이상입니다」, 모르면 「패스」.</li>'}</ul></section>
 <footer class="oral-foot"><button type="button" id="oralSkip">패스 (다음 문제)</button><button type="button" id="oralStop">연습 끝내기</button>
 <details><summary>마이크 없이 시험 (글로 입력)</summary><form id="oralForm"><input id="oralText" autocomplete="off" placeholder="말할 내용을 입력"><button>입력</button></form></details></footer>`;
  }else{
@@ -128,5 +139,5 @@ function overview(){const stats=load(KEY.stats,{}),all=R().all(),now=Date.now(),
  return {byMode:{speak:log.filter(r=>(r.mode||'speak')==='speak').length,card:log.filter(r=>r.mode==='card').length,type:log.filter(r=>r.mode==='type').length},total:all.length,seen:seen.length,due:seen.filter(x=>stats[x.id].due<=now).length,mastered:seen.filter(x=>(stats[x.id].interval||0)>=7).length,
   weak:seen.filter(x=>stats[x.id].score<100).sort((a,b)=>(stats[a.id].score-stats[b.id].score)||(stats[b.id].lapses-stats[a.id].lapses)).slice(0,8).map(x=>({id:x.id,q:x.q,score:stats[x.id].score,lapses:stats[x.id].lapses}))};}
 function reset(){save(KEY.stats,{});save(KEY.log,[]);}
-root.SimOralRelayUI={start,stop,settings,overview,reset,heard:t=>heard(t),state:()=>run&&{phase:run.phase,item:run.q?.item.id,done:run.q?.done.slice(),results:run.results.slice()}};
+root.SimOralRelayUI={start,stop,settings,overview,reset,heard:t=>heard(t),partial:t=>partial(t),state:()=>run&&{phase:run.phase,item:run.q?.item.id,done:run.q?.done.slice(),results:run.results.slice()}};
 })(typeof window!=='undefined'?window:globalThis);

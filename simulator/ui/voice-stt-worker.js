@@ -24,9 +24,11 @@ let special=null;
 async function transcribe(audio,prompt){
  const tok=asr.tokenizer,id=t=>tok.convert_tokens_to_ids([t])[0];
  special??={sop:id('<|startofprev|>'),sot:id('<|startoftranscript|>'),ko:id('<|ko|>'),tr:id('<|transcribe|>'),nt:id('<|notimestamps|>')};
- const ctx=prompt?tok.encode(' '+String(prompt),{add_special_tokens:false}).slice(-180):[];
+ // 디코더는 앞 문맥까지 448토큰이 한계 → 소리 길이에 맞춰 받아쓸 토큰(1초에 약 14개)을 먼저 잡고, 남는 만큼만 앞 문맥을 넣는다 (engine/voice-segment.js budget과 같은 식)
+ const want=Math.min(440,Math.ceil(audio.length/16000*14)+16),room=Math.max(0,Math.min(180,448-want-6));
+ const ctx=prompt&&room?tok.encode(' '+String(prompt),{add_special_tokens:false}).slice(-room):[];
  const pre=[...(ctx.length?[special.sop,...ctx]:[]),special.sot,special.ko,special.tr,special.nt];
- const f=await asr.processor(audio),out=await asr.model.generate({...f,decoder_input_ids:[pre],max_new_tokens:160});
+ const f=await asr.processor(audio),out=await asr.model.generate({...f,decoder_input_ids:[pre],max_new_tokens:Math.min(want,447-pre.length)});
  const seq=out[0].tolist?out[0].tolist():Array.from(out[0].data??out[0]);
  return tok.decode(seq.slice(pre.length).map(Number),{skip_special_tokens:true}).trim();
 }

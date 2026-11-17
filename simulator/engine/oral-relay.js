@@ -21,7 +21,7 @@ const need=n=>n>=12?0.5:n>=6?0.55:0.75;
 // 지금까지 말한 글(transcript)에서 새로 체크되는 항목 번호
 // 항목만의 단어: 문제 글에 없는 단어에서 조사·이음말을 뗀 것 (「종합시험운행의 일정」 → 일정)
 const PARTICLE=/(으로서|으로|에서|에게|부터|까지|이며|이고|하여|하고|하는|되는|된|의|은|는|이|가|을|를|에|와|과|로|도|및|등)$/;
-const words=(item,k)=>{const q=clean(item.q);return String(k).replace(/[^\uAC00-\uD7A3A-Za-z0-9\s]/g,' ').split(/\s+/).map(w=>w.replace(PARTICLE,'')).filter(w=>w.length>=2&&!q.includes(w)&&!/^(및|등|그|밖에|경우|필요한|사항|대한|관한|위한|대하여|위하여|관하여|따른|따라|있는|없는|해당)$/.test(w));};
+const words=(item,k,strip=true)=>{const q=clean(item.q);return String(k).replace(/[^\uAC00-\uD7A3A-Za-z0-9\s]/g,' ').split(/\s+/).map(w=>strip?w.replace(PARTICLE,''):w).filter(w=>w.length>=2&&!q.includes(w)&&!/^(및|등|그|밖에|경우|필요한|사항|대한|관한|위한|대하여|위하여|관하여|따른|따라|있는|없는|해당)$/.test(w));};
 // 지금까지 말한 글(transcript)에서 새로 체크되는 항목 번호: 글 조각 비율 또는 항목만의 단어 대부분
 function check(item,transcript,done=[]){const heard=grams(transcript),said=clean(transcript),out=[];item.key.forEach((k,i)=>{if(done.includes(i))return;
  const g=keyGrams(item,k);let hit=0;for(const x of g)if(heard.has(x))hit++;
@@ -37,7 +37,13 @@ function endOf(t){const s=String(t||'').trim(),m=s.match(END);if(!m)return null;
  if(m[1]===''&&!/^이상\s*(?:입니다|임니다|입니당|입니다요|임다|이에요|이요|입니다만)?[\s.,!?~…]*(?:감사합니다[\s.!]*)?$/.test(s))return null;return head;}
 const isSkip=t=>/^\s*(패스|다음\s*문제|넘어가|모르겠)/.test(String(t||''))||/^(패스|패쓰|파스|빠스|pass)[.!]?$/i.test(String(t||'').trim());
 // Whisper 문맥 힌트: 그 문제의 핵심 항목들 (정해진 몇 개 중 무엇을 말했는지 고르는 문제가 된다)
-const hint=item=>[item.ch,...item.key].join('. ').slice(0,560)+'. 이상입니다. 패스.';      // 끝말은 맨 뒤(앞 문맥은 뒤쪽이 남는다)
+// · 'words'(기본): 항목 문장 대신 그 항목만의 단어 목록 — 문장을 통째로 주면 뭉개진 소리에서 Whisper가 힌트 문장을 베껴 써서 말하지 않은 항목이 체크될 수 있다
+// · said: 그 문제에서 직전까지 받아쓴 글의 끝 — 잘린 마디 앞뒤가 이어진다(<|startofprev|> 본래 용도). 앞 문맥은 뒤쪽이 남으므로 맨 뒤에 둔다
+function hint(item,said='',style='words'){
+ const vocab=style==='keys'?item.key.join('. '):[...new Set(item.key.flatMap(k=>words(item,k,false)))].join(' ');      // 조사를 떼지 않은 말 그대로 (뗀 조각 「실시결」을 주면 그대로 받아 적는다), 쉼표 목록이 아니게
+ const tail=String(said||'').replace(/\s+/g,' ').trim().slice(-60);
+ return `${item.ch}. ${vocab.slice(0,500)}. 이상입니다. 패스.${tail?' '+tail:''}`;
+}
 // ── 간격 반복 (SM-2를 줄인 것): 점수 비율로 다시/어려움/좋음을 정한다
 const DAY=86400000;
 function grade(stat={},fraction,now=Date.now()){
