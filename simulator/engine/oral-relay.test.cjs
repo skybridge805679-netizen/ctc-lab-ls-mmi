@@ -7,6 +7,15 @@ test('구술 릴레이 항목 판정: 모범 답안을 말하면 모든 문항�
  const it=all.find(x=>x.id==='TEST-PLAN');      // 문제 글에 나온 말(종합시험운행)은 되풀이하지 않아도 된다
  assert.deepEqual(R.check(it,'방법 및 절차, 평가항목 및 평가 기준, 일정'),[0,1,2]);assert.deepEqual(R.check(it,'시험기기 및 장비'),[4]);assert.deepEqual(R.check(it,'방법'),[]);
  assert.ok(R.isSkip('패스')&&R.isSkip('다음 문제요')&&!R.isSkip('철도운영자와 합동으로'));
+ // 「이상입니다」: 끝말로 문제를 마친다. 함께 말한 앞부분은 채점에 쓰고, 수량 뒤의 「이상」(200m 이상입니다)은 답으로 본다
+ for(const t of ['이상입니다','이상입니다.','이상 입니다','이상.'])assert.equal(R.endOf(t),'',t);
+ assert.equal(R.endOf('관제사에게 보고합니다. 이상입니다.'),'관제사에게 보고합니다.');
+ assert.equal(R.endOf('현장 확인 후 보고함 이상입니다 감사합니다'),'현장 확인 후 보고함');
+ for(const t of ['200m 이상입니다','2년 이상입니다.','두 명 이상입니다','30mm 이상','이상 유무를 확인합니다','이상이 있으면 보고합니다','정차 시간은 30초 이상입니다'])assert.equal(R.endOf(t),null,t);
+ assert.equal(R.endOf('30초 이상입니다. 이상입니다.'),'30초 이상입니다.');
+ // 문제 은행 어느 답안 줄도 끝말로 오인하지 않는다
+ for(const x of R.all())for(const l of [...x.a,...x.key])assert.equal(R.endOf(l),null,x.id+': '+l);
+ assert.ok(R.hint(R.all()[0]).endsWith('이상입니다. 패스.'));
 });
 test('결과 화면: 모범 답안에서 말하지 못한 항목의 말만 강조한다 (문제 글에 있는 말은 제외)',()=>{
  const x=R.all().find(x=>x.id==='B-TEST-RECORD-A'),miss=R.highlight(x,[1,2])[0].filter(p=>p.miss).map(p=>p.text.trim());

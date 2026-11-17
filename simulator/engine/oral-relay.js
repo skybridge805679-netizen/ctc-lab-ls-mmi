@@ -29,9 +29,15 @@ function check(item,transcript,done=[]){const heard=grams(transcript),said=clean
  if(g.size&&hit/g.size>=need(g.size)||len>=2&&wordHit>=0.6)out.push(i);});return out;}
 // 항목별 맞힌 정도 (결과 화면에서 모범 답안 줄과 빠진 항목을 짝짓는 데에도 쓴다)
 const similar=(a,b)=>recall(a,grams(b));
-const isSkip=t=>/^\s*(패스|다음\s*문제|넘어가|모르겠)/.test(String(t||''))||/^(패스|pass)[.!]?$/i.test(String(t||'').trim());
+// 「이상입니다」: 구술을 마칠 때 하는 말 → 그 문제를 끝내고 지금까지 말한 항목으로 채점 (빠진 항목은 오답).
+// 「200m 이상입니다」「2년 이상입니다」처럼 수량 뒤의 「이상」은 답의 일부다 → 말 첫머리, 문장부호 뒤, 문장을 맺은 말(…합니다·…요·…함) 뒤일 때만 끝으로 본다.
+// 반환: 끝말 앞에 함께 말한 글 (없으면 '') · 끝말이 아니면 null
+const END=/(^|[.,!?…]\s*|(?:다|요|죠|함|음|임|됨|있음|없음)[.,!?]?\s+)이상\s*(?:입니다|임니다|입니당|입니다요|임다|이에요|이요|입니다만)?[\s.,!?~…]*(?:감사합니다[\s.!]*)?$/;
+function endOf(t){const s=String(t||'').trim(),m=s.match(END);if(!m)return null;const head=s.slice(0,m.index+m[1].length).trim();
+ if(m[1]===''&&!/^이상\s*(?:입니다|임니다|입니당|입니다요|임다|이에요|이요|입니다만)?[\s.,!?~…]*(?:감사합니다[\s.!]*)?$/.test(s))return null;return head;}
+const isSkip=t=>/^\s*(패스|다음\s*문제|넘어가|모르겠)/.test(String(t||''))||/^(패스|패쓰|파스|빠스|pass)[.!]?$/i.test(String(t||'').trim());
 // Whisper 문맥 힌트: 그 문제의 핵심 항목들 (정해진 몇 개 중 무엇을 말했는지 고르는 문제가 된다)
-const hint=item=>[item.ch,...item.key].join('. ').slice(0,600);
+const hint=item=>[item.ch,...item.key].join('. ').slice(0,560)+'. 이상입니다. 패스.';      // 끝말은 맨 뒤(앞 문맥은 뒤쪽이 남는다)
 // ── 간격 반복 (SM-2를 줄인 것): 점수 비율로 다시/어려움/좋음을 정한다
 const DAY=86400000;
 function grade(stat={},fraction,now=Date.now()){
@@ -58,6 +64,6 @@ function highlight(item,missed){
    const last=out.at(-1);if(last&&(last.miss===m||/^\s+$/.test(p)))last.text+=p;else out.push({text:p,miss:m});}
   return out;});
 }
-const api={highlight,all,pool,chapters,check,similar,isSkip,hint,grade,pick,recall,grams};
+const api={highlight,all,pool,chapters,check,similar,isSkip,endOf,hint,grade,pick,recall,grams};
 if(node)module.exports=api;else root.SimOralRelay=api;
 })(typeof window!=='undefined'?window:globalThis);

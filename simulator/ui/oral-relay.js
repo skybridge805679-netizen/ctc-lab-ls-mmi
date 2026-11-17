@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 // 구술 릴레이 (운행선관리 구술 연습): 문제가 하나씩 뜨고, 교육생이 말하면(음성인식) 핵심 항목이 하나씩 체크된다.
-//  · 항목을 다 말하면 즉시 끝, 제한 시간(기본 120초)이 지나도 끝. 「패스」라고 말하면 넘어간다.
+//  · 항목을 다 말하면 즉시 끝, 제한 시간(기본 120초)이 지나도 끝. 다 말했으면 「이상입니다」(못 말한 항목은 오답), 모르면 「패스」.
 //  · 끝나면 점수(부분점수)와 모범 답안 전체를 보여 주고, 말하지 못한 항목은 굵은 빨간 글씨로 표시한다. 몇 초 뒤 다음 문제.
 //  · 출제는 간격 반복(틀린 문제는 곧 다시, 맞힌 문제는 뜸하게). 기록은 이 컴퓨터에 남는다.
 // 마이크·받아쓰기는 음성 1인 모드의 것을 빌려 쓴다 (SimVoiceSolo.attach). 휴대폰 리모컨 마이크도 그대로 된다.
@@ -51,8 +51,9 @@ function tick(){if(!run||run.phase!=='ask')return;const left=run.q.limit-(Date.n
 function heard(text){
  if(!run||run.phase!=='ask'||!text)return;const q=run.q;
  if(R().isSkip(text)){q.heard.push({text,skip:true});finish('skip');return;}
- q.transcript+=' '+text;const newly=R().check(q.item,q.transcript,q.done);q.done.push(...newly);q.heard.push({text,hit:newly.length});
- render();if(q.done.length===q.item.key.length)finish('all');
+ const head=R().endOf(text),said=head??text;      // 「이상입니다」: 함께 말한 앞부분까지 채점한 뒤 끝낸다
+ let newly=[];if(said.trim()){q.transcript+=' '+said;newly=R().check(q.item,q.transcript,q.done);q.done.push(...newly);}q.heard.push({text,hit:newly.length,end:head!=null});
+ if(q.done.length===q.item.key.length){finish('all');return;}if(head!=null){finish('end');return;}render();
 }
 // self: 카드에서 스스로 매긴 점수 비율 (모르겠음 0 · 헷갈림 0.7 · 알았음 1)
 function finish(reason,self){
@@ -90,7 +91,7 @@ function render(){
   const slots=it.key.map((k,i)=>q.done.includes(i)?`<li class="ok">✔ ${esc(k)}</li>`:`<li class="todo">○ 항목 ${i+1}</li>`).join('');
   box.innerHTML=`${head}<section class="oral-q">${meta}<h1>${esc(it.q)}</h1></section>
 <section class="oral-keys"><h2>말해야 할 항목 ${q.done.length} / ${it.key.length}</h2><ol>${slots}</ol></section>
-<section class="oral-heard"><h2><span id="oralMic">${esc(micText(VS()?.state()||{}))}</span> <span class="oral-meter"><i id="oralLevel"></i></span></h2><ul>${q.heard.slice(-4).reverse().map(h=>`<li class="${h.hit?'hit':''}"><q>${esc(h.text)}</q>${h.hit?` <small>+${h.hit}항목</small>`:''}</li>`).join('')||'<li class="empty">항목을 하나씩 말하세요. 「패스」라고 말하면 넘어갑니다.</li>'}</ul></section>
+<section class="oral-heard"><h2><span id="oralMic">${esc(micText(VS()?.state()||{}))}</span> <span class="oral-meter"><i id="oralLevel"></i></span></h2><ul>${q.heard.slice(-4).reverse().map(h=>`<li class="${h.hit?'hit':''}"><q>${esc(h.text)}</q>${h.hit?` <small>+${h.hit}항목</small>`:''}</li>`).join('')||'<li class="empty">항목을 하나씩 말하세요. 다 말했으면 「이상입니다」, 모르면 「패스」.</li>'}</ul></section>
 <footer class="oral-foot"><button type="button" id="oralSkip">패스 (다음 문제)</button><button type="button" id="oralStop">연습 끝내기</button>
 <details><summary>마이크 없이 시험 (글로 입력)</summary><form id="oralForm"><input id="oralText" autocomplete="off" placeholder="말할 내용을 입력"><button>입력</button></form></details></footer>`;
  }else{
@@ -98,7 +99,7 @@ function render(){
   // 모범 답안 줄 ↔ 빠진 항목: 그 줄과 가장 비슷한 항목이 빠졌으면 그 줄을 강조
   const lineMiss=line=>{let best=-1,score=0;it.key.forEach((k,i)=>{const s=Math.max(R().similar(k,line),R().similar(line,k));if(s>score){score=s;best=i;}});return score>=0.5&&missed.has(best);};
   box.innerHTML=`${head}<section class="oral-q">${meta}<h1>${esc(it.q)}</h1></section>
-<section class="oral-result ${r.score===100?'perfect':''}"><div class="oral-big">${r.score}점 <small>${r.got} / ${r.total}항목 · ${r.seconds}초 · ${{all:run.s.mode==='type'?'모두 맞힘':'모두 말함',time:'시간 종료',skip:run.s.mode==='type'?'모르겠음':'패스',submit:'제출'}[r.reason]}</small></div>
+<section class="oral-result ${r.score===100?'perfect':''}"><div class="oral-big">${r.score}점 <small>${r.got} / ${r.total}항목 · ${r.seconds}초 · ${{all:run.s.mode==='type'?'모두 맞힘':'모두 말함',time:'시간 종료',skip:run.s.mode==='type'?'모르겠음':'패스',end:'이상입니다',submit:'제출'}[r.reason]}</small></div>
 <h2>핵심 항목</h2><ol class="oral-check">${it.key.map((k,i)=>missed.has(i)?`<li class="miss">✖ <b>${esc(k)}</b></li>`:`<li class="ok">✔ ${esc(k)}</li>`).join('')}</ol>
 <h2>모범 답안 <small>— 말하지 못한 부분은 굵은 빨간 글씨</small></h2><ol class="oral-answer">${R().highlight(it,r.missed).map((parts,n)=>`<li class="${parts.length===1&&parts[0].miss||lineMiss(it.a[n])&&!parts.some(p=>!p.miss&&p.text.trim().length>8)?'miss':''}">${parts.map(p=>p.miss?`<mark class="miss">${esc(p.text)}</mark>`:esc(p.text)).join('')}</li>`).join('')}</ol>
 ${(it.ref||[]).length?`<h2>참고</h2><ul class="oral-ref">${it.ref.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</section>

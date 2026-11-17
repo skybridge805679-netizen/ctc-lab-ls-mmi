@@ -485,7 +485,7 @@ PAGES.oral={
   const s=O.settings(),v=O.overview(),chs=R.chapters();
   const opt=(val,label)=>`<option value="${esc(val)}" ${s.scope===val?'selected':''}>${esc(label)}</option>`;
   return `<div class="fts-split"><div class="fts-left"><div class="fts-bar">구술 릴레이 설정</div>
-<p class="fts-help">문제가 하나씩 뜨면 소리 내어 답하세요. 말한 핵심 항목이 하나씩 체크되고, 다 말하면 바로 다음 문제로 넘어갑니다. 「패스」라고 말하면 넘어갑니다.<br>마이크·음성인식은 음성 1인 모드와 같습니다 (PC 마이크 또는 휴대폰 리모컨의 「🎙 휴대폰 마이크」).</p>
+<p class="fts-help">문제가 하나씩 뜨면 소리 내어 답하세요. 말한 핵심 항목이 하나씩 체크되고, 다 말하면 바로 다음 문제로 넘어갑니다. 답을 마칠 때 「이상입니다」라고 하면 그 문제를 끝내고(못 말한 항목은 오답), 모르면 「패스」.<br>마이크·음성인식은 음성 1인 모드와 같습니다 (PC 마이크 또는 휴대폰 리모컨의 「🎙 휴대폰 마이크」).</p>
 <div class="fts-row-btns wrap" role="radiogroup" aria-label="연습 방식">${[['speak','🎙 말하기','소리 내어 답하면 항목이 체크'],['card','🃏 카드','정답을 보고 스스로 평가'],['type','⌨ 타이핑','입력하면 항목이 체크']].map(([m,l,d])=>`<label class="fts-mode ${s.mode===m?'on':''}"><input type="radio" name="orMode" value="${m}" ${s.mode===m?'checked':''}> <b>${l}</b> <small>${d}</small></label>`).join('')}</div>
 <p class="fts-help">세 방식은 같은 간격 반복 기록을 씁니다 — 말하기에서 틀린 문제는 카드·타이핑에서 곧 다시 나오고, 카드에서 「모르겠음」 한 문제는 말하기에서 먼저 나옵니다.</p>
 <div class="fts-grid2"><label>출제 범위<select id="orScope">${opt('all','전범위 ('+R.pool('all').length+'문항)')}${opt('exam','기출 ('+R.pool('exam').length+'문항)')}${chs.map(c=>opt('ch:'+c,c+' ('+R.pool('ch:'+c).length+'문항)')).join('')}</select></label>
