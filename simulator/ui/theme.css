@@ -1,0 +1,85 @@
+/* ORPHEIA 디자인 다듬기 (지금 청록 테마 유지)
+ * 범위: 앱 틀(LS 상단바·아래 역 줄), FTS 제어통제, 문제 발생 창, 구술 연습 창, 음성 패널.
+ * LS 배선 화면 안쪽(선로·신호기·열번창·제어 버튼)과 MMI 업무 화면은 원본 대조 화면이라 건드리지 않는다.
+ * 글꼴: Pretendard(OFL, assets/fonts) — 이름을 'ORPHEIA Sans'로 따로 둬서 위 범위에만 쓴다 (다른 화면의 글자 폭·배치는 그대로). */
+@font-face{font-family:'ORPHEIA Sans';src:url('../assets/fonts/PretendardVariable.woff2') format('woff2-variations'),url('../assets/fonts/PretendardVariable.woff2') format('woff2');font-weight:45 920;font-style:normal;font-display:swap}
+:root{
+ --ui-font:'ORPHEIA Sans',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+ --ui-mono:ui-monospace,'SF Mono',Consolas,'D2Coding',monospace;
+ --c-ink:#173d42;--c-ink-2:#3f6461;--c-muted:#6b8784;--c-line:#d3e3de;--c-line-2:#e3eeea;
+ --c-surface:#ffffff;--c-surface-2:#f6faf8;--c-canvas:#eef5f2;--c-mint:#bee3e3;--c-mint-2:#e2f2ef;
+ --c-teal:#245d59;--c-teal-2:#2f7871;--c-gold:#9a7940;--c-ok:#1f7a4a;--c-ok-bg:#e6f4ea;--c-bad:#b4352c;--c-bad-bg:#fdeeec;--c-warn:#8a5a12;--c-warn-bg:#fdf3e1;
+ --r-sm:6px;--r-md:9px;--r-lg:12px;
+ --sh-1:0 1px 2px #173d420d,0 1px 1px #173d4208;--sh-2:0 4px 16px #173d4212;
+ --focus:0 0 0 3px #5fb3ac55;
+}
+
+/* ── 앱 틀: LS 상단바 · 아래 역 줄 (배선 화면 안쪽은 그대로) */
+.ls-topbar,.ls-bottom{font-family:var(--ui-font)}
+.ls-topbar button{border-radius:var(--r-sm);transition:background .15s,border-color .15s}
+.ls-topbar button:focus-visible,.ls-bottom button:focus-visible{outline:none;box-shadow:var(--focus)}
+.ls-bottom .station-tabs button{border-radius:var(--r-sm);font-weight:500;transition:background .15s,color .15s,box-shadow .15s}
+.ls-bottom .station-tabs button[aria-pressed="true"],.ls-bottom .station-tabs button.active,.ls-bottom .station-tabs button.on{font-weight:650}
+
+/* ── FTS 제어통제 */
+.fts,.fts-picker,body.fts-detached,body.problem-detached{font-family:var(--ui-font)}
+.fts{font-size:13px;line-height:1.6;color:var(--c-ink);-webkit-font-smoothing:antialiased}
+.fts input,.fts select,.fts textarea,.fts button{font-family:inherit}
+.fts-head b{font-weight:700;letter-spacing:-.4px}
+.fts-workspace-head h2{font-weight:700;letter-spacing:-.6px}
+/* 왼쪽 메뉴: 기호(▸ —) 대신 점, 하위 메뉴는 세로 안내선 */
+.fts-nav button{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:550;padding:10px 12px;text-align:left}
+.fts-nav-dot{flex:none;width:6px;height:6px;border-radius:50%;background:#7fa9a5;transition:background .15s,box-shadow .15s}
+.fts-nav button.on .fts-nav-dot,.fts-nav button:hover .fts-nav-dot{background:var(--c-mint);box-shadow:0 0 0 3px #bee3e324}
+.fts-sub{margin:2px 0 6px 15px;padding:2px 0 2px 10px;border-left:1px solid #bee3e32e}
+.fts-sub button{font-size:12px;font-weight:500;padding:7px 10px}
+.fts-sub .fts-nav-dot{width:4px;height:4px;background:#6d9692}
+/* 구역 제목: 채운 띠 대신 왼쪽 강조선 · 작은 제목은 가는 밑줄 */
+.fts-bar{position:relative;background:transparent;border:0;border-bottom:1px solid var(--c-line);border-radius:0;padding:4px 0 9px 12px;margin:0 0 12px;font-size:14px;font-weight:700;color:var(--c-ink);letter-spacing:-.2px}
+.fts-bar::before{content:'';position:absolute;left:0;top:5px;bottom:12px;width:3px;border-radius:2px;background:var(--c-teal-2)}
+.fts-sub-bar{background:transparent;border-radius:0;padding:0 0 5px;margin:16px 0 8px;font-size:12px;font-weight:650;color:var(--c-ink-2);border-bottom:1px dashed var(--c-line)}
+.fts-cap{font-size:13px;font-weight:700;color:var(--c-ink);margin:18px 0 8px}
+.fts-help{font-size:12.5px;line-height:1.65;color:var(--c-muted)}
+.fts-left,.fts-right{background:var(--c-surface);border:1px solid var(--c-line-2);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--sh-1);align-self:start}
+.fts-right:has(>.fts-form),.fts-left:has(>.fts-form){background:transparent;border:0;padding:0;box-shadow:none}      /* 이미 카드인 편집 폼은 겹치지 않게 */
+.fts-form{background:var(--c-surface);border-color:var(--c-line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:16px 18px}
+/* 입력칸 · 버튼: 높이·모서리 통일 */
+.fts-grid2 label,.fts-edit-row label{font-size:12px;color:var(--c-ink-2)}
+.fts input,.fts select{min-height:32px;box-sizing:border-box}
+.fts input,.fts select,.fts textarea{border-color:#c6dad3;border-radius:var(--r-sm);font-size:13px;transition:border-color .15s,box-shadow .15s}
+.fts input:hover,.fts select:hover,.fts textarea:hover{border-color:#a9c9bf}
+.fts input:focus,.fts textarea:focus,.fts select:focus{outline:none;border-color:var(--c-teal-2);box-shadow:var(--focus)}
+.fts .sched-btn,.fts-picker .sched-btn{min-height:32px;padding:6px 14px;border-radius:var(--r-sm);font-size:12.5px;font-weight:550;transition:background .15s,border-color .15s,box-shadow .15s}
+.fts .sched-btn.primary,.fts-picker .sched-btn.primary{background:var(--c-teal);border-color:var(--c-teal);box-shadow:0 1px 2px #173d4230}
+.fts .sched-btn.primary:hover,.fts-picker .sched-btn.primary:hover{background:var(--c-teal-2);border-color:var(--c-teal-2)}
+.fts .sched-btn:focus-visible{outline:none;box-shadow:var(--focus)}
+/* 체크박스 줄: 한 줄씩 */
+.fts-left>label:has(>input[type=checkbox]),.fts-right>label:has(>input[type=checkbox]),.fts-body>label:has(>input[type=checkbox]){display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12.5px;color:var(--c-ink-2);cursor:pointer}
+.fts input[type=checkbox],.fts input[type=radio]{width:15px;height:15px;min-height:0;margin:0;accent-color:var(--c-teal-2)}
+/* 표 */
+.fts-table{border-color:var(--c-line);border-radius:var(--r-md);box-shadow:none}
+.fts-table table{font-size:12.5px}
+.fts-table th{font-size:11.5px;font-weight:650;background:var(--c-surface-2);color:var(--c-ink-2);letter-spacing:.1px}
+.fts-table td{padding:8px 10px}
+.fts-table tr.sel td,.fts-table tr.sel:hover td{background:var(--c-mint-2)}
+.fts-tabs button{font-size:12px}
+/* 숫자 타일 (모니터링 시간 · 구술 학습 현황) */
+.fts-clock-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;background:transparent;padding:0}
+.fts-clock-cards label{background:var(--c-surface-2);border:1px solid var(--c-line-2);border-radius:var(--r-md);padding:10px 12px;gap:2px;font-size:11.5px;color:var(--c-muted)}
+.fts-clock-cards input,.fts-clock-cards input[readonly]{width:100%;min-height:0;padding:0;border:0;background:transparent;box-shadow:none;font-family:var(--ui-font);font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;color:var(--c-ink);letter-spacing:-.3px}
+.fts-clock-cards label:first-child input{color:var(--c-teal)}
+.fts-clock-cards>button,.fts-clock-cards>.fts-progress{align-self:center}
+/* 구술 연습 방식 고르기: 세 칸 카드 */
+.fts-row-btns.wrap[role=radiogroup]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fts-mode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px 14px;border:1px solid var(--c-line);border-radius:var(--r-md);background:var(--c-surface);transition:border-color .15s,background .15s,box-shadow .15s;position:relative}
+.fts-mode input{position:absolute;top:12px;right:12px}
+.fts-mode b{font-size:14px;color:var(--c-ink)}.fts-mode small{font-size:11.5px;color:var(--c-muted);line-height:1.4}
+.fts-mode:hover{border-color:#9fc5bc}
+.fts-mode.on,.fts-mode:has(input:checked){border-color:var(--c-teal-2);background:#eef8f5;box-shadow:inset 0 0 0 1px var(--c-teal-2)}
+.fts-checks{border-radius:var(--r-md)}
+.fts-checks li{font-size:12.5px}
+/* 문제 발생 창 */
+.fts-pb-box{font-family:var(--ui-font)}
+
+/* ── 음성 1인 모드 패널 (FTS 안) */
+.fts-voice{font-family:var(--ui-font);border-radius:var(--r-lg)}

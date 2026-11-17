@@ -38,3 +38,17 @@ dialog p{margin:0 0 16px;line-height:1.6}.row{display:flex;gap:8px}.row button{f
 .voice .meter{display:inline-block;width:90px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}
 .voice .meter i{display:block;height:100%;background:#2b9a5a}
 .voice details.typed{margin-top:8px}.voice details.typed form{margin-top:6px}
+/* 디자인 다듬기: 음성 패널을 카드로 · 버튼 높이·여백 통일 */
+.voice{margin:10px 12px 14px;padding:12px 14px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.voice h2{margin:0 0 10px}
+.voice #rcMicOn{display:block;width:100%;min-height:54px;margin:0;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:17px}
+.voice #rcMicOff{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-weight:600}
+.voice .mic-on{display:flex;align-items:center;gap:10px;margin:2px 0 6px;font-weight:700;color:var(--accent)}
+.voice .meter{width:100px;height:8px;border:0;border-radius:4px;background:var(--line)}
+.voice .meter i{background:linear-gradient(90deg,#3fae78,var(--accent))}
+.voice .hint{color:var(--muted);opacity:1;line-height:1.55}
+.voice .warn{color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,var(--card));border-radius:10px;padding:10px 12px}
+.voice .list{padding:0;margin-top:10px}
+.voice details.typed{margin-top:10px;color:var(--muted);font-size:13px}.voice details.typed summary{cursor:pointer;padding:4px 0}
+.voice textarea{border-color:var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.voice .empty{padding:14px 8px;font-size:14px}

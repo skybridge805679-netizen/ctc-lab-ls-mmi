@@ -56,4 +56,6 @@ npm run test:desktop     # Electron 통합 시험 (리눅스는 xvfb-run -a 와 
 - [조작 절차 체크리스트](docs/조작절차체크리스트.md) · [자료 근거](docs/자료근거.md)
 - [참고자료 목록](references/README.md) · [변경 이력](CHANGELOG.md)
 
+화면 글꼴은 [Pretendard](https://github.com/orioncactus/pretendard)(SIL OFL 1.1, `simulator/assets/fonts`)입니다.
+
 개인 학습용 저장소입니다. 첨부 자료의 공개 재배포는 허가하지 않습니다.

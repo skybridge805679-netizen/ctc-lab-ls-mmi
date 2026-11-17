@@ -1,38 +1,87 @@
-/* 구술 연습 (구술 릴레이) 창 */
-body.oral-detached{margin:0;background:#eef6f5;font-family:inherit;color:#163a3a}
-.oral-overlay{position:fixed;inset:0;z-index:9000;background:#eef6f5;overflow:auto}
-.oral{max-width:1000px;margin:0 auto;padding:16px 20px 24px;box-sizing:border-box}
-.oral-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:#1d4d4d;color:#fff}
-.oral-head small{display:block;opacity:.75;font-size:12px}.oral-head b{font-size:18px}.oral-score{font-size:14px;opacity:.9}
-.oral-time{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;min-width:96px;text-align:right}.oral-time.low{color:#ffb4a8}
-.oral-q{margin:14px 0 10px}.oral-meta{margin:0 0 4px;color:#4a6d6d;font-size:13px}.oral-q h1{margin:0;font-size:24px;line-height:1.45;color:#0f3434}
-.oral-keys,.oral-heard,.oral-result{background:#fff;border:1px solid #b9d6d6;border-radius:10px;padding:10px 14px;margin:10px 0}
-.oral h2{margin:2px 0 8px;font-size:15px;color:#2b5d5d}
-.oral-keys ol{margin:0;padding-left:0;list-style:none;display:grid;gap:6px}
-.oral-keys li{padding:7px 10px;border-radius:6px;font-size:16px}.oral-keys li.todo{background:#f1f5f5;color:#8aa}.oral-keys li.ok{background:#e3f4e8;color:#155c2c;font-weight:600}
-.oral-heard ul{margin:0;padding:0;list-style:none}.oral-heard li{padding:4px 0;border-top:1px dashed #cde}.oral-heard li.hit q{color:#155c2c}.oral-heard li.empty{color:#789}
-.oral-heard small{color:#2b8a4a;font-weight:700}
-.oral-meter{display:inline-block;width:120px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}.oral-meter i{display:block;height:100%;width:0;background:#2b9a5a;transition:width .1s}
-.oral-big{font-size:30px;font-weight:800;color:#1d4d4d;margin:2px 0 8px}.oral-big small{font-size:14px;font-weight:400;color:#4a6d6d;margin-left:8px}
-.oral-result.perfect .oral-big{color:#187a3a}
-.oral-check,.oral-answer{margin:0 0 10px;padding-left:22px}.oral-check li,.oral-answer li{margin:4px 0;line-height:1.5;font-size:15px}
-.oral-check li.ok{color:#187a3a}.oral-check li.miss,.oral-answer li.miss{color:#c0262d;font-weight:700}
-.oral-check li.miss b{background:#ffe8e6;padding:0 3px;border-radius:3px}.oral-answer li.miss{background:#fff1f0;border-left:3px solid #c0262d;padding-left:6px;margin-left:-9px}
-.oral-ref{margin:0;padding-left:20px;color:#4a6d6d;font-size:14px}
-.oral-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
-.oral-foot button{padding:8px 14px;border-radius:6px;border:1px solid #6aa6a6;background:#fff;color:#1d4d4d;cursor:pointer;font-size:14px}
-.oral-foot #oralGo{background:#1d4d4d;color:#fff}.oral-foot details{flex-basis:100%}.oral-foot form{display:flex;gap:6px;margin-top:6px}.oral-foot input{flex:1;padding:6px}
-#oralNext{font-weight:700;color:#2b5d5d;margin-right:6px}
-.oral-answer mark.miss{background:#ffe8e6;color:#c0262d;font-weight:700;padding:0 2px;border-radius:3px}
-.oral h2 small{font-weight:400;color:#7a4a4a;font-size:12px}
-.oral-foot>*{margin:0!important}.oral-foot button{flex:0 0 auto}
+/* 구술 연습 (구술 릴레이) 창 — 지금 청록 테마. 글꼴·색 토큰은 ui/theme.css */
+html:has(body.oral-detached),body.oral-detached{min-width:0!important;overflow-x:hidden}      /* 전역 html 최소 폭(1280px) 때문에 1100px 창에서 오른쪽이 잘리던 것 */
+body.oral-detached{margin:0;background:var(--c-canvas,#eef5f2);color:var(--c-ink,#173d42);font-family:var(--ui-font,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.oral-overlay{position:fixed;inset:0;z-index:9000;background:var(--c-canvas,#eef5f2);overflow:auto;font-family:var(--ui-font,sans-serif)}
+.oral,.oral *{box-sizing:border-box}
+.oral{width:100%;max-width:980px;margin:0 auto;padding:18px 22px 28px;font-family:var(--ui-font,sans-serif);font-size:15px;line-height:1.6;color:var(--c-ink,#173d42)}
+.oral button,.oral input,.oral textarea{font-family:inherit}
+
+/* 머리: 진행 · 점수 · 남은 시간 */
+.oral-head{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:18px;padding:12px 18px;border-radius:12px;background:linear-gradient(110deg,#173d42,#245d59);color:#f2fbf9;box-shadow:0 6px 18px #173d4222}
+.oral-head>div{min-width:0}
+.oral-head small{display:block;font-size:11.5px;letter-spacing:.2px;color:#b8d9d5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oral-head b{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.oral-score{font-size:13px;color:#d3ebe7;white-space:nowrap}
+.oral-time{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.5px;min-width:92px;text-align:right;color:#fff}
+.oral-time.low{color:#ffb4a8}
+
+/* 문제 */
+.oral-q{margin:18px 2px 12px}
+.oral-meta{margin:0 0 6px;color:var(--c-muted,#6b8784);font-size:12.5px}
+.oral-q h1{margin:0;font-size:23px;font-weight:700;line-height:1.45;letter-spacing:-.5px;color:#10363a;word-break:keep-all;overflow-wrap:anywhere}
+
+/* 카드(항목 · 들은 말 · 결과) */
+.oral-keys,.oral-heard,.oral-result,.oral-type{background:var(--c-surface,#fff);border:1px solid var(--c-line,#d3e3de);border-radius:12px;padding:14px 18px;margin:12px 0;box-shadow:0 1px 2px #173d420d}
+.oral h2{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--c-ink-2,#3f6461);letter-spacing:-.1px}
+.oral h2 small{font-weight:500;color:#9a5a52;font-size:12px;margin-left:4px}
+
+/* 항목 체크리스트 */
+.oral-keys ol{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.oral-keys li{padding:9px 12px;border-radius:8px;font-size:15px;line-height:1.5;border:1px solid transparent}
+.oral-keys li.todo{background:var(--c-surface-2,#f6faf8);color:#91a8a4;border-color:var(--c-line-2,#e3eeea)}
+.oral-keys li.ok{background:var(--c-ok-bg,#e6f4ea);color:#165c35;font-weight:600;border-color:#c7e5d0;animation:oral-pop .35s ease-out}
+@keyframes oral-pop{from{transform:scale(.98);background:#c8ecd5}to{transform:none}}
+
+/* 들은 말 */
+.oral-heard h2{display:flex;align-items:center;gap:10px}
+.oral-heard ul{margin:0;padding:0;list-style:none}
+.oral-heard li{padding:6px 0;border-top:1px dashed var(--c-line,#d3e3de);font-size:14px}
+.oral-heard li:first-child{border-top:0}
+.oral-heard li q{quotes:'“' '”'}
+.oral-heard li.hit q{color:#165c35}
+.oral-heard li.empty{color:var(--c-muted,#6b8784)}
+.oral-heard li.live{color:var(--c-muted,#6b8784);font-style:italic}
+.oral-heard small{color:var(--c-ok,#1f7a4a);font-weight:700;font-style:normal}
+.oral-meter{display:inline-block;width:110px;height:6px;border-radius:3px;overflow:hidden;background:#e1ece9;vertical-align:middle}
+.oral-meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3fae78,#2f7871);transition:width .1s}
+
+/* 결과 */
+.oral-big{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;font-size:34px;font-weight:800;letter-spacing:-1px;color:var(--c-ink,#173d42);margin:0 0 10px}
+.oral-big small{font-size:13px;font-weight:500;letter-spacing:0;color:var(--c-muted,#6b8784)}
+.oral-result.perfect{border-color:#b9dfc6;background:linear-gradient(180deg,#f2fbf5,#fff 60%)}
+.oral-result.perfect .oral-big{color:var(--c-ok,#1f7a4a)}
+.oral-check,.oral-answer{margin:0 0 14px;padding-left:24px}
+.oral-check li,.oral-answer li{margin:5px 0;line-height:1.65;font-size:14.5px}
+.oral-check li.ok{color:var(--c-ok,#1f7a4a)}
+.oral-check li.miss{color:var(--c-bad,#b4352c);font-weight:700}
+.oral-check li.miss b{background:var(--c-bad-bg,#fdeeec);padding:1px 4px;border-radius:4px}
+.oral-answer li.miss{color:var(--c-bad,#b4352c);font-weight:700;background:var(--c-bad-bg,#fdeeec);border-left:3px solid var(--c-bad,#b4352c);padding:2px 8px;margin-left:-11px;border-radius:0 6px 6px 0}
+.oral-answer mark.miss{background:var(--c-bad-bg,#fdeeec);color:var(--c-bad,#b4352c);font-weight:700;padding:0 2px;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.oral-ref{margin:0;padding-left:20px;color:var(--c-muted,#6b8784);font-size:13.5px}
+.oral-keys ol.oral-check,.oral-keys ol.oral-answer{display:block;list-style:decimal;padding-left:24px}
+.oral-keys ol.oral-check li,.oral-keys ol.oral-answer li{padding:2px 0;background:none;border:0;animation:none}
+
 /* 카드 · 타이핑 */
-.oral-hint{color:#4a6d6d;margin:4px 0}
-.oral-type textarea{width:100%;box-sizing:border-box;font-size:16px;line-height:1.5;padding:10px;border:1px solid #6aa6a6;border-radius:8px;resize:vertical;font-family:inherit}
-.oral-foot kbd{font-size:11px;border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-left:4px;opacity:.7}
-.oral-foot button.primary{background:#1d4d4d;color:#fff}.oral-foot button.g0{border-color:#c0262d;color:#c0262d}.oral-foot button.g1{border-color:#b7791f;color:#8a5a12}.oral-foot button.g2{border-color:#187a3a;color:#187a3a}
-.oral-keys ol.oral-check,.oral-keys ol.oral-answer{display:block;list-style:decimal;padding-left:22px}.oral-keys ol.oral-check li,.oral-keys ol.oral-answer li{padding:2px 0;background:none}
-.oral .oral-foot{justify-content:flex-start!important}
-.oral .oral-foot{font-size:14px;color:#1d4d4d;padding:12px 0 0;border-top:1px solid #cfe2e2}
-.oral .oral-head{margin-bottom:0}
-.oral-heard li.live{color:#4a6d6d;font-style:italic}.oral-heard li.live small{color:#2b8a4a;font-style:normal}
+.oral-hint{color:var(--c-muted,#6b8784);margin:4px 0;font-size:14px}
+.oral-type textarea{width:100%;min-height:140px;font-size:16px;line-height:1.6;padding:12px 14px;border:1px solid var(--c-line,#d3e3de);border-radius:10px;resize:vertical;background:var(--c-surface-2,#f6faf8);color:var(--c-ink,#173d42);transition:border-color .15s,box-shadow .15s,background .15s}
+.oral-type textarea:focus{outline:none;border-color:var(--c-teal-2,#2f7871);background:#fff;box-shadow:0 0 0 3px #5fb3ac44}
+
+/* 아래 버튼 줄 (전역 footer 스타일 덮어씀) */
+.oral .oral-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start!important;gap:8px;margin-top:14px;padding:14px 0 0;border-top:1px solid var(--c-line,#d3e3de);font-size:14px;color:var(--c-ink,#173d42)}
+.oral-foot>*{margin:0!important}
+.oral-foot button{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 16px;border-radius:8px;border:1px solid #b6d1ca;background:#fff;color:var(--c-ink,#173d42);font-size:14px;font-weight:550;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+.oral-foot button:hover{background:#f0f8f5;border-color:#94bfb5}
+.oral-foot button:focus-visible{outline:none;box-shadow:0 0 0 3px #5fb3ac55}
+.oral-foot #oralGo,.oral-foot button.primary{background:var(--c-teal,#245d59);border-color:var(--c-teal,#245d59);color:#fff}
+.oral-foot #oralGo:hover,.oral-foot button.primary:hover{background:var(--c-teal-2,#2f7871)}
+.oral-foot button.g0{border-color:#e3b3ad;color:var(--c-bad,#b4352c)}.oral-foot button.g0:hover{background:var(--c-bad-bg,#fdeeec)}
+.oral-foot button.g1{border-color:#e6cd9c;color:var(--c-warn,#8a5a12)}.oral-foot button.g1:hover{background:var(--c-warn-bg,#fdf3e1)}
+.oral-foot button.g2{border-color:#a9d6b8;color:var(--c-ok,#1f7a4a)}.oral-foot button.g2:hover{background:var(--c-ok-bg,#e6f4ea)}
+.oral-foot kbd{font-family:var(--ui-mono,monospace);font-size:11px;line-height:1;border:1px solid currentColor;border-radius:4px;padding:2px 5px;opacity:.65}
+.oral-foot details{flex-basis:100%;font-size:13px;color:var(--c-muted,#6b8784)}
+.oral-foot details summary{cursor:pointer}
+.oral-foot form{display:flex;gap:6px;margin-top:8px}
+.oral-foot input{flex:1;min-height:36px;padding:6px 10px;border:1px solid var(--c-line,#d3e3de);border-radius:8px;font-size:14px}
+#oralNext{font-weight:700;color:var(--c-teal,#245d59);margin-right:4px;font-variant-numeric:tabular-nums}
+
+@media (max-width:640px){.oral{padding:12px}.oral-head{grid-template-columns:minmax(0,1fr) auto;gap:10px}.oral-score{display:none}.oral-q h1{font-size:19px}.oral-time{font-size:26px;min-width:0}}
