@@ -6,7 +6,7 @@
 //  · 상대 대사를 읽는 동안은 듣지 않는다 (자기 소리를 다시 받아쓰지 않게).
 // 상대를 고르는 화면이나 「말하기」 버튼은 없다. 화면에는 들은 말과 알아들은 단계만 보인다.
 const STT_URL=new URL('ui/voice-stt-worker.js',root.location?.href||'').href;
-const S={prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
+const S={consumer:null,prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
 // Whisper가 무음·잡음에서 자주 지어내는 말 (방송 끝인사 등) — 무전으로 넘기지 않는다
 const HALLUCINATION=/^(감사합니다\.?|시청해 ?주셔서 감사합니다\.?|구독과 좋아요.*|MBC 뉴스.*|\.+|…+)$/;
 
@@ -24,6 +24,7 @@ function worker(){
 // 받아쓴 한 마디 → 엔진
 function heard(text,ms){
  text=String(text||'').trim();if(!text||HALLUCINATION.test(text))return;
+ if(S.consumer){try{S.consumer.onText(text);}catch(e){console.error(e);}return;}      // 구술 연습 등 다른 화면이 마이크를 빌려 쓰는 중
  if(S.prep&&!S.on){S.prepHeard.unshift(text);S.prepHeard.length=Math.min(S.prepHeard.length,5);return;}      // 음성 준비(마이크 시험): 받아쓴 글만 보여 준다
  const r=S.send?S.send(text):{ok:false,message:'엔진 연결 없음'};
  S.heard.unshift({at:Date.now(),text,ms,ok:r?.ok!==false&&(!!r?.matched?.length||!!r?.ack),ack:!!r?.ack,matched:r?.matched||[],next:r?.next||'',message:r?.ok===false?r.message:''});S.heard.length=Math.min(S.heard.length,12);
@@ -42,7 +43,7 @@ async function listen(){
  const rate=S.ctx.sampleRate,frame=2048/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
  S.node.onaudioprocess=e=>{
   const x=new Float32Array(e.inputBuffer.getChannelData(0));let sum=0;for(const v of x)sum+=v*v;const rms=Math.sqrt(sum/x.length);
-  if(S.speaking||Date.now()<S.mutedUntil||!(S.on||S.prep)){talk=null;pre.length=0;S.level=0;return;}
+  if(S.speaking||Date.now()<S.mutedUntil||!(S.on||S.prep||S.consumer)){talk=null;pre.length=0;S.level=0;return;}
   const thr=Math.max(0.012,floor*3.5);
   if(!talk){floor=floor*0.95+rms*0.05;pre.push(x);if(pre.length>PRE)pre.shift();if(rms>thr){talk={chunks:[...pre,x],voiced:1};quiet=0;pre.length=0;}S.level=rms/thr;return;}
   talk.chunks.push(x);if(rms>thr){talk.voiced++;quiet=0;}else quiet+=frame;S.level=rms/thr;
@@ -54,11 +55,11 @@ async function listen(){
 function transcribe(chunks,rate){
  const n=chunks.reduce((a,c)=>a+c.length,0),audio=new Float32Array(n);let o=0;for(const c of chunks){audio.set(c,o);o+=c.length;}
  let pcm=audio;if(rate!==16000){const r=rate/16000,out=new Float32Array(Math.floor(n/r));for(let i=0;i<out.length;i++)out[i]=audio[Math.floor(i*r)];pcm=out;}
- const w=worker();if(!w)return;S.busy++;w.postMessage({type:'transcribe',id:++S.seq,audio:pcm,prompt:S.state?.v?.hint||''},[pcm.buffer]);render();
+ const w=worker();if(!w)return;S.busy++;w.postMessage({type:'transcribe',id:++S.seq,audio:pcm,prompt:(S.consumer?.hint?.()??S.state?.v?.hint)||''},[pcm.buffer]);render();
 }
 // 휴대폰 마이크(원격 리모컨)에서 온 한 마디: 16kHz · 16비트. PC 마이크로 들은 것과 똑같이 받아쓴다 (상대 대사를 읽는 동안 온 소리는 버린다)
 function phoneAudio(u8){
- if(!(S.on||S.prep)||S.speaking||Date.now()<S.mutedUntil)return;
+ if(!(S.on||S.prep||S.consumer)||S.speaking||Date.now()<S.mutedUntil)return;
  const i16=new Int16Array(u8.buffer,u8.byteOffset,Math.floor(u8.byteLength/2)),f=new Float32Array(i16.length);for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
  S.phoneAt=Date.now();transcribe([f],16000);
 }
@@ -138,5 +139,8 @@ function renderPrep(){
 let stopping=0;function stopPrepSoon(){clearTimeout(stopping);stopping=setTimeout(()=>{const D=S.doc?.()||root.document;if(S.prep&&!D?.getElementById('suVoicePrep'))stopPrep();},1500);}      // 교육설정 화면을 떠나면 마이크 시험을 끝낸다
 // FTS 안내(문제 발생·상황 변경) 음성도 상대 대사와 같은 줄에 세워 차례로 읽는다 (동시에 읽으면 겹친다)
 function announce(text){if(root.SimExtraLS||!text)return;T.queue.push({who:'chief',name:'안내',text});drain();}
-root.SimVoiceSolo={announce,sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};
+// 다른 화면(구술 연습)이 마이크·받아쓰기를 빌려 쓴다: onText(받아쓴 한 마디), hint()(Whisper 문맥 힌트)
+function attach(c){S.consumer=c;S.error='';worker();listen();}
+function detach(c){if(!c||S.consumer===c){S.consumer=null;if(!S.on&&!S.prep)stopListening();}}
+root.SimVoiceSolo={attach,detach,announce,sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice(),progress:S.progress,level:S.level||0,stream:!!S.stream,phone:Date.now()-(S.phoneAt||0)<120000})};
 })(typeof window!=='undefined'?window:globalThis);

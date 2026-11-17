@@ -31,14 +31,14 @@ function syncRemote(){const value=root.SimRemote.snapshot.fts;if(!value)return;i
 const SECTIONS=['지하청량리-수원','지하청량리-영등포','지하청량리-지하서울','노량진-금천구청','용산-수원','영등포-수원'];
 
 // ---------------------------------------------------------------- shell
-const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리'],['remote','원격 조작']];
+const MENU=[['setup','교육설정'],['system','시스템관리'],['users','사용자관리'],['scenario','시나리오관리',[['problems','문제 관리'],['situations','상황 관리'],['scenarios','시나리오 관리']]],['monitor','모니터링관리'],['history','교육이력관리'],['oral','구술 연습'],['remote','원격 조작']];
 function shell(){
  return `<div class="fts"><div class="fts-head"><img class="fts-banner" src="assets/orpheia/banner.png" alt="" aria-hidden="true" width="2172" height="724"><div class="fts-brand"><img src="assets/orpheia/emblem.png" alt="" width="38" height="38"><div><small>ORPHEIA · TRAINING CONTROL</small><b>FTS 제어통제 시스템</b></div></div><span class="fts-lamps"><i class="fts-engine" title="${root.OrpheiaEngine.native===false?'관제 엔진 (브라우저 시험 연결)':'독립 관제 엔진 연결'}">ENGINE</i>${['CTC','EMC','SIC','DB'].map(x=>`<i class="simulated" title="${x} 모의 · 외부 장치 통신 미연결">${x} · 모의</i>`).join('')}</span></div>
 <div class="fts-main"><nav class="fts-nav">${MENU.map(([id,label,sub])=>`<button type="button" data-fts-page="${sub?sub[0][0]:id}" data-fts-group="${id}">▸ ${label}</button>${sub?`<div class="fts-sub">${sub.map(([s,l])=>`<button type="button" data-fts-page="${s}">— ${l}</button>`).join('')}</div>`:''}`).join('')}</nav>
 <section class="fts-workspace"><div class="fts-workspace-head"><div><small>INSTRUCTOR WORKSPACE</small><h2 id="ftsPageTitle">교육설정</h2></div><span id="ftsSessionStatus">교육 전 준비</span></div><div class="fts-body" id="ftsBody"></div></section></div></div>`;
 }
 function go(p){
- page=p;monitorSignature='';problemSignature='';if($('ftsPageTitle'))$('ftsPageTitle').textContent={setup:'교육설정',system:'시스템관리',users:'사용자관리',problems:'문제 관리',situations:'상황 관리',scenarios:'시나리오 관리',monitor:'모니터링관리',history:'교육이력관리',remote:'원격 조작'}[p];for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
+ page=p;monitorSignature='';problemSignature='';if($('ftsPageTitle'))$('ftsPageTitle').textContent={setup:'교육설정',system:'시스템관리',users:'사용자관리',problems:'문제 관리',situations:'상황 관리',scenarios:'시나리오 관리',monitor:'모니터링관리',history:'교육이력관리',oral:'구술 연습',remote:'원격 조작'}[p];for(const b of doc.querySelectorAll('[data-fts-page]'))b.classList.toggle('on',b.dataset.ftsPage===p);
  $('ftsBody').innerHTML=PAGES[p].html();PAGES[p].bind?.();
 }
 
@@ -478,6 +478,32 @@ function speak(text){try{if(!text||root.SimExtraLS)return;if(root.SimRemote.snap
 
 // ---------------------------------------------------------------- 교육이력관리
 // 원격 조작: 같은 네트워크의 스마트폰(리모컨)·PC 브라우저(앱 화면)로 접속 — 데스크톱 앱 안의 원격 조작 서버를 켜고 끈다
+// ---------------------------------------------------------------- 구술 연습 (운행선관리 구술 릴레이 · ui/oral-relay.js)
+PAGES.oral={
+ html(){
+  const O=root.SimOralRelayUI,R=root.SimOralRelay;if(!O||!R)return '<p class="fts-empty">구술 연습을 불러오지 못했습니다.</p>';
+  const s=O.settings(),v=O.overview(),chs=R.chapters();
+  const opt=(val,label)=>`<option value="${esc(val)}" ${s.scope===val?'selected':''}>${esc(label)}</option>`;
+  return `<div class="fts-split"><div class="fts-left"><div class="fts-bar">구술 릴레이 설정</div>
+<p class="fts-help">문제가 하나씩 뜨면 소리 내어 답하세요. 말한 핵심 항목이 하나씩 체크되고, 다 말하면 바로 다음 문제로 넘어갑니다. 「패스」라고 말하면 넘어갑니다.<br>마이크·음성인식은 음성 1인 모드와 같습니다 (PC 마이크 또는 휴대폰 리모컨의 「🎙 휴대폰 마이크」).</p>
+<div class="fts-grid2"><label>출제 범위<select id="orScope">${opt('all','전범위 ('+R.pool('all').length+'문항)')}${opt('exam','기출 ('+R.pool('exam').length+'문항)')}${chs.map(c=>opt('ch:'+c,c+' ('+R.pool('ch:'+c).length+'문항)')).join('')}</select></label>
+<label>제한 시간(초)<input id="orLimit" type="number" min="10" max="600" step="10" value="${esc(s.limit)}"></label>
+<label>다음 문제까지(초)<input id="orGap" type="number" min="1" max="60" value="${esc(s.gap)}"></label></div>
+<label><input type="checkbox" id="orSrs" ${s.srs?'checked':''}> 간격 반복 출제 (틀린 문제는 곧 다시, 맞힌 문제는 뜸하게 — 끄면 무작위)</label>
+<label><input type="checkbox" id="orRead" ${s.read?'checked':''}> 문제를 소리 내어 읽어 주기</label>
+<div class="fts-row-btns"><button type="button" class="sched-btn primary" id="orStart">구술 연습 시작</button></div></div>
+<div class="fts-right"><div class="fts-bar">학습 현황 (이 컴퓨터)</div>
+<div class="fts-grid2 fts-clock-cards"><label>본 문항<input readonly value="${v.seen} / ${v.total}"></label><label>다시 볼 때가 된 문항<input readonly value="${v.due}"></label><label>익힌 문항 (7일 이상 간격)<input readonly value="${v.mastered}"></label></div>
+<div class="fts-cap">약한 문항</div><ul class="fts-checks">${v.weak.map(w=>`<li class="bad">${w.score}점${w.lapses?' · 틀린 횟수 '+w.lapses:''} · ${esc(w.q)}</li>`).join('')||'<li>아직 기록이 없습니다.</li>'}</ul>
+<div class="fts-row-btns"><button type="button" class="sched-btn" id="orReset">학습 기록 지우기</button></div></div></div>`;
+ },
+ bind(){
+  const O=root.SimOralRelayUI;if(!O)return;
+  const opts=()=>({scope:$('orScope').value,limit:Math.max(10,Math.min(600,Number($('orLimit').value)||120)),gap:Math.max(1,Math.min(60,Number($('orGap').value)||5)),srs:$('orSrs').checked,read:$('orRead').checked});
+  $('orStart').onclick=()=>O.start(opts());
+  $('orReset').onclick=()=>confirmBox('구술 연습 기록(간격 반복 일정·점수)을 모두 지울까요?',()=>{O.reset();go('oral');});
+ }
+};
 PAGES.remote={
  html:()=>'<div id="ftsRemote" class="fts-remote"></div>',
  bind(){

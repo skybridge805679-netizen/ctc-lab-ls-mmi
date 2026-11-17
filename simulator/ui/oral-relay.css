@@ -1,0 +1,28 @@
+/* 구술 연습 (구술 릴레이) 창 */
+body.oral-detached{margin:0;background:#eef6f5;font-family:inherit;color:#163a3a}
+.oral-overlay{position:fixed;inset:0;z-index:9000;background:#eef6f5;overflow:auto}
+.oral{max-width:1000px;margin:0 auto;padding:16px 20px 24px;box-sizing:border-box}
+.oral-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:#1d4d4d;color:#fff}
+.oral-head small{display:block;opacity:.75;font-size:12px}.oral-head b{font-size:18px}.oral-score{font-size:14px;opacity:.9}
+.oral-time{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;min-width:96px;text-align:right}.oral-time.low{color:#ffb4a8}
+.oral-q{margin:14px 0 10px}.oral-meta{margin:0 0 4px;color:#4a6d6d;font-size:13px}.oral-q h1{margin:0;font-size:24px;line-height:1.45;color:#0f3434}
+.oral-keys,.oral-heard,.oral-result{background:#fff;border:1px solid #b9d6d6;border-radius:10px;padding:10px 14px;margin:10px 0}
+.oral h2{margin:2px 0 8px;font-size:15px;color:#2b5d5d}
+.oral-keys ol{margin:0;padding-left:0;list-style:none;display:grid;gap:6px}
+.oral-keys li{padding:7px 10px;border-radius:6px;font-size:16px}.oral-keys li.todo{background:#f1f5f5;color:#8aa}.oral-keys li.ok{background:#e3f4e8;color:#155c2c;font-weight:600}
+.oral-heard ul{margin:0;padding:0;list-style:none}.oral-heard li{padding:4px 0;border-top:1px dashed #cde}.oral-heard li.hit q{color:#155c2c}.oral-heard li.empty{color:#789}
+.oral-heard small{color:#2b8a4a;font-weight:700}
+.oral-meter{display:inline-block;width:120px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}.oral-meter i{display:block;height:100%;width:0;background:#2b9a5a;transition:width .1s}
+.oral-big{font-size:30px;font-weight:800;color:#1d4d4d;margin:2px 0 8px}.oral-big small{font-size:14px;font-weight:400;color:#4a6d6d;margin-left:8px}
+.oral-result.perfect .oral-big{color:#187a3a}
+.oral-check,.oral-answer{margin:0 0 10px;padding-left:22px}.oral-check li,.oral-answer li{margin:4px 0;line-height:1.5;font-size:15px}
+.oral-check li.ok{color:#187a3a}.oral-check li.miss,.oral-answer li.miss{color:#c0262d;font-weight:700}
+.oral-check li.miss b{background:#ffe8e6;padding:0 3px;border-radius:3px}.oral-answer li.miss{background:#fff1f0;border-left:3px solid #c0262d;padding-left:6px;margin-left:-9px}
+.oral-ref{margin:0;padding-left:20px;color:#4a6d6d;font-size:14px}
+.oral-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.oral-foot button{padding:8px 14px;border-radius:6px;border:1px solid #6aa6a6;background:#fff;color:#1d4d4d;cursor:pointer;font-size:14px}
+.oral-foot #oralGo{background:#1d4d4d;color:#fff}.oral-foot details{flex-basis:100%}.oral-foot form{display:flex;gap:6px;margin-top:6px}.oral-foot input{flex:1;padding:6px}
+#oralNext{font-weight:700;color:#2b5d5d;margin-right:6px}
+.oral-answer mark.miss{background:#ffe8e6;color:#c0262d;font-weight:700;padding:0 2px;border-radius:3px}
+.oral h2 small{font-weight:400;color:#7a4a4a;font-size:12px}
+.oral-foot>*{margin:0!important}.oral-foot button{flex:0 0 auto}
