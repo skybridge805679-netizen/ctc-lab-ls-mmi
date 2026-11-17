@@ -35,11 +35,11 @@ function start(opts){
  if(s.mode==='speak')VS()?.attach(consumer);      // 마이크는 말하기 모드에서만
  bindKeys();next();
 }
-// 마이크 빌려 쓰기: 길게 이어 말하므로 숨 고르기에서 자르고(6~12초), 말하는 동안에도 중간 받아쓰기로 미리 체크한다.
+// 마이크 빌려 쓰기: 길게 이어 말하므로 숨 고르기에서 자르고(10~20초 — 측정해 보니 6~12초보다 Whisper가 덜 빠뜨린다), 말하는 동안에도 중간 받아쓰기로 미리 체크한다.
 // 힌트에는 그 문제의 핵심 단어와 직전까지 받아쓴 글의 끝을 넣는다 (잘린 마디 앞뒤가 이어진다)
 // 휴대폰 리모컨에 알린다: 구술 연습(말하기) 중이면 리모컨에 휴대폰 마이크 버튼과 지금 문제가 뜬다
 function tell(on){if(run?.s.mode!=='speak'&&on)return;const q=run?.q;try{root.SimRemote?.command?.({type:'fts',op:'oral',on:!!on,question:q?.item.q||'',got:q?.done.length||0,total:q?.item.key.length||0,heard:q?.heard.at(-1)?.text||''});}catch{}}
-const consumer={onText:text=>heard(text),onPartial:text=>partial(text),live:true,segment:{soft:6,gap:0.2,hard:12},hint:()=>run?.q?R().hint(run.q.item,run.q.transcript):''};
+const consumer={onText:text=>heard(text),onPartial:text=>partial(text),live:true,segment:{soft:10,gap:0.25,hard:20},hint:()=>run?.q?R().hint(run.q.item,run.q.transcript):''};
 function next(){
  if(!run)return;clearTimeout(run.wait);const stats=load(KEY.stats,{});
  const item=R().pick(run.items,stats,{recent:run.recent,srs:run.s.srs});

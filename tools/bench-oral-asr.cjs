@@ -2,6 +2,7 @@
 // 구술 연습 받아쓰기 측정: 모범 답안을 쉬지 않고 읽은 소리(Supertonic TTS)를 앱과 같은 말 자르기·Whisper·항목 판정에 넣어
 // 방식별로 「말한 항목이 체크된 비율(인정률)」과 「다른 문항 답으로 체크된 비율(잘못 인정률)」을 잰다.
 // 기계 목소리라 사람보다 점수가 좋게 나온다 — 방식끼리 비교하는 용도.
+// 결과(2026-11, whisper-small · 10문항 · 쉬지 않고 읽기 + 앞 절반만 읽기): 이전 100% · 6~12초 자르기 98.3% · 10~20초 자르기 100%, 잘못 인정 모두 0 → 구술 연습은 10~20초.
 // 준비: npm i --no-save @huggingface/transformers@4.3.2   사용: node tools/bench-oral-asr.cjs [--n 24] [--speed 1.0,1.25] [--noise 0.004] [--only A,C]
 const fs=require('fs'),path=require('path');
 const R=require('../simulator/engine/oral-relay.js'),G=require('../simulator/engine/voice-segment.js');
@@ -18,7 +19,7 @@ const STRATS={
  W:{name:'R, 자르기 10~20초',seg:{end:0.9,soft:10,gap:0.25,hard:20},hint:'words',prev:true,ctx:180,tokens:G.budget,tidy:true,retry:true},
  H:{name:'C, 힌트 없음',seg:SEG,hint:'none',prev:true,ctx:180,tokens:G.budget,tidy:true},
 };
-const ONLY=arg('only','')?arg('only').split(','):['A','R','W'];
+const ONLY=arg('only','')?arg('only').split(','):['A','W'];
 function seeded(seed){return()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};}
 function pickItems(){if(IDS)return R.all().filter(x=>IDS.includes(x.id));const rnd=seeded(7),all=R.all().filter(x=>x.key.length>=3&&x.key.length<=8);const out=[];const pool=[...all];
  while(out.length<N&&pool.length)out.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]);return out;}
