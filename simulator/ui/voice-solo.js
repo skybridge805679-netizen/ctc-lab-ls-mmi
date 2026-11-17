@@ -31,9 +31,12 @@ function heard(text,ms){
 // ── 마이크와 말 끊기(VAD): 소리 크기로 말의 시작과 끝을 찾는다
 async function listen(){
  if(S.stream)return;
+ const mac=/Mac/.test(navigator.platform||navigator.userAgent),GUIDE=mac?'macOS 시스템 설정 → 개인정보 보호 및 보안 → 마이크에서 「ORPHEIA CTC LAB」을 켠 뒤 [마이크 다시 연결]':'Windows 설정 → 개인 정보 → 마이크 → 「데스크톱 앱이 마이크에 액세스하도록 허용」을 켠 뒤 [마이크 다시 연결]';
+ // 데스크톱 앱: 운영체제 마이크 허용부터 받는다 (macOS는 여기서 허용 창이 뜬다)
+ try{const os=await root.OrpheiaEngine?.mic?.();if(os&&['denied','restricted'].includes(os.status)){S.error='마이크 사용이 막혀 있습니다 — '+GUIDE;render();return;}}catch{}
  try{
   S.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
- }catch(e){S.error='마이크를 쓸 수 없습니다: '+(e.name==='NotAllowedError'?'마이크 사용이 막혀 있습니다 (Windows 설정 → 개인 정보 → 마이크 → 데스크톱 앱의 마이크 접근 허용 / macOS 시스템 설정 → 개인정보 보호 → 마이크)':e.name==='NotFoundError'?'연결된 마이크가 없습니다 (휴대폰 리모컨의 「📻 무전」을 쓰세요)':(e.message||e.name));render();return;}
+ }catch(e){S.error='마이크를 쓸 수 없습니다: '+(e.name==='NotAllowedError'?'마이크 사용이 막혀 있습니다 — '+GUIDE:e.name==='NotFoundError'?'연결된 마이크가 없습니다 (휴대폰 리모컨의 「📻 무전」을 쓰세요)':(e.message||e.name));render();return;}
  S.ctx=new AudioContext({sampleRate:16000});S.ctx.resume?.();S.src=S.ctx.createMediaStreamSource(S.stream);
  S.node=S.ctx.createScriptProcessor(2048,1,1);
  const rate=S.ctx.sampleRate,frame=2048/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
@@ -103,9 +106,10 @@ function render(){
  const done=Object.keys(st.v?.done||{}).length;
  const html=`<div class="fts-voice ${S.speaking?'speaking':''}"><div class="fts-voice-status"><b>${esc(status)}</b><small>${S.model?'받아쓰기: '+esc(S.model)+' · ':''}${T.ready?'목소리: Supertonic · ':T.failed?'목소리: 기본 TTS · ':''}알아들은 말 ${done}개</small></div>
 <ul class="fts-voice-log">${S.heard.map(h=>`<li class="${h.ok?'ok':'miss'}"><span>${h.ok?'✔':'✖'}</span><div><q>${esc(h.text)}</q>${h.ok?`<small>${h.ack?'응답 (관제 이상 · 수신 이상)':h.matched.map(m=>esc(m.comm+' · '+m.text.slice(0,48))).join('<br>')}</small>`:`<small>${esc(h.message||'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게 다시 말해 보세요')}</small>`}</div></li>`).join('')||'<li class="empty">아직 들은 말이 없습니다.</li>'}</ul>
-<details class="fts-voice-type"><summary>마이크 없이 시험 (글로 입력)</summary><form id="ftsVoiceForm"><input id="ftsVoiceText" placeholder="예: K1210열차 금천구청역 정차" autocomplete="off"><button class="sched-btn">입력</button></form></details></div>`;
+${S.error&&!S.stream&&!phone?'<button type="button" class="sched-btn primary" id="ftsVoiceRetry">🎙 마이크 다시 연결</button>':''}<details class="fts-voice-type"><summary>마이크 없이 시험 (글로 입력)</summary><form id="ftsVoiceForm"><input id="ftsVoiceText" placeholder="예: K1210열차 금천구청역 정차" autocomplete="off"><button class="sched-btn">입력</button></form></details></div>`;
  if(html===last)return;const open=box.querySelector('details')?.open,typed=box.querySelector('#ftsVoiceText')?.value||'',focus=D.activeElement?.id==='ftsVoiceText';last=html;box.innerHTML=html;
  const d=box.querySelector('details');if(open)d.open=true;const inp=box.querySelector('#ftsVoiceText');inp.value=typed;if(focus)inp.focus();
+ box.querySelector('#ftsVoiceRetry')?.addEventListener('click',()=>{S.error='';stopListening();listen();render();});
  box.querySelector('#ftsVoiceForm').onsubmit=e=>{e.preventDefault();const t=inp.value.trim();if(!t)return;inp.value='';heard(t,0);render();};
 }
 // ── 음성 준비 (교육설정에서 「음성 1인 모드」를 켰을 때): 모델을 미리 받고, 마이크 소리 크기와 받아쓰기를 시험하고, 목소리를 들어 본다
@@ -121,10 +125,11 @@ function renderPrep(){
 <ul>${row('음성인식 (Whisper)',S.progress,!!S.model,false,S.model)}${row('목소리 (Supertonic)',T.progress,T.ready,T.failed,'')}
 <li><b>마이크</b> ${S.error&&!S.stream?'⚠ '+esc(S.error):S.stream?'✔ 듣는 중 '+mic+' <small>말하면 막대가 움직입니다</small>':'연결 중… (처음이면 마이크 허용을 묻습니다)'}</li>
 <li><b>받아쓰기 시험</b> ${S.prepHeard.length?S.prepHeard.map(t=>`<q>${esc(t)}</q>`).join(' '):S.busy?'⏳ 받아쓰는 중…':S.model?'「K1210열차 금천구청역 정차」처럼 말해 보세요':'음성인식 모델이 준비되면 시험할 수 있습니다'}</li></ul>
-<div class="fts-row-btns"><button type="button" class="sched-btn" id="suVoiceHear" ${T.playing?'disabled':''}>🔊 목소리 들어 보기</button><button type="button" class="sched-btn" id="suVoiceStop">마이크 시험 끝내기</button></div></div>`;
+<div class="fts-row-btns"><button type="button" class="sched-btn" id="suVoiceHear" ${T.playing?'disabled':''}>🔊 목소리 들어 보기</button>${!S.stream?'<button type="button" class="sched-btn primary" id="suVoiceRetry">🎙 마이크 다시 연결</button>':''}<button type="button" class="sched-btn" id="suVoiceStop">마이크 시험 끝내기</button></div></div>`;
  if(box.dataset.html===html)return;box.dataset.html=html;box.dataset.on='1';box.innerHTML=html;
  box.querySelector('#suVoiceHear').onclick=()=>speakLines([{who:'driver',name:'K1210 기관사',text:'K1210 열차. 수신 이상!'},{who:'station',name:'금천구청역',text:'금천구청역, 수신 이상!'}]);
  box.querySelector('#suVoiceStop').onclick=stopPrep;
+ box.querySelector('#suVoiceRetry')?.addEventListener('click',()=>{S.error='';stopListening();listen();renderPrep();});
 }
 let stopping=0;function stopPrepSoon(){clearTimeout(stopping);stopping=setTimeout(()=>{const D=S.doc?.()||root.document;if(S.prep&&!D?.getElementById('suVoicePrep'))stopPrep();},1500);}      // 교육설정 화면을 떠나면 마이크 시험을 끝낸다
 root.SimVoiceSolo={sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};

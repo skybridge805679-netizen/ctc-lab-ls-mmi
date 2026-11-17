@@ -31,7 +31,14 @@ else{
    const audioOnly=permission==='media'&&appPage(details?.requestingUrl||contents?.getURL())&&(details?.mediaTypes||[]).every(t=>t==='audio');
    if(!audioOnly)return respond(false);
    if(process.platform==='darwin')systemPreferences.askForMediaAccess('microphone').then(ok=>respond(!!ok),()=>respond(false));else respond(true);});
-  session.defaultSession.setPermissionCheckHandler((_contents,permission,origin,details)=>permission==='media'&&(details?.mediaType||'audio')==='audio'&&(appPage(details?.requestingUrl)||String(origin).startsWith('file://')));
+  // 확인(check)은 미디어 종류가 「unknown」으로 올 때도 있어(macOS 장치 조회 등) 종류로 거르지 않는다 — 실제 사용 요청(request)에서 오디오만 허용한다
+  session.defaultSession.setPermissionCheckHandler((_contents,permission,origin,details)=>permission==='media'&&(appPage(details?.requestingUrl)||String(origin).startsWith('file://')));
+  // 음성 1인 모드: 마이크를 켜기 전에 운영체제 허용을 먼저 받는다 (macOS는 여기서 허용 창이 뜨고, 시스템 설정 → 마이크 목록에 이 앱이 올라간다)
+  ipcMain.handle('orpheia:mic',async event=>{
+   if(!appPage(event.sender.getURL()))return {status:'denied',platform:process.platform};
+   if(process.platform==='darwin'){let status=systemPreferences.getMediaAccessStatus('microphone');if(status==='not-determined')status=await systemPreferences.askForMediaAccess('microphone')?'granted':'denied';return {status,platform:'darwin'};}
+   if(process.platform==='win32')return {status:systemPreferences.getMediaAccessStatus('microphone'),platform:'win32'};
+   return {status:'granted',platform:process.platform};});
   session.defaultSession.on('will-download',(_event,item)=>item.setSaveDialogOptions({defaultPath:path.join(app.getPath('downloads'),path.basename(item.getFilename()))}));
   engine=require('./engine-broker.cjs').create({utilityProcess,stateFile:path.join(app.getPath('userData'),'engine-session.orpheia'),onWarning:message=>{if(!quitting)dialog.showMessageBox({type:'warning',title:'실습 저장 알림',message});},onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
   await engine.ready;

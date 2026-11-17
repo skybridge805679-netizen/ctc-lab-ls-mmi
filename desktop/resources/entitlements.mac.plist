@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Electron 기본 (V8 JIT · 네이티브 모듈) -->
+  <key>com.apple.security.cs.allow-jit</key><true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key><true/>
+  <key>com.apple.security.cs.disable-library-validation</key><true/>
+  <!-- 음성 1인 모드: 마이크 (이 항목이 없으면 macOS가 허용 창 없이 마이크를 막고, 시스템 설정 마이크 목록에도 앱이 나오지 않는다) -->
+  <key>com.apple.security.device.audio-input</key><true/>
+</dict>
+</plist>
