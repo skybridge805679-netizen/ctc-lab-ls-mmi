@@ -87,7 +87,8 @@ function create(host){
  function release(j){if(j.route&&states()[j.station]?.routes[j.route]?.train?.scenario===j.id){cachedCore(j.station).dispatch(states()[j.station],{type:'clear',id:j.route,source:'SCENARIO'});}for(const s of Object.values(states()))if(s.scenarioMotions)s.scenarioMotions=s.scenarioMotions.filter(m=>m.id!==j.id);}
  function request(action,manual=false){
   const f=locate(action.uid);if(!f)return {ok:false,message:'이동할 열차번호가 없습니다.'};
-  if(action.op==='stop')return stop(action.uid,action.targetStation);
+  if(action.op==='stop')return stop(action.uid,action.targetStation,action.targetSlot);
+  if(!action.keepHold&&!action.runOn)holds.delete(action.uid);      // 새 운행 지시(운행선 변경·정상운행·구원 등)는 앞의 「○○역 정차」를 푼다
   let check=action.op==='follow'?{ok:true}:host.validate({...action,station:f.station,slot:f.slot});
   if(!check.ok&&action.op==='move'&&jobs.some(j=>j.uid===action.uid&&!['done','cancelled'].includes(j.phase)))check=host.validate({op:'insert',station:action.targetStation,slot:action.targetSlot,number:f.train.number,direction:f.train.direction});
   if(!check.ok)return check;
@@ -107,7 +108,7 @@ function create(host){
    if(!action.keepHold)holds.delete(action.uid);
    const dwell=dwellOf.get(action.uid)||0;
    let afterStop=!action.keepHold||!!W.data[from.station]?.rails.some(r=>r[0]===from.slot);      // 처음 출발은 지금 선 역에서부터, 갈림 역 진로를 받아 들어간 뒤에는 그 승강장에서부터 추가정차
-   for(const [i,l] of legs.entries()){const hold=afterStop?{stopHold:true,hold:dwell}:{};afterStop=!!l.stop;if(l.follow){const r=request({op:'follow',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,rails:l.follow,runOn:true,background:i>0,...hold},false);return result||r;}const r=request({op:'move',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.exitCode?{exitCode:l.exitCode}:{}),...(l.clear?{clear:l.clear}:{}),...(i===0&&action.handSignal?{handSignal:true}:{}),runOn:true,background:i>0,...hold},false);result??=r;if(!r.ok)break;}
+   for(const [i,l] of legs.entries()){const hold=i===0&&action.startIn>0?{stopHold:true,hold:Math.max(dwell,action.startIn)}:afterStop?{stopHold:true,hold:dwell}:{};/* startIn: 처음 출발까지 기다리는 초 (음성 모드 — 달리던 열차가 정차 지시를 받을 틈) */afterStop=!!l.stop;if(l.follow){const r=request({op:'follow',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,rails:l.follow,runOn:true,background:i>0,...hold},false);return result||r;}const r=request({op:'move',uid:action.uid,station:f.station,slot:f.slot,targetStation:l.station,targetSlot:l.slot,handover:!!l.handover,...(l.exitCode?{exitCode:l.exitCode}:{}),...(l.clear?{clear:l.clear}:{}),...(i===0&&action.handSignal?{handSignal:true}:{}),runOn:true,background:i>0,...hold},false);result??=r;if(!r.ok)break;}
    const last=request({...action,runOn:true,background:legs.length>0,...(afterStop?{stopHold:true,hold:dwell}:{})},false);return result||last;
   }
   const j={id:'SCM'+(++serial),uid:action.uid,number:f.train.number,background:!!action.background,station:f.station,fromStation:previous?.action.targetStation||f.station,from:previous?.action.targetSlot||f.slot,to:action.targetSlot||'관제구간 밖',action:{...action},manual,phase:'waiting',reason:'앞 열차 통과 대기'};jobs.push(j);step();return {ok:true,pending:j.phase!=='done',message:f.train.number+' 이동 접수 · '+(j.reason||'진행 중')};
@@ -157,7 +158,9 @@ function create(host){
   // 이어 달리기: 앞 폐색 열번창에 다른 열차가 있으면 그 뒤에서 기다린다
   // 스스로 달리는 열차(구원운전·수동 이동 제외)는 다른 열차가 있는 폐색 열번창으로 들어가지 않는다 (가짜 열차번호 중복 방지)
   if(j.action.op==='move'&&!j.manual&&!j.action.rescue){const blocks=j.action.clear||(W.data[target]?.rails.some(r=>r[0]===to)?[]:[{station:target,slot:to}]);
-   for(const b of blocks){const ahead=(ls().stations[b.station]?.windows[b.slot]||[]).find(t=>t.uid!==j.uid);if(ahead){j.reason='전방 폐색에 선행열차 '+ahead.number+' · 통과 대기';return;}}}
+   for(const b of blocks){const ahead=(ls().stations[b.station]?.windows[b.slot]||[]).find(t=>t.uid!==j.uid);if(ahead){j.reason='전방 폐색에 선행열차 '+ahead.number+' · 통과 대기';return;}
+    // 다른 열차가 지금 그 칸으로 가는 중이면(20초 이동) 그 칸도 찬 것으로 본다 — 둘이 같은 칸에 들어가 열차번호가 겹치지 않게
+    const coming=jobs.find(p=>p.uid!==j.uid&&['moving','block','handover','transit'].includes(p.phase)&&(p.action.targetStation||p.station)===b.station&&(p.legTo||p.to)===b.slot);if(coming){j.reason='전방 폐색에 진입 중인 열차 '+coming.number+' · 통과 대기';return;}}}
   // 출발 폐색 열번창이 없는 역에서 다음 역으로: 출발 진로(exitCode)를 지나야 넘어간다
   const viaExit=j.action.op==='move'&&j.action.exitCode&&def.rails.some(r=>r[0]===f.slot);
   const ids=viaExit?candidates(f.station,f.slot,j.action.exitCode,f.train.direction):target===f.station&&!straight?candidates(f.station,f.slot,to,f.train.direction):[];
@@ -216,7 +219,7 @@ function create(host){
     if(jobs.some(p=>p!==j&&p.uid===j.uid&&p.id!==j.id&&jobs.indexOf(p)<jobs.indexOf(j)&&!['done','cancelled'].includes(p.phase)))continue;
     // 정차 지시: 지정한 역(없으면 처음 닿는 역)의 승강장에 닿으면 남은 이어 달리기를 버리고 선다
     if(j.action.hold>0){j.notBefore??=now(j)+j.action.hold;if(now(j)<j.notBefore){const r='추가정차 · '+Math.ceil(j.notBefore-now(j))+'초 남음';changed||=j.reason!==r;j.reason=r;continue;}}
-    const h=holds.get(j.uid);if(h&&!j.manual&&W.data[f.station]?.rails.some(r=>r[0]===f.slot)&&(!h.station||h.station===f.station)){for(const p of jobs)if(p.uid===j.uid&&!['done','cancelled'].includes(p.phase)){release(p);p.phase='cancelled';p.reason='정차 지시 · '+(N.catalog[f.station]?.name||f.station);}holds.set(j.uid,{...h,held:f.station});changed=true;continue;}
+    const h=holds.get(j.uid);if(h&&!j.manual&&holdHere(h,f)){for(const p of jobs)if(p.uid===j.uid&&!['done','cancelled'].includes(p.phase)){release(p);p.phase='cancelled';p.reason='정차 지시 · '+(N.catalog[f.station]?.name||f.station);}holds.set(j.uid,{...h,held:f.station});changed=true;continue;}
     const phase=j.phase,reason=j.reason;begin(j,f);changed||=phase!==j.phase||reason!==j.reason;
    }else if(j.phase==='transit'){
     if(f.station!==j.station||f.slot!==j.from){release(j);j.phase='cancelled';j.reason='열차 위치 변경으로 취소';changed=true;}
@@ -229,7 +232,7 @@ function create(host){
     if(result.ok){release(j);j.route=null;j.phase=j.legTo?'waiting':'done';j.reason=j.legTo?'다음 진로 진행 대기':'도착';j.legTo=null;changed=true;if(j.phase==='waiting')begin(j,locate(j.uid));else if(j.action.resume)resume.push(j.uid);}else{j.reason=result.message;}
    }
   }
-  for(const uid of resume){const f=locate(uid);if(!f||jobs.some(p=>p.uid===uid&&!['done','cancelled'].includes(p.phase)))continue;const h=holds.get(uid);if(h&&(!h.station||h.station===f.station)){holds.set(uid,{...h,held:f.station});continue;}request({op:'delete',uid,station:f.station,slot:f.slot,keepHold:true},false);}
+  for(const uid of resume){const f=locate(uid);if(!f||jobs.some(p=>p.uid===uid&&!['done','cancelled'].includes(p.phase)))continue;const h=holds.get(uid);if(h&&holdHere(h,f)){holds.set(uid,{...h,held:f.station});continue;}request({op:'delete',uid,station:f.station,slot:f.slot,keepHold:true},false);}
   return changed;
  }
  // 끝난 작업은 오래된 것부터 버린다 (긴 실습에서 목록과 세션 저장 크기가 끝없이 커지지 않게) — 진행 중인 작업은 건드리지 않는다
@@ -237,7 +240,13 @@ function create(host){
  function step(){let changed=false;for(let i=0;i<Math.min(jobs.length+1,32);i++){const result=stepOnce();changed||=result;if(!result)break;}prune();return changed;}
  // 「○○역 정차」: 달리는 열차를 그 역 승강장에 세운다. 이미 승강장에 서 있으면 떠나지 않게 남은 이동을 지운다. 다시 보내려면 출발(delete) 요청.
  const holds=new Map(),dwellOf=new Map();
- function stop(uid,station){const f=locate(uid);if(!f)return {ok:false,message:'정차시킬 열차번호가 없습니다.'};if(station&&!W.data[station])return {ok:false,message:'정차역을 확인하세요.'};holds.set(uid,{station:station||null});step();return {ok:true,message:f.train.number+' '+(station?(N.catalog[station]?.name||station)+'역 ':'다음 역 ')+'정차 지시'};}
+ // slot: 비연동 중간역(석수·관악 등)의 정차 칸 — 그 연동역 화면(station)의 그 열번창에 닿으면 선다
+function stop(uid,station,slot){const f=locate(uid);if(!f)return {ok:false,message:'정차시킬 열차번호가 없습니다.'};if(station&&!W.data[station])return {ok:false,message:'정차역을 확인하세요.'};const h={station:station||null,...(slot?{slot}:{})};holds.set(uid,h);
+ // 이미 그 역에 서 있으면(출발 대기 중) 남은 출발 일정을 바로 지운다 — 나중의 운행 지시가 옛 일정과 엉키지 않게
+ if(holdHere(h,f))for(const p of jobs)if(p.uid===uid&&!['done','cancelled'].includes(p.phase)&&!['moving','block','handover','transit'].includes(p.phase)){release(p);p.phase='cancelled';p.reason='정차 지시 · '+(N.catalog[f.station]?.name||f.station);}
+ step();return {ok:true,message:f.train.number+' '+(station?(N.catalog[station]?.name||station)+'역 ':'다음 역 ')+'정차 지시'};}
+// 정차 지시가 지금 이 칸에서 걸리는가
+const holdHere=(h,f)=>h.slot?f.station===h.station&&f.slot===h.slot:W.data[f.station]?.rails.some(r=>r[0]===f.slot)&&(!h.station||h.station===f.station);
  // 수동 열번 이동(단선지령식 반대선 운행 등): 열번은 이미 목표 열번창에 옮겨졌다(LS가 반대선 열차를 따라가지 못해 관제사가 손으로 옮김).
  // 실제 열차는 그 칸까지 열차 속도(구간마다 20초)로 달려간다 — 붉은 점유가 세워 둔 입환진로·반대선을 따라 목표 칸까지 흘러가고,
  // 닿으면 그 자리에서 다음 역으로 이어 달린다. 지나간 입환진로는 그 역을 AUTO로 전환할 때 해정한다(runtime).

@@ -1,7 +1,7 @@
 {
   "name": "orpheia-ctc-lab",
   "productName": "ORPHEIA CTC LAB",
-  "version": "0.39.76",
+  "version": "0.39.77",
   "description": "오르페이아 철도관제 LS·MMI 데스크톱 실습",
   "private": true,
   "author": "CTC LAB",
@@ -14,7 +14,8 @@
     "pack": "electron-builder --dir --publish never",
     "dist:mac": "electron-builder --mac --arm64 --publish never",
     "dist:win": "electron-builder --win --x64 --publish never",
-    "setup:electron": "node desktop/install-electron.cjs"
+    "setup:electron": "node desktop/install-electron.cjs",
+    "postinstall": "node tools/vendor-voice.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
@@ -55,7 +56,10 @@
         "zip"
       ],
       "icon": "desktop/resources/icon.icns",
-      "identity": "-"
+      "identity": "-",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "음성 1인 모드에서 교육생의 무전 음성을 받아쓰기 위해 마이크를 사용합니다. 음성은 이 컴퓨터 안에서만 처리됩니다."
+      }
     },
     "win": {
       "target": [

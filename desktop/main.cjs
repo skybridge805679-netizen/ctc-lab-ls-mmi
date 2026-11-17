@@ -1,5 +1,5 @@
 'use strict';
-const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray,powerSaveBlocker}=require('electron');
+const {app,BrowserWindow,Menu,screen,dialog,session,ipcMain,utilityProcess,Tray,powerSaveBlocker,systemPreferences}=require('electron');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const stations=require('../simulator/engine/network').stations.filter(s=>s.controlled),extraLS=new Set();
@@ -9,6 +9,9 @@ const {fitWindow,readState,writeState}=require('./window-state.cjs');
 const appIcon=path.join(__dirname,'resources',process.platform==='win32'?'icon.ico':'icon.png');
 const entry=path.join(__dirname,'../simulator/index.html');
 const entryURL=pathToFileURL(entry).href;
+// 음성 1인 모드의 받아쓰기(Whisper, WASM)가 여러 코어를 쓰려면 SharedArrayBuffer가 필요하다 (file:// 화면은 교차 출처 격리 헤더를 줄 수 없다)
+app.commandLine.appendSwitch('enable-features','SharedArrayBuffer');
+const appPage=url=>String(url||'').startsWith(pathToFileURL(path.dirname(entry)).href);
 const prefs={nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,backgroundThrottling:false,preload:path.join(__dirname,'preload.cjs')};
 let resetting=false;
 let ls=null,mmi=null,graph=null,fts=null,problem=null,stateFile,layout={},quitting=false,engine=null,tray=null,remote=null;
@@ -23,7 +26,12 @@ else{
   if(process.platform==='darwin')app.dock?.setIcon(appIcon);
   if(process.platform==='win32')app.setAppUserModelId('org.orpheia.ctclab');
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
-  session.defaultSession.setPermissionRequestHandler((_contents,_permission,respond)=>respond(false));
+  // 권한은 모두 거절하되, 이 앱 화면의 마이크(음성 1인 모드)만 허용한다. macOS는 처음 한 번 시스템 마이크 허용을 묻는다.
+  session.defaultSession.setPermissionRequestHandler((contents,permission,respond,details)=>{
+   const audioOnly=permission==='media'&&appPage(details?.requestingUrl||contents?.getURL())&&(details?.mediaTypes||[]).every(t=>t==='audio');
+   if(!audioOnly)return respond(false);
+   if(process.platform==='darwin')systemPreferences.askForMediaAccess('microphone').then(ok=>respond(!!ok),()=>respond(false));else respond(true);});
+  session.defaultSession.setPermissionCheckHandler((_contents,permission,origin,details)=>permission==='media'&&(details?.mediaType||'audio')==='audio'&&(appPage(details?.requestingUrl)||String(origin).startsWith('file://')));
   session.defaultSession.on('will-download',(_event,item)=>item.setSaveDialogOptions({defaultPath:path.join(app.getPath('downloads'),path.basename(item.getFilename()))}));
   engine=require('./engine-broker.cjs').create({utilityProcess,stateFile:path.join(app.getPath('userData'),'engine-session.orpheia'),onWarning:message=>{if(!quitting)dialog.showMessageBox({type:'warning',title:'실습 저장 알림',message});},onFatal:message=>{if(!quitting){console.error(message);dialog.showErrorBox('관제 엔진 연결 오류',message+' 실시간 조작을 중단했습니다. 프로그램을 종료하고 다시 실행하세요.');}}});
   await engine.ready;

@@ -29,3 +29,7 @@ dialog p{margin:0 0 16px;line-height:1.6}.row{display:flex;gap:8px}.row button{f
 .start{display:grid;gap:10px;padding:0 12px 10px}.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
 .field select,.field input{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:48px;width:100%}
 .go{margin-top:6px;min-height:54px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px}.go:disabled{opacity:.45}
+/* 음성 1인 모드 무전 입력 */
+.voice{margin:8px 0 12px}.voice .hint{margin:4px 0 8px;font-size:13px;opacity:.8}
+.voice form{display:flex;gap:8px;align-items:stretch}.voice textarea{flex:1;font-size:16px;padding:8px;border-radius:8px;border:1px solid #9bb;resize:none}
+.voice .go{min-width:76px}

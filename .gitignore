@@ -13,3 +13,8 @@ archive/
 # 교재·매뉴얼 원본 PDF는 저장소에 넣지 않는다. 되살린 원본이 다시 커밋되지 않게 막는다 (references/README.md)
 references/textbooks/
 references/manuals/
+
+# 음성 1인 모드 라이브러리: npm install 때 tools/vendor-voice.cjs가 받아 둔다 (저장소에 넣지 않음)
+simulator/vendor/transformers/*.js
+simulator/vendor/transformers/*.mjs
+simulator/vendor/transformers/*.wasm

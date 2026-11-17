@@ -6,12 +6,12 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.cjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const MOBILE=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i;
-const REMOTE_OPS=new Set(['start','manual','next','reload','stop']);
+const REMOTE_OPS=new Set(['start','manual','next','reload','stop','voice']);
 // 모바일 리모컨이 보낼 수 있는 명령: 리모컨 요약 조회와 FTS 진행 명령(교육 시작 포함)뿐 (진로·신호·열번·시간표·문제 편집 등은 받지 않는다)
 function remoteAllowed(action){if(action?.type==='remote:view')return true;if(action?.type!=='fts'||!REMOTE_OPS.has(action.op))return false;
- if(action.op==='manual')return typeof action.key==='string';if(action.op==='start')return ['scenario','professor','student'].every(k=>typeof action[k]==='string');return true;}
+ if(action.op==='manual')return typeof action.key==='string';if(action.op==='start')return ['scenario','professor','student'].every(k=>typeof action[k]==='string');if(action.op==='voice')return typeof action.text==='string'&&action.text.length<=500;return true;}
 // 리모컨 명령은 허용한 필드만 엔진에 넘긴다 (교육 시작에 문제 라이브러리 등을 끼워 보내지 못하게)
-function remoteAction(a){if(a.type==='remote:view')return {type:'remote:view'};if(a.op==='manual')return {type:'fts',op:'manual',key:a.key};if(a.op==='start')return {type:'fts',op:'start',scenario:a.scenario,professor:a.professor,student:a.student};return {type:'fts',op:a.op};}
+function remoteAction(a){if(a.type==='remote:view')return {type:'remote:view'};if(a.op==='manual')return {type:'fts',op:'manual',key:a.key};if(a.op==='start')return {type:'fts',op:'start',scenario:a.scenario,professor:a.professor,student:a.student};if(a.op==='voice')return {type:'fts',op:'voice',text:a.text};      /* 음성 1인 모드: 휴대폰 키보드 음성 입력으로 받아쓴 무전 한 마디 */return {type:'fts',op:a.op};}
 // PC 브라우저: 앱 화면과 같지만 세션 파일·프로그램 초기화는 이 PC 앱에서만
 function pcAllowed(action){return typeof action?.type==='string'&&!action.type.startsWith('session:');}
 function addresses(){return Object.values(os.networkInterfaces()).flat().filter(a=>a&&a.family==='IPv4'&&!a.internal).map(a=>a.address);}

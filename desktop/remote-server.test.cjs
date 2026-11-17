@@ -51,6 +51,8 @@ test('PIN을 5번 틀리면 1분 잠금, 끊기(kick) 하면 그 기기는 다�
  }finally{srv.stop();}
 });
 test('리모컨 명령 허용 목록',()=>{
+ assert.ok(S.remoteAllowed({type:'fts',op:'voice',text:'K1210열차 금천구청역 정차'}));assert.ok(!S.remoteAllowed({type:'fts',op:'voice'}));assert.ok(!S.remoteAllowed({type:'fts',op:'voice',text:'x'.repeat(501)}));      // 음성 1인 모드: 휴대폰 키보드 음성 입력 무전
+ assert.deepEqual(S.remoteAction({type:'fts',op:'voice',text:'K1210',extra:1}),{type:'fts',op:'voice',text:'K1210'});
  assert.ok(S.remoteAllowed({type:'remote:view'}));assert.ok(S.remoteAllowed({type:'fts',op:'manual',key:'comm:n1'}));assert.ok(S.remoteAllowed({type:'fts',op:'next'}));
  assert.ok(S.remoteAllowed({type:'fts',op:'start',scenario:'a',professor:'b',student:'c'}));assert.deepEqual(S.remoteAction({type:'fts',op:'start',scenario:'a',professor:'b',student:'c',library:{},autoRun:false}),{type:'fts',op:'start',scenario:'a',professor:'b',student:'c'});
  for(const a of [{type:'poll'},{type:'fts',op:'start'},{type:'fts',op:'library'},{type:'numbers'},{type:'control'},{type:'fts',op:'manual'}])assert.equal(S.remoteAllowed(a),false,JSON.stringify(a));

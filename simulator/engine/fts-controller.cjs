@@ -1,6 +1,6 @@
 'use strict';
 // Authoritative instructor session: no DOM, browser timer or renderer-local training state.
-const F=require('./fts');
+const F=require('./fts'),V=require('./voice'),Line=require('./line'),Net=require('./network');
 const clone=structuredClone,active=s=>s&&!s.finished;
 function create(host){
  let library=clone(host.defaults()),users=[{role:'교수',id:'001',name:'교수'},{role:'교육생',id:'tester',name:'교육생',number:'202201'}],history=[],session=null,runLibrary=null,events=[],ui={},revision=0,sequence=0,notice=null,configured=false,logs=[];
@@ -63,11 +63,13 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
      if(o.kind==='activate'){host.clearAlarms?.();
       if(o.problem.setup?.scheduleId){const sch=runLibrary.schedules?.find(s=>s.id===o.problem.setup.scheduleId);if(!sch)throw Error('문제 시간표를 찾을 수 없습니다: '+o.problem.setup.scheduleId);loadTimetable(sch.timetable,sch.relative);}
       o.item.eventSeq=sequence;o.item.taskKey=taskKey(o.item);if(o.problem.script){const started=error(host.startScript(o.problem.script,o.problem.train,o.item.taskKey,ui));if(started?.problem)o.item.statement=started.problem;else delete o.item.statement;}syncAssessment(o.item);announce('activate',o.problem.voice||o.problem.name,'문제 발생 · '+o.problem.name);again=true;}
-     if(o.kind==='phenomenon'){apply(o.phenomenon);again=true;}
+     if(o.kind==='phenomenon'){if(!(o.reaction&&voiceRan(o.reaction,o.phenomenon)))apply(o.phenomenon);again=true;}
      if(o.kind==='branch'){const said=String(o.branch.text||o.branch.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||o.branch.label;announce('branch','상황 변경 · '+said,'상황 변경 · '+o.branch.label);again=true;}
      if(o.kind==='end'){ended(o.item,o.status);again=false;}
      if(o.kind==='finished')close('모든 문제 종료');
-    }if(!again)break;
+    }
+    for(const o of out)if(o.kind==='activate'&&session.voice)voiceBegin(o.item);
+    if(!again)break;
    }
   }catch(e){fail(current()||it,e);}
  }
@@ -76,13 +78,14 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   case 'bootstrap':if(!configured){if(a.library){const up=F.upgrade(a.library,host.defaults()),r=configure(up);if(up!==a.library)log('내장 문제를 이 앱 버전의 최신 내용으로 갱신했습니다.','I');if(!r.ok)return r;}if(Array.isArray(a.history))history=clone(a.history.slice(0,200));if(Array.isArray(a.users)&&a.users.length){const r=command({op:'users',users:a.users});if(!r.ok)return r;}configured=true;}return {ok:true};
   case 'library':return configure(a.library);
   case 'users':if(!Array.isArray(a.users)||a.users.some(u=>!u||!['교수','교육생'].includes(u.role)||typeof u.id!=='string'||!u.id||typeof u.name!=='string'||!u.name)||new Set(a.users.map(u=>u.id)).size!==a.users.length)return {ok:false,message:'사용자 ID·이름·구분을 확인하세요.'};users=clone(a.users);revision++;return {ok:true};
-  case 'start':{if(active(session))return {ok:false,message:'진행 중인 교육을 먼저 종료하세요.'};const sc=library.scenarios.find(s=>s.id===a.scenario);if(!sc)return {ok:false,message:'시나리오를 선택하세요.'};const sits=library.situations.filter(s=>sc.situations.includes(s.id)),pids=sits.flatMap(s=>s.problems),selected={...library,scenarios:[sc],situations:sits,problems:library.problems.filter(p=>pids.includes(p.id))};const errors=F.validate(selected,{scripts:host.scripts});if(errors.length)return {ok:false,message:errors.join('\n')};const prof=users.find(u=>u.id===a.professor&&u.role==='교수'),stud=users.find(u=>u.id===a.student&&u.role==='교육생');if(!prof||!stud)return {ok:false,message:'교수와 교육생을 선택하세요.'};configured=true;runLibrary=clone(library);session=F.createSession(runLibrary,sc.id,{professor:prof.name,student:stud.id,startedAt:now()});Object.assign(session,{id:'E'+Date.now()+'-'+(++sequence),showActions:a.showActions!==false,loadedEntry:null,attempt:0,attempts:[]});events=[];const budget=host.startAssessment();session.totalLimit=budget?.session?.limitSeconds||3600;host.pause(false);host.auto(a.autoRun!==false);announce('start','교육 시작 · '+sc.name);step();return {ok:true};}
+  case 'start':{if(active(session))return {ok:false,message:'진행 중인 교육을 먼저 종료하세요.'};const sc=library.scenarios.find(s=>s.id===a.scenario);if(!sc)return {ok:false,message:'시나리오를 선택하세요.'};const sits=library.situations.filter(s=>sc.situations.includes(s.id)),pids=sits.flatMap(s=>s.problems),selected={...library,scenarios:[sc],situations:sits,problems:library.problems.filter(p=>pids.includes(p.id))};const errors=F.validate(selected,{scripts:host.scripts});if(errors.length)return {ok:false,message:errors.join('\n')};const prof=users.find(u=>u.id===a.professor&&u.role==='교수'),stud=users.find(u=>u.id===a.student&&u.role==='교육생');if(!prof||!stud)return {ok:false,message:'교수와 교육생을 선택하세요.'};configured=true;runLibrary=clone(library);session=F.createSession(runLibrary,sc.id,{professor:prof.name,student:stud.id,startedAt:now()});Object.assign(session,{id:'E'+Date.now()+'-'+(++sequence),showActions:a.showActions!==false,...(a.voice?{voice:{items:{}}}:{}),loadedEntry:null,attempt:0,attempts:[]});events=[];const budget=host.startAssessment();session.totalLimit=budget?.session?.limitSeconds||3600;host.pause(false);host.auto(a.autoRun!==false);announce('start','교육 시작 · '+sc.name);step();return {ok:true};}
   case 'ui':if(!a.ui||!Array.isArray(a.ui.windows)||a.ui.windows.length>100)return {ok:false,message:'화면 상태를 확인하세요.'};ui=clone(a.ui);return {ok:true};
   case 'manual':{const it=current();if(!active(session)||!it||it.error)return {ok:false,message:'진행 중인 문제가 없습니다.'};const p=F.view(problem(it),it),allowed=(problem(it).branches||[]).map(b=>'branch:'+b.id);const visit=c=>{if(c?.type==='manual')allowed.push(c.key||c.label);if(Array.isArray(c?.conditions))c.conditions.forEach(visit);if(c?.condition)visit(c.condition);};[...(p.checks||[]),...(p.deductions||[]),...(p.objectives||[])].forEach(k=>visit(k.condition));for(const c of p.communications||[])allowed.push('comm:'+c.id);if(!allowed.includes(a.key))return {ok:false,message:'현재 문제의 구술 확인 항목이 아닙니다.'};if(a.key.startsWith('branch:')&&session.manual[session.current]?.[a.key])return {ok:false,message:'이미 발생한 상황 변경입니다.'};if(a.key.startsWith('branch:'))a={...a,checked:true};const m=session.manual[session.current]??={};m[a.key]=a.checked??!m[a.key];log('교수 확인 · '+a.key+' · '+(m[a.key]?'확인':'취소'));return {ok:true};}
   case 'next':if(active(session)){const it=current();if(it){ended(it,'종료');F.endCurrent(session,now());if(session.finished)close('모든 문제 종료');}}return {ok:true};
   case 'stop':close('교수 종료');return {ok:true};
   case 'reload':{if(!active(session))return {ok:false,message:'진행 중인 교육이 없습니다.'};const it=current(),entry=it.situationIndex,indices=session.items.map((x,i)=>x.situationIndex===entry?i:-1).filter(i=>i>=0);session.attempts.push({entry,at:now(),items:clone(indices.map(i=>session.items[i]))});for(const i of indices){const x=session.items[i];Object.assign(x,{status:'대기',startedAt:null,endedAt:null,met:[],deducted:[],score:0});delete x.error;delete x.fired;delete session.manual[i];}session.current=indices[0];session.readyAt=now();session.loadedEntry=null;session.attempt++;host.pause(false);announce('reload','상황 재로딩 · 이전 시도 기록 보존');step();return {ok:true};}
   case 'clearHistory':history=[];return {ok:true};
+  case 'voice':{const it=current();if(!active(session)||!session.voice||!it||it.error||it.status!=='진행')return {ok:false,message:'음성 모드로 진행 중인 문제가 없습니다.'};const r=voiceHear(it,String(a.text||'').slice(0,500));step();return r;}
   default:return {ok:false,message:'알 수 없는 FTS 명령'};
  }}
  function event(e){if(active(session)){events.push({...clone(e),seq:++sequence,at:now()});if(events.length>4000)events.shift();
@@ -94,6 +97,59 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   const v=F.view(problem(it),it),expected=number&&[...(v?.objectives||[]),...(v?.checks||[])].some(o=>leaf(o.condition,number));
   if(expected)log(`열번 수동 이동 · ${number} → ${target} ${op.targetSlot||''} (문제가 요구한 열번 이동 — 단선지령식 반대선 운행, 열번 이동 문제 등)`,'I');
   else log(`수동 열번 이동 · ${number||''} → ${target} ${op.targetSlot||''} (표시 정정 — 열차 운행으로 채점하지 않음. 열차는 진로·신호와 지시로 움직여야 합니다)`,'W');}
+ // ── 음성 1인 모드 (engine/voice.js): 교육생의 무전 한 마디 = 대본 한 단계. 그 말에 나온 열차만 반응하고, 상대 대사를 화면이 음성으로 읽는다.
+ const plans=new Map();
+ function voicePlan(it){const v=F.view(problem(it),it),key=it.problem+'|'+JSON.stringify(it.branch||{});if(!plans.has(key))plans.set(key,V.plan(v));return plans.get(key);}
+ function voiceState(it){const k=session.items.indexOf(it);return session.voice.items[k]??={done:{},ran:[],played:{},queue:[],heard:[],seq:0};}
+ function say(st,lines){for(const l of lines)st.queue.push({seq:++st.seq,who:l.who,name:l.name,text:l.text});if(st.queue.length>200)st.queue.splice(0,st.queue.length-200);}
+ const voiceRan=(rid,ph)=>{const it=current();if(!session?.voice||!it)return false;return voiceState(it).ran.includes(rid+'|'+JSON.stringify(ph));};
+ function findTrain(number){for(const [station,x] of Object.entries(host.context().ls.stations))for(const [slot,rows] of Object.entries(x.windows))for(const r of rows)if(r.number===number)return {station,slot,uid:r.uid,direction:r.direction};return null;}
+ // 지금 열차가 닿아 있는 곳의 노선 순서 (비연동 중간역 열번창이면 그 역, 아니면 그 연동역)
+ function orderAt(f){for(const [id,I] of Object.entries(Line.INTERMEDIATE))if(I.host===f.station&&Object.values(I.slots).some(x=>x===f.slot||Line.circuitOf(f.station,f.slot)===x))return Net.catalog[id].order;return Net.catalog[f.station].order;}
+ // 「○○열차 ○○역 정차 / 출발 정지」: 그 역(비연동 중간역은 그 역 정차 칸)에 세운다. 이미 지나쳤으면 다음 역에 선다.
+ function voiceStop(st,{number,station}){
+  const f=findTrain(number);if(!f){log('음성 · '+number+' 열차를 LS에서 찾지 못했습니다','W');return;}
+  const target=Net.catalog[station],passed=(orderAt(f)-target.order)*(f.direction==='down'?1:-1)>0;
+  let action={op:'stop',station:f.station,slot:f.slot,uid:f.uid};
+  if(passed)log(`음성 · ${number} 열차는 이미 ${target.name}역을 지났습니다 — 다음 역에 정차`,'W');
+  else if(target.controlled)action.targetStation=station;
+  else{const z=V.stopSlot(station,f.direction);if(z){const win=Object.keys(host.context().ls.stations[z.host]?.windows||{});action.targetStation=z.host;action.targetSlot=win.includes(z.slot)?z.slot:win.find(w=>Line.circuitOf(z.host,w)===z.slot)||z.slot;}}
+  error(host.apply({type:'scenario:move',auto:true,action}));
+ }
+ // 열차별 반응: 통보의 상황 반응 중 「통보 + 그 열차들이 남아 있음」만 조건인 것은, 그 열차에게 할 말을 다 하면 그 열차 몫만 먼저 실행한다
+ const simple=(r,cid)=>{const w=r.when,leaf=c=>c?.type==='communication'?c.id===cid:c?.type==='not'?c.condition?.type==='trainGone':c?.type==='any'||c?.type==='all'?(c.conditions||[]).every(leaf):false;return w?.type==='communication'?w.id===cid:w?.type==='all'&&w.conditions.some(c=>c.type==='communication'&&c.id===cid)&&w.conditions.every(leaf);};
+ function voiceTrainDone(it,st,P,cid,number){
+  const mine=P.steps.filter(s=>s.comm===cid&&s.required&&s.to.includes(number));if(!mine.every(s=>st.done[s.id]!=null))return;
+  for(const r of F.view(problem(it),it).reactions||[]){if(!simple(r,cid)||it.reactions?.[r.id]?.fired)continue;
+   for(const ph of r.do){const key=r.id+'|'+JSON.stringify(ph);if(ph.number!==number||st.ran.includes(key))continue;st.ran.push(key);apply(ph);}}
+ }
+ // 문제 시작: 대본에서 「정차」 지시를 받는 열차는 달리고 있다 — 말할 틈을 주고(대본 순서만큼) 출발한다. 상대가 먼저 거는 무전이면 그 무전부터 울린다.
+ function voiceBegin(it){const st=voiceState(it),P=voicePlan(it),req=P.steps.filter(s=>s.required);if(st.begun)return;st.begun=true;
+  const begun=new Set();
+  for(const s of P.steps)if(s.stop&&!begun.has(s.stop.number)){begun.add(s.stop.number);const f=findTrain(s.stop.number);if(!f)continue;/* 대본에 두 번 나오는 열차(「정차」 뒤 「출발 정지」)는 처음 지시를 기준으로 한 번만 */const startIn=60+15*Math.max(0,req.indexOf(s));
+   const r=host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid,startIn}});if(r?.ok===false)log('음성 · '+s.stop.number+' 운행 시작 실패: '+r.message,'W');}
+  voiceLead(st,P);}
+ function voiceLead(st,P){const next=P.comms.find(c=>c.steps.some(id=>{const s=P.steps.find(x=>x.id===id);return s.required&&st.done[id]==null;})||c.steps.every(id=>!P.steps.find(x=>x.id===id).required)&&!st.played[c.id]);
+  if(next?.incoming&&!st.played[next.id]){st.played[next.id]=true;say(st,next.lead);}}
+ function voiceHear(it,text){
+  const st=voiceState(it),P=voicePlan(it),elapsed=now()-(it.startedAt??now());
+  const open=P.comms.find(c=>c.steps.some(id=>{const s=P.steps.find(x=>x.id===id);return s.required&&st.done[id]==null;}));
+  const hits=V.match(P,st.done,text,{current:open?.id});
+  st.heard.push({at:elapsed,text,norm:V.normalize(text),steps:hits.map(h=>h.step.id)});if(st.heard.length>300)st.heard.shift();
+  if(!hits.length&&V.isAck(text)){st.heard.at(-1).ack=true;return {ok:true,matched:[],ack:true,heard:V.normalize(text)};}
+  if(!hits.length){log('음성 · 알아듣지 못함 · '+text,'W');return {ok:true,matched:[],heard:V.normalize(text)};}
+  const m=session.manual[session.current]??={};
+  for(const {step:s} of hits){
+   st.done[s.id]=elapsed;log('음성 · '+s.comm+' · '+s.text.slice(0,60));
+   if(s.stop)voiceStop(st,s.stop);
+   say(st,s.reply);
+   for(const n of s.to)voiceTrainDone(it,st,P,s.comm,n);
+   const c=P.comms.find(c=>c.id===s.comm);
+   if(c.steps.every(id=>{const x=P.steps.find(y=>y.id===id);return !x.required||st.done[id]!=null;})&&!m['comm:'+c.id]){m['comm:'+c.id]=true;log('음성 · 통보 '+c.id+' 확인 (필요한 말을 모두 함)');}
+  }
+  voiceLead(st,P);
+  return {ok:true,matched:hits.map(h=>({id:h.step.id,comm:h.step.comm,text:h.step.text})),heard:V.normalize(text)};
+ }
  // 원격 리모컨(모바일)용 요약: 엔진 전체 스냅숏 대신 지금 문제·시간·교수가 누를 항목만 내려 준다
  function remoteView(){
   // 교육 전(또는 끝난 뒤): 리모컨에서 시나리오를 골라 교육을 시작할 수 있게 목록을 같이 준다
@@ -109,6 +165,7 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
    problem:{name:p.name,subject:p.subject,limit:p.limit||0,status:it.status,error:it.error||null},elapsed,remaining:Math.max(0,(p.limit||0)-elapsed),
    comms:(v?.communications||[]).map(c=>({key:'comm:'+c.id,label:c.label,text:c.text||'',at:it.comm?.[c.id]??null,optional:!!c.optional})),
    branches:(p.branches||[]).map(b=>({key:'branch:'+b.id,label:b.label,at:it.branch?.[b.id]??null})),manual,
+   voice:session.voice?(()=>{const st=session.voice.items[idx];return {on:true,heard:(st?.heard||[]).slice(-6).reverse().map(h=>({text:h.text,ok:!!h.steps.length||!!h.ack,steps:h.steps.map(id=>{const step=voicePlan(it).steps.find(x=>x.id===id);return step?step.comm+' · '+step.text.slice(0,40):id;})}))};})():null,
    result:session.finished?F.summary(runLibrary,session):null,...(session.finished?{setup}:{})};
  }
  function checkpoint(){return clone({library,users,history,session,runLibrary,events,ui,revision,sequence,notice,configured,logs});}
