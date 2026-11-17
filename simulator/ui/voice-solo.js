@@ -53,6 +53,13 @@ function transcribe(chunks,rate){
  let pcm=audio;if(rate!==16000){const r=rate/16000,out=new Float32Array(Math.floor(n/r));for(let i=0;i<out.length;i++)out[i]=audio[Math.floor(i*r)];pcm=out;}
  const w=worker();if(!w)return;S.busy++;w.postMessage({type:'transcribe',id:++S.seq,audio:pcm},[pcm.buffer]);render();
 }
+// 휴대폰 마이크(원격 리모컨)에서 온 한 마디: 16kHz · 16비트. PC 마이크로 들은 것과 똑같이 받아쓴다 (상대 대사를 읽는 동안 온 소리는 버린다)
+function phoneAudio(u8){
+ if(!(S.on||S.prep)||S.speaking||Date.now()<S.mutedUntil)return;
+ const i16=new Int16Array(u8.buffer,u8.byteOffset,Math.floor(u8.byteLength/2)),f=new Float32Array(i16.length);for(let i=0;i<i16.length;i++)f[i]=i16[i]/32768;
+ S.phoneAt=Date.now();transcribe([f],16000);
+}
+try{root.OrpheiaEngine?.onRemoteAudio?.(phoneAudio);}catch{}
 function stopListening(){try{S.node?.disconnect();S.src?.disconnect();S.ctx?.close();}catch{}for(const t of S.stream?.getTracks()||[])t.stop();S.stream=S.ctx=S.node=S.src=null;}
 // ── 상대 대사 읽기: Supertonic 2 (ui/voice-tts-worker.js, 배역마다 다른 목소리). 모델 준비 전이나 실패하면 기본 TTS로 읽는다.
 const TTS_URL=new URL('ui/voice-tts-worker.js',root.location?.href||'').href;
@@ -92,7 +99,7 @@ let last='';
 function render(){
  renderPrep();const D=S.doc?.()||root.document,box=D?.getElementById('ftsVoice');if(!box)return;
  const st=S.state||{};if(!st.voice){if(box.innerHTML)box.innerHTML='';last='';return;}
- const p=S.progress||T.progress&&!T.ready&&{...T.progress,tts:true},mb=x=>Math.round(x/1e6),status=S.error?`⚠ ${S.error}`:p&&!p.total?'음성 모델 준비 중…':p&&p.total?`${p.tts?'목소리(TTS)':'음성인식'} 모델 내려받는 중 ${mb(p.loaded)} / ${mb(p.total)}MB (처음 한 번만)`:!st.live?'음성 1인 모드 · 문제가 진행되면 듣기 시작합니다':S.speaking?'🔊 상대 응답 중 — 끝나면 다시 듣습니다':S.busy?'⏳ 받아쓰는 중…':'🎙 듣는 중 — 무전하듯 말하세요';
+ const p=S.progress||T.progress&&!T.ready&&{...T.progress,tts:true},mb=x=>Math.round(x/1e6),phone=Date.now()-(S.phoneAt||0)<120000,status=S.error&&!phone?`⚠ ${S.error}`:p&&!p.total?'음성 모델 준비 중…':p&&p.total?`${p.tts?'목소리(TTS)':'음성인식'} 모델 내려받는 중 ${mb(p.loaded)} / ${mb(p.total)}MB (처음 한 번만)`:!st.live?'음성 1인 모드 · 문제가 진행되면 듣기 시작합니다':S.speaking?'🔊 상대 응답 중 — 끝나면 다시 듣습니다':S.busy?'⏳ 받아쓰는 중…':(phone?'🎙 듣는 중 (휴대폰 마이크) — 무전하듯 말하세요':'🎙 듣는 중 — 무전하듯 말하세요');
  const done=Object.keys(st.v?.done||{}).length;
  const html=`<div class="fts-voice ${S.speaking?'speaking':''}"><div class="fts-voice-status"><b>${esc(status)}</b><small>${S.model?'받아쓰기: '+esc(S.model)+' · ':''}${T.ready?'목소리: Supertonic · ':T.failed?'목소리: 기본 TTS · ':''}알아들은 말 ${done}개</small></div>
 <ul class="fts-voice-log">${S.heard.map(h=>`<li class="${h.ok?'ok':'miss'}"><span>${h.ok?'✔':'✖'}</span><div><q>${esc(h.text)}</q>${h.ok?`<small>${h.ack?'응답 (관제 이상 · 수신 이상)':h.matched.map(m=>esc(m.comm+' · '+m.text.slice(0,48))).join('<br>')}</small>`:`<small>${esc(h.message||'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게 다시 말해 보세요')}</small>`}</div></li>`).join('')||'<li class="empty">아직 들은 말이 없습니다.</li>'}</ul>
@@ -120,5 +127,5 @@ function renderPrep(){
  box.querySelector('#suVoiceStop').onclick=stopPrep;
 }
 let stopping=0;function stopPrepSoon(){clearTimeout(stopping);stopping=setTimeout(()=>{const D=S.doc?.()||root.document;if(S.prep&&!D?.getElementById('suVoicePrep'))stopPrep();},1500);}      // 교육설정 화면을 떠나면 마이크 시험을 끝낸다
-root.SimVoiceSolo={sync,render,heard,readable,prepare,stopPrep,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};
+root.SimVoiceSolo={sync,render,heard,readable,prepare,stopPrep,phoneAudio,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};
 })(typeof window!=='undefined'?window:globalThis);

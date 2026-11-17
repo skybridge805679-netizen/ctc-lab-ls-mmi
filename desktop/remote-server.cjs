@@ -3,7 +3,7 @@
 //  - PIN(4자리) 로그인 → HttpOnly 쿠키 토큰. 잘못된 PIN이 이어지면 잠시 잠근다.
 //  - 모바일(스마트폰·태블릿): 리모컨 화면만. 서버도 리모컨 명령(교육 진행 · 통보·구술 확인 · 상황 변경 · 문제 종료·재로딩·교육 종료)만 받는다.
 //  - PC 브라우저: 앱과 같은 화면(LS·MMI·FTS·그래프·문제 화면). 엔진 연결만 네트워크로 바뀐다(ui/net-engine.js). 세션 파일·전체 초기화는 막는다.
-const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
+const http=require('node:http'),https=require('node:https'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.cjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const MOBILE=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i;
 const REMOTE_OPS=new Set(['start','manual','next','reload','stop','voice']);
@@ -15,10 +15,11 @@ function remoteAction(a){if(a.type==='remote:view')return {type:'remote:view'};i
 // PC 브라우저: 앱 화면과 같지만 세션 파일·프로그램 초기화는 이 PC 앱에서만
 function pcAllowed(action){return typeof action?.type==='string'&&!action.type.startsWith('session:');}
 function addresses(){return Object.values(os.networkInterfaces()).flat().filter(a=>a&&a.family==='IPv4'&&!a.internal).map(a=>a.address);}
-function create({root,request,onChange=()=>{}}){
+function create({root,request,onChange=()=>{},certFile=null,onAudio=null}){
+ let secure=null,securePort=0;
  let server=null,port=0,pin='',failures=0,lockedUntil=0;const clients=new Map(),sockets=new Set();
  const changed=()=>{try{onChange(info());}catch{}};
- function info(){return {on:!!server,port,pin:server?pin:'',urls:server?addresses().map(a=>`http://${a}:${port}/`):[],clients:[...clients.values()].map(c=>({id:c.id,role:c.role,address:c.address,agent:c.agent,last:c.last}))};}
+ function info(){return {on:!!server,port,pin:server?pin:'',urls:server?addresses().map(a=>`http://${a}:${port}/`):[],securePort,secureUrls:secure?addresses().map(a=>`https://${a}:${securePort}/`):[],clients:[...clients.values()].map(c=>({id:c.id,role:c.role,address:c.address,agent:c.agent,last:c.last}))};}
  const token=req=>(/(?:^|;\s*)orpheia_remote=([a-f0-9]{48})/.exec(req.headers.cookie||'')||[])[1];
  const client=req=>{const t=token(req),c=t&&clients.get(t);if(c){c.last=Date.now();}return c;};
  const send=(res,status,body,type='text/plain; charset=utf-8',extra={})=>{res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',...extra});res.end(body);};
@@ -47,6 +48,14 @@ function create({root,request,onChange=()=>{}}){
    return send(res,401,'login required');
   }
   if(url.pathname==='/api/logout'&&req.method==='POST'){clients.delete(token(req));changed();return send(res,200,'',undefined,{'Set-Cookie':'orpheia_remote=; Path=/; Max-Age=0'});}
+  // 음성 1인 모드: 휴대폰(또는 원격 PC) 마이크로 들은 한 마디의 소리 (16kHz · 16비트). PC 앱이 받아써 판정한다
+  if(url.pathname==='/api/audio'&&req.method==='POST'){
+   let body;try{body=await readBody(req,2_000_000);}catch{return json(res,400,{error:'잘못된 요청'});}
+   const pcm=typeof body.pcm==='string'?Buffer.from(body.pcm,'base64'):null;
+   if(!pcm||pcm.length<3200||pcm.length>1_000_000||pcm.length%2)return json(res,400,{error:'소리 데이터가 올바르지 않습니다.'});
+   const r=onAudio?onAudio(pcm):{ok:false,message:'이 PC에서 음성 1인 모드를 받을 수 없습니다.'};
+   return json(res,200,r?.ok===false?{error:r.message}:{ok:true});
+  }
   if(url.pathname==='/api/request'&&req.method==='POST'){
    let body;try{body=await readBody(req);}catch{return json(res,400,{error:'잘못된 요청'});}
    const action=body.action;
@@ -54,7 +63,7 @@ function create({root,request,onChange=()=>{}}){
     if(!remoteAllowed(action))return json(res,403,{error:'리모컨에서는 할 수 없는 조작입니다.'});
     const r=await engine(remoteAction(action),0,-1);if(r.error)return json(res,200,{error:r.error});
     const view=action.type==='remote:view'?r:await engine({type:'remote:view'},0,-1);
-    return json(res,200,{result:r.result,view:view.result});
+    return json(res,200,{result:r.result,view:view.result,net:{https:securePort}});
    }
    if(!pcAllowed(action)||!Number.isFinite(body.since)||body.since<0)return json(res,403,{error:'원격 PC에서는 할 수 없는 조작입니다. (세션 파일·전체 초기화는 이 PC 앱에서)'});
    return json(res,200,await engine(action,body.since,body.version??-1));
@@ -77,9 +86,20 @@ function create({root,request,onChange=()=>{}}){
    s.on('connection',k=>{sockets.add(k);k.on('close',()=>sockets.delete(k));});
    let tries=0;const listen=p=>{s.once('error',e=>{if(e.code==='EADDRINUSE'&&tries++<20)listen(p+1);else reject(e);});s.listen(p,'0.0.0.0',()=>{server=s;port=s.address().port;changed();resolve(info());});};
    listen(preferred);
+  }).then(r=>startSecure().then(()=>info(),()=>info()));
+ }
+ // HTTPS (휴대폰 마이크용): 같은 처리기를 자체 서명 인증서로 한 포트 더 연다. 실패해도 http 리모컨은 그대로 쓴다.
+ function startSecure(){
+  if(!certFile)return Promise.resolve();
+  let c;try{c=require('./cert.cjs').load(certFile,addresses());}catch{return Promise.resolve();}
+  return new Promise(resolve=>{
+   const s=https.createServer({key:c.key,cert:c.cert},(req,res)=>{handle(req,res).catch(()=>{try{send(res,500,'error');}catch{}});});
+   s.on('connection',k=>{sockets.add(k);k.on('close',()=>sockets.delete(k));});
+   let tries=0;const listen=p=>{s.once('error',e=>{if(e.code==='EADDRINUSE'&&tries++<20)listen(p+1);else resolve();});s.listen(p,'0.0.0.0',()=>{secure=s;securePort=s.address().port;changed();resolve();});};
+   listen(port+1);
   });
  }
- function stop(){if(!server)return;for(const sock of sockets)sock.destroy();server.close();server=null;port=0;pin='';clients.clear();changed();}
+ function stop(){if(!server)return;for(const sock of sockets)sock.destroy();server.close();server=null;if(secure){secure.close();secure=null;securePort=0;}port=0;pin='';clients.clear();changed();}
  function kick(id){for(const [t,c]of clients)if(c.id===id)clients.delete(t);changed();}
  return {start,stop,info,kick};
 }

@@ -33,3 +33,8 @@ dialog p{margin:0 0 16px;line-height:1.6}.row{display:flex;gap:8px}.row button{f
 .voice{margin:8px 0 12px}.voice .hint{margin:4px 0 8px;font-size:13px;opacity:.8}
 .voice form{display:flex;gap:8px;align-items:stretch}.voice textarea{flex:1;font-size:16px;padding:8px;border-radius:8px;border:1px solid #9bb;resize:none}
 .voice .go{min-width:76px}
+.voice .warn{color:#b33;font-size:14px;margin:6px 0}.voice .warn a{word-break:break-all}
+.voice .mic-on{font-weight:bold;margin:6px 0}.voice #rcMicOn{width:100%;padding:14px;font-size:17px}.voice #rcMicOff{margin-top:6px}
+.voice .meter{display:inline-block;width:90px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}
+.voice .meter i{display:block;height:100%;background:#2b9a5a}
+.voice details.typed{margin-top:8px}.voice details.typed form{margin-top:6px}

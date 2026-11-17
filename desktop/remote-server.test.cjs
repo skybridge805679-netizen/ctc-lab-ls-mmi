@@ -58,3 +58,19 @@ test('리모컨 명령 허용 목록',()=>{
  for(const a of [{type:'poll'},{type:'fts',op:'start'},{type:'fts',op:'library'},{type:'numbers'},{type:'control'},{type:'fts',op:'manual'}])assert.equal(S.remoteAllowed(a),false,JSON.stringify(a));
  assert.equal(S.pcAllowed({type:'session:open'}),false);assert.ok(S.pcAllowed({type:'control'}));
 });
+test('휴대폰 마이크: 보안 주소(https, 자체 서명)로도 열리고, 로그인한 리모컨이 보낸 한 마디 소리를 PC 앱에 넘긴다',async()=>{
+ const os=require('node:os'),fs=require('node:fs'),https=require('node:https'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'orpheia-cert-')),got=[];
+ const r=R.create(),srv=S.create({root:path.join(__dirname,'../simulator'),certFile:path.join(dir,'cert.json'),onAudio:pcm=>{got.push(pcm.length);return {ok:true};},request:(action,since,reply,version)=>{try{reply({result:r.command(action),snapshot:r.transport(version,since)});}catch(e){reply({error:e.message});}}});
+ const info=await srv.start(0);
+ const call=(method,p,body,cookie='')=>new Promise((res,rej)=>{const q=https.request({host:'127.0.0.1',port:info.securePort,path:p,method,rejectUnauthorized:false,headers:{'Content-Type':'application/json','User-Agent':MOBILE,Cookie:cookie}},x=>{let b='';x.on('data',d=>b+=d);x.on('end',()=>res({status:x.statusCode,body:b,cookie:(x.headers['set-cookie']||[''])[0].split(';')[0]}));});q.on('error',rej);q.end(body&&JSON.stringify(body));});
+ try{
+  assert.ok(info.securePort>0&&info.secureUrls.every(u=>u.startsWith('https://')),'https 주소');
+  assert.equal((await call('POST','/api/audio',{pcm:'AAAA'})).status,401,'로그인 전에는 소리를 받지 않는다');
+  const m=await call('POST','/api/login',{pin:info.pin});assert.equal(m.status,200);
+  const pcm=Buffer.alloc(16000*2).toString('base64');
+  assert.deepEqual(JSON.parse((await call('POST','/api/audio',{pcm},m.cookie)).body),{ok:true});assert.deepEqual(got,[32000]);
+  assert.equal((await call('POST','/api/audio',{pcm:'AAA'},m.cookie)).status,400,'너무 짧거나 깨진 소리는 거절');
+  const v=JSON.parse((await call('POST','/api/request',{action:{type:'remote:view'}},m.cookie)).body);assert.equal(v.net.https,info.securePort,'리모컨이 보안 주소 포트를 안다');
+  const x=new (require('node:crypto').X509Certificate)(JSON.parse(fs.readFileSync(path.join(dir,'cert.json'),'utf8')).cert);assert.match(x.subjectAltName,/DNS:localhost/);
+ }finally{srv.stop();}
+});

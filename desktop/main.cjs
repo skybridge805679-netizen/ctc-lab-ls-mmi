@@ -42,8 +42,10 @@ else{
    engine.request(message.action,message.since,response=>{event.returnValue=response;},message.version??-1);
   });
   // 원격 조작 서버 (같은 네트워크의 PC·스마트폰 브라우저): 기본 꺼짐. FTS [원격 조작]에서 켜고 끈다.
-  remote=require('./remote-server.cjs').create({root:path.join(__dirname,'../simulator'),request:(action,since,reply,version)=>{if(resetting){reply({error:'프로그램 전체 초기화 중입니다.'});return;}engine.request(action,since,reply,version);}});
-  const remoteInfo=()=>{const i=remote.info();return {...i,qr:i.urls[0]?require('./qr.cjs').svg(i.urls[0],{scale:5}):''};};
+  remote=require('./remote-server.cjs').create({root:path.join(__dirname,'../simulator'),certFile:path.join(app.getPath('userData'),'remote-cert.json'),
+   // 휴대폰 마이크의 소리 → LS 창의 음성 1인 모드(받아쓰기)
+   onAudio:pcm=>{if(!alive(ls))return {ok:false,message:'LS 창이 열려 있지 않습니다.'};ls.webContents.send('orpheia:remote-audio',pcm);return {ok:true};},request:(action,since,reply,version)=>{if(resetting){reply({error:'프로그램 전체 초기화 중입니다.'});return;}engine.request(action,since,reply,version);}});
+  const remoteInfo=()=>{const i=remote.info();return {...i,qr:(i.secureUrls[0]||i.urls[0])?require('./qr.cjs').svg(i.secureUrls[0]||i.urls[0],{scale:5}):''};};
   ipcMain.handle('orpheia:remote',async(event,{op,id}={})=>{
    if(!trustedLS(event.sender)||event.senderFrame!==event.sender.mainFrame)throw Error('Untrusted remote client');
    if(op==='start')await remote.start();else if(op==='stop')remote.stop();else if(op==='kick')remote.kick(String(id||''));

@@ -3,11 +3,11 @@
 // 모바일 리모컨: 교수 PC의 앱(원격 조작 서버)에 붙어 FTS 진행만 한다. 엔진 상태는 서버가 만든 요약(remote:view)만 받는다.
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clock=s=>{s=Math.max(0,Math.round(s||0));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
-let view=null,busy=false,signature='',opened=new Set(),lastAt=0;
+let net={},view=null,busy=false,signature='',opened=new Set(),lastAt=0;
 async function call(action){
  const r=await fetch('/api/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
  if(r.status===401){location.replace('/');throw new Error('로그아웃');}
- const j=await r.json();if(j.error)throw new Error(j.error);if(j.view){view=j.view;lastAt=Date.now();render();}return j.result;
+ const j=await r.json();if(j.error)throw new Error(j.error);if(j.net)net=j.net;if(j.view){view=j.view;lastAt=Date.now();render();}return j.result;
 }
 function toast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1800);}
 function ask(text){return new Promise(res=>{const d=$('confirm');$('confirmText').textContent=text;$('yes').onclick=()=>{d.close();res(true);};$('no').onclick=()=>{d.close();res(false);};d.showModal();});}
@@ -19,7 +19,7 @@ function render(){
  $('status').textContent=v.finished?'교육 종료':v.problem?.status||'';$('status').hidden=!$('status').textContent;
  $('error').hidden=!v.problem?.error;$('error').textContent=v.problem?.error||'';
  for(const id of ['reload','next','stop'])$(id).disabled=!running;
- tickClock();voicePanel(v,running);
+ tickClock();voicePanel(v,running,net);
  const sig=JSON.stringify([v.index,v.finished,v.problem?.status,v.comms,v.branches,v.manual,v.result,[...opened]]);if(sig===signature)return;signature=sig;
  if(!v.problem){$('lists').innerHTML=startForm(v.setup);return;}
  const next=(v.comms||[]).find(c=>c.at==null&&!c.optional)||(v.comms||[]).find(c=>c.at==null);
@@ -42,23 +42,61 @@ function startForm(setup,title='교육 시작'){
 <ul class="list">${shown.map(s=>`<li class="item ${pick.scenario===s.id?'next':''}"><button type="button" class="tap" data-scenario="${esc(s.id)}"><b>${esc(s.name)}</b><small>문제 ${s.count}개</small></button></li>`).join('')||'<li class="empty">맞는 시나리오가 없습니다.</li>'}</ul>
 <div class="start"><button type="button" id="rcStart" class="go" ${pick.scenario?'':'disabled'}>${pick.scenario?'선택한 시나리오로 교육 시작':'시나리오를 고르세요'}</button></div>`;
 }
-// 음성 1인 모드: 휴대폰을 마이크로 쓴다. 휴대폰 키보드의 음성 입력(🎤)으로 무전을 말하면 받아쓴 글을 교수 PC에 보낸다
-// (이 리모컨은 같은 네트워크의 http 주소라 웹페이지가 마이크를 직접 쓸 수 없다 — 키보드 음성 입력은 된다)
-function voicePanel(v,running){
+// 음성 1인 모드: 휴대폰을 마이크로 쓴다. 「🎙 휴대폰 마이크 켜기」를 한 번 누르면 마이크 사용 동의를 받고,
+// 그 뒤로는 계속 듣다가 말이 끝날 때마다(무음 0.9초) 그 한 마디의 소리를 교수 PC로 보낸다. PC 앱이 받아써(Whisper) 판정한다.
+// 휴대폰 브라우저는 보안 주소(https)에서만 마이크를 준다 — http로 들어왔으면 https 주소로 안내한다.
+const M={on:false,stream:null,ctx:null,node:null,level:0,sent:0,busy:false,error:'',wake:null,https:0};
+async function micOn(){
+ if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){M.error='insecure';voiceRefresh();return;}
+ try{M.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});}
+ catch(e){M.error=e.name==='NotAllowedError'?'마이크 사용이 거부되었습니다. 브라우저 주소창의 자물쇠(또는 ⓘ) → 권한에서 마이크를 허용하세요.':'마이크를 켜지 못했습니다: '+(e.message||e.name);voiceRefresh();return;}
+ M.error='';M.on=true;try{M.wake=await navigator.wakeLock?.request('screen');}catch{}
+ M.ctx=new (window.AudioContext||window.webkitAudioContext)();await M.ctx.resume?.();
+ const src=M.ctx.createMediaStreamSource(M.stream);M.node=M.ctx.createScriptProcessor(4096,1,1);
+ const rate=M.ctx.sampleRate,frame=4096/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
+ M.node.onaudioprocess=e=>{
+  const x=new Float32Array(e.inputBuffer.getChannelData(0));let sum=0;for(const v of x)sum+=v*v;const rms=Math.sqrt(sum/x.length),thr=Math.max(0.012,floor*3.5);M.level=rms/thr;
+  if(!talk){floor=floor*0.95+rms*0.05;pre.push(x);if(pre.length>PRE)pre.shift();if(rms>thr){talk={chunks:[...pre,x],voiced:1};quiet=0;pre.length=0;}return;}
+  talk.chunks.push(x);if(rms>thr){talk.voiced++;quiet=0;}else quiet+=frame;
+  if(quiet>=0.9||talk.chunks.length*frame>=25){const t=talk;talk=null;if(t.voiced*frame>=0.35)upload(t.chunks,rate);}
+ };
+ src.connect(M.node);M.node.connect(M.ctx.destination);voiceRefresh();
+}
+function micOff(){M.on=false;try{M.node?.disconnect();M.ctx?.close();}catch{}for(const t of M.stream?.getTracks()||[])t.stop();M.stream=M.ctx=M.node=null;try{M.wake?.release();}catch{}M.wake=null;voiceRefresh();}
+// 16kHz · 16비트로 줄여 보낸다 (한 마디 25초까지 약 0.8MB)
+async function upload(chunks,rate){
+ const n=chunks.reduce((a,c)=>a+c.length,0),r=rate/16000,out=new Int16Array(Math.floor(n/r));let all=new Float32Array(n),o=0;for(const c of chunks){all.set(c,o);o+=c.length;}
+ for(let i=0;i<out.length;i++){const v=Math.max(-1,Math.min(1,all[Math.floor(i*r)]));out[i]=v<0?v*0x8000:v*0x7fff;}
+ let bin='';const u8=new Uint8Array(out.buffer);for(let i=0;i<u8.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));
+ M.busy=true;voiceRefresh();
+ try{const res=await fetch('/api/audio',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pcm:btoa(bin)})});const j=await res.json();if(j.error)toast(j.error);else M.sent++;}catch(e){toast('보내지 못했습니다: '+e.message);}
+ finally{M.busy=false;voiceRefresh();}
+}
+let voiceView=null;
+function voicePanel(v,running,net){
+ voiceView={v,running,net};if(net?.https)M.https=net.https;
  let box=$('rcVoice');
- if(!v.voice||!v.problem){if(box)box.remove();return;}
+ if(!v.voice||!v.problem){if(box)box.remove();if(M.on&&!v.voice)micOff();return;}
  if(!box){box=document.createElement('section');box.id='rcVoice';box.className='voice';
-  box.innerHTML=`<h2>📻 무전 (음성 1인 모드)</h2><p class="hint">입력칸을 누르고 키보드의 🎤 음성 입력으로 무전하듯 말한 뒤 [보내기]. 말이 끝날 때마다 한 마디씩 보내세요.</p>
-<form id="rcVoiceForm"><textarea id="rcVoiceText" rows="2" placeholder="예: K1210열차 금천구청역 정차" enterkeyhint="send"></textarea><button type="submit" class="go">보내기</button></form><ul class="list" id="rcVoiceLog"></ul>`;
+  box.innerHTML=`<h2>📻 무전 (음성 1인 모드)</h2><div id="rcMic"></div><ul class="list" id="rcVoiceLog"></ul>
+<details class="typed"><summary>마이크 대신 키보드로 보내기</summary><form id="rcVoiceForm"><textarea id="rcVoiceText" rows="2" placeholder="예: K1210열차 금천구청역 정차" enterkeyhint="send"></textarea><button type="submit" class="go">보내기</button></form></details>`;
   $('lists').before(box);
-  const t=$('rcVoiceText');
-  const send=async()=>{const text=t.value.trim();if(!text)return;t.value='';await act({type:'fts',op:'voice',text});};
-  $('rcVoiceForm').onsubmit=e=>{e.preventDefault();send();};
-  t.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});}
- $('rcVoiceText').disabled=!running;
- const log=(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 보낸 무전이 없습니다.</li>';
+  const t=$('rcVoiceText'),send=async()=>{const text=t.value.trim();if(!text)return;t.value='';await act({type:'fts',op:'voice',text});};
+  $('rcVoiceForm').onsubmit=e=>{e.preventDefault();send();};t.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  box.addEventListener('click',e=>{if(e.target.id==='rcMicOn')micOn();if(e.target.id==='rcMicOff')micOff();});}
+ voiceRefresh();
+ const log=(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 들은 무전이 없습니다.</li>';
  if($('rcVoiceLog').innerHTML!==log)$('rcVoiceLog').innerHTML=log;
 }
+function voiceRefresh(){
+ const box=$('rcMic');if(!box)return;
+ const secure=location.protocol==='https:'?'':M.https?`https://${location.hostname}:${M.https}/`:'';
+ const html=M.error==='insecure'?`<p class="warn">휴대폰 마이크는 보안 주소에서만 쓸 수 있습니다.${secure?` <a href="${esc(secure)}">${esc(secure)}</a> 로 다시 접속하세요 (처음 한 번 「안전하지 않음」 경고가 나오면 [고급 → 계속]).`:''}</p>`
+  :M.on?`<p class="mic-on">🎙 휴대폰 마이크로 듣는 중 <span class="meter"><i style="width:${Math.round(Math.max(0,Math.min(1,M.level/3))*100)}%"></i></span>${M.busy?' · 보내는 중…':''}</p><p class="hint">무전하듯 말하세요. 말이 끝나면 PC가 받아써 판정합니다 (보낸 말 ${M.sent}개). 화면을 켜 둔 채로 두세요.</p><button type="button" id="rcMicOff">마이크 끄기</button>`
+  :`${M.error?`<p class="warn">${esc(M.error)}</p>`:''}<button type="button" class="go" id="rcMicOn">🎙 휴대폰 마이크 켜기</button><p class="hint">누르면 마이크 사용 동의를 묻습니다. 그 뒤로는 휴대폰이 계속 듣습니다.</p>`;
+ if(box.dataset.html!==html){box.dataset.html=html;box.innerHTML=html;}
+}
+setInterval(()=>{if(M.on)voiceRefresh();},250);
 function tickClock(){const v=view;if(!v?.problem){$('remaining').textContent='--:--';return;}const live=v.active&&!v.finished&&v.problem.status==='진행',r=Math.max(0,v.remaining-(live?(Date.now()-lastAt)/1000:0));$('remaining').textContent=clock(r);document.querySelector('.clock').classList.toggle('low',live&&r<=60);}
 $('lists').addEventListener('input',e=>{if(e.target.id==='rcFilter'){pick.filter=e.target.value.trim();const keep=[$('rcProf')?.value,$('rcStud')?.value];signature='';render();const f=$('rcFilter');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length);}if(keep[0]&&$('rcProf'))$('rcProf').value=keep[0];if(keep[1]&&$('rcStud'))$('rcStud').value=keep[1];}});
 $('lists').addEventListener('click',async e=>{
