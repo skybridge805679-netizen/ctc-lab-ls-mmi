@@ -65,7 +65,12 @@ function trainsIn(text,known){
 }
 // 역 이름 (비연동 중간역 포함). 음성인식이 「가산디지털단지」「금천구청」처럼 붙이거나 떼어 써도 찾는다
 const NAMES=N.stations.map(s=>({id:s.id,name:s.name,key:s.name.replace(/\s/g,'')})).sort((a,b)=>b.key.length-a.key.length);
-function stationsIn(text){const t=String(text).replace(/\s/g,''),out=[];let rest=t;for(const s of NAMES)if(rest.includes(s.key)){out.push(s.id);rest=rest.split(s.key).join('#');}return out;}
+// 세 글자 이상 역 이름은 한 글자 틀린 받아쓰기도 찾는다 (「금청구청」 → 금천구청)
+const levS=(a,b)=>{const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t;}}return d[b.length];};
+function stationsIn(text){const t=String(text).replace(/\s/g,''),out=[];let rest=t;
+ for(const s of NAMES)if(rest.includes(s.key)){out.push(s.id);rest=rest.split(s.key).join('#');}
+ for(const s of NAMES){if(out.includes(s.id)||s.key.length<3)continue;for(let i=0;i+s.key.length<=rest.length;i++){const w=rest.slice(i,i+s.key.length);if(!w.includes('#')&&levS(w,s.key)<=1&&w[0]===s.key[0]){out.push(s.id);rest=rest.slice(0,i)+'#'+rest.slice(i+s.key.length);break;}}}
+ return out;}
 
 // ── 문제 → 음성 단계. 통보마다 관제사의 말 한 마디가 한 단계.
 //  to: 그 말을 받는 열차(앞 말에서 이어짐) · stop: 「○○열차 ○○역 정차 / 출발 정지」 · reply: 그 말 뒤 상대 대사 · lead: 상대가 먼저 거는 무전

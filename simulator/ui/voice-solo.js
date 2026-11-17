@@ -6,7 +6,7 @@
 //  · 상대 대사를 읽는 동안은 듣지 않는다 (자기 소리를 다시 받아쓰지 않게).
 // 상대를 고르는 화면이나 「말하기」 버튼은 없다. 화면에는 들은 말과 알아들은 단계만 보인다.
 const STT_URL=new URL('ui/voice-stt-worker.js',root.location?.href||'').href;
-const S={on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
+const S={prep:false,prepHeard:[],level:0,doc:null,on:false,worker:null,model:'',progress:null,stream:null,ctx:null,node:null,src:null,speaking:false,mutedUntil:0,busy:0,heard:[],played:0,sessionKey:'',error:'',send:null,seq:0};
 // Whisper가 무음·잡음에서 자주 지어내는 말 (방송 끝인사 등) — 무전으로 넘기지 않는다
 const HALLUCINATION=/^(감사합니다\.?|시청해 ?주셔서 감사합니다\.?|구독과 좋아요.*|MBC 뉴스.*|\.+|…+)$/;
 
@@ -24,6 +24,7 @@ function worker(){
 // 받아쓴 한 마디 → 엔진
 function heard(text,ms){
  text=String(text||'').trim();if(!text||HALLUCINATION.test(text))return;
+ if(S.prep&&!S.on){S.prepHeard.unshift(text);S.prepHeard.length=Math.min(S.prepHeard.length,5);return;}      // 음성 준비(마이크 시험): 받아쓴 글만 보여 준다
  const r=S.send?S.send(text):{ok:false,message:'엔진 연결 없음'};
  S.heard.unshift({at:Date.now(),text,ms,ok:r?.ok!==false&&(!!r?.matched?.length||!!r?.ack),ack:!!r?.ack,matched:r?.matched||[],message:r?.ok===false?r.message:''});S.heard.length=Math.min(S.heard.length,12);
 }
@@ -32,13 +33,13 @@ async function listen(){
  if(S.stream)return;
  try{
   S.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
- }catch(e){S.error='마이크를 쓸 수 없습니다: '+(e.message||e.name);render();return;}
- S.ctx=new AudioContext({sampleRate:16000});S.src=S.ctx.createMediaStreamSource(S.stream);
+ }catch(e){S.error='마이크를 쓸 수 없습니다: '+(e.name==='NotAllowedError'?'마이크 사용이 막혀 있습니다 (Windows 설정 → 개인 정보 → 마이크 → 데스크톱 앱의 마이크 접근 허용 / macOS 시스템 설정 → 개인정보 보호 → 마이크)':e.name==='NotFoundError'?'연결된 마이크가 없습니다 (휴대폰 리모컨의 「📻 무전」을 쓰세요)':(e.message||e.name));render();return;}
+ S.ctx=new AudioContext({sampleRate:16000});S.ctx.resume?.();S.src=S.ctx.createMediaStreamSource(S.stream);
  S.node=S.ctx.createScriptProcessor(2048,1,1);
  const rate=S.ctx.sampleRate,frame=2048/rate,pre=[],PRE=Math.ceil(0.3/frame);let floor=0.005,talk=null,quiet=0;
  S.node.onaudioprocess=e=>{
   const x=new Float32Array(e.inputBuffer.getChannelData(0));let sum=0;for(const v of x)sum+=v*v;const rms=Math.sqrt(sum/x.length);
-  if(S.speaking||Date.now()<S.mutedUntil||!S.on){talk=null;pre.length=0;return;}
+  if(S.speaking||Date.now()<S.mutedUntil||!(S.on||S.prep)){talk=null;pre.length=0;S.level=0;return;}
   const thr=Math.max(0.012,floor*3.5);
   if(!talk){floor=floor*0.95+rms*0.05;pre.push(x);if(pre.length>PRE)pre.shift();if(rms>thr){talk={chunks:[...pre,x],voiced:1};quiet=0;pre.length=0;}S.level=rms/thr;return;}
   talk.chunks.push(x);if(rms>thr){talk.voiced++;quiet=0;}else quiet+=frame;S.level=rms/thr;
@@ -75,29 +76,49 @@ async function drain(){if(T.playing)return;T.playing=true;S.speaking=true;render
  T.playing=false;S.speaking=false;S.mutedUntil=Date.now()+350;render();}
 function speakLines(lines){T.queue.push(...lines);drain();}
 // FTS 화면이 엔진 상태를 받을 때마다 부른다
-function sync(fts,send){
- S.send=send;const session=fts?.session,idx=session?Math.min(session.current,session.items.length-1):-1,item=session?.items[idx],v=session?.voice?.items?.[idx];
+function sync(fts,send,doc){
+ S.send=send;if(doc)S.doc=doc;const session=fts?.session,idx=session?Math.min(session.current,session.items.length-1):-1,item=session?.items[idx],v=session?.voice?.items?.[idx];
  const live=!!(session?.voice&&!session.finished&&item?.status==='진행');
  const key=session?session.id+':'+idx+':'+(session.attempt||0):'';
  if(key!==S.sessionKey){S.sessionKey=key;S.played=0;S.heard=[];}
  if(live&&!S.on){S.on=true;S.error='';worker();ttsWorker();listen();}
- else if(!live&&S.on){S.on=false;stopListening();}
+ else if(!live&&S.on){S.on=false;if(!S.prep)stopListening();}
+ if(live)S.prep=false;
  if(v?.queue?.length){const fresh=v.queue.filter(q=>q.seq>S.played);if(fresh.length){S.played=fresh.at(-1).seq;speakLines(fresh);}}
  S.state={live,v,item,voice:!!session?.voice};render();
 }
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let last='';
 function render(){
- const box=root.document?.getElementById('ftsVoice');if(!box)return;
+ renderPrep();const D=S.doc?.()||root.document,box=D?.getElementById('ftsVoice');if(!box)return;
  const st=S.state||{};if(!st.voice){if(box.innerHTML)box.innerHTML='';last='';return;}
  const p=S.progress||T.progress&&!T.ready&&{...T.progress,tts:true},mb=x=>Math.round(x/1e6),status=S.error?`⚠ ${S.error}`:p&&!p.total?'음성 모델 준비 중…':p&&p.total?`${p.tts?'목소리(TTS)':'음성인식'} 모델 내려받는 중 ${mb(p.loaded)} / ${mb(p.total)}MB (처음 한 번만)`:!st.live?'음성 1인 모드 · 문제가 진행되면 듣기 시작합니다':S.speaking?'🔊 상대 응답 중 — 끝나면 다시 듣습니다':S.busy?'⏳ 받아쓰는 중…':'🎙 듣는 중 — 무전하듯 말하세요';
  const done=Object.keys(st.v?.done||{}).length;
  const html=`<div class="fts-voice ${S.speaking?'speaking':''}"><div class="fts-voice-status"><b>${esc(status)}</b><small>${S.model?'받아쓰기: '+esc(S.model)+' · ':''}${T.ready?'목소리: Supertonic · ':T.failed?'목소리: 기본 TTS · ':''}알아들은 말 ${done}개</small></div>
 <ul class="fts-voice-log">${S.heard.map(h=>`<li class="${h.ok?'ok':'miss'}"><span>${h.ok?'✔':'✖'}</span><div><q>${esc(h.text)}</q>${h.ok?`<small>${h.ack?'응답 (관제 이상 · 수신 이상)':h.matched.map(m=>esc(m.comm+' · '+m.text.slice(0,48))).join('<br>')}</small>`:`<small>${esc(h.message||'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게 다시 말해 보세요')}</small>`}</div></li>`).join('')||'<li class="empty">아직 들은 말이 없습니다.</li>'}</ul>
 <details class="fts-voice-type"><summary>마이크 없이 시험 (글로 입력)</summary><form id="ftsVoiceForm"><input id="ftsVoiceText" placeholder="예: K1210열차 금천구청역 정차" autocomplete="off"><button class="sched-btn">입력</button></form></details></div>`;
- if(html===last)return;const open=box.querySelector('details')?.open,typed=box.querySelector('#ftsVoiceText')?.value||'',focus=root.document.activeElement?.id==='ftsVoiceText';last=html;box.innerHTML=html;
+ if(html===last)return;const open=box.querySelector('details')?.open,typed=box.querySelector('#ftsVoiceText')?.value||'',focus=D.activeElement?.id==='ftsVoiceText';last=html;box.innerHTML=html;
  const d=box.querySelector('details');if(open)d.open=true;const inp=box.querySelector('#ftsVoiceText');inp.value=typed;if(focus)inp.focus();
  box.querySelector('#ftsVoiceForm').onsubmit=e=>{e.preventDefault();const t=inp.value.trim();if(!t)return;inp.value='';heard(t,0);render();};
 }
-root.SimVoiceSolo={sync,render,heard,readable,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};
+// ── 음성 준비 (교육설정에서 「음성 1인 모드」를 켰을 때): 모델을 미리 받고, 마이크 소리 크기와 받아쓰기를 시험하고, 목소리를 들어 본다
+let prepTimer=0;
+function prepare(doc){if(doc)S.doc=doc;S.prep=true;S.error='';worker();ttsWorker();listen();clearInterval(prepTimer);prepTimer=setInterval(renderPrep,200);renderPrep();}
+function stopPrep(){S.prep=false;clearInterval(prepTimer);if(!S.on)stopListening();renderPrep();}
+function renderPrep(){
+ const D=S.doc?.()||root.document,box=D?.getElementById('suVoicePrep');if(!box){if(S.prep&&!D?.getElementById('ftsVoice'))stopPrepSoon();return;}
+ if(!S.prep){if(box.dataset.on){box.innerHTML='';delete box.dataset.on;}return;}
+ const mb=x=>Math.round(x/1e6),row=(name,p,ready,failed,done)=>`<li><b>${name}</b> ${ready?`✔ 준비됨${done?' · '+esc(done):''}`:failed?'⚠ 준비 실패':p&&p.total?`내려받는 중 ${mb(p.loaded)} / ${mb(p.total)}MB`:'준비 중…'}</li>`;
+ const lvl=Math.max(0,Math.min(1,(S.level||0)/3)),mic=S.stream?`<span class="fts-meter"><i style="width:${Math.round(lvl*100)}%"></i></span>`:'';
+ const html=`<div class="fts-voice-prep"><div class="fts-voice-status"><b>음성 준비</b><small>처음 한 번 모델을 내려받습니다 (약 500MB · 인터넷 필요). 그 뒤로는 인터넷 없이 동작합니다.</small></div>
+<ul>${row('음성인식 (Whisper)',S.progress,!!S.model,false,S.model)}${row('목소리 (Supertonic)',T.progress,T.ready,T.failed,'')}
+<li><b>마이크</b> ${S.error&&!S.stream?'⚠ '+esc(S.error):S.stream?'✔ 듣는 중 '+mic+' <small>말하면 막대가 움직입니다</small>':'연결 중… (처음이면 마이크 허용을 묻습니다)'}</li>
+<li><b>받아쓰기 시험</b> ${S.prepHeard.length?S.prepHeard.map(t=>`<q>${esc(t)}</q>`).join(' '):S.busy?'⏳ 받아쓰는 중…':S.model?'「K1210열차 금천구청역 정차」처럼 말해 보세요':'음성인식 모델이 준비되면 시험할 수 있습니다'}</li></ul>
+<div class="fts-row-btns"><button type="button" class="sched-btn" id="suVoiceHear" ${T.playing?'disabled':''}>🔊 목소리 들어 보기</button><button type="button" class="sched-btn" id="suVoiceStop">마이크 시험 끝내기</button></div></div>`;
+ if(box.dataset.html===html)return;box.dataset.html=html;box.dataset.on='1';box.innerHTML=html;
+ box.querySelector('#suVoiceHear').onclick=()=>speakLines([{who:'driver',name:'K1210 기관사',text:'K1210 열차. 수신 이상!'},{who:'station',name:'금천구청역',text:'금천구청역, 수신 이상!'}]);
+ box.querySelector('#suVoiceStop').onclick=stopPrep;
+}
+let stopping=0;function stopPrepSoon(){clearTimeout(stopping);stopping=setTimeout(()=>{const D=S.doc?.()||root.document;if(S.prep&&!D?.getElementById('suVoicePrep'))stopPrep();},1500);}      // 교육설정 화면을 떠나면 마이크 시험을 끝낸다
+root.SimVoiceSolo={sync,render,heard,readable,prepare,stopPrep,state:()=>({on:S.on,speaking:S.speaking,busy:S.busy,model:S.model,error:S.error,heard:S.heard.slice()})};
 })(typeof window!=='undefined'?window:globalThis);

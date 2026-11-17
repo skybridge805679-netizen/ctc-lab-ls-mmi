@@ -89,3 +89,7 @@ body.problem-detached .problem-panel{height:100vh;overflow:auto;scrollbar-gutter
 .fts-voice-log li>span{width:16px;font-weight:bold}.fts-voice-log li.ok>span{color:#187a3a}.fts-voice-log li.miss>span{color:#b33}
 .fts-voice-log q{display:block}.fts-voice-log small{color:#456}.fts-voice-log li.empty{color:#678}
 .fts-voice-type{margin-top:6px}.fts-voice-type form{display:flex;gap:6px;margin-top:4px}.fts-voice-type input{flex:1}
+.fts-voice-prep{margin:6px 0 8px;padding:8px 10px;border:1px solid #6aa6a6;border-radius:6px;background:#eef8f8}
+.fts-voice-prep ul{margin:6px 0;padding-left:18px}.fts-voice-prep li{margin:3px 0}.fts-voice-prep q{margin-right:8px}
+.fts-meter{display:inline-block;width:120px;height:8px;border:1px solid #6aa6a6;border-radius:4px;vertical-align:middle;overflow:hidden;background:#fff}
+.fts-meter i{display:block;height:100%;background:#2b9a5a;transition:width .1s}

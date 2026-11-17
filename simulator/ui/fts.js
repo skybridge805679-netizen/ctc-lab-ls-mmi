@@ -341,13 +341,14 @@ PAGES.setup={
 <div class="fts-sub-bar">교육 시나리오 정보</div><button type="button" class="sched-btn fts-pick" id="suPick">시나리오 선택</button>
 <div class="fts-grid2"><label>시나리오 명칭<input readonly value="${esc(sc?.name||'')}" id="suName"></label><label>작성자<input readonly value="${esc(sc?.author||'')}"></label><label>작성일자<input readonly value="${esc(sc?.createdAt||'')}"></label></div>
 ${table('suSits',['시나리오상황','구간','스케줄ID'],rows)}
-<label><input type="checkbox" id="suActions" ${setup.showActions?'checked':''}> 교육생 문제 발생 화면에 조치사항 표시</label><label title="교수 없이 교육생이 말과 LS 조작만으로 진행합니다. 마이크로 들은 무전 한 마디마다 그 말에 나온 열차가 반응하고, 기관사·역·관제팀장의 대답을 음성으로 읽습니다."><input type="checkbox" id="suVoice" ${setup.voice?'checked':''}> 음성 1인 모드 (교수 없이 음성인식으로 진행)</label><label><input type="checkbox" id="suAuto" ${setup.autoRun?'checked':''}>교육 중 시간표에 따른 열차 자동운행</label>
+<label><input type="checkbox" id="suActions" ${setup.showActions?'checked':''}> 교육생 문제 발생 화면에 조치사항 표시</label><label title="교수 없이 교육생이 말과 LS 조작만으로 진행합니다. 마이크로 들은 무전 한 마디마다 그 말에 나온 열차가 반응하고, 기관사·역·관제팀장의 대답을 음성으로 읽습니다."><input type="checkbox" id="suVoice" ${setup.voice?'checked':''}> 음성 1인 모드 (교수 없이 음성인식으로 진행)</label><div id="suVoicePrep"></div><label><input type="checkbox" id="suAuto" ${setup.autoRun?'checked':''}>교육 중 시간표에 따른 열차 자동운행</label>
 <div class="fts-row-btns"><button type="button" class="sched-btn primary" id="suStart">교육 시작</button><button type="button" class="sched-btn" id="suClear">Clear</button></div></div>
 <div class="fts-right"><div class="fts-bar">교육 설정</div><div class="fts-sub-bar">시나리오 조회</div><div class="fts-grid2"><label>스케줄ID<input id="suSch"></label><button type="button" class="sched-btn" id="suSchFind">조회</button></div><div id="suSchList"></div></div></div>`;
  },
  bind(){
   const remember=()=>{setup.professor=$('suProf').value;setup.student=$('suStud').value;setup.showActions=$('suActions').checked;setup.autoRun=$('suAuto').checked;setup.voice=$('suVoice').checked;};
   $('suPick').onclick=()=>{remember();openPicker();};
+  $('suVoice').onchange=()=>{remember();if(setup.voice)root.SimVoiceSolo?.prepare(ftsDoc);else root.SimVoiceSolo?.stopPrep();};if(setup.voice)root.SimVoiceSolo?.prepare(ftsDoc);      // 음성 준비: 모델 내려받기 · 마이크 시험
   $('suClear').onclick=()=>{setup={professor:'',student:'',scenario:null,showActions:true,autoRun:true,voice:false};go('setup');};
   $('suSchFind').onclick=()=>{const v=$('suSch').value.trim();const list=lib.situations.filter(s=>!v||s.scheduleId===v);$('suSchList').innerHTML=table('suSchRows',['상황','스케줄ID','제한시간'],list.map(s=>({id:s.id,cells:[esc(s.name),esc(s.scheduleId||''),s.limit||'']})));};
   $('suStart').onclick=()=>{remember();startSession();};
@@ -395,7 +396,7 @@ function tick(){
   if(state.notice?.id!==lastNotice){lastNotice=state.notice?.id||0;if(state.notice?.kind==='activate'){speak(state.notice.text);showProblem();}
    // 감독관 지시·상황 변경은 음성으로 알리고 문제 창을 앞에 띄운다
    else if(['notice','branch'].includes(state.notice?.kind)){speak(state.notice.text);showProblem();}}
-  root.SimVoiceSolo?.sync(state,text=>remote({op:'voice',text}));      // 음성 1인 모드: 듣기·상대 대사 읽기
+  root.SimVoiceSolo?.sync(state,text=>remote({op:'voice',text}),ftsDoc);      // 음성 1인 모드: 듣기·상대 대사 읽기
   if(page==='monitor'&&ftsOpen()){renderMonitor();renderLog();}if(problemOpen())renderProblem();}
 function finishSession(){remote({op:'stop'});tick();}
 

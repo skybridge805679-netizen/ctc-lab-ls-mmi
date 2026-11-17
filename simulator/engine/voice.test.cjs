@@ -8,6 +8,7 @@ test('음성인식 결과를 열번으로 읽는다: 한글 숫자 · 흔들린 
  assert.deepEqual(V.trainsIn('가산 디지털력 K-1200 8 열차 차량 고장',known),['K1208']);
  assert.deepEqual(V.trainsIn('케이 공사오이 열차',known),['K0452']);
  assert.deepEqual(V.trainsIn('K1210이 출발합니다',known),['K1210']);
+ assert.deepEqual(V.stationsIn('K1210차 금청구청역 정차'),['geumcheon']);assert.deepEqual(V.stationsIn('가산 디지털력'),['gasan']);assert.deepEqual(V.stationsIn('금정역'),['geumjeong']);
  assert.ok(V.isAck('철도관제 이상!'));assert.ok(!V.isAck('K1210열차 금천구청역 정차'));
 });
 test('대본의 통보 하나가 관제사의 말 한 마디씩 단계로 나뉘고, 한 문장에 이어 말한 단계도 알아듣는다',()=>{
