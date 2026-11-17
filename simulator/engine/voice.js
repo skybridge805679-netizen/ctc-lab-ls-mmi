@@ -98,11 +98,12 @@ function plan(problem){
  return {comms,steps,known:canon};
 }
 // 음절 두 개씩 겹친 조각 (띄어쓰기·조사 차이에 덜 민감하다)
-const grams=t=>{const s=core(normalize(t)),g=new Set();for(let i=0;i<s.length-1;i++)g.add(s.slice(i,i+2));return g;};
+// 열번(숫자)은 따로 맞추므로 글 조각 비교에서는 뺀다 — 열번만 같고 내용이 다른 말(「K1208 석수역 정차」 vs 「K1208 정상운행 가능」)을 비슷하다고 보지 않게
+const grams=t=>{const s=core(normalize(t).replace(/[KAGM]?[\s-]*\d[\d\s-]*/g,' ')),g=new Set();for(let i=0;i<s.length-1;i++)g.add(s.slice(i,i+2));return g;};
 // 들은 말이 어느 단계인가: 열차가 나오는 단계는 그 열번을 들어야 하고, 글 조각이 충분히 겹쳐야 한다.
 // 한 번에 이어 말한 여러 단계(「K1210열차 관제 이상… 신호 확인 출발」)도 함께 알아듣는다.
 const better=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]>b[i];return false;};
-function match(p,done,said,{current}={}){
+function match(p,done,said,{current,near=[]}={}){
  const heard=grams(said),trains=trainsIn(said,p.known),places=stationsIn(normalize(said)),cands=[],order=new Map(p.steps.map((s,i)=>[s.id,i])),ci=p.comms.findIndex(c=>c.id===current);
  for(const s of p.steps){
   if(done[s.id]!=null||!s.required)continue;      // 0초에 한 말도 한 것
@@ -111,7 +112,8 @@ function match(p,done,said,{current}={}){
   const same=(a,b)=>a[0]===b[0]&&Number(a.slice(1))===Number(b.slice(1));      // 원문의 「K809」 = K0809
   if(own.length&&!own.some(n=>trains.some(t=>same(t,n))))continue;                                    // 열차에게 한 말은 그 열번을 들어야 한다
   if(!own.length&&s.to.length&&trains.length&&!s.to.some(n=>trains.some(t=>same(t,n))))continue;      // 다른 열차에게 한 말
-  if(s.stop&&!places.includes(s.stop.station))continue;                                         // 정차 지시는 역 이름까지
+  if(s.stop&&!places.includes(s.stop.station))continue;
+  if(s.stop&&(s.stop.kind==='출발정지')!==/출발/.test(said))continue;      // 「정차」와 「출발 정지」는 다른 지시                                         // 정차 지시는 역 이름까지
   if(s.stations.length&&places.length&&!s.stations.some(x=>places.includes(x)))continue;
   cands.push({step:s,g,ahead:ci>=0?Math.max(0,p.comms.findIndex(c=>c.id===s.comm)-ci):0});
  }
@@ -121,7 +123,7 @@ function match(p,done,said,{current}={}){
  for(;;){
   let best=null;
   for(const c of cands){if(out.some(o=>o.step===c.step))continue;let hit=0;for(const x of c.g)if(left.has(x))hit++;const recall=hit/c.g.size;
-   const s=c.step,ok=(recall>=0.5&&hit/left.size>=0.4)||(s.stop&&trains.some(t=>t[0]===s.stop.number[0]&&Number(t.slice(1))===Number(s.stop.number.slice(1)))&&/정차|정지/.test(said));if(!ok||!hit)continue;      // 남은 말의 상당 부분이 그 단계여야 한다 (정차 지시를 되풀이했을 때 짧은 호출 단계로 잘못 인정하지 않게)
+   const s=c.step,call=core(s.text.replace(TRAIN,'')).replace(/열차/g,'').length<3,soon=near.includes(s.id)&&!call,ok=(recall>=(soon?0.35:0.5)&&hit/left.size>=(soon?0.25:call?0.6:0.4))||      /* 짧은 호출(「K1208열차. 관제 이상!」)은 들은 말이 거의 그 호출뿐일 때만 — 정차 지시를 호출로 잘못 인정하지 않게 */      /* 다음에 할 말(대본 순서 가까운 단계)은 받아쓰기가 조금 틀려도 인정 */(s.stop&&trains.some(t=>t[0]===s.stop.number[0]&&Number(t.slice(1))===Number(s.stop.number.slice(1)))&&/정차|정지/.test(said)&&(s.stop.kind==='출발정지')===/출발/.test(said));if(!ok||!hit)continue;      // 남은 말의 상당 부분이 그 단계여야 한다 (정차 지시를 되풀이했을 때 짧은 호출 단계로 잘못 인정하지 않게)
    const key=[hit+(s.stop?3:0),recall,-c.ahead,-order.get(s.id)];      // 겹친 조각 수 → 겹친 비율 → 지금 통보에 가까운 것 → 대본 순서
    if(!best||better(key,best.key))best={c,key,recall};}
   if(!best)break;
@@ -138,6 +140,26 @@ function stopSlot(station,direction,trunkHint){
 }
 // 의례적인 응답만 한 말 (「철도관제 이상」「수신 이상」) — 채점할 말은 아니지만 알아들은 것으로 본다
 const isAck=t=>core(normalize(t)).replace(/철도|관제|수신|이상/g,'').length<3;
-const api={isAck,utterances,role,normalize,trainsIn,stationsIn,plan,match,stopSlot,koNumber};
+// ── 상대 대사 음성 (화면 · 미리 만든 음성 파일 도구가 같이 쓴다)
+// 배역별 목소리: 기관사는 열차마다 다른 남자 목소리, 역은 여자, 관제팀장·운영실·안내는 다른 여자, 복구반·검수반은 남자 (Supertonic 2 목소리 이름)
+const VOICES={driver:['M1','M2','M3','M5'],station:['F1','F4'],chief:['F3'],crew:['M4']};
+const fnv=t=>{let h=0x811c9dc5;for(const c of String(t)){h^=c.codePointAt(0);h=Math.imul(h,0x01000193)>>>0;}return h;};
+const voiceOf=l=>{const list=VOICES[l.who]||['M1'];return list[fnv(l.name)%list.length];};
+// 열번·숫자를 무전에서 읽는 말로 (TTS가 「K1210」을 바르게 읽지 못한다): K1210 → 케이 천이백십, 3호 → 삼호
+const KO=['','일','이','삼','사','오','육','칠','팔','구'],LETTERS={K:'케이',A:'에이',G:'지',M:'엠'};
+const koNum=n=>{n=Number(n);if(!n)return '공';let s='';for(const [u,w] of [[1000,'천'],[100,'백'],[10,'십']]){const d=Math.floor(n/u)%10;if(d)s+=(d>1?KO[d]:'')+w;}return s+KO[n%10];};
+const readable=t=>String(t).replace(/([KAGM])(\d{3,4})/g,(m,l,d)=>LETTERS[l]+' '+(d[0]==='0'?[...d].map(x=>x==='0'?'공':KO[x]).join(''):koNum(d))).replace(/(\d+)호/g,(m,d)=>koNum(d)+'호').replace(/[<>]/g,' ').replace(/\s+/g,' ').trim();
+// 미리 만든 음성 파일 이름: 목소리 + 읽는 글
+const lineKey=l=>{const v=voiceOf(l),t=readable(l.text);return v+'-'+fnv(v+'|'+t).toString(16).padStart(8,'0');};
+// 문제의 모든 상대 대사와 FTS 안내 (미리 만들 목록): 기본 통보 + 상황 변경 통보, 문제 발생 안내, 상황 변경 안내
+function linesOf(problem){
+ const out=[],add=l=>{if(l?.text&&!out.some(x=>x.name===l.name&&x.text===l.text&&x.who===l.who))out.push(l);};
+ const comms=[...(problem.communications||[]),...(problem.branches||[]).flatMap(b=>b.communications||[])];
+ const P=plan({...problem,communications:comms});for(const c of P.comms)c.lead.forEach(add);for(const s of P.steps)s.reply.forEach(add);
+ if(problem.voice||problem.name)add({who:'chief',name:'안내',text:problem.voice||problem.name});
+ for(const b of problem.branches||[]){const said=String(b.text||b.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||b.label;add({who:'chief',name:'안내',text:'상황 변경 · '+said});}
+ return out;
+}
+const api={isAck,voiceOf,readable,lineKey,linesOf,utterances,role,normalize,trainsIn,stationsIn,plan,match,stopSlot,koNumber};
 if(node)module.exports=api;else root.SimVoice=api;
 })(typeof window!=='undefined'?window:globalThis);

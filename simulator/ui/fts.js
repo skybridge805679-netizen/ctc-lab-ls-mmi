@@ -474,7 +474,7 @@ ${session.showActions?section('actions','03','조치사항',waiting?'':p?.action
 }
 // 교수가 주입한 상황 변경: 교육생에게는 감독관이 알려 주는 상황(분기 문서 첫 줄)만 보인다 — 모범 대응은 보이지 않는다
 function changes(p,item){return (p?.branches||[]).filter(b=>item.branch?.[b.id]!=null).map(b=>String(b.text||b.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||b.label);}
-function speak(text){try{if(!text||!root.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';root.speechSynthesis.cancel();root.speechSynthesis.speak(u);}catch{}}
+function speak(text){try{if(!text||root.SimExtraLS)return;if(root.SimRemote.snapshot.fts?.session?.voice&&root.SimVoiceSolo){root.SimVoiceSolo.announce(text);return;}if(!root.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='ko-KR';root.speechSynthesis.cancel();root.speechSynthesis.speak(u);}catch{}}
 
 // ---------------------------------------------------------------- 교육이력관리
 // 원격 조작: 같은 네트워크의 스마트폰(리모컨)·PC 브라우저(앱 화면)로 접속 — 데스크톱 앱 안의 원격 조작 서버를 켜고 끈다

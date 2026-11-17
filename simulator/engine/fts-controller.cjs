@@ -128,16 +128,20 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
   const begun=new Set();
   for(const s of P.steps)if(s.stop&&!begun.has(s.stop.number)){begun.add(s.stop.number);const f=findTrain(s.stop.number);if(!f)continue;/* 대본에 두 번 나오는 열차(「정차」 뒤 「출발 정지」)는 처음 지시를 기준으로 한 번만 */const startIn=60+15*Math.max(0,req.indexOf(s));
    const r=host.apply({type:'scenario:move',auto:true,action:{op:'delete',station:f.station,slot:f.slot,uid:f.uid,startIn}});if(r?.ok===false)log('음성 · '+s.stop.number+' 운행 시작 실패: '+r.message,'W');}
-  voiceLead(st,P);}
+  voiceLead(st,P);voiceHint(st,P);}
  function voiceLead(st,P){const next=P.comms.find(c=>c.steps.some(id=>{const s=P.steps.find(x=>x.id===id);return s.required&&st.done[id]==null;})||c.steps.every(id=>!P.steps.find(x=>x.id===id).required)&&!st.played[c.id]);
   if(next?.incoming&&!st.played[next.id]){st.played[next.id]=true;say(st,next.lead);}}
+ // 아직 하지 않은 말 (대본 순서) — 받아쓰기 문맥 힌트와 너그러운 판정에 쓴다
+ function voiceNext(st,P,n){const out=[];for(const c of P.comms)for(const id of c.steps){const s=P.steps.find(x=>x.id===id);if(s.required&&st.done[id]==null){out.push(s);if(out.length>=n)return out;}}return out;}
+ // Whisper 문맥 힌트: 이 문제의 열번·역 이름·무전 용어
+ function voiceHint(st,P){const names=[...new Set(P.steps.flatMap(s=>s.stations))].map(id=>(Net.catalog[id]?.name||'')+'역');st.hint=[P.known.map(k=>k+'열차').join(' '),names.join(' '),'철도관제 이상, 수신 이상, 정차, 출발 정지, 주의운전, 추가 정차, 운행선 변경, 관제승인, 안내방송, 신호 확인 출발, 구원, 회송, 열차번호'].join('. ');}      // 다음 대본 문장까지 넣으면 받아쓰기가 그 문장의 열번으로 끌려간다 (K1212 → K1208) — 열번·역 이름·무전 용어만
  function voiceHear(it,text){
   const st=voiceState(it),P=voicePlan(it),elapsed=now()-(it.startedAt??now());
   const open=P.comms.find(c=>c.steps.some(id=>{const s=P.steps.find(x=>x.id===id);return s.required&&st.done[id]==null;}));
-  const hits=V.match(P,st.done,text,{current:open?.id});
+  const hits=V.match(P,st.done,text,{current:open?.id,near:voiceNext(st,P,4).map(s=>s.id)});
   st.heard.push({at:elapsed,text,norm:V.normalize(text),steps:hits.map(h=>h.step.id)});if(st.heard.length>300)st.heard.shift();
   if(!hits.length&&V.isAck(text)){st.heard.at(-1).ack=true;return {ok:true,matched:[],ack:true,heard:V.normalize(text)};}
-  if(!hits.length){log('음성 · 알아듣지 못함 · '+text,'W');return {ok:true,matched:[],heard:V.normalize(text)};}
+  if(!hits.length){log('음성 · 알아듣지 못함 · '+text,'W');return {ok:true,matched:[],heard:V.normalize(text),next:voiceNext(st,P,1)[0]?.text||''};}
   const m=session.manual[session.current]??={};
   for(const {step:s} of hits){
    st.done[s.id]=elapsed;log('음성 · '+s.comm+' · '+s.text.slice(0,60));
@@ -147,8 +151,8 @@ while(current()?.situationIndex===entry){const x=current();if(x.startedAt===null
    const c=P.comms.find(c=>c.id===s.comm);
    if(c.steps.every(id=>{const x=P.steps.find(y=>y.id===id);return !x.required||st.done[id]!=null;})&&!m['comm:'+c.id]){m['comm:'+c.id]=true;log('음성 · 통보 '+c.id+' 확인 (필요한 말을 모두 함)');}
   }
-  voiceLead(st,P);
-  return {ok:true,matched:hits.map(h=>({id:h.step.id,comm:h.step.comm,text:h.step.text})),heard:V.normalize(text)};
+  voiceLead(st,P);voiceHint(st,P);
+  return {ok:true,next:voiceNext(st,P,1)[0]?.text||'',matched:hits.map(h=>({id:h.step.id,comm:h.step.comm,text:h.step.text})),heard:V.normalize(text)};
  }
  // 원격 리모컨(모바일)용 요약: 엔진 전체 스냅숏 대신 지금 문제·시간·교수가 누를 항목만 내려 준다
  function remoteView(){

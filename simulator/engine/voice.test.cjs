@@ -32,3 +32,9 @@ test('음성 1인 모드: 「K1210열차 금천구청역 정차」를 들으면 
  assert.notEqual(at('K1212'),'geumcheon:B967T','지시를 받지 못한 열차는 석수역을 떠나 달린다');
  assert.equal(r.snapshot().fts.session.manual[0]?.['comm:n3'],undefined,'통보 n3의 다른 말을 아직 하지 않았다');
 });
+test('대본의 모든 상대 대사·안내는 미리 만든 음성 파일이 있다 (대본이 바뀌면 node tools/build-voice-lines.cjs)',()=>{
+ const fs=require('node:fs'),path=require('node:path'),dir=path.join(__dirname,'../assets/voice'),index=JSON.parse(fs.readFileSync(path.join(dir,'index.json'),'utf8'));
+ const missing=[];for(const p of F.seed().problems.filter(p=>/^P-(em|ev)/.test(p.id)))for(const l of V.linesOf(p)){const k=V.lineKey(l);if(!index[k]||!fs.existsSync(path.join(dir,k+'.ogg')))missing.push(p.id+' '+l.name+': '+l.text.slice(0,30));}
+ assert.deepEqual(missing.slice(0,5),[],missing.length+'줄 음성 없음');
+ assert.equal(V.readable('K1210 열차. 관제승인 3호로 K0452열차'),'케이 천이백십 열차. 관제승인 삼호로 케이 공사오이열차');
+});
