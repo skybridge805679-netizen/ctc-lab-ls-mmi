@@ -107,3 +107,12 @@ jobs:
           awk -v v="v${version}" 'index($0,v)==1 && substr($0,length(v)+1,1)~/[: ]|^$/ {on=1} on && /^v[0-9]/ && index($0,v)!=1 {exit} on' desktop/release-notes.md > current-notes.md
           [ -s current-notes.md ] || echo "v${version}" > current-notes.md
           gh release create "$tag" installers/* --target "$GITHUB_SHA" --title "ORPHEIA CTC LAB ${version}" --notes-file current-notes.md
+      - name: Keep only the latest 5 releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          # 새 릴리즈를 올린 뒤 최신 5개만 남기고, 더 오래된 릴리즈와 그 태그를 지운다
+          gh release list --limit 1000 --json tagName,publishedAt --jq 'sort_by(.publishedAt) | reverse | .[5:] | .[].tagName' | while read -r tag; do
+            echo "릴리즈 삭제: $tag"; gh release delete "$tag" --yes --cleanup-tag || true
+          done

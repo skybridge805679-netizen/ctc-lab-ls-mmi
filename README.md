@@ -46,7 +46,7 @@ npm run test:desktop     # Electron 통합 시험 (리눅스는 xvfb-run -a 와 
 - `simulator/ui/` — LS·MMI·FTS 화면
 - `desktop/` — Electron 셸, 원격 조작 서버
 - `simulator/tools/audit-scenarios.cjs` — 비상 시나리오를 대본 순서대로 자동 실행해 멈춘 열차·접근쇄정 판정을 점검
-- main에 새 버전(`package.json`)이 올라가면 [GitHub Actions](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/actions/workflows/desktop.yml)가 Windows·Mac 설치 파일을 빌드해 릴리즈를 만듭니다. 패치노트 규칙은 [AGENTS.md](AGENTS.md)를 따릅니다.
+- main에 새 버전(`package.json`)이 올라가면 [GitHub Actions](https://github.com/skybridge805679-netizen/ctc-lab-ls-mmi/actions/workflows/desktop.yml)가 Windows·Mac 설치 파일을 빌드해 릴리즈를 만들고, 최신 5개만 남깁니다. 패치노트 규칙은 [AGENTS.md](AGENTS.md)를 따릅니다.
 
 ## 문서
 
