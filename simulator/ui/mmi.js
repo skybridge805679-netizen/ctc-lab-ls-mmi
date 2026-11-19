@@ -198,10 +198,9 @@ function placeholder(id,title,note){
 }
 
 // ---------------------------------------------------------------- menu bar
-// Locally bundled image-generated ORPHEIA assets; custom mascot remains optional.
+// MMI 첫 화면: 가운데 오르페이아 크레스트(assets/orpheia/crest.png, NovelAI 시안) + 아래 문구
 function brand(){
- const portrait=root.SimMMITheme?.mascotUrl||'assets/orpheia/guide.png';
- return `<div class="mmi-wallpaper" aria-hidden="true"><div class="mmi-brand"><span class="mmi-mascot"><img src="assets/orpheia/emblem.png" alt="" width="92" height="92"></span><span class="mmi-brand-text"><b>ORPHEIA</b><em>FTS WORKSPACE</em><small>RAIL CONTROL SYSTEM</small></span></div><img class="mmi-guide" src="${esc(portrait)}" alt="" width="240" height="340" loading="lazy"></div>`;
+ return `<div class="mmi-wallpaper mmi-crest-home" aria-hidden="true"><div class="mmi-brand"><img class="mmi-crest" src="assets/orpheia/crest.png" alt="" width="768" height="768"><span class="mmi-brand-text"><b>ORPHEIA</b><em>CTC LAB · RAIL CONTROL TRAINING</em><small>LS · MMI · FTS</small><i>Cantus viam ducit</i></span></div></div>`;
 }
 
 function buildMenu(){

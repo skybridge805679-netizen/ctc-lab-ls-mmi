@@ -83,3 +83,14 @@
 
 /* ── 음성 1인 모드 패널 (FTS 안) */
 .fts-voice{font-family:var(--ui-font);border-radius:var(--r-lg)}
+
+/* ── MMI 첫 화면: 가운데 크레스트 + 아래 문구 */
+.mmi-wallpaper.mmi-crest-home{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:0}
+.mmi-crest-home .mmi-brand{display:flex;flex-direction:column;align-items:center;gap:14px;opacity:1;font-family:var(--ui-font)}
+.mmi-crest-home .mmi-crest{width:clamp(180px,34vh,340px);height:auto;opacity:.82;filter:drop-shadow(0 6px 18px #193f4314)}
+.mmi-crest-home .mmi-brand-text{align-items:center;text-align:center;line-height:1}
+.mmi-crest-home .mmi-brand-text b{font-size:34px;font-weight:300;letter-spacing:.42em;margin-right:-.42em;color:#1d4a4a}
+.mmi-crest-home .mmi-brand-text em{margin-top:14px;font-size:11px;font-weight:600;letter-spacing:.38em;margin-right:-.38em;color:var(--c-gold,#9a7940)}
+.mmi-crest-home .mmi-brand-text small{margin-top:10px;font-size:10px;letter-spacing:.3em;margin-right:-.3em;color:#5f807b}
+.mmi-crest-home .mmi-brand-text i{margin-top:14px;font-family:'Times New Roman',Georgia,serif;font-size:13px;font-style:italic;letter-spacing:.08em;color:#7d6a45}
+.mmi-crest-home .mmi-brand-text b::after{content:'';display:block;width:56px;height:1px;margin:14px auto 0;background:linear-gradient(90deg,transparent,#9a7940,transparent)}

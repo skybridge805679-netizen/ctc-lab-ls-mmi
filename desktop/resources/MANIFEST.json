@@ -1,28 +1,28 @@
 {
-  "generated_date": "2026-10-31",
-  "generator": "OpenAI image_gen",
-  "design": "Orpheia lyre and railway symbol; mint #BEE3E3, ivory, midnight teal, muted gold; rounded tile with transparent outside; no text",
-  "conversion": "Electron nativeImage.resize quality=best; multi-size ICO and PNG-chunk ICNS; original design preserved",
+  "generated_date": "2026-11-19",
+  "generator": "NovelAI Diffusion V5 Full (img2img, 2번 크레스트 시안) + 타일 합성",
+  "design": "Orpheia crest: abstract lyre with ribbon bow and sharp swooping ink flourishes; mint crest on deep teal rounded tile with thin gold inner line; transparent outside; no text",
+  "conversion": "Electron nativeImage.resize quality=best; multi-size ICO and PNG-chunk ICNS",
   "files": [
     {
       "path": "docs/assets/orpheia-app-icon-source.png",
-      "bytes": 1687846,
-      "sha256": "4386aad8d6e07bcee276b3ec207bea3a49be1f39c3b9424a1081b267a7f0c59f"
+      "bytes": 520002,
+      "sha256": "736ecdf7a1bd6af9c0841449124696bf62fc0b9439a6bfa134e61748d5128412"
     },
     {
       "path": "desktop/resources/icon.png",
-      "bytes": 1113248,
-      "sha256": "4a07c7077541ab344d61dbcf9d491a8531e18c23615d0871b5af908c98e00cc1"
+      "bytes": 598733,
+      "sha256": "c49d3a0a3f0023b27f792b06a7ab0d412e3414f6faacfe35186ffdc14d21d424"
     },
     {
       "path": "desktop/resources/icon.ico",
-      "bytes": 132243,
-      "sha256": "8dbeac7fa76f3fcdd63498be0fda84c2ea63da1d7b1304bb1ee76e80c24ea375"
+      "bytes": 107037,
+      "sha256": "3184016780163fb6e82ef7bff532bbb9d6e16a2705cf46b02e40628ec3e60a88"
     },
     {
       "path": "desktop/resources/icon.icns",
-      "bytes": 1901195,
-      "sha256": "b4753eaef738cf62c0d73d3bde6157513fa14fd5157d3ca1e2f1c07b4aeb0bf2"
+      "bytes": 1168727,
+      "sha256": "f943155f57452f3abee98695753cb6d5a4429114d25e09f34da7e32b6bfea7b9"
     }
   ]
 }
