@@ -1,0 +1,52 @@
+{
+ "source": "nai/requests/101-orpheia-perfect.json",
+ "input": "1.5::artist:tsunako::, 0.7::artist:mishima kurone, artist:toosaka asagi, artist:takeshima eku::, year 2026, 0.1::neptune (sereis)::, 0.1::date a live::, {best quality, very aesthetic, best details, highres, amazing quality, high complexity}, -6::artist collaboration::, 1girl, solo, long hair, very long hair, wavy hair, white hair, green eyes, maid, maid headdress, black dress, white apron, frilled apron, puffy short sleeves, wrist cuffs, black bowtie, hair ribbon, black ribbon, musical note hair ornament, gold brooch, upper body, looking at viewer, happy, open mouth, :d, clapping, sparkle, transparent background, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "generate",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 1024,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 1610403871,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts, ",
+  "prompt": "1.5::artist:tsunako::, 0.7::artist:mishima kurone, artist:toosaka asagi, artist:takeshima eku::, year 2026, 0.1::neptune (sereis)::, 0.1::date a live::, {best quality, very aesthetic, best details, highres, amazing quality, high complexity}, -6::artist collaboration::, 1girl, solo, long hair, very long hair, wavy hair, white hair, green eyes, maid, maid headdress, black dress, white apron, frilled apron, puffy short sleeves, wrist cuffs, black bowtie, hair ribbon, black ribbon, musical note hair ornament, gold brooch, upper body, looking at viewer, happy, open mouth, :d, clapping, sparkle, transparent background, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 1610403871,
+  "straight_alpha": true,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "1.5::artist:tsunako::, 0.7::artist:mishima kurone, artist:toosaka asagi, artist:takeshima eku::, year 2026, 0.1::neptune (sereis)::, 0.1::date a live::, {best quality, very aesthetic, best details, highres, amazing quality, high complexity}, -6::artist collaboration::, 1girl, solo, long hair, very long hair, wavy hair, white hair, green eyes, maid, maid headdress, black dress, white apron, frilled apron, puffy short sleeves, wrist cuffs, black bowtie, hair ribbon, black ribbon, musical note hair ornament, gold brooch, upper body, looking at viewer, happy, open mouth, :d, clapping, sparkle, transparent background, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts, ",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  }
+ }
+}

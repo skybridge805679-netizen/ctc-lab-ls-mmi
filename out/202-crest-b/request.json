@@ -1,0 +1,55 @@
+{
+ "source": "nai/requests/202-crest-b.json",
+ "input": "no humans, emblem, crest, heraldry, symbol, symmetry, monochrome, greyscale, lineart, ornate, filigree, art nouveau, sword, vertical sword, wings, spread wings, feathered wings, lyre, musical note, laurel, white background, simple background, best quality, very aesthetic, highres, high complexity, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "img2img",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 832,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 4213067829,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, 1girl, 1boy, person, face, text, error",
+  "prompt": "no humans, emblem, crest, heraldry, symbol, symmetry, monochrome, greyscale, lineart, ornate, filigree, art nouveau, sword, vertical sword, wings, spread wings, feathered wings, lyre, musical note, laurel, white background, simple background, best quality, very aesthetic, highres, high complexity, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 4213067829,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "no humans, emblem, crest, heraldry, symbol, symmetry, monochrome, greyscale, lineart, ornate, filigree, art nouveau, sword, vertical sword, wings, spread wings, feathered wings, lyre, musical note, laurel, white background, simple background, best quality, very aesthetic, highres, high complexity, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, 1girl, 1boy, person, face, text, error",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  },
+  "image": "(base64)",
+  "strength": 0.7,
+  "noise": 0.05,
+  "color_correct": true
+ }
+}
