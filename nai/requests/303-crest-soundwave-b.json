@@ -1,0 +1,9 @@
+{
+ "name": "303-crest-soundwave-b",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 229,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, monochrome, greyscale, black and white, high contrast, ink, lineart, sharp lines, rough lineart, angular, jagged, spiked, abstract, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield::, abstract lyre, sound waves, radiating lines, vibrating strings, music staff, sharp spikes, geometric, art deco",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, soft lines, smooth, cute, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, knife, shield, cross"
+}
