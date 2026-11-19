@@ -1,0 +1,9 @@
+{
+ "name": "e03-fan-shape-a",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 221,
+ "prompt": "emblem, crest, symbol, symmetry, open folding fan shape, sensu, fan ribs as music staff lines, musical notes, christian cross at the fan pivot, virgin mary relief in the center, veil, halo, holy, gold lines, ink, elegant, ornate, white background, simple background, best quality, very aesthetic, highres, high complexity",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, evil, demonic, horror, skull, weapon, sword, blood, photorealistic"
+}

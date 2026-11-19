@@ -1,0 +1,9 @@
+{
+ "name": "e01-madonna-ink-a",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 21,
+ "prompt": "emblem, crest, symbol, symmetry, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, swooping curves, elegant, ornate, open folding fan behind as halo, sensu, virgin mary silhouette, veil, praying hands, christian cross, halo, musical notes, white background, simple background, best quality, very aesthetic, highres, high complexity",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, evil, demonic, horror, skull, weapon, sword, blood, color, colorful, gradient, detailed face"
+}
