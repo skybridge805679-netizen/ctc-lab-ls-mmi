@@ -1,0 +1,17 @@
+{
+  "_note": "주인님 기본 세팅 (2026-11-19). 바꾸라는 말씀이 없으면 모든 생성에 이 값을 쓴다. docs/NAI-이미지-생성.md",
+  "model": "nai-diffusion-5-full",
+  "mode": "anime",
+  "effort": "high",
+  "prompt": "1.5::artist:tsunako::, 0.7::artist:mishima kurone, artist:toosaka asagi, artist:takeshima eku::, year 2026, 0.1::neptune (sereis)::, 0.1::date a live::, {best quality, very aesthetic, best details, highres, amazing quality, high complexity}, -6::artist collaboration::, ",
+  "qualityPreset": "standard",
+  "uc": "worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, bad perspective, bad proportions, bad aspect ratio, bad face, long face, bad teeth, bad neck, long neck, bad arm, bad hands, bad ass, bad leg, bad feet, bad reflection, bad shadow, bad link, bad source, wrong hand, wrong feet, missing limb, missing eye, missing tooth, missing ear, missing finger, extra faces, extra eyes, extra eyebrows, extra mouth, extra tongue, extra teeth, extra ears, extra breasts, extra arms, extra hands, extra legs, extra digits, fewer digits, cropped head, cropped torso, cropped shoulders, cropped arms, cropped legs, mutation, deformed, disfigured, unfinished, chromatic aberration, text, error, jpeg artifacts, watermark, scan, scan artifacts, ",
+  "ucPreset": "none",
+  "steps": 28,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "noise_schedule": "karras",
+  "cfg_rescale": 0,
+  "width": 832,
+  "height": 1216
+}

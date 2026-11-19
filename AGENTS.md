@@ -15,3 +15,7 @@ v0.39.13
 - 종각 상선 칸 경계를 원본 위치로 수정
 - 스케줄 ID 관리에 실시간 변경 버튼 추가
 ```
+
+## 이미지 생성 (NovelAI)
+
+이미지를 만들 때는 `docs/NAI-이미지-생성.md`의 **주인님 기본 세팅**(`tools/nai/preset.json`)을 따로 말씀이 없으면 그대로 쓴다. 토큰은 저장소 시크릿 `NAI_TOKEN`이라 `nai/requests/*.json`을 올려 「NAI image」 워크플로로 만들고, 결과는 `nai-images` 브랜치에서 가져온다.

@@ -1,0 +1,54 @@
+name: NAI image
+# 이미지 생성 통로: nai/requests/*.json 을 올리면 NovelAI로 만들어 「nai-images」 브랜치의 out/<이름>/ 에 올린다.
+# 토큰은 저장소 시크릿 NAI_TOKEN (로그에 찍지 않는다). 이미 만든 요청(out/<이름>/done.json 있음)은 건너뛴다.
+on:
+  push:
+    branches: ['claude/**']
+    paths: ['nai/requests/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: nai-image
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare output branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin nai-images >/dev/null; then
+            git fetch -q origin nai-images && git worktree add -q images FETCH_HEAD && git -C images checkout -q -B nai-images
+          else
+            git worktree add -q --detach images && git -C images checkout -q --orphan nai-images && git -C images rm -rfq . && echo '# NovelAI 생성 결과 (NAI image 워크플로)' > images/README.md
+          fi
+          mkdir -p images/out
+      - name: Generate
+        env:
+          NAI_TOKEN: ${{ secrets.NAI_TOKEN }}
+        run: |
+          shopt -s nullglob
+          files=(nai/requests/*.json)
+          if [ ${#files[@]} -eq 0 ]; then echo '요청 없음'; exit 0; fi
+          node tools/nai/generate.mjs "${files[@]}" --out images/out
+      - name: Publish
+        if: always()
+        run: |
+          cd images
+          git add -A
+          if git diff --cached --quiet; then echo '새 결과 없음'; exit 0; fi
+          git commit -q -m "NAI 결과: ${GITHUB_SHA::7}"
+          for i in 1 2 3; do git push -q origin nai-images && break; git pull -q --rebase origin nai-images || true; sleep 3; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nai-out
+          path: images/out
+          retention-days: 7
