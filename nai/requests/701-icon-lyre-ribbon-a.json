@@ -1,0 +1,9 @@
+{
+ "name": "701-icon-lyre-ribbon-a",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 3,
+ "prompt": "no humans, logo, app icon, flat design, vector art, minimalist, simple, bold shapes, thick lines, solid black, monochrome, symmetry, centered, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, detailed background::, lyre, ribbon bow on top, few strings",
+ "negative": "worst quality, bad quality, displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, gradient, colorful, 1girl, 1boy, person, face, text, letters, error, sword, weapon, shield, thin lines, intricate, sketch, hatching"
+}
