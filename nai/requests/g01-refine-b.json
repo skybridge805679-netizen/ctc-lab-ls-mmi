@@ -1,0 +1,13 @@
+{
+ "name": "g01-refine-b",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 61,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, abstract, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, swooping curves, elegant, ornate, open folding fan arch, sensu, christian cross in the center rising upward, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons tied in a bow, holy, sacred, radiant, white background, simple background, best quality, very aesthetic, highres, high complexity, detailed linework",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, color, colorful, gradient, lyre, harp, fire, flames",
+ "action": "img2img",
+ "image": "nai/inputs/emblem-f6.png",
+ "strength": 0.45,
+ "noise": 0.05
+}
