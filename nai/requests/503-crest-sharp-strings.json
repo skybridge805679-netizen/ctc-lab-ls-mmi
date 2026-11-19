@@ -1,0 +1,9 @@
+{
+ "name": "503-crest-sharp-strings",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 107,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, angular, dynamic brush strokes, calligraphy, abstract, elegant, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield, thorns::, abstract lyre made of sweeping strings, sound waves, musical notes, sharp calligraphic curves, crescent",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, shield, cross, evil, demonic, sinister, horror, skull, thorns, claws, fangs, horns"
+}

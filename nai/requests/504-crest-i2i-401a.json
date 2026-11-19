@@ -1,0 +1,13 @@
+{
+ "name": "504-crest-i2i-401a",
+ "base": false,
+ "action": "img2img",
+ "image": "nai/inputs/crest-401a.png",
+ "strength": 0.55,
+ "noise": 0.05,
+ "width": 1024,
+ "height": 1024,
+ "seed": 7,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, angular, dynamic brush strokes, calligraphy, abstract, elegant, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield, thorns::, lyre, lyre strings, ribbon bow on top, musical notes, sharp flourishes",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, shield, cross, evil, demonic, sinister, horror, skull, thorns, claws, fangs, horns"
+}
