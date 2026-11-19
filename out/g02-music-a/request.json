@@ -1,0 +1,55 @@
+{
+ "source": "nai/requests/g02-music-a.json",
+ "input": "no humans, emblem, crest, symbol, symmetry, abstract, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, swooping curves, elegant, ornate, open folding fan arch, sensu, christian cross in the center rising upward, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons tied in a bow, holy, sacred, radiant, white background, simple background, best quality, very aesthetic, highres, high complexity, 1.3::musical notes, musical staff lines, treble clef::, fan ribs as musical staff, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "img2img",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 1024,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 107,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, color, colorful, gradient, lyre, harp, fire, flames",
+  "prompt": "no humans, emblem, crest, symbol, symmetry, abstract, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, swooping curves, elegant, ornate, open folding fan arch, sensu, christian cross in the center rising upward, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons tied in a bow, holy, sacred, radiant, white background, simple background, best quality, very aesthetic, highres, high complexity, 1.3::musical notes, musical staff lines, treble clef::, fan ribs as musical staff, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 107,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "no humans, emblem, crest, symbol, symmetry, abstract, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, swooping curves, elegant, ornate, open folding fan arch, sensu, christian cross in the center rising upward, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons tied in a bow, holy, sacred, radiant, white background, simple background, best quality, very aesthetic, highres, high complexity, 1.3::musical notes, musical staff lines, treble clef::, fan ribs as musical staff, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, color, colorful, gradient, lyre, harp, fire, flames",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  },
+  "image": "(base64)",
+  "strength": 0.6,
+  "noise": 0.08,
+  "color_correct": true
+ }
+}
