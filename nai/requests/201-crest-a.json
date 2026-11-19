@@ -1,0 +1,8 @@
+{
+ "name": "201-crest-a",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "prompt": "no humans, emblem, crest, heraldry, symbol, symmetry, monochrome, greyscale, lineart, ornate, filigree, art nouveau, sword, vertical sword, wings, spread wings, feathered wings, lyre, musical note, laurel, white background, simple background, best quality, very aesthetic, highres, high complexity",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, 1girl, 1boy, person, face, text, error"
+}

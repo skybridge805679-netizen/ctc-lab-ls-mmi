@@ -2,6 +2,7 @@
 // 사용: node tools/nai/generate.mjs <요청.json>... --out <폴더>
 // 요청 JSON (nai/requests/*.json) — 적지 않은 값은 tools/nai/preset.json(주인님 기본 세팅)을 쓴다:
 //   { "name": "orpheia-01", "prompt": "1girl, ...", "negative": "...", "width": 832, "height": 1216, "seed": 123, "n": 1,
+//     "transparent": false,       // true면 투명 배경 PNG (V5)
 //     "base": true,                 // false면 기본 프롬프트(작가·퀄리티 태그)를 앞에 붙이지 않는다
 //     "characters": [{ "prompt": "girl, ...", "uc": "", "center": { "x": 0.3, "y": 0.5 } }],
 //     "action": "generate" | "img2img" | "infill" | "balance",
@@ -20,14 +21,14 @@ const b64=f=>fs.readFileSync(f).toString('base64');
 async function balance(){const r=await fetch(HOST+'/user/subscription',{headers:auth});if(!r.ok)return {error:r.status+' '+(await r.text()).slice(0,200)};const j=await r.json();
  const s=j.trainingStepsLeft||{};return {tier:j.tier,active:j.active,anlas:(s.fixedTrainingStepsLeft||0)+(s.purchasedTrainingSteps||0)};}
 function body(q){
- const base=q.base===false?'':preset.prompt,prompt=(base+(q.prompt||'')).replace(/[,\s]+$/,'')+QUALITY[q.quality??preset.qualityPreset];
+ const base=q.base===false?'':preset.prompt,prompt=(base+(q.prompt||'')).replace(/[,\s]+$/,'')+(q.transparent?', transparent background':'')+QUALITY[q.quality??preset.qualityPreset];      // 투명 배경(V5): 퀄리티 문구 앞에 태그 + straight_alpha
  const uc=(q.base===false?'':preset.uc)+(q.negative||'');
  const chars=q.characters||[],coords=chars.some(c=>c.center&&(c.center.x||c.center.y));
  const action=q.action||'generate',seed=q.seed??Math.floor(Math.random()*4294967288)+1;
  const p={params_version:4,width:q.width||preset.width,height:q.height||preset.height,scale:q.scale??preset.scale,sampler:q.sampler||preset.sampler,steps:q.steps||preset.steps,seed,n_samples:q.n||1,
   ucPreset:UC_PRESET[q.ucPreset||preset.ucPreset]??4,qualityToggle:(q.quality??preset.qualityPreset)!=='none',sm:false,sm_dyn:false,dynamic_thresholding:false,controlnet_strength:1,legacy:false,
   add_original_image:false,cfg_rescale:q.cfg_rescale??preset.cfg_rescale,noise_schedule:q.noise_schedule||preset.noise_schedule,legacy_v3_extend:false,uncond_scale:1,
-  negative_prompt:uc,prompt,reference_image_multiple:[],reference_information_extracted_multiple:[],reference_strength_multiple:[],extra_noise_seed:seed,
+  negative_prompt:uc,prompt,reference_image_multiple:[],reference_information_extracted_multiple:[],reference_strength_multiple:[],extra_noise_seed:seed,...(q.transparent?{straight_alpha:true}:{}),
   v4_prompt:{use_coords:coords,use_order:true,caption:{base_caption:prompt,char_captions:chars.map(c=>({char_caption:c.prompt,centers:[c.center||{x:0,y:0}]}))}},
   v4_negative_prompt:{use_coords:coords,use_order:true,caption:{base_caption:uc,char_captions:chars.map(c=>({char_caption:c.uc||'',centers:[c.center||{x:0,y:0}]}))},legacy_uc:false}};
  let model=q.model||preset.model;
