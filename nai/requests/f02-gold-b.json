@@ -1,0 +1,9 @@
+{
+ "name": "f02-gold-b",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 177,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, abstract, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, elegant, ornate, christian cross in the center, open folding fan radiating behind like a halo, sensu, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons, musical notes, holy, sacred, white background, simple background, best quality, very aesthetic, highres, high complexity, gold ink, gold lines on white",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, dark, black background"
+}
