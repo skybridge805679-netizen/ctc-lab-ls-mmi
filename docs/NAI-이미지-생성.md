@@ -88,6 +88,9 @@ worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, 
 | `…/ui/pattern.png` | 804 바탕 무늬 | FTS 머리 왼쪽 · MMI 첫 화면 바탕 (아주 옅게) |
 | `…/ui/perfect.webp` · `cheer.webp` · `listen.webp` · `wait.webp` | 101~104 (기본 세팅, 투명 배경) | 구술 결과 80점 이상·미만 · 구술 말하기 듣는 중 · 진행 중인 교육 없음 |
 
+| `…/ui/greet.webp` · `think.webp` · `alert.webp` · `grade.webp` | 901~904 | FTS 교육설정 · 음성 준비(모델 준비 중) · 구술 시간 종료 · 교육이력 |
+| `simulator/assets/orpheia/emblem.png` · `guide.png` · `briefing.png` · `banner.png` | 911~914a (GPT 그림 교체) | LS·MMI·탭 아이콘 · MMI 대기 · 문제 발생 창 · FTS 머리 (배너 왼쪽은 투명으로 흐림) |
+
 선 장식은 흑백 그림에서 검은 선만 남긴 투명 마스크라 CSS `mask` + 배경색으로 색을 입힌다 (`theme.css`의 `--orn`·`--orn-mint`). 색을 바꿔도 다시 만들 필요가 없다.
 
 ## 출처

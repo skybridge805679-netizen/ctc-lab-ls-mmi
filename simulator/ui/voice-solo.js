@@ -133,7 +133,7 @@ function renderPrep(){
  if(!S.prep){if(box.dataset.on){box.innerHTML='';delete box.dataset.on;}return;}
  const mb=x=>Math.round(x/1e6),row=(name,p,ready,failed,done)=>`<li><b>${name}</b> ${ready?`✔ 준비됨${done?' · '+esc(done):''}`:failed?'⚠ 준비 실패':p&&p.total?`${p.cached?'불러오는 중 (저장된 모델)':'내려받는 중'} ${mb(p.loaded)} / ${mb(p.total)}MB`:'준비 중…'}</li>`;
  const lvl=Math.max(0,Math.min(1,(S.level||0)/3)),mic=S.stream?`<span class="fts-meter"><i style="width:${Math.round(lvl*100)}%"></i></span>`:'';
- const html=`<div class="fts-voice-prep"><div class="fts-voice-status"><b>음성 준비</b><small>처음 한 번 음성인식 모델을 내려받아 이 컴퓨터에 저장합니다 (인터넷 필요). 그 뒤로는 저장된 모델을 불러와 인터넷 없이 동작합니다.</small></div>
+ const html=`<div class="fts-voice-prep ${S.model?'ready':'loading'}">${S.model?'':'<img class="fts-voice-think" src="assets/orpheia/ui/think.webp" alt="" aria-hidden="true" width="556" height="560">'}<div class="fts-voice-status"><b>음성 준비</b><small>처음 한 번 음성인식 모델을 내려받아 이 컴퓨터에 저장합니다 (인터넷 필요). 그 뒤로는 저장된 모델을 불러와 인터넷 없이 동작합니다.</small></div>
 <ul>${row('음성인식 (Whisper)',S.progress,!!S.model,false,S.model)}<li><b>상대 대사 음성</b> ${T.count?`✔ 미리 만든 음성 ${T.count}줄 (바로 재생)`:'준비 중…'}${T.worker?` · 대본 밖 말: ${T.ready?'Supertonic ✔':T.progress&&T.progress.total?'Supertonic '+(T.progress.cached?'불러오는 중 ':'내려받는 중 ')+mb(T.progress.loaded)+' / '+mb(T.progress.total)+'MB':'준비 중'}`:''}</li>
 <li><b>마이크</b> ${S.error&&!S.stream?'⚠ '+esc(S.error):S.stream?'✔ 듣는 중 '+mic+' <small>말하면 막대가 움직입니다</small>':'연결 중… (처음이면 마이크 허용을 묻습니다)'}</li>
 <li><b>받아쓰기 시험</b> ${S.prepHeard.length?S.prepHeard.map(t=>`<q>${esc(t)}</q>`).join(' '):S.busy?'⏳ 받아쓰는 중…':S.model?'「K1210열차 금천구청역 정차」처럼 말해 보세요':'음성인식 모델이 준비되면 시험할 수 있습니다'}</li></ul>

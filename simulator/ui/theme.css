@@ -158,3 +158,17 @@ body.ls-mainline-hint .overview-link[data-overview-link$=":GU"]{stroke:var(--ml-
 body.ls-mainline-hint .overview-link[data-overview-link$=":GD"]{stroke:var(--ml-GD)}
 body.ls-mainline-hint .overview-link[data-overview-link$=":EU"],body.ls-mainline-hint .overview-link[data-overview-link$=":MU"]{stroke:var(--ml-EU)}
 body.ls-mainline-hint .overview-link[data-overview-link$=":ED"],body.ls-mainline-hint .overview-link[data-overview-link$=":MD"]{stroke:var(--ml-ED)}
+
+/* ── 오르페이아 그림 자리 (assets/orpheia/ui: greet·think·alert·grade) — 장식만 */
+.fts-deco{display:block;height:auto;pointer-events:none;user-select:none;filter:drop-shadow(0 6px 14px #173d4218)}
+.fts-deco-greet{width:170px;margin:18px 0 -6px auto}
+.fts-history-head{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+.fts-history-head .fts-cap{margin:0 0 4px}.fts-history-head .fts-help{margin:0}
+.fts-deco-grade{width:96px;flex:none}
+.fts-voice-prep{position:relative}
+.fts-voice-prep.loading{padding-left:84px}
+.fts-voice-think{position:absolute;left:4px;top:4px;width:72px;height:72px;object-fit:cover;object-position:50% 14%;border-radius:50%;background:#eef7f4;border:2px solid #cfe5df}
+/* 음성 준비: 생각하는 그림 옆에서 제목·설명이 접히지 않게 */
+.fts-voice-prep .fts-voice-status{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.fts-voice-prep .fts-voice-status b{white-space:nowrap}
+.fts-voice-prep .fts-voice-status small{flex:1 1 260px;min-width:0;white-space:normal}
