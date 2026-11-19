@@ -1,0 +1,9 @@
+{
+ "name": "801-divider",
+ "width": 1536,
+ "height": 640,
+ "seed": 11,
+ "prompt": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, horizontal ornamental divider, symmetrical, long thin flourish line extending left and right, small lyre with ribbon bow in the center, musical notes",
+ "base": false,
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns"
+}

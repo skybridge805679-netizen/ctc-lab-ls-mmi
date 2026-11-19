@@ -1,0 +1,9 @@
+{
+ "name": "803-mark",
+ "width": 1024,
+ "height": 1024,
+ "seed": 37,
+ "prompt": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, small emblem, lyre with ribbon bow on top, sharp swooping flourishes on both sides, symmetrical, compact, centered",
+ "base": false,
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns"
+}

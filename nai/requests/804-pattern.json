@@ -1,0 +1,9 @@
+{
+ "name": "804-pattern",
+ "width": 1024,
+ "height": 1024,
+ "seed": 51,
+ "prompt": "no humans, monochrome, black and white, high contrast, ink, thin ink lines, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, seamless pattern, repeating pattern, wallpaper, lyres, musical notes, ribbons, flourishes, evenly spaced, damask",
+ "base": false,
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns"
+}

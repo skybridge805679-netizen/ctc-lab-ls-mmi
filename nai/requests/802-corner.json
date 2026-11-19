@@ -1,0 +1,9 @@
+{
+ "name": "802-corner",
+ "width": 1024,
+ "height": 1024,
+ "seed": 23,
+ "prompt": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, corner ornament, ornamental corner flourish in the top left corner, swooping feather-like strokes along two edges, empty center, ribbon",
+ "base": false,
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns"
+}
