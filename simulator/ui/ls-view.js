@@ -14,6 +14,45 @@ const labelReview=typeof module!=='undefined'?require('./circuit-label-review'):
 const lineInfo=()=>typeof module!=='undefined'?require('../engine/line.js'):root.SimLine,networkInfo=()=>typeof module!=='undefined'?require('../engine/network.js'):root.SimNetwork;
 const windowLayouts=new WeakMap();
 const WIDTH=1600,BAR=18,PADDING=30;
+// 연습 힌트 「본선 색」: 칸이 어느 본선(상1·상2·하1·하2, 지하철 상·하)인지. 역 안 칸(2T·5T)은 그 역 본선 선로, 역 사이 칸(B966T)은 번호로 정한다.
+// 표시는 테두리 색만 (점유·진로 색은 그대로) — body.ls-mainline-hint 일 때만 보인다
+// 역 안의 본선: 같은 본선(상1·상2·하1·하2)의 서쪽 폐색 칸과 동쪽 폐색 칸을 잇는 배선상의 최단 경로 = 본선 진로.
+//  (구로 상2선: B949T → 21BT → 23 건넘선 → 23BT·BT·5T·51BT → YT1T·YT → B951T — 원본 LS의 본선 진로와 같다)
+//  선로 줄 전체를 보지 않는다: 같은 줄이라도 경로 밖(구로 4T 동쪽·경인 입출고선)은 본선이 아니다.
+//  종착역처럼 한쪽에만 폐색 칸이 있으면 그 칸이 붙은 선로 끝까지.
+const DEPOT_PORT={dongmyo:['CT','DT'],guro:['F1T','F2T'],uiwang:['GT','FT','ET']};      // 차량기지 입출고선 (역마다 — 구로의 CT·DT·ET는 평범한 칸)
+const mainPathCache={};
+function mainPaths(station){
+ if(mainPathCache[station])return mainPathCache[station];const t=networkInfo()?.catalog?.[station]?.topology,L=lineInfo(),out=[];
+ if(t&&L){
+  const pt=new Map(t.nodes.map(n=>[n.id,n.point])),adj=new Map(),add=(a,b,e)=>{const w=Math.hypot(pt.get(a)[0]-pt.get(b)[0],pt.get(a)[1]-pt.get(b)[1]);(adj.get(a)||adj.set(a,[]).get(a)).push([b,w,e]);};
+  for(const e of t.edges)if(pt.has(e.a)&&pt.has(e.b)){add(e.a,e.b,e);add(e.b,e.a,e);}
+  const route=(from,to)=>{const dist=new Map([[from,0]]),prev=new Map(),todo=new Set([from]);
+   while(todo.size){let u=null;for(const n of todo)if(u===null||dist.get(n)<dist.get(u))u=n;todo.delete(u);if(u===to)break;
+    for(const [v,w] of adj.get(u)||[]){const d=dist.get(u)+w;if(d<(dist.get(v)??Infinity)){dist.set(v,d);prev.set(v,u);todo.add(v);}}}
+   if(!dist.has(to))return null;const nodes=[to];while(nodes[0]!==from)nodes.unshift(prev.get(nodes[0]));return nodes;};
+  const ports=t.ports.filter(p=>/^B\d{3,4}T/.test(p.code)).map(p=>({...p,ml:L.mainLineOf(L.trunkOf(p.code))}));
+  for(const ml of ['GU','GD','EU','ED']){const left=ports.find(p=>p.ml===ml&&p.side==='left'),right=ports.find(p=>p.ml===ml&&p.side==='right');
+   let nodes=left&&right?route(left.node,right.node):null;
+   if(!nodes&&(left||right)){const p=left||right,es=t.edges.filter(e=>e.rail===p.rail);nodes=[...new Set(es.flatMap(e=>[e.a,e.b]))];      // 종착역: 그 선로 전체
+    out.push({ml,segs:es.filter(e=>pt.has(e.a)&&pt.has(e.b)).map(e=>[...pt.get(e.a),...pt.get(e.b)])});continue;}
+   if(nodes)out.push({ml,segs:nodes.slice(1).map((n,i)=>[...pt.get(nodes[i]),...pt.get(n)])});}
+ }
+ return mainPathCache[station]=out;
+}
+// 점이 본선 경로 위인가 (원본 좌표, 선분까지 4px 안)
+function onMainPath(station,x,y){
+ for(const {ml,segs} of mainPaths(station))for(const [x1,y1,x2,y2] of segs){const dx=x2-x1,dy=y2-y1,L2=dx*dx+dy*dy;const k=L2?Math.max(0,Math.min(1,((x-x1)*dx+(y-y1)*dy)/L2)):0;if(Math.hypot(x-(x1+k*dx),y-(y1+k*dy))<=6)return ml;}
+ return '';
+}
+function mainLineFor(station,label,rail){
+ const L=lineInfo();if(!L)return '';const name=String(label||'').split(' · ')[0].trim();if(DEPOT_PORT[station]?.includes(name))return '';      // 차량기지 입출고선 칸은 본선 아님
+ let trunk=/^B\d{3,4}T/.test(name)?L.trunkOf(name):null;      // 역 사이 폐색 칸(B966T) — 역 안의 「B1T」 같은 이름은 아님
+ if(!trunk&&rail)return onMainPath(station,rail[0],rail[1]);      // 역 안 칸: 본선 진로(폐색 칸끼리 잇는 경로) 위에 있으면 — 부본선·측선·건넘선은 색 없음
+ if(!trunk)return '';      // 지하 구간(청량리~서울 지하)도 하2선·상2선으로 이어진다 (서울역에서 하1선·상1선이 붙는다)
+ const m=L.mainLineOf(trunk);return ['GU','GD','EU','ED'].includes(m)?m:'';
+}
+const MAINLINE_NAME={GU:'상1선',EU:'상2선',GD:'하1선',ED:'하2선'};
 const COLORS={set:'#35dc82',occupied:'#ff5c50',locked:'#ffbd55'};
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dpath=points=>'M'+points.map(p=>p.join(' ')).join('L');
@@ -456,11 +495,14 @@ function render(st,def,core,model,neighbours={}){
   platforms+=`<rect data-platform-height="${info.height}" class="platform ${info.css}" x="${p.x}" y="${p.y}" width="${p.right-p.x}" height="${p.height}" rx="2"><title>${info.colour} 승강장 · ${info.label}</title></rect>`;
   occupiedBoxes.push([p.x-3,p.y-3,p.right+3,p.y+p.height+3]);
  }
+ // 연습 힌트 「본선 색」: 본선 선로(2T·3T…) 아래에 본선 색 테두리 (흰 선로 밖으로 조금 보인다)
+ for(const {ml,segs} of mainPaths(st.id))rails+=`<path class="rail-hint" data-mainline="${ml}" d="${segs.map(([x1,y1,x2,y2])=>'M'+Tw([x1,y1]).join(' ')+'L'+Tw([x2,y2]).join(' ')).join('')}"/>`;
  for(const [i,points]of paths.entries())rails+=`<path${i>=def.rails.length&&i<def.rails.length+(data.joins||[]).length?` data-reviewed-join="${i-def.rails.length}"`:''} d="${dpath(points)}"/>`;
  for(const polygon of (data.joins?.length?[]:wing.diags))rails+=`<polygon class="rail-join" points="${polygon.map(p=>T(p).join(',')).join(' ')}"/>`;
  for(const c of cells){
   const state=onRoute(c)?.state||'clear';
-  sections+=`<g class="track-cell ${state}" data-track-section="${st.id}-${c.index}" data-track-circuit="${esc(c.label)}" data-track-state="${state}"><rect class="cell-bed" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/><title>${esc(c.label||'원본 무기명 구간')} · ${state}</title></g>`;
+  const ml=mainLineFor(st.id,c.label,[c.source[0]+c.source[2]/2,c.source[1]]);
+  sections+=`<g class="track-cell ${state}" data-track-section="${st.id}-${c.index}" data-track-circuit="${esc(c.label)}" data-track-state="${state}"${ml?` data-mainline="${ml}"`:''}><rect class="cell-bed" x="${c.x}" y="${c.y-BAR/2}" width="${c.width}" height="${BAR}"/>${ml?`<rect class="cell-hint" x="${c.x+1}" y="${c.y-BAR/2-1}" width="${Math.max(0,c.width-2)}" height="${BAR+2}" rx="3"/>`:''}<title>${esc(c.label||'원본 무기명 구간')}${ml?' · '+MAINLINE_NAME[ml]:''} · ${state}</title></g>`;
  }
  // Adjacent extraction fragments may belong to one named circuit. Consolidate text only;
  // every original circuit rectangle, hit target and interlocking resource stays intact.
