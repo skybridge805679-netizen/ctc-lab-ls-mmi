@@ -1,0 +1,9 @@
+{
+ "name": "402-crest-lyre-laurel-a",
+ "base": false,
+ "width": 1024,
+ "height": 1024,
+ "seed": 107,
+ "prompt": "no humans, emblem, crest, symbol, symmetry, monochrome, black and white, ink, lineart, crisp lines, sharp lines, thin lines, calligraphy, flourish, abstract, elegant, graceful, minimalist, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield, thorns, spikes::, lyre, laurel wreath, stylized feathers, star above, sparkle, art nouveau, celestial",
+ "negative": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, shield, cross, evil, demonic, sinister, horror, skull, thorns, spikes, claws, fangs, horns, tribal tattoo"
+}
