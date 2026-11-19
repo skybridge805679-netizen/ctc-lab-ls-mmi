@@ -38,3 +38,20 @@ test('대본의 모든 상대 대사·안내는 미리 만든 음성 파일이 �
  assert.deepEqual(missing.slice(0,5),[],missing.length+'줄 음성 없음');
  assert.equal(V.readable('K1210 열차. 관제승인 3호로 K0452열차'),'케이 천이백십 열차. 관제승인 삼호로 케이 공사오이열차');
 });
+
+test('긴 단계를 숨 쉬며 나눠 말해도 합쳐서 알아듣는다 (비상 06-1 13번: 안내방송 / 호출) · 비슷한 소리 · 앞 마디의 열차',()=>{
+ const V=require('./voice.js'),F=require('./fts.js');
+ const p=F.seed().problems.find(p=>p.id==='P-em-06-1'),P=V.plan(F.view(p,{status:'진행'}));
+ const start=()=>{const ti=P.steps.findIndex(s=>s.id==='n13#0'),done={};P.steps.slice(0,ti).forEach(s=>done[s.id]=1);const near=[];for(const s of P.steps)if(done[s.id]==null&&s.required&&near.length<4)near.push(s.id);return {done,near,mem:{}};};
+ const say=(st,t)=>{const r=V.match(P,st.done,t,{current:'n13',near:st.near,memory:st.mem});if(!r.length&&r.partial)(st.mem[r.partial.id]??=[]).push(t);r.forEach(h=>st.done[h.step.id]=1);return r;};
+ // 실제로 받아써진 말 (인접선→인정성, 재개→제기, 역간→역 관, 안양역→아내로)
+ const A='철도관제에서 열립니다. 석수 관악역 관, 열차 화재지점, 인정성 열차 운행 제기하겠습니다. 호출하는 열차는 사고지점 운행하는 최초 열차이니 사고지점에서 관악역 관 주의운전 바랍니다.',B='금천구청역 A1001열차 금천구청역 K401열차 아내로 A1004열차 신호 확인 출발.';
+ for(const order of [[A,B],[B,A]]){const st=start(),r1=say(st,order[0]);assert.equal(r1.length,0,'한 마디만으로는 아직');assert.equal(r1.partial?.id,'n13#0','일부로 기억');
+  const r2=say(st,order[1]);assert.deepEqual(r2.map(h=>h.step.id),['n13#0'],'두 마디를 합쳐 인정');}
+ const st=start();say(st,A);const R=V.remaining(P.steps.find(s=>s.id==='n13#0'),st.mem['n13#0']);
+ assert.ok(R.got>=2&&R.got<R.parts&&!/철도관제에서 알립니다/.test(R.rest)&&/신호 확인 출발/.test(R.rest),'남은 말은 호출 부분: '+R.rest);
+ // 받침 빠짐·모음 바뀜으로 받아써진 정차 지시 (「아양역 추바정지」)
+ const q=F.seed().problems.find(p=>p.id==='P-em-03'),Q=V.plan(F.view(q,{status:'진행'})),stop=Q.steps.find(s=>s.stop&&s.stop.kind==='출발정지');
+ const d={};Q.steps.slice(0,Q.steps.indexOf(stop)).forEach(s=>d[s.id]=1);
+ const noisy=stop.text.replace('안양','아양').replace('출발','추바');assert.ok(V.match(Q,d,noisy,{current:stop.comm,near:[stop.id]}).some(h=>h.step.id===stop.id),noisy);
+});

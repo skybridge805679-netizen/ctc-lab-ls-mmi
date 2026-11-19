@@ -92,7 +92,7 @@ ${kind==='oral'?'':`<details class="typed"><summary>마이크 대신 키보드�
   $('rcVoiceForm').onsubmit=e=>{e.preventDefault();send();};t.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});}
   box.addEventListener('click',e=>{if(e.target.id==='rcMicOn')micOn();if(e.target.id==='rcMicOff')micOff();});}
  voiceRefresh();
- const log=kind==='oral'?`<li class="item"><div class="tap"><b>${esc(v.oral.question||'다음 문제를 기다리는 중')}</b><small>${v.oral.total?`항목 ${v.oral.got} / ${v.oral.total}`:''}${v.oral.heard?' · 들은 말: '+esc(v.oral.heard):''}</small></div></li>`:(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 들은 무전이 없습니다.</li>';
+ const log=kind==='oral'?`<li class="item"><div class="tap"><b>${esc(v.oral.question||'다음 문제를 기다리는 중')}</b><small>${v.oral.total?`항목 ${v.oral.got} / ${v.oral.total}`:''}${v.oral.heard?' · 들은 말: '+esc(v.oral.heard):''}</small></div></li>`:(v.voice.heard||[]).map(h=>`<li class="item ${h.ok?'done':''}"><div class="tap"><b>${h.ok?'✔':h.partial?'◐':'✖'} ${esc(h.text)}</b><small>${h.ok?esc(h.steps.join(' / ')||'응답'):h.partial?'통보 일부 — 이어서 말하세요':'대본의 말과 맞지 않습니다 — 열차번호·역 이름을 또렷하게'}</small></div></li>`).join('')||'<li class="empty">아직 들은 무전이 없습니다.</li>';
  if($('rcVoiceLog').innerHTML!==log)$('rcVoiceLog').innerHTML=log;
 }
 function voiceRefresh(){

@@ -70,6 +70,8 @@ const levS=(a,b)=>{const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length
 function stationsIn(text){const t=String(text).replace(/\s/g,''),out=[];let rest=t;
  for(const s of NAMES)if(rest.includes(s.key)){out.push(s.id);rest=rest.split(s.key).join('#');}
  for(const s of NAMES){if(out.includes(s.id)||s.key.length<3)continue;for(let i=0;i+s.key.length<=rest.length;i++){const w=rest.slice(i,i+s.key.length);if(!w.includes('#')&&levS(w,s.key)<=1&&w[0]===s.key[0]){out.push(s.id);rest=rest.slice(0,i)+'#'+rest.slice(i+s.key.length);break;}}}
+ // 받침이 빠지거나 모음이 비슷하게 받아써진 역 이름 (「아냥역」·「금처구청역」): 느슨하게 한 번 더
+ for(const s of NAMES){if(out.includes(s.id))continue;const k=soft(s.key.length<3?s.key+'역':s.key),r=soft(rest);if(k.length>=3&&r.includes(k)){out.push(s.id);rest=rest.split(s.key).join('#');}}      // 두 글자 이름은 「역」까지 붙여 본다
  return out;}
 
 // ── 문제 → 음성 단계. 통보마다 관제사의 말 한 마디가 한 단계.
@@ -100,37 +102,70 @@ function plan(problem){
 // 음절 두 개씩 겹친 조각 (띄어쓰기·조사 차이에 덜 민감하다)
 // 열번(숫자)은 따로 맞추므로 글 조각 비교에서는 뺀다 — 열번만 같고 내용이 다른 말(「K1208 석수역 정차」 vs 「K1208 정상운행 가능」)을 비슷하다고 보지 않게
 const grams=t=>{const s=core(normalize(t).replace(/[KAGM]?[\s-]*\d[\d\s-]*/g,' ')),g=new Set();for(let i=0;i<s.length-1;i++)g.add(s.slice(i,i+2));return g;};
+// 받아쓰기가 비슷한 소리로 잘못 들은 말도 맞추기 위한 「느슨한」 조각: 받침을 떼고 비슷한 모음(ㅐ·ㅔ, ㅒ·ㅖ, ㅙ·ㅚ·ㅞ)을 하나로 본다
+//  (「인정성」≈「인접선」, 「제게」≈「재개」). 다음에 할 말(대본 순서 가까운 단계)에만 쓰고, 기준을 더 높게 둔다
+const VOWEL={1:5,3:7,10:11,15:11};      // ㅐ→ㅔ ㅒ→ㅖ ㅙ→ㅚ ㅞ→ㅚ (중성 번호)
+const soft=t=>[...t].map(ch=>{const c=ch.charCodeAt(0)-0xAC00;if(c<0||c>11171)return ch;const i=Math.floor(c/588),m=Math.floor(c%588/28);return String.fromCharCode(0xAC00+i*588+(VOWEL[m]??m)*28);}).join('');
+const looseGrams=t=>{const s=soft(core(normalize(t).replace(/[KAGM]?[\s-]*\d[\d\s-]*/g,' '))),g=new Set();for(let i=0;i<s.length-1;i++)g.add(s.slice(i,i+2));return g;};
+// 긴 단계의 문장 나누기 (「다음에 할 말」에 아직 안 한 부분만 보여 주고, 「2/3 부분」 진행을 센다)
+const partsOf=t=>String(t).split(/(?<=[.!?])\s+|\s*\/\s*/).map(x=>x.trim()).filter(x=>core(x).length>=4);
 // 들은 말이 어느 단계인가: 열차가 나오는 단계는 그 열번을 들어야 하고, 글 조각이 충분히 겹쳐야 한다.
 // 한 번에 이어 말한 여러 단계(「K1210열차 관제 이상… 신호 확인 출발」)도 함께 알아듣는다.
+// memory: 단계별로 앞서 들은 그 단계의 일부 말 { 단계id: [말, …] } — 긴 단계를 숨 쉬며 여러 마디로 나눠 말해도 합쳐서 본다.
+//  돌려주는 partial: 인정은 아직 아니지만 이번 말이 그 단계의 일부였던 단계 (부르는 쪽이 memory에 쌓는다)
 const better=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]>b[i];return false;};
-function match(p,done,said,{current,near=[]}={}){
- const heard=grams(said),trains=trainsIn(said,p.known),places=stationsIn(normalize(said)),cands=[],order=new Map(p.steps.map((s,i)=>[s.id,i])),ci=p.comms.findIndex(c=>c.id===current);
+// context: 바로 앞 마디에서 부른 열차 (「K0399열차.」 하고 쉰 뒤 「정상운행 하세요」)
+const departWord=t=>/출발/.test(t)||soft(core(t)).includes('추바'),stopWord=t=>/정차|정지/.test(t)||/저차|저지/.test(soft(core(t)));      // 받침 빠진 「출바」「정차→저차」도
+function match(p,done,said,{current,near=[],memory={},context=[]}={}){
+ const heard=grams(said),lheard=looseGrams(said),trains=trainsIn(said,p.known),places=stationsIn(normalize(said)),cands=[],order=new Map(p.steps.map((s,i)=>[s.id,i])),ci=p.comms.findIndex(c=>c.id===current);
+ const seen=new Set();
  for(const s of p.steps){
   if(done[s.id]!=null||!s.required)continue;      // 0초에 한 말도 한 것
+  const key=core(s.text);if(seen.has(key))continue;seen.add(key);      // 대본에 똑같은 말이 두 번 나오면(같은 안내방송·같은 호출) 앞 차례만
   const g=grams(s.text);if(!g.size)continue;
-  const own=(s.text.match(TRAIN)||[]);
+  const own=(s.text.match(TRAIN)||[]),prior=memory[s.id]||[];
   const same=(a,b)=>a[0]===b[0]&&Number(a.slice(1))===Number(b.slice(1));      // 원문의 「K809」 = K0809
-  if(own.length&&!own.some(n=>trains.some(t=>same(t,n))))continue;                                    // 열차에게 한 말은 그 열번을 들어야 한다
+  const priorTrains=prior.length?trainsIn(prior.join(' '),p.known):[],allTrains=[...trains,...priorTrains,...(trains.length||!near.includes(s.id)?[]:context)];      // 앞 마디의 열차는 다음에 할 말에만
+  if(own.length&&trains.length&&!own.some(n=>allTrains.some(t=>same(t,n))))continue;                     // 다른 열차를 부른 말
+  const needTrain=own.length&&!own.some(n=>allTrains.some(t=>same(t,n)));      // 열차에게 한 말은 그 열번을 들어야 인정 (앞 마디에서 말했어도 된다) — 열번 없는 앞부분(안내방송)은 일부로만 기억
   if(!own.length&&s.to.length&&trains.length&&!s.to.some(n=>trains.some(t=>same(t,n))))continue;      // 다른 열차에게 한 말
   if(s.stop&&!places.includes(s.stop.station))continue;
-  if(s.stop&&(s.stop.kind==='출발정지')!==/출발/.test(said))continue;      // 「정차」와 「출발 정지」는 다른 지시                                         // 정차 지시는 역 이름까지
+  if(s.stop&&(s.stop.kind==='출발정지')!==departWord(said))continue;      // 「정차」와 「출발 정지」는 다른 지시                                         // 정차 지시는 역 이름까지
   if(s.stations.length&&places.length&&!s.stations.some(x=>places.includes(x)))continue;
-  cands.push({step:s,g,ahead:ci>=0?Math.max(0,p.comms.findIndex(c=>c.id===s.comm)-ci):0});
+  const pg=prior.length?grams(prior.join(' ')):new Set(),plg=prior.length?looseGrams(prior.join(' ')):new Set();
+  cands.push({step:s,needTrain,g,lg:looseGrams(s.text),pg,plg,ahead:ci>=0?Math.max(0,p.comms.findIndex(c=>c.id===s.comm)-ci):0});
  }
  // 한 문장에 이어 말한 여러 단계: 가장 많이 겹치는 단계부터 그 조각을 가져가고, 남은 조각으로 다음 단계를 본다
  // (긴 지시 속 「K1208열차」 같은 짧은 호출 단계가 덩달아 인정되지 않게)
- const left=new Set(heard),out=[];
+ const left=new Set(heard),lleft=new Set(lheard),out=[];let partial=null;
  for(;;){
   let best=null;
-  for(const c of cands){if(out.some(o=>o.step===c.step))continue;let hit=0;for(const x of c.g)if(left.has(x))hit++;const recall=hit/c.g.size;
-   const s=c.step,call=core(s.text.replace(TRAIN,'')).replace(/열차/g,'').length<3,soon=near.includes(s.id)&&!call,ok=(recall>=(soon?0.35:0.5)&&hit/left.size>=(soon?0.25:call?0.6:0.4))||      /* 짧은 호출(「K1208열차. 관제 이상!」)은 들은 말이 거의 그 호출뿐일 때만 — 정차 지시를 호출로 잘못 인정하지 않게 */      /* 다음에 할 말(대본 순서 가까운 단계)은 받아쓰기가 조금 틀려도 인정 */(s.stop&&trains.some(t=>t[0]===s.stop.number[0]&&Number(t.slice(1))===Number(s.stop.number.slice(1)))&&/정차|정지/.test(said)&&(s.stop.kind==='출발정지')===/출발/.test(said));if(!ok||!hit)continue;      // 남은 말의 상당 부분이 그 단계여야 한다 (정차 지시를 되풀이했을 때 짧은 호출 단계로 잘못 인정하지 않게)
+  for(const c of cands){if(out.some(o=>o.step===c.step))continue;
+   const s=c.step,call=core(s.text.replace(TRAIN,'')).replace(/열차/g,'').length<3,soon=near.includes(s.id)&&!call;
+   let hit=0,all=0;for(const x of c.g){const h=left.has(x);if(h)hit++;if(h||c.pg.has(x))all++;}      // hit: 이번 말에서 · all: 앞 마디까지 합쳐서
+   const recall=all/c.g.size,frac=left.size?hit/left.size:0;
+   let ok=(recall>=(soon?0.35:0.5)&&frac>=(soon?0.25:call?0.6:0.4))||      /* 짧은 호출(「K1208열차. 관제 이상!」)은 들은 말이 거의 그 호출뿐일 때만 — 정차 지시를 호출로 잘못 인정하지 않게 */      /* 다음에 할 말(대본 순서 가까운 단계)은 받아쓰기가 조금 틀려도 인정 */(s.stop&&trains.some(t=>t[0]===s.stop.number[0]&&Number(t.slice(1))===Number(s.stop.number.slice(1)))&&stopWord(said)&&(s.stop.kind==='출발정지')===departWord(said));
+   if(!ok&&soon){let lh=0,la=0;for(const x of c.lg){const h=lleft.has(x);if(h)lh++;if(h||c.plg.has(x))la++;}      // 비슷한 소리로 잘못 받아쓴 말: 느슨한 조각으로, 기준은 더 높게
+    if(la/c.lg.size>=0.5&&lleft.size&&lh/lleft.size>=0.4){ok=true;hit=Math.max(hit,lh);}}
+   if(c.needTrain)ok=false;
+   if(soon&&!call&&hit>=4&&frac>=0.4&&(!partial||hit>partial.hit)&&!ok)partial={step:s,hit};      // 인정은 아직이지만 이번 말이 이 단계의 일부 — 다음 마디와 합쳐 본다
+   if(!ok||!hit)continue;      // 남은 말의 상당 부분이 그 단계여야 한다 (정차 지시를 되풀이했을 때 짧은 호출 단계로 잘못 인정하지 않게)
    const key=[hit+(s.stop?3:0),recall,-c.ahead,-order.get(s.id)];      // 겹친 조각 수 → 겹친 비율 → 지금 통보에 가까운 것 → 대본 순서
    if(!best||better(key,best.key))best={c,key,recall};}
   if(!best)break;
-  out.push({step:best.c.step,score:best.recall});for(const x of best.c.g)left.delete(x);
+  out.push({step:best.c.step,score:best.recall});for(const x of best.c.g)left.delete(x);for(const x of best.c.lg)lleft.delete(x);
   if(left.size<2)break;
  }
+ if(out.length)partial=null;
+ Object.defineProperty(out,'partial',{value:partial?.step||null,enumerable:false});      // 배열 비교(deepEqual)에 끼지 않게
  return out;
+}
+// 긴 단계에서 아직 안 한 부분: memory(앞서 들은 그 단계의 말)와 문장별로 견주어 남은 문장과 진행(2/3)을 준다
+function remaining(step,prior=[]){
+ const parts=partsOf(step.text);if(parts.length<2)return {parts:parts.length||1,got:0,rest:step.text};
+ const heard=grams(prior.join(' ')),lheard=looseGrams(prior.join(' '));
+ const said=parts.filter(x=>{const g=grams(x),lg=looseGrams(x);if(!g.size)return true;let h=0;for(const y of g)if(heard.has(y))h++;let lh=0;for(const y of lg)if(lheard.has(y))lh++;return h/g.size>=0.6||lh/lg.size>=0.7;});
+ return {parts:parts.length,got:said.length,rest:parts.filter(x=>!said.includes(x)).join(' ')};
 }
 // 비연동 중간역의 정차 칸: 그 역 본선(상·하행)의 열번창. 원본 LS의 정지위치 회로(B969T)가 열번창이 아니면 그 회로를 밟는 열번창(B967T)
 function stopSlot(station,direction,trunkHint){
@@ -160,6 +195,6 @@ function linesOf(problem){
  for(const b of problem.branches||[]){const said=String(b.text||b.label).split('\n')[0].replace(/^[\s▪•·-]+/,'').trim()||b.label;add({who:'chief',name:'안내',text:'상황 변경 · '+said});}
  return out;
 }
-const api={isAck,voiceOf,readable,lineKey,linesOf,utterances,role,normalize,trainsIn,stationsIn,plan,match,stopSlot,koNumber};
+const api={isAck,voiceOf,readable,lineKey,linesOf,utterances,role,normalize,trainsIn,stationsIn,plan,match,remaining,partsOf,stopSlot,koNumber};
 if(node)module.exports=api;else root.SimVoice=api;
 })(typeof window!=='undefined'?window:globalThis);

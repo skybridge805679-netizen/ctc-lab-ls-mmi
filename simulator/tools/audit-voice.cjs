@@ -2,9 +2,12 @@
 // 음성 1인 모드 점검: 비상시조치 대본을 「대본대로 말하는 교육생」으로 끝까지 진행한다.
 //  통보 단계마다 관제사의 말을 한 마디씩 음성 입력(op:'voice')으로 넣고, 대본의 LS 조작은 그 자리에서 한다.
 //  알아듣지 못한 말, 통보가 확인되지 않은 곳, 정차 지시가 늦어 지나친 열차, 끝까지 서 있는 열차를 보고한다.
-//  사용: node simulator/tools/audit-voice.cjs [em-05-1 ...] [--say 3]   (--say: 한 마디에 걸리는 초)
+//  사용: node simulator/tools/audit-voice.cjs [em-05-1 ...] [--say 3] [--split] [--noisy]
+//   --say: 한 마디에 걸리는 초 · --split: 긴 말을 문장마다 나눠 말함(숨 쉬며 말하기) · --noisy: 받아쓰기가 비슷한 소리로 틀림(받침 빠짐·ㅐ/ㅔ 바뀜)
 const R=require('../engine/runtime.cjs'),E=require('../engine/emergency.js'),V=require('../engine/voice.js'),F=require('../engine/fts.js');
-const args=process.argv.slice(2),only=args.filter(a=>/^em-/.test(a)),per=Number(args[args.indexOf('--say')+1])||3;
+const args=process.argv.slice(2),only=args.filter(a=>/^em-/.test(a)),per=Number(args[args.indexOf('--say')+1])||3,SPLIT=args.includes('--split'),NOISY=args.includes('--noisy');
+// 받아쓰기 흉내: 한글 음절 일곱 개 중 하나꼴로 받침을 빼거나 ㅐ↔ㅔ를 바꾼다 (열번·숫자는 그대로)
+function noisy(t){let i=0;return [...t].map(ch=>{const c=ch.charCodeAt(0)-0xAC00;if(c<0||c>11171||(++i)%7)return ch;const a=Math.floor(c/588),m=Math.floor(c%588/28),f=c%28;return String.fromCharCode(0xAC00+a*588+(m===1?5:m===5?1:m)*28+(f&&i%2?0:f));}).join('');}
 function audit(sc){
  const pid='P-'+sc.id,r=R.create(),lib=r.snapshot().ftsLibrary;
  lib.situations.push({id:'S-V',name:'v',problems:[pid]});lib.scenarios.push({id:'SC-V',name:'v',situations:['S-V']});
@@ -32,7 +35,9 @@ function audit(sc){
   for(const step of P.steps.filter(x=>x.comm===s.tag&&x.required)){
    const v=snap().fts.session.voice.items[0];if(v.done[step.id]!=null){continue;}
    if(snap().fts.session.items[0].status!=='진행'){if(!issues.some(i=>i.startsWith('시간 종료')))issues.push('시간 종료 · '+step.id+'부터 말하지 못함 (문제 제한시간)');continue;}
-   const o=r.command({type:'fts',op:'voice',text:step.text});if(process.env.VDEBUG)console.log('   ',step.id,'=>',o.matched?.map(m=>m.id).join(',')||o.message,(()=>{const f=rows()['G0450']||rows()['K0450'];const j=(snap().scenario?.jobs||[]).find(j=>/0450/.test(j.number)&&!['done','cancelled'].includes(j.phase));return JSON.stringify(f&&[f.station,f.slot])+' '+(j?j.phase+'>'+j.to+' '+j.reason:'-');})());
+   const split=t=>String(t).split(/(?<=[.!?])\s+|\s*\/\s*/).map(x=>x.trim()).filter(x=>x.replace(/[^가-힣A-Z0-9]/g,'').length>=4),parts=SPLIT&&split(step.text).length>1?split(step.text):[step.text];let o;
+   for(const [k,part] of parts.entries()){o=r.command({type:'fts',op:'voice',text:NOISY?noisy(part):part});if(k<parts.length-1)tick(2);}
+   if(snap().fts.session.voice.items[0].done[step.id]!=null&&!o.matched?.some(m=>m.id===step.id))o={...o,matched:[...(o.matched||[]),{id:step.id}]};      // 앞 마디에서 이미 인정됨if(process.env.VDEBUG)console.log('   ',step.id,'=>',o.matched?.map(m=>m.id).join(',')||o.message,(()=>{const f=rows()['G0450']||rows()['K0450'];const j=(snap().scenario?.jobs||[]).find(j=>/0450/.test(j.number)&&!['done','cancelled'].includes(j.phase));return JSON.stringify(f&&[f.station,f.slot])+' '+(j?j.phase+'>'+j.to+' '+j.reason:'-');})());
    if(!o.matched?.some(m=>m.id===step.id))issues.push(`못 알아들음 · ${step.id} · 「${step.text.slice(0,40)}」 → ${o.matched?.map(m=>m.id).join(',')||'없음'}`);
    tick(per);
   }

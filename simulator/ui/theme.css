@@ -94,3 +94,4 @@
 .mmi-crest-home .mmi-brand-text small{margin-top:10px;font-size:10px;letter-spacing:.3em;margin-right:-.3em;color:#5f807b}
 .mmi-crest-home .mmi-brand-text i{margin-top:14px;font-family:'Times New Roman',Georgia,serif;font-size:13px;font-style:italic;letter-spacing:.08em;color:#7d6a45}
 .mmi-crest-home .mmi-brand-text b::after{content:'';display:block;width:56px;height:1px;margin:14px auto 0;background:linear-gradient(90deg,transparent,#9a7940,transparent)}
+.fts-voice-log li.part>span{color:#b7791f}.fts-voice-log li.part small{color:#8a5a12}
