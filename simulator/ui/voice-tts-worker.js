@@ -5,11 +5,12 @@ env.allowLocalModels=false;env.useBrowserCache=true;
 env.backends.onnx.wasm.wasmPaths=new URL('../vendor/transformers/',import.meta.url).href;
 env.backends.onnx.wasm.numThreads=typeof SharedArrayBuffer==='function'?Math.max(1,Math.min(4,(navigator.hardwareConcurrency||4)>>1)):1;
 const MODEL='onnx-community/Supertonic-TTS-2-ONNX',VOICES=`https://huggingface.co/${MODEL}/resolve/main/voices/`;
-let tts=null,loading=null;const progress={};
+let tts=null,loading=null;const progress={};let cached=false;
+const inCache=async id=>{try{const c=await caches.open('transformers-cache');return (await c.keys()).some(r=>r.url.includes('/'+id+'/'));}catch{return false;}};
 function load(){
  if(loading)return loading;
- loading=pipeline('text-to-speech',MODEL,{device:'wasm',progress_callback:p=>{if(p.status==='progress'&&p.file){progress[p.file]=[p.loaded||0,p.total||0];const t=Object.values(progress).reduce((a,[l,s])=>[a[0]+l,a[1]+s],[0,0]);self.postMessage({type:'progress',loaded:t[0],total:t[1]});}}})
-  .then(x=>{tts=x;self.postMessage({type:'ready'});},e=>{loading=null;self.postMessage({type:'error',message:String(e?.message||e)});});
+ loading=inCache(MODEL).then(c=>{cached=c;}).then(()=>pipeline('text-to-speech',MODEL,{device:'wasm',progress_callback:p=>{if(p.status==='progress'&&p.file){progress[p.file]=[p.loaded||0,p.total||0];const t=Object.values(progress).reduce((a,[l,s])=>[a[0]+l,a[1]+s],[0,0]);self.postMessage({type:'progress',loaded:t[0],total:t[1],cached});}}})
+  ).then(x=>{tts=x;self.postMessage({type:'ready'});},e=>{loading=null;self.postMessage({type:'error',message:String(e?.message||e)});});
  return loading;
 }
 self.onmessage=async e=>{

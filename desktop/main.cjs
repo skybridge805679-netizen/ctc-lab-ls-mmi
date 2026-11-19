@@ -28,6 +28,7 @@ else{
   stateFile=path.join(app.getPath('userData'),'window-layout.json');layout=readState(stateFile);
   // 권한은 모두 거절하되, 이 앱 화면의 마이크(음성 1인 모드)만 허용한다. macOS는 처음 한 번 시스템 마이크 허용을 묻는다.
   session.defaultSession.setPermissionRequestHandler((contents,permission,respond,details)=>{
+   if(permission==='persistent-storage')return respond(appPage(details?.requestingUrl||contents?.getURL()));      // 내려받은 음성 모델 캐시가 지워지지 않게
    const audioOnly=permission==='media'&&appPage(details?.requestingUrl||contents?.getURL())&&(details?.mediaTypes||[]).every(t=>t==='audio');
    if(!audioOnly)return respond(false);
    if(process.platform==='darwin')systemPreferences.askForMediaAccess('microphone').then(ok=>respond(!!ok),()=>respond(false));else respond(true);});
@@ -69,7 +70,9 @@ else{
     for(const child of [mmi,graph,fts,problem,...extraLS])if(alive(child))child.destroy();
     extraLS.clear();mmi=graph=fts=problem=null;
     await ls.webContents.executeJavaScript('localStorage.clear();sessionStorage.clear();');
-    await session.defaultSession.clearStorageData({storages:['localstorage','indexdb','cachestorage']});
+    // 내려받은 음성 모델(transformers-cache, 수백 MB)은 교육 데이터가 아니라 남긴다 — 지우면 다음에 처음부터 다시 내려받는다
+    await ls.webContents.executeJavaScript("caches.keys().then(ks=>Promise.all(ks.filter(k=>k!=='transformers-cache').map(k=>caches.delete(k)))).catch(()=>{})");
+    await session.defaultSession.clearStorageData({storages:['localstorage','indexdb']});
     layout={};require('node:fs').rmSync(stateFile,{force:true});
     if(ls.isMaximized())ls.unmaximize();ls.setBounds(savedBounds('ls'));ls.show();
     // Return the IPC result first, then build a fresh LS/MMI workspace against the clean engine.

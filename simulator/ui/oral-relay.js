@@ -80,7 +80,7 @@ function finish(reason,self){
 function stop(closed){if(!run)return;tell(false);clearInterval(run.timer);unbindKeys();clearTimeout(run.wait);VS()?.detach(consumer);const was=run;run=null;
  if(!closed&&doc){if(win&&!win.closed){summary(was);}else{const o=doc.getElementById('oralOverlay');if(o)o.hidden=true;}}}
 const clock=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
-const micText=st=>st.error&&!st.phone?'⚠ '+st.error:st.progress&&st.progress.total?`음성인식 모델 내려받는 중 ${Math.round(st.progress.loaded/1e6)} / ${Math.round(st.progress.total/1e6)}MB`:!st.model?'음성인식 준비 중…':st.busy?'⏳ 받아쓰는 중…':st.speaking?'🔊 문제 읽는 중':st.phone?'🎙 듣는 중 (휴대폰 마이크)':'🎙 듣는 중 — 말하세요';
+const micText=st=>st.error&&!st.phone?'⚠ '+st.error:st.progress&&st.progress.total?`음성인식 모델 ${st.progress.cached?'불러오는 중':'내려받는 중'} ${Math.round(st.progress.loaded/1e6)} / ${Math.round(st.progress.total/1e6)}MB`:!st.model?'음성인식 준비 중…':st.busy?'⏳ 받아쓰는 중…':st.speaking?'🔊 문제 읽는 중':st.phone?'🎙 듣는 중 (휴대폰 마이크)':'🎙 듣는 중 — 말하세요';
 // ── 화면
 function render(){
  const box=$('oralRoot');if(!box||!run)return;const q=run.q,it=q.item,res=run.results,avg=res.length?Math.round(res.reduce((a,r)=>a+r.score,0)/res.length):0;
