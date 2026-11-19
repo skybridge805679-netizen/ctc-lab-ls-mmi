@@ -1,0 +1,51 @@
+{
+ "source": "nai/requests/301-crest-lyre-thorn-a.json",
+ "input": "no humans, emblem, crest, symbol, symmetry, monochrome, greyscale, black and white, high contrast, ink, lineart, sharp lines, rough lineart, angular, jagged, spiked, abstract, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield::, abstract lyre, lyre made of thorns, strings, musical note, sharp flourishes, gothic, tribal pattern, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "generate",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 1024,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 11,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, soft lines, smooth, cute, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, knife, shield, cross",
+  "prompt": "no humans, emblem, crest, symbol, symmetry, monochrome, greyscale, black and white, high contrast, ink, lineart, sharp lines, rough lineart, angular, jagged, spiked, abstract, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield::, abstract lyre, lyre made of thorns, strings, musical note, sharp flourishes, gothic, tribal pattern, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 11,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "no humans, emblem, crest, symbol, symmetry, monochrome, greyscale, black and white, high contrast, ink, lineart, sharp lines, rough lineart, angular, jagged, spiked, abstract, white background, simple background, best quality, very aesthetic, highres, high complexity, -3::sword, weapon, blade, shield::, abstract lyre, lyre made of thorns, strings, musical note, sharp flourishes, gothic, tribal pattern, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, asymmetry, color, colorful, gradient, soft lines, smooth, cute, 1girl, 1boy, person, face, text, error, sword, weapon, blade, dagger, spear, knife, shield, cross",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  }
+ }
+}
