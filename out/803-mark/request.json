@@ -1,0 +1,51 @@
+{
+ "source": "nai/requests/803-mark.json",
+ "input": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, small emblem, lyre with ribbon bow on top, sharp swooping flourishes on both sides, symmetrical, compact, centered, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "generate",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 1024,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 37,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns",
+  "prompt": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, small emblem, lyre with ribbon bow on top, sharp swooping flourishes on both sides, symmetrical, compact, centered, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 37,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "no humans, monochrome, black and white, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, abstract, elegant, ornate, art nouveau, white background, simple background, best quality, very aesthetic, highres, -3::sword, weapon, shield, thorns, text::, small emblem, lyre with ribbon bow on top, sharp swooping flourishes on both sides, symmetrical, compact, centered, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, color, colorful, gradient, 1girl, 1boy, person, face, text, letters, error, sword, weapon, blade, shield, cross, evil, demonic, skull, thorns, claws, horns",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  }
+ }
+}
