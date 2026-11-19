@@ -78,6 +78,18 @@ worst quality, bad quality, displeasing, very displeasing, lowres, bad anatomy, 
 ## V5에서 안 되는 것
 - 바이브 트랜스퍼(그림 분위기 참조)와 캐릭터 레퍼런스(같은 인물 유지)는 **V4.5 전용** — V5에는 없다. 같은 인물을 여러 장에서 유지하려면 고정 외모 태그 묶음 + 같은 시드 근처 + i2i/인페인트로 맞춘다.
 
+## 만든 에셋 (앱에 들어간 것)
+| 파일 | 원본 요청 | 쓰는 곳 |
+|---|---|---|
+| `simulator/assets/orpheia/crest.png` | 602 (5번 시안 i2i 0.7) | MMI 첫 화면 크레스트 |
+| `simulator/assets/orpheia/ui/divider.png` | 801 장식선 | FTS 화면 제목 아래 · 구술 결과 점수 옆 (마스크, 금빛) |
+| `…/ui/corner.png` | 802 모서리 (왼쪽 위만 잘라냄) | FTS 카드 오른쪽 위 (마스크) |
+| `…/ui/mark.png` | 803 작은 문장 | FTS 왼쪽 메뉴 아래 · 구술 창 머리 (마스크) |
+| `…/ui/pattern.png` | 804 바탕 무늬 | FTS 머리 왼쪽 · MMI 첫 화면 바탕 (아주 옅게) |
+| `…/ui/perfect.webp` · `cheer.webp` · `listen.webp` · `wait.webp` | 101~104 (기본 세팅, 투명 배경) | 구술 결과 80점 이상·미만 · 구술 말하기 듣는 중 · 진행 중인 교육 없음 |
+
+선 장식은 흑백 그림에서 검은 선만 남긴 투명 마스크라 CSS `mask` + 배경색으로 색을 입힌다 (`theme.css`의 `--orn`·`--orn-mint`). 색을 바꿔도 다시 만들 필요가 없다.
+
 ## 출처
 - dev.to: Calling the NovelAI V5 API directly — https://dev.to/ilan_kim/calling-the-novelai-v5-api-directly-nai-diffusion-5-full-request-body-paramsversion-4310-133a
 - LlmKira/novelai-python (SDK 소스: 파라미터·enum·인페인트) — https://github.com/LlmKira/novelai-python

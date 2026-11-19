@@ -407,7 +407,7 @@ function renderLog(){const box=$('ftsLog');if(!box)return;const list=logs().slic
  box.innerHTML=`<table><thead><tr><th>시각</th><th>구분</th><th>내용</th></tr></thead><tbody>${list.map(l=>`<tr class="${l.level==='E'?'bad':''}"><td>${esc(T().clock(l.at))}</td><td>${l.level==='E'?'오류':'정보'}</td><td>${esc(l.text)}</td></tr>`).join('')||'<tr class="empty"><td colspan="3">기록이 없습니다.</td></tr>'}</tbody></table>`;}
 function renderMonitor(){
  const box=$('ftsMonitor');if(!box)return;
- if(!session){box.innerHTML='<p class="fts-empty">진행 중인 교육이 없습니다. [교육설정]에서 시나리오를 고르고 교육 시작을 누르세요.</p>';return;}
+ if(!session){box.innerHTML='<div class="fts-idle"><img src="assets/orpheia/ui/wait.webp" alt="" aria-hidden="true" width="409" height="640"><p class="fts-empty">진행 중인 교육이 없습니다. [교육설정]에서 시나리오를 고르고 교육 시작을 누르세요.</p></div>';return;}
  const item=session.items[Math.min(session.current,session.items.length-1)],p=activeLibrary().problems.find(x=>x.id===item.problem),s=activeLibrary().situations.find(x=>x.id===item.situation);
  const v=F().view(p,item),ctx=ctxFor(item),elapsed=item.startedAt!=null?(item.endedAt??now())-item.startedAt:0;
  const remaining=Math.max(0,(p?.limit||0)-elapsed),progress=session.items.map(it=>{const q=activeLibrary().problems.find(x=>x.id===it.problem);return [it.status,it.error||'',it.score,(q?.checks||[]).map((_,i)=>!!it.met?.[i]),(q?.deductions||[]).map((_,i)=>!!it.deducted?.[i]),it.obj,it.missed,it.comm,it.reactions,it.branch];}),signature=JSON.stringify([session.current,progress,session.manual,session.finished,ctx.script,(p?.trigger?.conditions||[]).map((c,i)=>item.triggerMet?.[i]??F().test(c,ctx))]);
