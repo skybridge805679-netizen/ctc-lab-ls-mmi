@@ -1,0 +1,51 @@
+{
+ "source": "nai/requests/f02-gold-b.json",
+ "input": "no humans, emblem, crest, symbol, symmetry, abstract, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, elegant, ornate, christian cross in the center, open folding fan radiating behind like a halo, sensu, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons, musical notes, holy, sacred, white background, simple background, best quality, very aesthetic, highres, high complexity, gold ink, gold lines on white, very aesthetic, masterpiece, no text",
+ "model": "nai-diffusion-5-full",
+ "action": "generate",
+ "parameters": {
+  "params_version": 4,
+  "width": 1024,
+  "height": 1024,
+  "scale": 5,
+  "sampler": "k_euler_ancestral",
+  "steps": 28,
+  "seed": 177,
+  "n_samples": 1,
+  "ucPreset": 4,
+  "qualityToggle": true,
+  "sm": false,
+  "sm_dyn": false,
+  "dynamic_thresholding": false,
+  "controlnet_strength": 1,
+  "legacy": false,
+  "add_original_image": false,
+  "cfg_rescale": 0,
+  "noise_schedule": "karras",
+  "legacy_v3_extend": false,
+  "uncond_scale": 1,
+  "negative_prompt": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, dark, black background",
+  "prompt": "no humans, emblem, crest, symbol, symmetry, abstract, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, elegant, ornate, christian cross in the center, open folding fan radiating behind like a halo, sensu, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons, musical notes, holy, sacred, white background, simple background, best quality, very aesthetic, highres, high complexity, gold ink, gold lines on white, very aesthetic, masterpiece, no text",
+  "reference_image_multiple": [],
+  "reference_information_extracted_multiple": [],
+  "reference_strength_multiple": [],
+  "extra_noise_seed": 177,
+  "v4_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "no humans, emblem, crest, symbol, symmetry, abstract, high contrast, ink, bold ink strokes, sharp lines, flame-like flourishes, swooping curves, elegant, ornate, christian cross in the center, open folding fan radiating behind like a halo, sensu, lily flowers, crown of twelve stars, crescent moon, flowing veil-like ribbons, musical notes, holy, sacred, white background, simple background, best quality, very aesthetic, highres, high complexity, gold ink, gold lines on white, very aesthetic, masterpiece, no text",
+    "char_captions": []
+   }
+  },
+  "v4_negative_prompt": {
+   "use_coords": false,
+   "use_order": true,
+   "caption": {
+    "base_caption": "worst quality, bad quality, displeasing, very displeasing, lowres, jpeg artifacts, watermark, signature, blurry, text, letters, error, asymmetry, 1girl, 1boy, person, human, face, silhouette, nun, praying hands, hands, statue, evil, demonic, horror, skull, weapon, sword, blood, dark, black background",
+    "char_captions": []
+   },
+   "legacy_uc": false
+  }
+ }
+}
