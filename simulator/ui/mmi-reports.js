@@ -72,6 +72,11 @@ const buildReports=()=>({
   run(v){return {cols:['시간','역','내용'],rows:mmi().history().mode.filter(r=>dayOf(r)===v.date&&(!v.station||r.station===name(v.station))).map(r=>[r.time,r.station,r.text])};},read:id=>({date:$(id+'Date').value,station:$(id+'Station').value})},
  manualField:{title:'현장설비 수동조작 이력',cond:`${date('manualField')}<label>역<select id="manualFieldStation">${stationOptions()}</select></label><label>구분<select id="manualFieldKind"><option value="">전체</option><option>선로전환기</option><option>신호기</option><option>진로</option></select></label>`,
   run(v){return {cols:['시간','역','구분','내용'],rows:mmi().history().field.filter(r=>dayOf(r)===v.date&&(!v.station||r.station===name(v.station))&&(!v.kind||r.kind===v.kind)).map(r=>[r.time,r.station,r.kind,r.text])};},read:id=>({date:$(id+'Date').value,station:$(id+'Station').value,kind:$(id+'Kind').value})},
+ manualEquip:{title:'장비계절체 수동조작 이력',cond:`${date('manualEquip')}<label>역<select id="manualEquipStation">${stationOptions()}</select></label>`,note:'LDTS 상태 창에서 수동 계절체를 실행하면 기록됩니다 (실기1 4장 7절 가 ◈ 장비 계절체이력).',
+  run(v){return {cols:['시간','역','장비','내용','조작콘솔'],rows:mmi().history().equip.filter(r=>dayOf(r)===v.date&&(!v.station||r.station===name(v.station))).map(r=>[r.time,r.station,r.device,r.text,r.console])};},read:id=>({date:$(id+'Date').value,station:$(id+'Station').value})},
+ offlineHistory:{title:'오프라인 스케줄 이력',cond:`${line}${opt('offlineHistory','Date','조작날짜',`<input type="date" id="offlineHistoryDate" value="${today()}">`)}${opt('offlineHistory','Type','조작타입',`<select id="offlineHistoryType">${SCHEDULE_TYPES.filter(x=>!x.startsWith('운휴')).map(x=>`<option>${x}</option>`).join('')}</select>`)}${opt('offlineHistory','Id','스케줄ID','<input id="offlineHistoryId" maxlength="5" size="6">')}`,note:'오프라인 열차스케줄ID관리·오프라인 열차스케줄관리에서 조작하면 기록됩니다 (실기1 4장 7절 다).',
+  run(v){return {cols:['조작시간','조작타입','스케줄ID','열차번호','콘솔','내용'],rows:mmi().history().offline.filter(r=>(!v.date||dayOf(r)===v.date)&&(!v.type||r.type===v.type)&&(!v.id||r.id===v.id)).map(r=>[r.time,r.type,r.id,r.train||'',r.console,r.text])};},
+  read:id=>({date:$(id+'UseDate').checked?$(id+'Date').value:'',type:$(id+'UseType').checked?$(id+'Type').value:'',id:$(id+'UseId').checked?$(id+'Id').value.trim():''})},
  scheduleHistory:{title:'온라인 스케줄 이력',cond:`${line}${opt('scheduleHistory','Date','조작날짜',`<input type="date" id="scheduleHistoryDate" value="${today()}">`)}${opt('scheduleHistory','Type','조작타입',`<select id="scheduleHistoryType">${SCHEDULE_TYPES.map(x=>`<option>${x}</option>`).join('')}</select>`)}${opt('scheduleHistory','Console','콘솔정보','<select id="scheduleHistoryConsole"><option>MMI-1</option></select>')}${opt('scheduleHistory','Text','내용검색','<input id="scheduleHistoryText" placeholder="예: K1131">')}`,
   run(v){return {cols:['조작시간','조작타입','열차번호','콘솔','내용'],rows:mmi().history().schedule.filter(r=>(!v.date||dayOf(r)===v.date)&&(!v.type||scheduleType(r)===v.type)&&(!v.console||r.console===v.console)).map(r=>[r.time,scheduleType(r),r.train,r.console,scheduleText(r)]).filter(r=>!v.text||r.join(' ').includes(v.text))};},
   read:id=>({date:$(id+'UseDate').checked?$(id+'Date').value:'',type:$(id+'UseType').checked?$(id+'Type').value:'',console:$(id+'UseConsole').checked?$(id+'Console').value:'',text:$(id+'UseText').checked?$(id+'Text').value.trim():''})},
@@ -111,5 +116,5 @@ function init(api){
   if(def.auto){w.opener=draw;setInterval(()=>{if(!w.el.hidden){const selected=$(id+'Body').querySelector('tr.sel')?.cells[0]?.textContent;draw();if(selected)for(const row of $(id+'Body').rows)if(row.cells[0]?.textContent===selected)row.classList.add('sel');}},1000);}
  });
 }
-root.SimMMIReports={init};
+root.SimMMIReports={init,printTable};
 })(window);

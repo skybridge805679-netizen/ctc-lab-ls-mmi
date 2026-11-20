@@ -5,7 +5,7 @@
 const N=root.SimNetwork,doc=SimDOM.document,$=id=>doc.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PENDING='원본 화면을 아직 확인하지 못해 구현하지 않았습니다.';
-// Menu structure copied from the photos. Items without `open` are known names whose windows are not implemented yet;
+// Menu structure copied from the photos (시스템상태조회 · 장비계절체 이력 · 오프라인 열차스케줄 · 오프라인 스케줄 이력은 실기1 교재의 메뉴 경로). Items without `open` are known names whose windows are not implemented yet;
 // menus whose entries were never photographed are marked as unknown.
 const MENUS=[
  {label:'프로그램',items:[
@@ -20,12 +20,13 @@ const MENUS=[
   {label:'온라인열차스케줄 관리',items:[{label:'온라인 열차스케줄ID관리(I)',open:'scheduleId'},{label:'온라인 열차스케줄관리(G)',open:'schedule'},{label:'진입예고열차관리(E)',open:'entryNotice'}]},
   {label:'온라인 열차그래프(O)',open:'graph'},
   {label:'오프라인 열차그래프(F)',open:'offlineGraph'},
-  {label:'오프라인 열차스케줄',items:[{label:'(원본 메뉴 항목 미확인)',disabled:true}]}]},
+  {label:'오프라인 열차스케줄',items:[{label:'오프라인 열차스케줄ID관리',open:'offlineId'},{label:'오프라인 열차스케줄관리',open:'offlineSchedule'}]}]},
  {label:'시스템 조회',items:[
   {label:'경광등상태',open:'beacon'},{label:'알람메시지 확인이력 조회',open:'alarmAck'},
-  {label:'수동제어 이력 조회',items:[{label:'열차번호 수동조작 이력',open:'manualTrain'},{label:'역제어모드 수동조작 이력',open:'manualMode'},{label:'현장설비 수동조작 이력',open:'manualField'}]},
+  {label:'시스템상태조회',items:[{label:'사령설비상태조회',open:'serverStatus'},{label:'LDTS상태',open:'ldtsStatus'},{label:'터미널서버 상태',open:'terminalStatus'}]},
+  {label:'수동제어 이력 조회',items:[{label:'열차번호 수동조작 이력',open:'manualTrain'},{label:'역제어모드 수동조작 이력',open:'manualMode'},{label:'현장설비 수동조작 이력',open:'manualField'},{label:'장비계절체 수동조작 이력',open:'manualEquip'}]},
   {sep:true},{label:'열차위치목록 조회',open:'trainPositions'},{sep:true},
-  {label:'열차스케줄 이력조회',items:[{label:'온라인 스케줄 이력',open:'scheduleHistory'}]},
+  {label:'열차스케줄 이력조회',items:[{label:'온라인 스케줄 이력',open:'scheduleHistory'},{label:'오프라인 스케줄 이력',open:'offlineHistory'}]},
   {label:'알람/이벤트조회',open:'alarmEvent'},{sep:true},
   {label:'실적조회',items:[{label:'역실적 조회',open:'stationActual'},{label:'열차실적 조회',open:'trainActual'},{sep:true},{label:'운휴열차조회',open:'cancelledList'},{label:'임시열차 조회',open:'createdList'},{label:'지연열차조회',open:'delayList'}]}]},
  {label:'시스템 관리',items:[
@@ -46,7 +47,7 @@ function renderLogs(){
 // 경고 종류 (실기1 p.87): 중대한 오류(F) · 오류(E) · 경고(W) · 안내(I) · 디버깅(D)
 const LEVELS={F:'중대한 오류',E:'오류',W:'경고',I:'안내',D:'디버깅'};
 // operator histories shown by the 시스템 조회 windows
-const history={train:[],mode:[],field:[],ack:[],schedule:[]};
+const history={train:[],mode:[],field:[],ack:[],schedule:[],equip:[],offline:[]};
 function record(kind,row){history[kind].unshift({time:stamp(new Date()),...row});if(history[kind].length>500)history[kind].length=500;}
 function log(kind,text,date=new Date(),level='I'){logRows[kind].unshift({time:stamp(date),text,level});if(logRows[kind].length>500)logRows[kind].length=500;renderLogs();}
 // Station names and codes as the real MMI shows them (photos): Cheongnyangni is 지하청량리; the 18 jurisdiction stations have codes too.
@@ -246,7 +247,7 @@ function init(){
  if(schedule){const w=createWindow('schedule',{title:'[CA028_02] 온라인 열차스케줄관리',x:120,y:40,width:1180,host:schedule});w.opener=()=>{$('onlineScheduleBtn')?.click();};w.closer='closeSchedule';}
  if(host)root.SimMMITrains.init(host);
  root.SimScheduleDialogs.init();root.SimFTSUI.init(host);root.SimNotes.init(host);root.SimDrill.init(host);root.SimPreferred.init(host);root.SimEquipment.init(host);root.SimCDRSUI.init(host);root.SimLedgerUI.init(host);root.SimScenarioUI.init(host);root.SimReplay.init(host);root.SimAutoUI.init(host);
- root.SimMMIWindows.init(host);
+ root.SimMMIWindows.init(host);root.SimMMISystem?.init(host);root.SimOffline?.init(host);
  // every other menu entry known from the photos gets an honest "not implemented" window
  const leaves=(items,out=[])=>{for(const it of items){if(it.items)leaves(it.items,out);else if(it.open&&!windows[it.open])out.push(it);}return out;};
  for(const it of leaves(MENUS.flatMap(m=>m.items)))placeholder(it.open,it.label);

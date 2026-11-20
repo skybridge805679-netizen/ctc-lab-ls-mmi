@@ -241,7 +241,7 @@ ${table('sTable',['시나리오 상황명칭','구간','스케줄ID'],rows,{sele
    else{const sch=schedules().find(x=>x.id===schSel);if(!sch){alert('수정할 스케줄ID를 선택하세요.');return;}sch.timetable=snap;sch.createdAt=stamp();sch.relative=false;delete sch.generated;delete sch.timing;delete sch.builtin;}
    persist();go('situations');alert(`${schSel} 열차 스케줄에 ${snap.trains.length}개 열차를 저장했습니다.`);
   };
-  $('schDelete').onclick=()=>{const used=[...lib.situations.filter(x=>x.scheduleId===schSel),...lib.problems.filter(x=>x.setup?.scheduleId===schSel)];if(used.length){alert('상황·문제에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
+  $('schDelete').onclick=()=>{if(/^\d{3}00$/.test(schSel||'')){alert(`${schSel}는 마스터 스케줄(끝 두 자리 00)이라 삭제할 수 없습니다.`);return;}const used=[...lib.situations.filter(x=>x.scheduleId===schSel),...lib.problems.filter(x=>x.setup?.scheduleId===schSel)];if(used.length){alert('상황·문제에서 사용 중인 스케줄입니다: '+used.map(x=>x.name).join(', '));return;}if(!schSel){alert('삭제할 스케줄ID를 선택하세요.');return;}confirmBox(`${schSel} 열차 스케줄을 삭제하시겠습니까?`,()=>{lib.schedules=schedules().filter(x=>x.id!==schSel);persist();schSel=null;go('situations');});};
   $('schApplySit').onclick=()=>{if(!sSel||!schSel){alert('상황과 스케줄ID를 모두 선택하세요.');return;}const s=lib.situations.find(x=>x.id===sSel);s.scheduleId=schSel;persist();go('situations');};
   $('schCopy').onclick=()=>{const sch=schedules().find(x=>x.id===schSel),t=sch?.timetable?.trains.find(x=>x.id===schTrain),targets=schedules().filter(x=>x.id!==schSel);if(!t){alert('복사할 열차를 선택하세요.');return;}if(!targets.length){alert('대상 스케줄ID를 먼저 생성하세요.');return;}
    if(!M().windowIds().includes('ftsCopy'))M().createWindow('ftsCopy',{container:panel(),title:'스케줄 간 열차 복사',x:180,y:80,width:470,body:'<div class="fts-picker" id="ftsCopyBody"></div>'});
@@ -558,5 +558,7 @@ function open(){
  panel().hidden=false;panel().classList.add('fts-inline');panel().scrollIntoView({block:'start'});return true;   // pop-ups blocked: in the LS page
 }
 function close(){if(root.SimWorkspace?.ftsDetached?.()){root.SimWorkspace.closeFts();return;}panel().hidden=true;panel().classList.remove('fts-inline');}
-root.SimFTSUI={init,open,close,isOpen:ftsOpen,showProblem,closeProblem,problemOpen,logs,go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
+// MMI 「오프라인 열차스케줄」 창이 같은 라이브러리(오프라인 스케줄 = lib.schedules)를 고칠 때: fn이 false를 돌려주면 되돌린다
+function commit(fn){syncRemote();const before=structuredClone(lib);let r;try{r=fn(lib);}catch(e){lib=before;throw e;}if(r===false){lib=before;return false;}if(!persist())return false;if(ftsOpen()&&page==='situations')go('situations');return true;}
+root.SimFTSUI={commit,init,open,close,isOpen:ftsOpen,showProblem,closeProblem,problemOpen,logs,go,library:()=>lib,session:()=>session,importLibrary,tick,users:()=>users,history:()=>history};
 })(window);

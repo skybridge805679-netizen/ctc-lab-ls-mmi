@@ -44,5 +44,9 @@ function init(){
  $('eqClose').onclick=()=>m.close('equipment');
  w.opener=draw;refresh=draw;draw();
 }
-root.SimEquipment={init,NAMES,INFO,set,isFault,paint,tick,faultList,reset,sentTimes:()=>eq().sent.slice()};
+// LDTS 운용계·수동 계절체 (엔진이 관리, 화면은 MMI 「LDTS 상태」 창)
+const sideOf=st=>(eq().ldts||{})[st]===2?2:1;
+const ldts=st=>[1,2].map(side=>({side,state:isFault(st,'DTS'+side)?'FAIL':side===sideOf(st)?'ACTIVE':'STANDBY'}));
+function switchover(st,side){const r=root.SimRemote.command({type:'equipment',op:'switchover',station:st,side});root.SimRemote.poll?.();return r||{ok:false,message:'계절체 명령을 보낼 수 없습니다.'};}
+root.SimEquipment={init,NAMES,INFO,set,isFault,paint,tick,faultList,reset,sentTimes:()=>eq().sent.slice(),sideOf,ldts,switchover};
 })(window);

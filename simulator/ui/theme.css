@@ -172,3 +172,20 @@ body.ls-mainline-hint .overview-link[data-overview-link$=":ED"],body.ls-mainline
 .fts-voice-prep .fts-voice-status{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
 .fts-voice-prep .fts-voice-status b{white-space:nowrap}
 .fts-voice-prep .fts-voice-status small{flex:1 1 260px;min-width:0;white-space:normal}
+
+/* LS 역제어모드: AUTO·CCM → LOCAL 전환 표시 (실기3 그림 2-24·2-25: LOCAL 적색 점멸, 현장 응답까지) */
+.mode-btn.local.req{animation:local-req 1s steps(1,end) infinite}
+@keyframes local-req{0%{background:#e5231b;border-color:#a8130d;color:#fff}50%{background:#f2f2f0;border-color:#b7b9b4;color:#111}}
+@media (prefers-reduced-motion:reduce){.mode-btn.local.req{animation:none;background:#e5231b;border-color:#a8130d;color:#fff}}
+
+/* 시스템상태조회 · 오프라인 열차스케줄 (MMI) */
+.sys-tabs{display:flex;gap:6px;margin:0 0 8px}.sys-tabs .sched-btn.on{background:var(--c-teal,#245d59);border-color:var(--c-teal,#245d59);color:#fff}
+.sys-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+.sys-ok{color:#1f7a4a}.sys-warn{color:#8a5a12}.sys-bad{color:#b4352c}
+.sys-legend{display:inline-flex;align-items:center;gap:6px;font-size:12px;margin-left:8px}
+.ldts-side{display:inline-block;min-width:96px;padding:3px 8px;border:1px solid #9bb3ad;border-radius:4px;background:#f2f2f0;color:#111;font:600 12px/1.4 var(--ui-mono,monospace);cursor:pointer;font-style:normal}
+.sys-legend .ldts-side{min-width:0;cursor:default}
+.ldts-side.active{background:#18df00;border-color:#149e00;color:#101510}.ldts-side.standby{background:#f4ec00;border-color:#b6ae00}.ldts-side.fail{background:#e5231b;border-color:#a8130d;color:#fff}
+#offSchCalls input[size]{font-family:var(--ui-mono,monospace)}
+[data-mmi-window^="offline"] .rpt-cond label,[data-mmi-window="terminalStatus"] .rpt-cond label,[data-mmi-window="ldtsStatus"] .rpt-cond label{white-space:nowrap}
+[data-mmi-window="offlineSchedule"] .sys-two{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}

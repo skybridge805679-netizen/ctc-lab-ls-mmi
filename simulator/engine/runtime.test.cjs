@@ -61,3 +61,13 @@ test('opening another session discards old undo and redo, failed opening preserv
  assert.equal(r.command({type:'timetable',method:'undo',args:[]}).ok,false);
  assert.deepEqual(r.snapshot().timetable.trains,[]);
 });
+test('LDTS 수동 계절체: 운용계 장애 시 대기계로만 절체되고 체크포인트에 남는다 (실기1 4장 6절)',()=>{
+ const r=create(),sw=side=>r.command({type:'equipment',op:'switchover',station:'anyang',side});
+ assert.equal(sw(1).ok,false);                                                    // 정상 운용 중인 1계는 누르기만 해서는 절체하지 않음
+ r.command({type:'equipment',station:'anyang',name:'DTS1',on:true});
+ assert.ok(r.snapshot().events.some(e=>e.kind==='alarm'&&/1계\(운용계\) 장애/.test(e.text)));
+ const done=sw(1);assert.equal(done.ok,true);assert.equal(done.to,2);assert.equal(r.snapshot().equipment.ldts.anyang,2);
+ r.command({type:'equipment',station:'anyang',name:'DTS2',on:true});assert.equal(sw(1).ok,false);   // 1계 장애 중이면 되돌릴 수 없음
+ const saved=r.checkpoint();r.command({type:'equipment',reset:true});assert.deepEqual(r.snapshot().equipment.ldts,{});
+ r.restore(saved);assert.equal(r.snapshot().equipment.ldts.anyang,2);
+});
