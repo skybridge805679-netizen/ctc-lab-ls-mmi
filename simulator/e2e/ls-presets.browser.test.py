@@ -23,7 +23,7 @@ try:
   assert page.locator('[data-point-control]').count()==0
   def win(slot):return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
   def action(name):return page.locator(f'[data-context-action="{name}"]')
-  def confirm():page.click('#dialogConfirm');expect(page.locator('#actionDialog')).not_to_be_visible();page.wait_for_function('dialogAction===null')
+  def confirm():page.click('#dialogConfirm');page.locator('[data-train-confirm]').count() and page.click('#dialogConfirm');expect(page.locator('#actionDialog')).not_to_be_visible();page.wait_for_function('dialogAction===null')
   def branch(slot,name):
    win(slot).click(button='right');action(name).hover();action(name).locator('..').locator('.ls-submenu button').first.click()
   def entries(slot):return page.evaluate('(slot)=>SimLSUI.getModel().stations.uiwang.windows[slot]||[]',slot)

@@ -28,7 +28,7 @@ try:
    def numbers():menu('현장제어','열차제어','열차번호제어(B)')
    def graph():menu('열차스케줄','온라인 열차그래프(O)')
    def schedule():menu('열차스케줄','온라인열차스케줄 관리','온라인 열차스케줄관리(G)')
-   def confirm():page.click('#dialogConfirm');page.wait_for_function('dialogAction===null')
+   def confirm():page.click('#dialogConfirm');page.locator('[data-train-confirm]').count() and page.click('#dialogConfirm');page.wait_for_function('dialogAction===null')
    def acknowledge():page.locator('#mmiAlertOk').click()
    def entries(st,slot):return page.evaluate('([s,k])=>SimLSUI.getModel().stations[s].windows[k]||[]',[st,slot])
    expect(page.locator('[data-mmi-window="field"]')).to_have_class(__import__('re').compile('docked'))
@@ -54,7 +54,7 @@ try:
    # One clock drives the LS and graph. Model changes go to MMI event logs.
    graph();page.click('#skipBtn');assert page.locator('#diaNow').get_attribute('data-seconds')==str(page.evaluate('state.clock'))
    page.select_option('#graphTrain','K1131');schedule();page.fill('#scheduleSearch','K1131');page.click('#scheduleFind')
-   page.check('[name="scheduleCancelType"][value="part"]');page.select_option('#scheduleCancelFrom','dongmyo');page.select_option('#scheduleCancelTo','jonggak');page.click('#scheduleSuspend');acknowledge();expect(page.locator('#scheduleCancelTo')).to_have_value('jonggak')
+   page.check('[name="scheduleCancelType"][value="part"]');page.select_option('#scheduleCancelFrom','dongmyo');page.select_option('#scheduleCancelTo','jonggak');page.click('#scheduleSuspend');page.click('#scheduleApply');acknowledge();expect(page.locator('#scheduleCancelTo')).to_have_value('jonggak')
    assert page.evaluate("SimDiagram.getModel().trains.find(t=>t.id==='K1131').calls.find(c=>c.station==='dongmyo').cancelled")
    graph();assert page.locator('[data-dia-cancelled-segment="K1131"]').count()>0
    expect(page.locator('#eventLogBody')).to_contain_text('partial-cancel')

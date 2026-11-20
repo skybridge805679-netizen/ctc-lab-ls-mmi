@@ -95,7 +95,8 @@ const ACTIONS={
  create(){root.SimScheduleDialogs.openPatternLoad({container:$('graphPanel'),onPick:pick=>{root.SimScheduleDialogs.openAdd(pick,$('graphPanel'));status(`${pick.pattern.name} 패턴 적용 · 열차번호와 시발시각을 입력하세요.`);}});status('열차생성 · 열차패턴을 선택하세요.');},
  edit(){if(notes?.selected()&&notes.edit()){status('선택한 노트를 수정합니다.');return;}if(root.SimScheduleDialogs.openEdit(selectedTrain(),$('graphPanel')))status(`${selectedTrain()} 열차 스케줄 수정`);},
  note(){notes?notes.open():status('노트편집을 사용할 수 없습니다.');},
- jumpNow(){const L=D().layout();$('graphStart').value=hhmm(Math.max(-8*3600,D().clock()-Number($('graphSpan').value)*60/6));fire('graphStart');status('현재 시각으로 이동했습니다.');},
+ // F9 (실기1 p.149): 즐겨찾기에 저장된 화면(역 구간·시간 간격)을 현재 시각에 맞춰 연다. 즐겨찾기가 없으면 지금 화면 그대로 현재 시각으로.
+ jumpNow(){const f=store.get();if(f){$('graphFrom').value=f.from;$('graphTo').value=f.to;ensureOption($('graphSpan'),f.span,`${f.span}분`);$('graphSpan').value=f.span;ensureOption($('graphRow'),f.row,f.row);$('graphRow').value=f.row;}const L=D().layout();$('graphStart').value=hhmm(Math.max(-8*3600,D().clock()-Number($('graphSpan').value)*60/6));fire(f?'graphFrom':'graphStart');status(f?'즐겨찾기 화면을 현재 시각으로 열었습니다.':'현재 시각으로 이동했습니다.');},
  timeIn(){const v=step(SPANS,Number($('graphSpan').value),-1);ensureOption($('graphSpan'),v,`${v}분`);$('graphSpan').value=String(v);fire('graphSpan');status(`시간축 확대 · ${v}분`);},
  timeOut(){const v=step(SPANS,Number($('graphSpan').value),1);ensureOption($('graphSpan'),v,`${v}분`);$('graphSpan').value=String(v);fire('graphSpan');status(`시간축 축소 · ${v}분`);},
  stationIn(){const v=step(ROWS,Number($('graphRow').value),1);ensureOption($('graphRow'),v,String(v));$('graphRow').value=String(v);fire('graphRow');status(`역축 확대 · ${v}`);},

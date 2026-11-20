@@ -2,7 +2,7 @@
  'use strict';
  // [CA028_02] online train schedule window (수정 / 복사 / 생성), laid out after the real MMI photos
  const N=root.SimNetwork,T=root.SimTimetable,D=root.SimDiagram,$=id=>SimDOM.document.getElementById(id),model=D.getModel();
- let draft=null,patternKey='',draftRevision=0,selRow=0,needle='';
+ let draft=null,patternKey='',draftRevision=0,selRow=0,selEnd=null,needle='';
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const seconds=value=>{if(!/^\d{2}:\d{2}(:\d{2})?$/.test(value))return NaN;const [h,m,s=0]=value.split(':').map(Number);return h*3600+m*60+s-28800;};
  const radio=name=>SimDOM.document.querySelector(`input[name="${name}"]:checked`)?.value;
@@ -48,7 +48,7 @@
     const all=[...new Set([...(cur&&!opts.includes(cur)?[cur]:[]),...opts])];
     return `<select aria-label="${n} ${kind==='arrival'?'도착':'출발'}진로" data-call="${i}" data-field="${f}" ${lock(f)}><option value=""></option>${all.map(o=>`<option ${o===cur?'selected':''}>${escape(o)}</option>`).join('')}</select>`;};
    const a=source&&root.SimScheduleDialogs?root.SimScheduleDialogs.actualOf(source,source.calls.find(c=>c.station===call.station)||call):{arrival:null,departure:null,dwell:null};
-   return `<tr data-sc-row="${i}" class="${call.cancelled?'cx':''}"><td class="${i===selRow?'sc-sel':''}">${escape(n)}</td><td>${dir}</td><td>오늘</td><td>${time('arrival')}</td><td>${time('dwell')}</td><td>오늘</td><td>${time('departure')}</td><td>${first?'':route('arrivalRoute')}</td><td>${route('departureRoute')}</td><td><label class="sched-cx"><input type="checkbox" data-call="${i}" data-field="cancelled" aria-label="${n} 운휴" ${call.cancelled?'checked':''} ${lock('cancelled')}>${call.cancelled?'운휴':'운행'}</label></td><td>${hms(a.arrival)}</td><td>${dur(a.dwell)}</td><td>${hms(a.departure)}</td><td>${a.arrival===null?'':escape(call.arrivalRoute||'')}</td><td>${a.departure===null?'':escape(call.departureRoute||'')}</td></tr>`;}).join('')}</tbody></table>`;
+   return `<tr data-sc-row="${i}" class="${call.cancelled?'cx':''}"><td class="${i>=Math.min(selRow,selEnd??selRow)&&i<=Math.max(selRow,selEnd??selRow)?'sc-sel':''}">${escape(n)}</td><td>${dir}</td><td>오늘</td><td>${time('arrival')}</td><td>${time('dwell')}</td><td>오늘</td><td>${time('departure')}</td><td>${first?'':route('arrivalRoute')}</td><td>${route('departureRoute')}</td><td><label class="sched-cx"><input type="checkbox" data-call="${i}" data-field="cancelled" aria-label="${n} 운휴" ${call.cancelled?'checked':''} ${lock('cancelled')}>${call.cancelled?'운휴':'운행'}</label></td><td>${hms(a.arrival)}</td><td>${dur(a.dwell)}</td><td>${hms(a.departure)}</td><td>${a.arrival===null?'':escape(call.arrivalRoute||'')}</td><td>${a.departure===null?'':escape(call.departureRoute||'')}</td></tr>`;}).join('')}</tbody></table>`;
   summary();stationOptions();
  }
  // 연동: a changed time moves every later time up to 수정구간; 개별: only that cell
@@ -87,7 +87,7 @@
    if(m==='copy'){$('scheduleFrom').value=source.calls[0].station;$('scheduleTo').value=source.calls.at(-1).station;$('scheduleNumber').value='C'+source.id.slice(1);$('scheduleStart').value=T.clock(source.calls[0].departure);}
   }else draft=null;
   if(m==='edit')$('scheduleSearch').value=source?source.id:'';
-  draftRevision=model.changes.length;selRow=0;table();message('');
+  draftRevision=model.changes.length;selRow=0;selEnd=null;pendingCx=[];table();message('');
  }
  // a hand-typed route must exist at that controlled station (arrival = 장내, departure = 출발 signal)
  function badRoute(){
@@ -109,18 +109,35 @@
    if(m==='create'&&patternKey!==key()){notify('시발·종착·시작시각 변경 후 열차운행패턴을 다시 적용하세요.');return;}
    const candidate=structuredClone(draft);Object.assign(candidate,attributes());
    if(m==='create')candidate.id=newId;
-   candidate.cancelled=candidate.calls.every(c=>c.cancelled);
-   result=m==='create'?T.create(model,candidate):T.update(model,id,candidate);
+   if(m==='edit'&&pendingCx.length){
+    // 운휴 구간 설정은 따로 보내고, 그 밖에 고친 것(시각·진로·속성·개별 운휴 체크)만 수정으로 보낸다
+    const source=model.trains.find(t=>t.id===id),covered=new Set();
+    for(const op of pendingCx){const a=candidate.calls.findIndex(c=>c.station===op.from),b=candidate.calls.findIndex(c=>c.station===op.to);for(let k=a;k<=b;k++)covered.add(k);}
+    for(const k of covered)candidate.calls[k].cancelled=source.calls[k].cancelled??false;
+    candidate.cancelled=candidate.calls.every(c=>c.cancelled);
+    const same=JSON.stringify({...candidate,cancelled:undefined,plan:undefined})===JSON.stringify({...source,cancelled:undefined,plan:undefined});
+    result=same?{ok:true,message:''}:T.update(model,id,candidate);
+    if(result.ok){const msgs=[result.message].filter(Boolean);for(const op of pendingCx){const r=T.setCancelled(model,id,op.from,op.to,op.cancelled);msgs.push(r.message);if(!r.ok){result=r;break;}}if(result.ok)result={ok:true,message:msgs.join(' · ')};}
+   }else{
+    candidate.cancelled=candidate.calls.every(c=>c.cancelled);
+    result=m==='create'?T.create(model,candidate):T.update(model,id,candidate);
+   }
   }
   if(result.ok){const target=m==='edit'?id:newId;if(m!=='edit')SimDOM.document.querySelector('input[name="scheduleMode"][value="edit"]').checked=true;$('scheduleSearch').value='';needle='';list(target);load();D.selectTrain(target);}
   notify(result.message);
  }
- function cancelRange(cancelled){
-  if(!draft||mode()==='create'){notify('운휴/운행을 설정할 열차를 먼저 조회하세요.');return;}
-  const part=radio('scheduleCancelType')==='part',id=draft.id,from=part?$('scheduleCancelFrom').value:draft.calls[0].station,to=part?$('scheduleCancelTo').value:draft.calls.at(-1).station;
-  const result=T.setCancelled(model,id,from,to,cancelled);
-  if(result.ok){list(id);load();D.selectTrain(id);}
-  notify(result.message);
+ // 운휴운행설정 (실기1 p.128-129): [운휴]·[운행]과 경유역 우클릭 「운휴설정」·「운행설정」은 화면의 설정만 바꾸고, [편집적용]을 눌러야 송신된다.
+ // [닫기]를 누르면 설정한 운휴는 취소된다. 편집적용 때 구간마다 운휴/운행 명령(T.setCancelled)으로 보내 운휴 이력·운전정리 대장이 그대로 남는다.
+ let pendingCx=[];
+ function cancelRange(cancelled,range){
+  if(!draft||mode()!=='edit'){notify('운휴/운행을 설정할 열차를 [수정]에서 먼저 조회하세요.');return;}
+  const part=radio('scheduleCancelType')==='part',from=range?range[0]:part?$('scheduleCancelFrom').value:draft.calls[0].station,to=range?range[1]:part?$('scheduleCancelTo').value:draft.calls.at(-1).station;
+  const a=draft.calls.findIndex(c=>c.station===from),b=draft.calls.findIndex(c=>c.station===to);
+  if(a<0||b<0||b<a){notify('운휴 구간의 시작역과 마지막역을 열차 진행 순서대로 선택하세요.');return;}
+  const now=D.clock();if(draft.calls.slice(a,b+1).some(c=>c.departure<=now)){notify('실적이 생긴 역은 운휴·운행을 바꿀 수 없습니다.');return;}
+  for(let k=a;k<=b;k++)draft.calls[k].cancelled=cancelled;
+  pendingCx.push({from,to,cancelled});table();
+  message(`${stationName(from)}~${stationName(to)} ${cancelled?'운휴':'운행'} 설정 · [편집적용]을 누르면 송신됩니다.`);
  }
  // [열차운행패턴선택] opens [PTN_LOAD]; the chosen stretch starts at 시작시간
  function openPattern(){
@@ -136,7 +153,7 @@
  list();load();
  $('scheduleMenu').onclick=()=>$('scheduleSubmenu').hidden=!$('scheduleSubmenu').hidden;
  $('onlineScheduleBtn').onclick=()=>{list();load();$('schedulePanel').hidden=false;};
- $('closeSchedule').onclick=()=>{$('schedulePanel').hidden=true;draft=null;root.SimMMI.close('ptnLoad');};
+ $('closeSchedule').onclick=()=>{$('schedulePanel').hidden=true;draft=null;pendingCx=[];root.SimMMI.close('ptnLoad');};
  $('scheduleClose').onclick=()=>root.SimMMI.close('schedule');
  for(const el of SimDOM.document.querySelectorAll('input[name="scheduleMode"]'))el.onchange=load;
  for(const el of SimDOM.document.querySelectorAll('input[name="scheduleDir"],input[name="scheduleDay"]'))el.onchange=()=>list();
@@ -146,7 +163,17 @@
  $('scheduleSearch').onkeydown=e=>{if(e.key==='Enter')$('scheduleFind').click();};
  $('scheduleCalls').onchange=e=>{const input=e.target.closest('[data-call]');if(!input||!draft)return;const i=Number(input.dataset.call),f=input.dataset.field;
   if(f==='cancelled'){draft.calls[i].cancelled=input.checked;table();}else if(f.endsWith('Route'))draft.calls[i][f]=input.value;else timeEdit(input);};
- $('scheduleCalls').onclick=e=>{const tr=e.target.closest('[data-sc-row]');if(!tr||e.target.closest('input,select'))return;selRow=Number(tr.dataset.scRow);for(const td of $('scheduleCalls').querySelectorAll('td.sc-sel'))td.classList.remove('sc-sel');tr.firstElementChild.classList.add('sc-sel');};
+ const paintSel=()=>{const [a,b]=[selRow,selEnd??selRow].sort((x,y)=>x-y);for(const tr of $('scheduleCalls').querySelectorAll('[data-sc-row]')){const i=Number(tr.dataset.scRow);tr.firstElementChild.classList.toggle('sc-sel',i>=a&&i<=b);}};
+ // 경유역 이름 칸을 눌러 고르고, Shift를 누른 채 누르면 구간을 고른다
+ $('scheduleCalls').onclick=e=>{const tr=e.target.closest('[data-sc-row]');if(!tr||e.target.closest('input,select'))return;const i=Number(tr.dataset.scRow);if(e.shiftKey)selEnd=i;else{selRow=i;selEnd=null;}paintSel();};
+ // 우클릭: 「운휴설정」·「운행설정」 (실기1 p.129)
+ $('scheduleCalls').oncontextmenu=e=>{const tr=e.target.closest('[data-sc-row]');if(!tr||!draft)return;e.preventDefault();const i=Number(tr.dataset.scRow),[a,b]=[selRow,selEnd??selRow].sort((x,y)=>x-y);if(i<a||i>b){selRow=i;selEnd=null;paintSel();}
+  const [lo,hi]=[selRow,selEnd??selRow].sort((x,y)=>x-y),range=[draft.calls[lo].station,draft.calls[hi].station],doc=SimDOM.document;
+  doc.querySelector('.sc-menu')?.remove();const menu=doc.createElement('div');menu.className='sc-menu';menu.setAttribute('role','menu');
+  menu.innerHTML=`<button type="button" role="menuitem" data-cx="1">운휴설정</button><button type="button" role="menuitem" data-cx="0">운행설정</button>`;
+  menu.style.left=e.clientX+'px';menu.style.top=e.clientY+'px';doc.body.appendChild(menu);menu.querySelector('button').focus();
+  const off=()=>{menu.remove();doc.removeEventListener('pointerdown',away,true);};const away=ev=>{if(!menu.contains(ev.target))off();};doc.addEventListener('pointerdown',away,true);
+  menu.onkeydown=ev=>{if(ev.key==='Escape')off();};menu.onclick=ev=>{const b=ev.target.closest('[data-cx]');if(!b)return;off();cancelRange(b.dataset.cx==='1',range);};};
  $('schedulePrint').disabled=false;$('schedulePrint').removeAttribute('title');
  $('schedulePrint').onclick=()=>root.SimScheduleDialogs.openPrint(draft&&{...draft,id:mode()==='edit'?draft.id:$('scheduleNumber').value.trim().toUpperCase()});
  $('scheduleActual').disabled=false;$('scheduleActual').removeAttribute('title');

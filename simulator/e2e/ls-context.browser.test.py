@@ -24,7 +24,7 @@ try:
    def win(slot): return page.locator(f'#trackSvg [data-train-slot="{slot}"]')
    def action(name): return page.locator(f'.ls-context-menu [data-context-action="{name}"]')
    def background(): page.locator('.ls-head').click(button='right',position={'x':12,'y':12})
-   def confirm(): page.click('#dialogConfirm'); expect(page.locator('#actionDialog')).not_to_be_visible(); page.wait_for_function('dialogAction===null')
+   def confirm(): page.click('#dialogConfirm');page.locator('[data-train-confirm]').count() and page.click('#dialogConfirm'); expect(page.locator('#actionDialog')).not_to_be_visible(); page.wait_for_function('dialogAction===null')
    def cancel(): page.locator('#actionDialog [value="cancel"]').click(); expect(page.locator('#actionDialog')).not_to_be_visible(); page.wait_for_function('dialogAction===null')
    def entries(slot,station='geumcheon'): return page.evaluate('([s,k])=>SimLSUI.getModel().stations[s].windows[k]||[]',[station,slot])
    def branch(slot,command,index=0):

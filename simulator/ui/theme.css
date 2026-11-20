@@ -189,3 +189,16 @@ body.ls-mainline-hint .overview-link[data-overview-link$=":ED"],body.ls-mainline
 #offSchCalls input[size]{font-family:var(--ui-mono,monospace)}
 [data-mmi-window^="offline"] .rpt-cond label,[data-mmi-window="terminalStatus"] .rpt-cond label,[data-mmi-window="ldtsStatus"] .rpt-cond label{white-space:nowrap}
 [data-mmi-window="offlineSchedule"] .sys-two{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+/* 온라인 열차스케줄 경유역 우클릭: 운휴설정 · 운행설정 */
+.sc-menu{position:fixed;z-index:9500;display:flex;flex-direction:column;min-width:120px;padding:4px;background:#fff;border:1px solid #9bb3ad;border-radius:6px;box-shadow:0 6px 18px #173d4233}
+.sc-menu button{border:0;background:none;text-align:left;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;border-radius:4px}.sc-menu button:hover,.sc-menu button:focus-visible{background:#e3f1ee;outline:none}
+/* 오프라인 열차스케줄 (교재 구성) */
+.off-copy{display:grid;grid-template-columns:minmax(0,1fr) 210px minmax(0,1fr);gap:10px;align-items:start}
+.off-copy-mid{display:flex;flex-direction:column;gap:8px;padding-top:40px}.off-copy-mid .rpt-cond label{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.off-copy-mid>.sched-btn{font-weight:700;letter-spacing:.05em}
+.off-short{max-height:170px;overflow:auto}
+.off-sch{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:10px;align-items:start}
+.off-group{display:block}.off-group .idm-table{margin:0}
+.off-edit-top{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}.off-edit-top .rpt-cond{margin:0}
+[data-mmi-window^="offline"] .rpt-cond label{white-space:nowrap}
+#offEdCalls input[size]{font-family:var(--ui-mono,monospace)}

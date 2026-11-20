@@ -17,6 +17,13 @@ function editTrain(slot,uid){
  confirm(t?'열차번호 수정':'열차번호 입력',`<p>${esc(ctx().viewName||root.SimNetwork.catalog[station].name)} · ${esc(slot)}</p><label class="field-label" for="lsTrainNumber">열차번호</label><input id="lsTrainNumber" required pattern="[A-Za-z]{0,2}[0-9]{1,6}" maxlength="8" autocomplete="off" value="${esc(t?.number||'')}" placeholder="K1234"><label class="field-label" for="lsTrainDirection">운행방향</label><select id="lsTrainDirection"><option value="up">상행 ◀</option><option value="down">하행 ▶</option></select>`,()=>({op:t?'rename':'insert',station,slot,uid,number:$('lsTrainNumber').value,direction:$('lsTrainDirection').value}));
  $('lsTrainDirection').value=t?.direction||'up';$('lsTrainNumber').focus();$('lsTrainNumber').select();
  $('lsTrainNumber').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('dialogConfirm').click();}};
+ // 실기1 p.44-45: 열차번호를 입력하고 Enter를 누르면 「열차번호제어 확인」 메시지 박스가 한 번 더 뜨고 [예]를 눌러야 삽입·수정된다
+ const btn=$('dialogConfirm'),d=$('actionDialog');let asked=false;
+ const ask=e=>{if(asked)return;const input=$('lsTrainNumber');if(!input?.checkValidity())return;e.preventDefault();e.stopImmediatePropagation();asked=true;
+  for(const el of $('dialogBody').querySelectorAll('label,input,select'))el.style.display='none';
+  $('dialogBody').insertAdjacentHTML('beforeend',`<p class="q-text" data-train-confirm>열차번호 ${esc(input.value.trim().toUpperCase())}${t?` (기존 ${esc(t.number)})`:''}을(를) ${t?'수정':'삽입'}하시겠습니까?</p>`);
+  $('dialogTitle').textContent='열차번호제어 확인';btn.textContent='예(Y)';btn.focus();};
+ btn.addEventListener('click',ask,true);d.addEventListener('close',()=>btn.removeEventListener('click',ask,true),{once:true});
 }
 function chooseTarget(op,slot,uid){closeMenu();setPending({op,station:ctx().station,slot,uid});host.toast((op==='move'?'이동할':'교환할')+' 열번창을 클릭하세요. 다른 역 선택 가능 · Esc 취소');}
 function target(slot){
